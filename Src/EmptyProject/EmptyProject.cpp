@@ -17,6 +17,8 @@ LPDIRECT3DVERTEXDECLARATION9    g_pVertexDeclaration = NULL;
 
 CFirstPersonCamera				g_camera;
 Picture							g_pic;
+Picture							g_avatar;
+
 
 //--------------------------------------------------------------------------------------
 // Rejects any D3D9 devices that aren't acceptable to the app by returning false
@@ -59,6 +61,8 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 	// Load sample image (vertex and index buffer creation with texture)
 	g_pic.init(L"tank.jpg", pd3dDevice, 10);
 	g_pic.setSize(32, 32);
+	g_avatar.init(L"smiley.jpg", pd3dDevice);
+	g_avatar.setSize(1, 1);
 
     return S_OK;
 }

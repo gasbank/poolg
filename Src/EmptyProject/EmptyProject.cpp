@@ -57,7 +57,7 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 	g_camera.SetViewParams( &vecEye, &vecAt );
 
 	// Load sample image (vertex and index buffer creation with texture)
-	g_pic.init(L"bigtile.tga", pd3dDevice, 10);
+	g_pic.init(L"tank.jpg", pd3dDevice, 10);
 	g_pic.setSize(32, 32);
 
     return S_OK;

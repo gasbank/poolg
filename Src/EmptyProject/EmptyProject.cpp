@@ -61,7 +61,7 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 	// Load sample image (vertex and index buffer creation with texture)
 	g_pic.init(L"tank.jpg", pd3dDevice, 10);
 	g_pic.setSize(32, 32);
-	g_avatar.init(L"smiley.jpg", pd3dDevice);
+	g_avatar.init(L"smiley.png", pd3dDevice);
 	g_avatar.setSize(1, 1);
 
     return S_OK;
@@ -90,6 +90,7 @@ HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFA
 void CALLBACK OnFrameMove( double fTime, float fElapsedTime, void* pUserContext )
 {
 	g_pic.frameMove(fElapsedTime);
+	g_avatar.frameMove(fElapsedTime);
 	g_camera.FrameMove(fElapsedTime);
 }
 
@@ -113,8 +114,8 @@ void CALLBACK OnD3D9FrameRender( IDirect3DDevice9* pd3dDevice, double fTime, flo
 
 		// Draw our image
 		g_pic.draw();
+		g_avatar.draw();
 		
-
         V( pd3dDevice->EndScene() );
     }
 }
@@ -127,7 +128,8 @@ LRESULT CALLBACK MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
                           bool* pbNoFurtherProcessing, void* pUserContext )
 {
 
-	g_pic.handleMessages(hWnd, uMsg, wParam, lParam);
+	g_avatar.handleMessages(hWnd, uMsg, wParam, lParam);
+	//g_pic.handleMessages(hWnd, uMsg, wParam, lParam);
 	//g_camera.HandleMessages(hWnd, uMsg, wParam, lParam);
     return 0;
 }
@@ -147,6 +149,7 @@ void CALLBACK OnD3D9LostDevice( void* pUserContext )
 void CALLBACK OnD3D9DestroyDevice( void* pUserContext )
 {
 	g_pic.release();
+	g_avatar.release();
 
 	SAFE_RELEASE( g_pVertexShader );
 	SAFE_RELEASE( g_pConstantTable );
@@ -174,6 +177,16 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 #if defined(DEBUG) | defined(_DEBUG)
     _CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 #endif
+
+	// Setup working directory
+	TCHAR buf[MAX_PATH];
+	TCHAR drive[_MAX_DRIVE];
+	TCHAR dir[_MAX_DIR];
+	GetModuleFileName(NULL, buf, MAX_PATH);
+	_tsplitpath_s(buf, drive, _MAX_DRIVE, dir, _MAX_DIR, 0, 0, 0, 0);
+	StringCchPrintf(buf, MAX_PATH, _T("%s%s"), drive, dir);
+	SetCurrentDirectory(buf);
+
 
     // Set the callback functions
     DXUTSetCallbackD3D9DeviceAcceptable( IsD3D9DeviceAcceptable );

@@ -10,6 +10,7 @@
 #include "DXUTcamera.h"
 #include "resource.h"
 #include "Picture.h"
+#include "Sound.h"
 
 LPDIRECT3DVERTEXSHADER9         g_pVertexShader = NULL;
 LPD3DXCONSTANTTABLE             g_pConstantTable = NULL;
@@ -21,6 +22,7 @@ D3DXHANDLE						g_tech;
 CFirstPersonCamera				g_camera;
 Picture							g_pic;
 Picture							g_avatar;
+Sound							g_sound;
 
 D3DCOLOR						g_fillColor;
 
@@ -71,6 +73,7 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 	g_pic.setSize(32, 32);
 	g_avatar.init(L"smiley.png", pd3dDevice);
 	g_avatar.setSize(1, 1);
+	g_sound.init();
 
 	
     return S_OK;
@@ -149,6 +152,7 @@ LRESULT CALLBACK MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
 	g_avatar.handleMessages(hWnd, uMsg, wParam, lParam);
 	g_pic.handleMessages(hWnd, uMsg, wParam, lParam);
 	g_camera.HandleMessages(hWnd, uMsg, wParam, lParam);
+	g_sound.handleMessages(hWnd, uMsg, wParam, lParam);
     return 0;
 }
 
@@ -168,6 +172,7 @@ void CALLBACK OnD3D9DestroyDevice( void* pUserContext )
 {
 	g_pic.release();
 	g_avatar.release();
+	g_sound.release();
 
 	SAFE_RELEASE( g_pVertexShader );
 	SAFE_RELEASE( g_pConstantTable );

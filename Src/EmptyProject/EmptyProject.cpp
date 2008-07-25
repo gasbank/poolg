@@ -22,6 +22,7 @@ CFirstPersonCamera				g_camera;
 Picture							g_pic;
 Picture							g_avatar;
 
+D3DCOLOR						g_fillColor;
 
 //--------------------------------------------------------------------------------------
 // Rejects any D3D9 devices that aren't acceptable to the app by returning false
@@ -59,7 +60,6 @@ bool CALLBACK ModifyDeviceSettings( DXUTDeviceSettings* pDeviceSettings, void* p
 HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
                                      void* pUserContext )
 {
-	HRESULT hr;
 
 	// Setup main camera
 	D3DXVECTOR3 vecEye( 0.0f, 0.0f, -5.0f );
@@ -71,14 +71,6 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 	g_pic.setSize(32, 32);
 	g_avatar.init(L"smiley.png", pd3dDevice);
 	g_avatar.setSize(1, 1);
-
-
-	// If this fails, there should be debug output as to 
-	// they the .fx file failed to compile
-	DWORD dwShaderFlags = D3DXFX_NOT_CLONEABLE | D3DXSHADER_DEBUG | D3DXSHADER_FORCE_VS_SOFTWARE_NOOPT;
-	//dwShaderFlags = 0;
-	//V_RETURN( D3DXCreateEffectFromFile( pd3dDevice, L"Ocean.fx", NULL, NULL, dwShaderFlags,	NULL, &g_pEffect, NULL ) );
-
 
 	
     return S_OK;
@@ -92,6 +84,7 @@ HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFA
                                     void* pUserContext )
 {
 	
+	g_fillColor = D3DCOLOR_ARGB( 0, 45, 50, 170 );
 
 	pd3dDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
 
@@ -116,6 +109,7 @@ void CALLBACK OnFrameMove( double fTime, float fElapsedTime, void* pUserContext 
 	//g_pEffect->SetFloat( "gTimer", ( FLOAT )fTime );
 }
 
+
 //--------------------------------------------------------------------------------------
 // Render the scene using the D3D9 device
 //--------------------------------------------------------------------------------------
@@ -123,11 +117,11 @@ void CALLBACK OnD3D9FrameRender( IDirect3DDevice9* pd3dDevice, double fTime, flo
 {
     HRESULT hr;
 
+	
     // Clear the render target and the zbuffer 
-    V( pd3dDevice->Clear( 0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_ARGB( 0, 45, 50, 170 ), 1.0f, 0 ) );
+    V( pd3dDevice->Clear( 0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, g_fillColor, 1.0f, 0 ) );
 
 
-	UINT iPass, cPasses;
 
     // Render the scene
     if( SUCCEEDED( pd3dDevice->BeginScene() ) )
@@ -190,6 +184,34 @@ void CALLBACK OnD3D9DestroyDevice( void* pUserContext )
 //--------------------------------------------------------------------------------------
 void CALLBACK KeyboardProc( UINT nChar, bool bKeyDown, bool bAltDown, void* pUserContext )
 {
+	if( bKeyDown )
+	{
+		switch( nChar )
+		{
+		case VK_F1:
+			if (g_fillColor == D3DCOLOR_ARGB( 0, 45, 50, 170 ))
+			{
+				g_fillColor = D3DCOLOR_ARGB(0, 200, 100, 25);
+			}
+			else
+			{
+				g_fillColor = D3DCOLOR_ARGB( 0, 45, 50, 170 );
+			}
+			break;
+		case VK_F2:
+			break;
+		case VK_F3:
+			break;
+		case VK_LEFT:
+			break;
+		case VK_RIGHT:
+			break;
+		case VK_UP:
+			break;
+		case VK_DOWN:
+			break;
+		}
+	}
 }
 
 

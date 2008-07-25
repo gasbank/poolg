@@ -120,7 +120,7 @@ LRESULT Sound::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 	{
 		case WM_KEYDOWN:
 			if( wParam == VK_SPACE )
-                audioState.pSoundBank->Play( g_audioState.iZap, 0, 0, NULL );
+                audioState.pSoundBank->Play( audioState.iZap, 0, 0, NULL );
 			break;
 	}
 

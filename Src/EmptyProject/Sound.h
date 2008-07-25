@@ -20,6 +20,9 @@ public:
 	~Sound(void);
 
 	HRESULT init();
+	bool DoesCommandLineContainAuditionSwitch();
+	LRESULT handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
+	void release();
 private:
 	AUDIO_STATE audioState;
 	HRESULT hr;

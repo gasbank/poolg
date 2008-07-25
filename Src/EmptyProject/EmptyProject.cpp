@@ -15,6 +15,9 @@ LPDIRECT3DVERTEXSHADER9         g_pVertexShader = NULL;
 LPD3DXCONSTANTTABLE             g_pConstantTable = NULL;
 LPDIRECT3DVERTEXDECLARATION9    g_pVertexDeclaration = NULL;
 
+LPD3DXEFFECT		            g_pEffect = NULL;       // D3DX effect interface
+D3DXHANDLE						g_tech;
+
 CFirstPersonCamera				g_camera;
 Picture							g_pic;
 Picture							g_avatar;
@@ -42,6 +45,9 @@ bool CALLBACK IsD3D9DeviceAcceptable( D3DCAPS9* pCaps, D3DFORMAT AdapterFormat, 
 //--------------------------------------------------------------------------------------
 bool CALLBACK ModifyDeviceSettings( DXUTDeviceSettings* pDeviceSettings, void* pUserContext )
 {
+	pDeviceSettings->d3d9.BehaviorFlags &= ~D3DCREATE_HARDWARE_VERTEXPROCESSING;
+	pDeviceSettings->d3d9.BehaviorFlags |= D3DCREATE_SOFTWARE_VERTEXPROCESSING;
+
     return true;
 }
 
@@ -53,6 +59,8 @@ bool CALLBACK ModifyDeviceSettings( DXUTDeviceSettings* pDeviceSettings, void* p
 HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
                                      void* pUserContext )
 {
+	HRESULT hr;
+
 	// Setup main camera
 	D3DXVECTOR3 vecEye( 0.0f, 0.0f, -5.0f );
 	D3DXVECTOR3 vecAt ( 0.0f, 0.0f, -0.0f );
@@ -64,6 +72,15 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 	g_avatar.init(L"smiley.png", pd3dDevice);
 	g_avatar.setSize(1, 1);
 
+
+	// If this fails, there should be debug output as to 
+	// they the .fx file failed to compile
+	DWORD dwShaderFlags = D3DXFX_NOT_CLONEABLE | D3DXSHADER_DEBUG | D3DXSHADER_FORCE_VS_SOFTWARE_NOOPT;
+	//dwShaderFlags = 0;
+	V_RETURN( D3DXCreateEffectFromFile( pd3dDevice, L"Ocean.fx", NULL, NULL, dwShaderFlags,	NULL, &g_pEffect, NULL ) );
+
+
+	
     return S_OK;
 }
 
@@ -75,10 +92,14 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
                                     void* pUserContext )
 {
+	
+
 	pd3dDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
 
 	float fAspectRatio = pBackBufferSurfaceDesc->Width / ( FLOAT )pBackBufferSurfaceDesc->Height;
 	g_camera.SetProjParams( D3DX_PI / 4, fAspectRatio, 0.1f, 20.0f );
+
+	g_tech = g_pEffect->GetTechniqueByName("Main");
 	
     return S_OK;
 }
@@ -92,6 +113,8 @@ void CALLBACK OnFrameMove( double fTime, float fElapsedTime, void* pUserContext 
 	g_pic.frameMove(fElapsedTime);
 	g_avatar.frameMove(fElapsedTime);
 	g_camera.FrameMove(fElapsedTime);
+
+	g_pEffect->SetFloat( "gTimer", ( FLOAT )fTime );
 }
 
 //--------------------------------------------------------------------------------------
@@ -105,6 +128,8 @@ void CALLBACK OnD3D9FrameRender( IDirect3DDevice9* pd3dDevice, double fTime, flo
     V( pd3dDevice->Clear( 0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_ARGB( 0, 45, 50, 170 ), 1.0f, 0 ) );
 
 
+	UINT iPass, cPasses;
+
     // Render the scene
     if( SUCCEEDED( pd3dDevice->BeginScene() ) )
     {
@@ -114,8 +139,25 @@ void CALLBACK OnD3D9FrameRender( IDirect3DDevice9* pd3dDevice, double fTime, flo
 
 		// Draw our image
 		g_pic.draw();
-		g_avatar.draw();
 		
+		
+
+		V( g_pEffect->Begin( &cPasses, 0 ) );
+		for( iPass = 0; iPass < cPasses; iPass++ )
+		{
+			// Set the render targets here.  If multiple render targets are
+			// supported, render target 1 is set to be the velocity surface.
+			// If multiple render targets are not supported, the velocity
+			// surface will be rendered in the 2nd pass.
+
+			V( g_pEffect->BeginPass( iPass ) );
+
+			g_avatar.draw();
+
+			V( g_pEffect->EndPass() );
+		}
+		V( g_pEffect->End() );
+
         V( pd3dDevice->EndScene() );
     }
 }
@@ -154,6 +196,7 @@ void CALLBACK OnD3D9DestroyDevice( void* pUserContext )
 	SAFE_RELEASE( g_pVertexShader );
 	SAFE_RELEASE( g_pConstantTable );
 	SAFE_RELEASE( g_pVertexDeclaration );
+	SAFE_RELEASE( g_pEffect );
 }
 
 
@@ -190,7 +233,7 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 
     // Set the callback functions
     DXUTSetCallbackD3D9DeviceAcceptable( IsD3D9DeviceAcceptable );
-    DXUTSetCallbackD3D9DeviceCreated( OnD3D9CreateDevice );
+	DXUTSetCallbackD3D9DeviceCreated( OnD3D9CreateDevice );
     DXUTSetCallbackD3D9DeviceReset( OnD3D9ResetDevice );
     DXUTSetCallbackD3D9FrameRender( OnD3D9FrameRender );
     DXUTSetCallbackD3D9DeviceLost( OnD3D9LostDevice );

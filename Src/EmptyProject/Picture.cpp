@@ -82,8 +82,8 @@ void Picture::release()
 
 void Picture::draw()
 {
-	m_d3dDev->SetTransform(D3DTS_WORLD, &m_localXform);
-	m_d3dDev->SetTexture(0, m_d3dTex);
+	//m_d3dDev->SetTransform(D3DTS_WORLD, &m_localXform);
+	//m_d3dDev->SetTexture(0, m_d3dTex);
 	m_d3dxMesh->DrawSubset(0);
 }
 

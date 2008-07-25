@@ -5,7 +5,6 @@ Picture::Picture(void)
 {
 	m_d3dxMesh = 0;
 	m_d3dTex = 0;
-	m_x = m_y = 0;
 	m_width = m_height = 0;
 }
 
@@ -167,5 +166,5 @@ void Picture::frameMove( float fElapsedTime )
 	D3DXMatrixScaling(&mScaling, m_width, m_height, 1.0f);
 	D3DXMatrixTranslation(&mTranslation, m_vPos.x, m_vPos.y, m_vPos.z);
 
-	m_localXform = mTranslation * mScaling;
+	m_localXform = mScaling * mTranslation;
 }

@@ -32,22 +32,26 @@ class Picture
 {
 public:
 	Picture(void);
-	~Picture(void);
+	virtual ~Picture(void);
 
 	void init(const TCHAR* imgFileName, LPDIRECT3DDEVICE9 d3dDev, UINT segments = 1);
 	void release();
 	void draw();
 	const D3DXMATRIX* getLocalXform() const { return &m_localXform; }
 	void setSize(float width, float height) { m_width = width; m_height = height; }
-	
-	LRESULT handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
+	const D3DXVECTOR3* getPos() const { return &m_vPos; }
+	void setPos(const D3DXVECTOR3& val) { m_vPos = val; }
+
+	virtual LRESULT handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 	void frameMove(float fElapsedTime);
+
+protected:
+	virtual PictureInput mapKey( UINT nKey );
+
 private:
 	bool IsKeyDown( BYTE key ) const { return( (key & KEY_IS_DOWN_MASK) == KEY_IS_DOWN_MASK ); }
 	bool WasKeyDown( BYTE key ) const { return( (key & KEY_WAS_DOWN_MASK) == KEY_WAS_DOWN_MASK ); }
-	PictureInput mapKey( UINT nKey );
-
-	float m_x, m_y;
+	
 	D3DXMATRIX m_localXform;
 	LPDIRECT3DDEVICE9 m_d3dDev;
 	LPD3DXMESH m_d3dxMesh;
@@ -57,6 +61,7 @@ private:
 	D3DXVECTOR3 m_vKeyboardDirection;
 	D3DXVECTOR3 m_vVelocity;
 	D3DXVECTOR3 m_vPos;
+	
 	D3DXMATRIX m_mWorld;
 	float m_width, m_height;
 };

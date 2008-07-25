@@ -550,7 +550,7 @@
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
 			>
 			<File
-				RelativePath="..\..\DXUT\Optional\directx.ico"
+				RelativePath=".\directx.ico"
 				>
 			</File>
 			<File
@@ -678,6 +678,14 @@
 		</File>
 		<File
 			RelativePath=".\Picture.h"
+			>
+		</File>
+		<File
+			RelativePath=".\PictureMap.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\PictureMap.h"
 			>
 		</File>
 		<File

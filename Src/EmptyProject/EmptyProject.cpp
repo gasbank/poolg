@@ -77,13 +77,12 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 	// they the .fx file failed to compile
 	DWORD dwShaderFlags = D3DXFX_NOT_CLONEABLE | D3DXSHADER_DEBUG | D3DXSHADER_FORCE_VS_SOFTWARE_NOOPT;
 	//dwShaderFlags = 0;
-	V_RETURN( D3DXCreateEffectFromFile( pd3dDevice, L"Ocean.fx", NULL, NULL, dwShaderFlags,	NULL, &g_pEffect, NULL ) );
+	//V_RETURN( D3DXCreateEffectFromFile( pd3dDevice, L"Ocean.fx", NULL, NULL, dwShaderFlags,	NULL, &g_pEffect, NULL ) );
 
 
 	
     return S_OK;
 }
-
 
 //--------------------------------------------------------------------------------------
 // Create any D3D9 resources that won't live through a device reset (D3DPOOL_DEFAULT) 
@@ -99,7 +98,7 @@ HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFA
 	float fAspectRatio = pBackBufferSurfaceDesc->Width / ( FLOAT )pBackBufferSurfaceDesc->Height;
 	g_camera.SetProjParams( D3DX_PI / 4, fAspectRatio, 0.1f, 20.0f );
 
-	g_tech = g_pEffect->GetTechniqueByName("Main");
+	//g_tech = g_pEffect->GetTechniqueByName("Main");
 	
     return S_OK;
 }
@@ -114,7 +113,7 @@ void CALLBACK OnFrameMove( double fTime, float fElapsedTime, void* pUserContext 
 	g_avatar.frameMove(fElapsedTime);
 	g_camera.FrameMove(fElapsedTime);
 
-	g_pEffect->SetFloat( "gTimer", ( FLOAT )fTime );
+	//g_pEffect->SetFloat( "gTimer", ( FLOAT )fTime );
 }
 
 //--------------------------------------------------------------------------------------
@@ -140,24 +139,7 @@ void CALLBACK OnD3D9FrameRender( IDirect3DDevice9* pd3dDevice, double fTime, flo
 		// Draw our image
 		g_pic.draw();
 		
-		
-
-		V( g_pEffect->Begin( &cPasses, 0 ) );
-		for( iPass = 0; iPass < cPasses; iPass++ )
-		{
-			// Set the render targets here.  If multiple render targets are
-			// supported, render target 1 is set to be the velocity surface.
-			// If multiple render targets are not supported, the velocity
-			// surface will be rendered in the 2nd pass.
-
-			V( g_pEffect->BeginPass( iPass ) );
-
-			g_avatar.draw();
-
-			V( g_pEffect->EndPass() );
-		}
-		V( g_pEffect->End() );
-
+	
         V( pd3dDevice->EndScene() );
     }
 }
@@ -171,8 +153,8 @@ LRESULT CALLBACK MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
 {
 
 	g_avatar.handleMessages(hWnd, uMsg, wParam, lParam);
-	//g_pic.handleMessages(hWnd, uMsg, wParam, lParam);
-	//g_camera.HandleMessages(hWnd, uMsg, wParam, lParam);
+	g_pic.handleMessages(hWnd, uMsg, wParam, lParam);
+	g_camera.HandleMessages(hWnd, uMsg, wParam, lParam);
     return 0;
 }
 
@@ -196,7 +178,7 @@ void CALLBACK OnD3D9DestroyDevice( void* pUserContext )
 	SAFE_RELEASE( g_pVertexShader );
 	SAFE_RELEASE( g_pConstantTable );
 	SAFE_RELEASE( g_pVertexDeclaration );
-	SAFE_RELEASE( g_pEffect );
+	//SAFE_RELEASE( g_pEffect );
 }
 
 

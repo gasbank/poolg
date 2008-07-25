@@ -680,6 +680,14 @@
 			RelativePath=".\Picture.h"
 			>
 		</File>
+		<File
+			RelativePath=".\Sound.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\Sound.h"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

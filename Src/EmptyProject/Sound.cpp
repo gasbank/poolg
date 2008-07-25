@@ -7,14 +7,13 @@ Sound::Sound(void)
 
 Sound::~Sound(void)
 {
-    release();
 }
 
 HRESULT Sound::init()
 {
 	ZeroMemory( &audioState, sizeof( AUDIO_STATE ) );
 
-	hr = CoInitializeEx( NULL, COINIT_MULTITHREADED );  // COINIT_APARTMENTTHREADED will work too
+	hr = CoInitializeEx( NULL, COINIT_APARTMENTTHREADED );  // COINIT_APARTMENTTHREADED will work too
     if( SUCCEEDED( hr ) )
     {
         // Switch to auditioning mode based on command line.  Change if desired

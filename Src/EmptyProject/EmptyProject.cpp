@@ -15,6 +15,7 @@
 LPDIRECT3DVERTEXSHADER9         g_pVertexShader = NULL;
 LPD3DXCONSTANTTABLE             g_pConstantTable = NULL;
 LPDIRECT3DVERTEXDECLARATION9    g_pVertexDeclaration = NULL;
+LPD3DXFONT						g_pFont = NULL;
 
 LPD3DXEFFECT		            g_pEffect = NULL;       // D3DX effect interface
 D3DXHANDLE						g_tech;
@@ -50,6 +51,8 @@ bool CALLBACK ModifyDeviceSettings( DXUTDeviceSettings* pDeviceSettings, void* p
 {
 	pDeviceSettings->d3d9.BehaviorFlags &= ~D3DCREATE_HARDWARE_VERTEXPROCESSING;
 	pDeviceSettings->d3d9.BehaviorFlags |= D3DCREATE_SOFTWARE_VERTEXPROCESSING;
+	pDeviceSettings->d3d9.BehaviorFlags |= D3DCREATE_MULTITHREADED;
+
 
     return true;
 }
@@ -62,19 +65,21 @@ bool CALLBACK ModifyDeviceSettings( DXUTDeviceSettings* pDeviceSettings, void* p
 HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
                                      void* pUserContext )
 {
+	HRESULT hr;
 
 	// Setup main camera
-	D3DXVECTOR3 vecEye( 0.0f, 0.0f, -5.0f );
+	D3DXVECTOR3 vecEye( 0.0f, 0.0f, -30.0f );
 	D3DXVECTOR3 vecAt ( 0.0f, 0.0f, -0.0f );
 	g_camera.SetViewParams( &vecEye, &vecAt );
 
 	// Load sample image (vertex and index buffer creation with texture)
-	g_pic.init(L"tank.jpg", pd3dDevice, 10);
-	g_pic.setSize(32, 32);
+	g_pic.init(L"graytile.jpg", pd3dDevice, 10);
+	g_pic.setSize(12, 12);
 	g_avatar.init(L"smiley.png", pd3dDevice);
 	g_avatar.setSize(1, 1);
 	g_sound.init();
 
+	V( D3DXCreateFont( pd3dDevice, 14, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Gulim"), &g_pFont) );
 	
     return S_OK;
 }
@@ -92,7 +97,7 @@ HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFA
 	pd3dDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
 
 	float fAspectRatio = pBackBufferSurfaceDesc->Width / ( FLOAT )pBackBufferSurfaceDesc->Height;
-	g_camera.SetProjParams( D3DX_PI / 4, fAspectRatio, 0.1f, 20.0f );
+	g_camera.SetProjParams( D3DX_PI / 4, fAspectRatio, 0.1f, 100.0f );
 
 	//g_tech = g_pEffect->GetTechniqueByName("Main");
 	
@@ -178,6 +183,7 @@ void CALLBACK OnD3D9DestroyDevice( void* pUserContext )
 	SAFE_RELEASE( g_pConstantTable );
 	SAFE_RELEASE( g_pVertexDeclaration );
 	//SAFE_RELEASE( g_pEffect );
+	SAFE_RELEASE( g_pFont );
 }
 
 

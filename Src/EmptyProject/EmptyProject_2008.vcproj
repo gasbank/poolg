@@ -697,6 +697,14 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\..\..\Visual Studio 2008\Projects\PoolG\EmptyProjectForIntro\IntroModule.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\..\Visual Studio 2008\Projects\PoolG\EmptyProjectForIntro\IntroModule.h"
+			>
+		</File>
+		<File
 			RelativePath=".\Picture.cpp"
 			>
 		</File>

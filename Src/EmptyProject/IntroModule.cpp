@@ -27,6 +27,7 @@ IntroModule::IntroModule(void)
 	m_pStrs[12] = L"사람 손을 들어 보게.";
 	m_pStrs[14] = L"이글거리는 이펙트는 의도적으로 구현한 것으로";
 	m_pStrs[15] = L"Antialiasing을 못해서 그러는게 절대 아니다.";
+	m_pStrs[17] = L"F4를 누르시오";
 }
 
 IntroModule::~IntroModule(void)
@@ -143,7 +144,7 @@ void IntroModule::frameMove( double fTime )
 	{
 		D3DXMatrixRotationAxis( &m_matObjs[i], &vAxis1, 0.0f );		
 		m_matObjs[i]._41 = -10.0f;   
-		m_matObjs[i]._42 = -16 - ( float) i * 2.0f + ( float ) fTime / 1.0f;
+		m_matObjs[i]._42 = -16 - ( float) i * 2.0f + ( float ) fTime / 0.5f;
 		m_matObjs[i]._43 = 0.0f;
 	}
 }

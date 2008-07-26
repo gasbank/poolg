@@ -697,11 +697,11 @@
 			>
 		</File>
 		<File
-			RelativePath="..\..\..\..\Visual Studio 2008\Projects\PoolG\EmptyProjectForIntro\IntroModule.cpp"
+			RelativePath=".\IntroModule.cpp"
 			>
 		</File>
 		<File
-			RelativePath="..\..\..\..\Visual Studio 2008\Projects\PoolG\EmptyProjectForIntro\IntroModule.h"
+			RelativePath=".\IntroModule.h"
 			>
 		</File>
 		<File

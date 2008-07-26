@@ -69,8 +69,6 @@ void Picture::init(const TCHAR* imgFileName, LPDIRECT3DDEVICE9 d3dDev, UINT segm
 	m_d3dDev = d3dDev;
 
 	D3DXMatrixIdentity(&m_localXform);
-
-	
 }
 
 void Picture::release()

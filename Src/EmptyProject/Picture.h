@@ -17,6 +17,21 @@ struct Vertex
 		v = _v;
 	}
 };
+struct VertexRhw
+{
+	float x, y, z, rhw;
+	float u, v;
+
+	VertexRhw(float _x, float _y, float _z, float _rhw, float _u, float _v)
+	{
+		x = _x;
+		y = _y;
+		z = _z;
+		rhw = _rhw;
+		u = _u;
+		v = _v;
+	}
+};
 
 enum PictureInput
 {
@@ -35,8 +50,9 @@ public:
 	virtual ~Picture(void);
 
 	void init(const TCHAR* imgFileName, LPDIRECT3DDEVICE9 d3dDev, UINT segments = 1);
+	HRESULT initRhw(const TCHAR* imgFileName, LPDIRECT3DDEVICE9 d3dDev, float x = 0, float y = 0);
 	void release();
-	void draw();
+	HRESULT draw();
 	const D3DXMATRIX* getLocalXform() const { return &m_localXform; }
 	void setSize(float width, float height) { m_width = width; m_height = height; }
 	const D3DXVECTOR3* getPos() const { return &m_vPos; }
@@ -64,4 +80,7 @@ protected:
 	
 	D3DXMATRIX m_mWorld;
 	float m_width, m_height;
+
+	// for RHW vertex
+	LPDIRECT3DVERTEXBUFFER9 m_d3dVB;
 };

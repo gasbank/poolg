@@ -5,6 +5,7 @@ Picture::Picture(void)
 {
 	m_d3dxMesh = 0;
 	m_d3dTex = 0;
+	m_d3dVB = 0;
 	m_width = m_height = 0;
 }
 
@@ -13,10 +14,15 @@ Picture::~Picture(void)
 	release();
 }
 
-void Picture::init(const TCHAR* imgFileName, LPDIRECT3DDEVICE9 d3dDev, UINT segments )
+void Picture::init(const TCHAR* imgFileName, LPDIRECT3DDEVICE9 d3dDev, UINT segments)
 {
 	UINT faces = segments * segments * 2;
 	UINT vertices = (segments+1) * (segments+1);
+
+	m_d3dDev = d3dDev;
+
+	D3DXMatrixIdentity(&m_localXform);
+
 	if (FAILED(D3DXCreateMeshFVF(faces, vertices, D3DXMESH_MANAGED, D3DFVF_XYZ | D3DFVF_TEX1, d3dDev, &m_d3dxMesh)))
 	{
 		exit(10);
@@ -65,23 +71,70 @@ void Picture::init(const TCHAR* imgFileName, LPDIRECT3DDEVICE9 d3dDev, UINT segm
 	{
 		exit(100);
 	}
+}
+
+HRESULT Picture::initRhw( const TCHAR* imgFileName, LPDIRECT3DDEVICE9 d3dDev, float x, float y )
+{
+	HRESULT hr = S_OK;
+	const UINT segments = 1;
 
 	m_d3dDev = d3dDev;
 
 	D3DXMatrixIdentity(&m_localXform);
+
+	V(D3DXCreateTextureFromFile(d3dDev, imgFileName, &m_d3dTex));
+
+	V(d3dDev->CreateVertexBuffer(4 * sizeof(VertexRhw), D3DUSAGE_WRITEONLY, D3DFVF_XYZRHW | D3DFVF_TEX1, D3DPOOL_MANAGED, &m_d3dVB, 0));
+
+	D3DSURFACE_DESC texDesc;
+	m_d3dTex->GetLevelDesc(0, &texDesc);
+
+	VertexRhw* v = 0;
+	m_d3dVB->Lock(0, 0, (void**)&v, 0);
+	UINT i, j;
+	
+	v[0] = VertexRhw(x,                 y,                  0, 1, 0, 0);
+	v[1] = VertexRhw(x + texDesc.Width, y,                  0, 1, 1, 0);
+	v[2] = VertexRhw(x + texDesc.Width, y + texDesc.Height, 0, 1, 1, 1);
+	v[3] = VertexRhw(x,                 y + texDesc.Height, 0, 1, 0, 1);
+
+	m_d3dVB->Unlock();
+
+	return hr;
+	
 }
 
 void Picture::release()
 {
 	SAFE_RELEASE(m_d3dxMesh);
 	SAFE_RELEASE(m_d3dTex);
+	SAFE_RELEASE(m_d3dVB);
 }
 
-void Picture::draw()
+HRESULT Picture::draw()
 {
-	m_d3dDev->SetTransform(D3DTS_WORLD, &m_localXform);
-	m_d3dDev->SetTexture(0, m_d3dTex);
-	m_d3dxMesh->DrawSubset(0);
+	HRESULT hr = S_OK;
+
+	if (m_d3dxMesh)
+	{
+		// Non-rhw drawing
+		m_d3dDev->SetTransform(D3DTS_WORLD, &m_localXform);
+		m_d3dDev->SetTexture(0, m_d3dTex);
+		m_d3dxMesh->DrawSubset(0);
+	}
+	else if (m_d3dVB)
+	{
+		// RHW drawing
+		m_d3dDev->SetTexture(0, m_d3dTex);
+		m_d3dDev->SetFVF(D3DFVF_XYZRHW | D3DFVF_TEX1);
+		m_d3dDev->SetStreamSource(0, m_d3dVB, 0, sizeof(VertexRhw));
+		m_d3dDev->DrawPrimitive(D3DPT_TRIANGLEFAN, 0, 2);
+	}
+	else
+	{
+		V(0 && "Should not be called");
+	}
+	return hr;
 }
 
 

@@ -1,6 +1,9 @@
 #include "EmptyProjectPCH.h"
 #include "Sound.h"
 
+void WINAPI XACTNotificationCallback( const XACT_NOTIFICATION* pNotification );
+AUDIO_STATE audioState;
+
 Sound::Sound(void)
 {
 }
@@ -234,7 +237,7 @@ void Sound::release()
 // and a limited subset of XACT API can be called from inside the callback so 
 // it is sometimes necessary to handle the notification outside of this callback.
 //-----------------------------------------------------------------------------------------
-void Sound::XACTNotificationCallback( const XACT_NOTIFICATION* pNotification )
+void WINAPI XACTNotificationCallback( const XACT_NOTIFICATION* pNotification )
 {
     // Use the critical section properly to make shared data thread safe while avoiding deadlocks.  
     //
@@ -262,7 +265,7 @@ void Sound::XACTNotificationCallback( const XACT_NOTIFICATION* pNotification )
     }
 
     if( pNotification->type == XACTNOTIFICATIONTYPE_WAVEBANKPREPARED &&
-        pNotification->waveBank.pInMemoryWaveBank == audioState.pStreamingWaveBank )
+        pNotification->waveBank.pWaveBank == audioState.pStreamingWaveBank )
     {
         // Respond to this notification outside of this callback so Prepare() can be called
         EnterCriticalSection( &audioState.cs );
@@ -279,24 +282,6 @@ void Sound::XACTNotificationCallback( const XACT_NOTIFICATION* pNotification )
             delete[] audioState.pbSoundBank;
             audioState.pbSoundBank = NULL;
         }
-    }
-
-    if( pNotification->type == XACTNOTIFICATIONTYPE_CUEPREPARED &&
-        pNotification->cue.pCue == audioState.pZeroLatencyRevCue )
-    {
-        // No need to handle this notification here but its 
-        // done so for demonstration purposes.  This is typically useful
-        // for triggering animation as soon as zero-latency audio is prepared 
-        // to ensure the audio and animation are in sync
-    }
-
-    if( pNotification->type == XACTNOTIFICATIONTYPE_CUESTOP &&
-        pNotification->cue.pCue == audioState.pZeroLatencyRevCue )
-    {
-        // Respond to this notification outside of this callback so Prepare() can be called
-        EnterCriticalSection( &audioState.cs );
-        audioState.bHandleZeroLatencyCueStop = true;
-        LeaveCriticalSection( &audioState.cs );
     }
 }
 
@@ -320,7 +305,6 @@ void Sound::UpdateAudio()
 
     EnterCriticalSection( &audioState.cs );
     bool bHandleStreamingWaveBankPrepared = audioState.bHandleStreamingWaveBankPrepared;
-    bool bHandleZeroLatencyCueStop = audioState.bHandleZeroLatencyCueStop;
     LeaveCriticalSection( &audioState.cs );
 
     if( bHandleStreamingWaveBankPrepared )

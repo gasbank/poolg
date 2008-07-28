@@ -33,10 +33,9 @@ public:
 	bool DoesCommandLineContainAuditionSwitch();
 	LRESULT handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 	void release();
-	void XACTNotificationCallback( const XACT_NOTIFICATION* pNotification );
 	void UpdateAudio();
+
 private:
-	AUDIO_STATE audioState;
 	HRESULT hr;
     HANDLE hFile;
     DWORD dwFileSize;

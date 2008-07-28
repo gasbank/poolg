@@ -16,6 +16,7 @@ HRESULT Sound::init()
 {
 	audioState.nCurSongPlaying = -1;
 	ZeroMemory( &audioState, sizeof( AUDIO_STATE ) );
+	InitializeCriticalSection( &audioState.cs );
 
 	hr = CoInitializeEx( NULL, COINIT_APARTMENTTHREADED );  // COINIT_APARTMENTTHREADED will work too
     if( SUCCEEDED( hr ) )

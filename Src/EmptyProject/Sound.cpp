@@ -109,7 +109,7 @@ HRESULT Sound::init()
     //    wave bank to prepared first or the playing the cue will fail
     //-----------------------------------------------------------------------------------------
     hr = E_FAIL; // assume failure
-    audioState.hStreamingWaveBankFile = CreateFile( L"Streaming.xwb",
+    audioState.hStreamingWaveBankFile = CreateFile( L"Stream.xwb",
                                                       GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING,
                                                       FILE_FLAG_OVERLAPPED | FILE_FLAG_NO_BUFFERING, NULL );
     if( audioState.hStreamingWaveBankFile != INVALID_HANDLE_VALUE )
@@ -131,7 +131,7 @@ HRESULT Sound::init()
     // Read and register the sound bank file with XACT.  Do not use memory mapped file IO because the 
     // memory needs to be read/write and the working set of sound banks are small.
        hr = E_FAIL; // assume failure
-    hFile = CreateFile( L"sounds.xsb", GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL );
+    hFile = CreateFile( L"Sounds.xsb", GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL );
     if( hFile != INVALID_HANDLE_VALUE )
     {
         dwFileSize = GetFileSize( hFile, NULL );

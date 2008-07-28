@@ -11,6 +11,7 @@ Sound::~Sound(void)
 
 HRESULT Sound::init()
 {
+	audioState.nCurSongPlaying = -1;
 	ZeroMemory( &audioState, sizeof( AUDIO_STATE ) );
 
 	hr = CoInitializeEx( NULL, COINIT_APARTMENTTHREADED );  // COINIT_APARTMENTTHREADED will work too
@@ -32,15 +33,47 @@ HRESULT Sound::init()
     // Initialize & create the XACT runtime 
     XACT_RUNTIME_PARAMETERS xrParams = {0};
     xrParams.lookAheadTime = 250;
+	xrParams.fnNotificationCallback = XACTNotificationCallback;
     hr = audioState.pEngine->Initialize( &xrParams );
     if( FAILED( hr ) )
         return hr;
+
+	//-----------------------------------------------------------------------------------------
+    // Register for XACT notifications
+    //-----------------------------------------------------------------------------------------
+
+    // The "wave bank prepared" notification will let the app know when it is save to use
+    // play cues that reference streaming wave data.
+    XACT_NOTIFICATION_DESCRIPTION desc = {0};
+    desc.flags = XACT_FLAG_NOTIFICATION_PERSIST;
+    desc.type = XACTNOTIFICATIONTYPE_WAVEBANKPREPARED;
+    audioState.pEngine->RegisterNotification( &desc );
+
+    // The "sound bank destroyed" notification will let the app know when it is save to use
+    // play cues that reference streaming wave data.
+    desc.flags = XACT_FLAG_NOTIFICATION_PERSIST;
+    desc.type = XACTNOTIFICATIONTYPE_SOUNDBANKDESTROYED;
+    audioState.pEngine->RegisterNotification( &desc );
+
+    // The "cue stop" notification will let the app know when it a song stops so a new one 
+    // can be played
+    desc.flags = XACT_FLAG_NOTIFICATION_PERSIST;
+    desc.type = XACTNOTIFICATIONTYPE_CUESTOP;
+    desc.cueIndex = XACTINDEX_INVALID;
+    audioState.pEngine->RegisterNotification( &desc );
+
+    // The "cue prepared" notification will let the app know when it a a cue that uses 
+    // streaming data has been prepared so it is ready to be used for zero latency streaming
+    desc.flags = XACT_FLAG_NOTIFICATION_PERSIST;
+    desc.type = XACTNOTIFICATIONTYPE_CUEPREPARED;
+    desc.cueIndex = XACTINDEX_INVALID;
+    audioState.pEngine->RegisterNotification( &desc );
 
     // Create an "in memory" XACT wave bank file using memory mapped file IO
     // Memory mapped files tend to be the fastest for most situations assuming you 
     // have enough virtual address space for a full map of the file
     hr = E_FAIL; // assume failure
-    hFile = CreateFile( L"sounds.xwb", GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL );
+    hFile = CreateFile( L"InMemory.xwb", GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL );
     if( hFile != INVALID_HANDLE_VALUE )
     {
         dwFileSize = GetFileSize( hFile, NULL );
@@ -49,16 +82,45 @@ HRESULT Sound::init()
             hMapFile = CreateFileMapping( hFile, NULL, PAGE_READONLY, 0, dwFileSize, NULL );
             if( hMapFile )
             {
-                audioState.pbWaveBank = MapViewOfFile( hMapFile, FILE_MAP_READ, 0, 0, 0 );
-                if( audioState.pbWaveBank )
+                audioState.pbInMemoryWaveBank = MapViewOfFile( hMapFile, FILE_MAP_READ, 0, 0, 0 );
+                if( audioState.pbInMemoryWaveBank )
                 {
-                    hr = audioState.pEngine->CreateInMemoryWaveBank( audioState.pbWaveBank, dwFileSize, 0,
-                                                                       0, &audioState.pWaveBank );
+                    hr = audioState.pEngine->CreateInMemoryWaveBank( audioState.pbInMemoryWaveBank, dwFileSize, 0,
+                                                                       0, &audioState.pInMemoryWaveBank );
                 }
-                CloseHandle( hMapFile ); // pbWaveBank maintains a handle on the file so close this unneeded handle
+                CloseHandle( hMapFile ); // pbInMemoryWaveBank maintains a handle on the file so close this unneeded handle
             }
         }
-        CloseHandle( hFile ); // pbWaveBank maintains a handle on the file so close this unneeded handle
+        CloseHandle( hFile ); // pbInMemoryWaveBank maintains a handle on the file so close this unneeded handle
+    }
+    if( FAILED( hr ) )
+        return E_FAIL; // CleanupXACT() will cleanup state before exiting
+
+	//-----------------------------------------------------------------------------------------
+    // Create a streaming XACT wave bank file.  
+    // Take note of the following:
+    // 1) This wave bank in the XACT project file must marked as a streaming wave bank 
+    //    This is set inside the XACT authoring tool)
+    // 2) Use FILE_FLAG_OVERLAPPED | FILE_FLAG_NO_BUFFERING flags when opening the file 
+    // 3) To use cues that reference this streaming wave bank, you must wait for the 
+    //    wave bank to prepared first or the playing the cue will fail
+    //-----------------------------------------------------------------------------------------
+    hr = E_FAIL; // assume failure
+    audioState.hStreamingWaveBankFile = CreateFile( L"Streaming.xwb",
+                                                      GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING,
+                                                      FILE_FLAG_OVERLAPPED | FILE_FLAG_NO_BUFFERING, NULL );
+    if( audioState.hStreamingWaveBankFile != INVALID_HANDLE_VALUE )
+    {
+        XACT_WAVEBANK_STREAMING_PARAMETERS wsParams;
+        ZeroMemory( &wsParams, sizeof( XACT_WAVEBANK_STREAMING_PARAMETERS ) );
+        wsParams.file = audioState.hStreamingWaveBankFile;
+        wsParams.offset = 0;
+
+        // 64 means to allocate a 64 * 2k buffer for streaming.  
+        // This is a good size for DVD streaming and takes good advantage of the read ahead cache
+        wsParams.packetSize = 64;
+
+        hr = audioState.pEngine->CreateStreamingWaveBank( &wsParams, &audioState.pStreamingWaveBank );
     }
     if( FAILED( hr ) )
         return E_FAIL; // CleanupXACT() will cleanup state before exiting
@@ -92,7 +154,13 @@ HRESULT Sound::init()
     //
     // Note that if the cue does not exist in the sound bank, the index will be XACTINDEX_INVALID
     // however this is ok especially during development.  The Play or Prepare call will just fail.
-    audioState.iZap = audioState.pSoundBank->GetCueIndex( "zap" );
+    audioState.iSE = audioState.pSoundBank->GetCueIndex( "se" );
+	for( int i = 0; i < 4; i++ )
+    {
+        CHAR sz[256];
+        StringCchPrintfA( sz, 256, "song%d", i + 1 );
+        audioState.iSong[i] = audioState.pSoundBank->GetCueIndex( sz );
+    }
 
     return S_OK;
 }
@@ -119,7 +187,7 @@ LRESULT Sound::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 	{
 		case WM_KEYDOWN:
 			if( wParam == VK_SPACE )
-                audioState.pSoundBank->Play( audioState.iZap, 0, 0, NULL );
+                audioState.pSoundBank->Play( audioState.iSE, 0, 0, NULL );
 			break;
 	}
 
@@ -142,14 +210,149 @@ void Sound::release()
         audioState.pEngine->Release();
     }
 
+    // After pEngine->ShutDown() returns, it is safe to release audio file memory
+    if( audioState.hStreamingWaveBankFile != INVALID_HANDLE_VALUE && audioState.hStreamingWaveBankFile != NULL )
+        CloseHandle( audioState.hStreamingWaveBankFile );
+
     if( audioState.pbSoundBank )
         delete[] audioState.pbSoundBank;
     audioState.pbSoundBank = NULL;
 
-    // After pEngine->ShutDown() returns it is safe to release memory mapped files
-    if( audioState.pbWaveBank )
-        UnmapViewOfFile( audioState.pbWaveBank );
-    audioState.pbWaveBank = NULL;
+    if( audioState.pbInMemoryWaveBank )
+        UnmapViewOfFile( audioState.pbInMemoryWaveBank );
+    audioState.pbInMemoryWaveBank = NULL;
+
+    DeleteCriticalSection( &audioState.cs );
 
     CoUninitialize();
+}
+
+//-----------------------------------------------------------------------------------------
+// This is the callback for handling XACT notifications.  This callback can be executed on a 
+// different thread than the app thread so shared data must be thread safe.  The game 
+// also needs to minimize the amount of time spent in this callbacks to avoid glitching, 
+// and a limited subset of XACT API can be called from inside the callback so 
+// it is sometimes necessary to handle the notification outside of this callback.
+//-----------------------------------------------------------------------------------------
+void Sound::XACTNotificationCallback( const XACT_NOTIFICATION* pNotification )
+{
+    // Use the critical section properly to make shared data thread safe while avoiding deadlocks.  
+    //
+    // To do this follow this advice:
+    // 1) Use a specific CS only to protect the specific shared data structures between the callback and the app thread.
+    // 2) Don’t make any API calls while holding the CS. Use it to access the shared data, make a local copy of the data, release the CS and then make the API call.
+    // 3) Spend minimal amount of time in the CS (to prevent the callback thread from waiting too long causing a glitch).   
+    // 
+    // Instead of using a CS, you can also use a non-blocking queues to keep track of notifications meaning 
+    // callback will push never pop only push and the app thread will only pop never push
+
+    // In this simple tutorial, we will respond to a cue stop notification for the song 
+    // cues by simply playing another song but its ultimately it's up the application 
+    // and sound designer to decide what to do when a notification is received. 
+    if( pNotification->type == XACTNOTIFICATIONTYPE_CUESTOP &&
+        ( pNotification->cue.cueIndex == audioState.iSong[0] ||
+          pNotification->cue.cueIndex == audioState.iSong[1] ||
+          pNotification->cue.cueIndex == audioState.iSong[2] ) )
+    {
+        // The previous background song ended, so pick and new song to play it
+        EnterCriticalSection( &audioState.cs );
+        audioState.nCurSongPlaying++; audioState.nCurSongPlaying %= 4;
+        audioState.bHandleSongStopped = true;
+        LeaveCriticalSection( &audioState.cs );
+    }
+
+    if( pNotification->type == XACTNOTIFICATIONTYPE_WAVEBANKPREPARED &&
+        pNotification->waveBank.pInMemoryWaveBank == audioState.pStreamingWaveBank )
+    {
+        // Respond to this notification outside of this callback so Prepare() can be called
+        EnterCriticalSection( &audioState.cs );
+        audioState.bHandleStreamingWaveBankPrepared = true;
+        LeaveCriticalSection( &audioState.cs );
+    }
+
+    if( pNotification->type == XACTNOTIFICATIONTYPE_SOUNDBANKDESTROYED &&
+        pNotification->soundBank.pSoundBank == audioState.pSoundBank )
+    {
+        // Cleanup sound bank memory
+        if( audioState.pbSoundBank )
+        {
+            delete[] audioState.pbSoundBank;
+            audioState.pbSoundBank = NULL;
+        }
+    }
+
+    if( pNotification->type == XACTNOTIFICATIONTYPE_CUEPREPARED &&
+        pNotification->cue.pCue == audioState.pZeroLatencyRevCue )
+    {
+        // No need to handle this notification here but its 
+        // done so for demonstration purposes.  This is typically useful
+        // for triggering animation as soon as zero-latency audio is prepared 
+        // to ensure the audio and animation are in sync
+    }
+
+    if( pNotification->type == XACTNOTIFICATIONTYPE_CUESTOP &&
+        pNotification->cue.pCue == audioState.pZeroLatencyRevCue )
+    {
+        // Respond to this notification outside of this callback so Prepare() can be called
+        EnterCriticalSection( &audioState.cs );
+        audioState.bHandleZeroLatencyCueStop = true;
+        LeaveCriticalSection( &audioState.cs );
+    }
+}
+
+//-----------------------------------------------------------------------------------------
+// Handle these notifications outside of the callback and call pEngine->DoWork()
+//-----------------------------------------------------------------------------------------
+void Sound::UpdateAudio()
+{
+    // Handle these notifications outside of the callback because
+    // only a subset of XACT APIs can be called inside the callback.
+
+    // Use the critical section properly to make shared data thread safe while avoiding deadlocks.  
+    //
+    // To do this follow this advice:
+    // 1) Use a specific CS only to protect the specific shared data structures between the callback and the app thread.
+    // 2) Don’t make any API calls while holding the CS. Use it to access the shared data, make a local copy of the data, release the CS and then make the API call.
+    // 3) Spend minimal amount of time in the CS (to prevent the callback thread from waiting too long causing a glitch).   
+    // 
+    // Instead of using a CS, you can also use a non-blocking queues to keep track of notifications meaning 
+    // callback will push never pop only push and the app thread will only pop never push
+
+    EnterCriticalSection( &audioState.cs );
+    bool bHandleStreamingWaveBankPrepared = audioState.bHandleStreamingWaveBankPrepared;
+    bool bHandleZeroLatencyCueStop = audioState.bHandleZeroLatencyCueStop;
+    LeaveCriticalSection( &audioState.cs );
+
+    if( bHandleStreamingWaveBankPrepared )
+    {
+        EnterCriticalSection( &audioState.cs );
+        audioState.bHandleStreamingWaveBankPrepared = false;
+        LeaveCriticalSection( &audioState.cs );
+
+        // Starting playing background music after the streaming wave bank 
+        // has been prepared but no sooner.  The background music does not need to be 
+        // zero-latency so the cues do not need to be prepared first 
+        audioState.nCurSongPlaying = 0;
+        audioState.pSoundBank->Play( audioState.iSong[audioState.nCurSongPlaying], 0, 0, NULL );
+    }
+
+    if( audioState.bHandleSongStopped )
+    {
+        EnterCriticalSection( &audioState.cs );
+        audioState.bHandleSongStopped = false;
+        LeaveCriticalSection( &audioState.cs );
+
+        audioState.pSoundBank->Play( audioState.iSong[audioState.nCurSongPlaying], 0, 0, NULL );
+    }
+
+
+    // It is important to allow XACT to do periodic work by calling pEngine->DoWork().  
+    // However this must function be call often enough.  If you call it too infrequently, 
+    // streaming will suffer and resources will not be managed promptly.  On the other hand 
+    // if you call it too frequently, it will negatively affect performance. Calling it once 
+    // per frame is usually a good balance.
+    if( audioState.pEngine )
+        audioState.pEngine->DoWork();
+
+	Sleep( 10 ); // Yield CPU time to other apps.  Note that this is not normally needed when rendering
 }

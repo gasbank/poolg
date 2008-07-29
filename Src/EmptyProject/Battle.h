@@ -3,7 +3,7 @@
 #include "HPbar.h"
 #include "ProgressBar.h"
 
-class CJW
+class Battle
 {
 public:
 	void init (LPDIRECT3DDEVICE9& d3dDev);

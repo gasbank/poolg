@@ -1,7 +1,7 @@
 #include "EmptyProjectPCH.h"
-#include "CJW.h"
+#include "Battle.h"
 
-void CJW::init (LPDIRECT3DDEVICE9& d3dDev)
+void Battle::init (LPDIRECT3DDEVICE9& d3dDev)
 {
 	m_backGround.init(L"bg01.jpg", d3dDev);
 	m_backGround.setPosition (-50.0f, -25.0f, 20);
@@ -29,7 +29,7 @@ void CJW::init (LPDIRECT3DDEVICE9& d3dDev)
 	m_Enemy.setSize(7.75f, 8.7f);
 }
 
-void CJW::frameMove(float fElapsedTime)
+void Battle::frameMove(float fElapsedTime)
 {
 	m_backGround.frameMove(fElapsedTime);
 	m_hpbar.frameMove(fElapsedTime);
@@ -39,7 +39,7 @@ void CJW::frameMove(float fElapsedTime)
 	m_Enemy.frameMove(fElapsedTime);
 }
 
-void CJW::draw()
+void Battle::draw()
 {
 	m_backGround.draw();
 	m_hpbar.draw();
@@ -50,12 +50,12 @@ void CJW::draw()
 	
 }
 
-void CJW::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+void Battle::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {	
 	m_hpbar.handleMessages(hWnd, uMsg, wParam, lParam);
 }
 
-void CJW::release ()
+void Battle::release ()
 {
 	m_backGround.release();
 	m_hpbar.release();

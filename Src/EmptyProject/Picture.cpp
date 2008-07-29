@@ -237,7 +237,7 @@ void Picture::setSizeToTexture()
 	D3DXMATRIX rotMat, scaleMat, transMat;
 	D3DXMatrixIdentity(&rotMat);
 	D3DXMatrixScaling(&scaleMat, m_width, m_height, 1.0f);
-	D3DXMatrixTranslation(&transMat, m_vPos.x, m_vPos.y, m_vPos.z);
+	D3DXMatrixTranslation(&transMat, m_vPos.x, m_vPos.y, 10.0f);
 	
 	m_localXform = rotMat * scaleMat * transMat;
 }

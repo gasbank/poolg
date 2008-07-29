@@ -49,12 +49,13 @@ public:
 	Picture(void);
 	virtual ~Picture(void);
 
-	void init(const TCHAR* imgFileName, LPDIRECT3DDEVICE9 d3dDev, UINT segments = 1);
+	void init(const TCHAR* imgFileName, LPDIRECT3DDEVICE9 d3dDev, UINT segments = 1, float x = 0, float y = 0);
 	HRESULT initRhw(const TCHAR* imgFileName, LPDIRECT3DDEVICE9 d3dDev, float x = 0, float y = 0);
 	void release();
 	HRESULT draw();
 	const D3DXMATRIX* getLocalXform() const { return &m_localXform; }
 	void setSize(float width, float height) { m_width = width; m_height = height; }
+	void setSizeToTexture();
 	const D3DXVECTOR3* getPos() const { return &m_vPos; }
 	void setPos(const D3DXVECTOR3& val) { m_vPos = val; }
 
@@ -83,4 +84,6 @@ protected:
 
 	// for RHW vertex
 	LPDIRECT3DVERTEXBUFFER9 m_d3dVB;
+
+	float m_texWidth, m_texHeight;
 };

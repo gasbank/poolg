@@ -14,7 +14,7 @@ Picture::~Picture(void)
 	release();
 }
 
-void Picture::init(const TCHAR* imgFileName, LPDIRECT3DDEVICE9 d3dDev, UINT segments)
+void Picture::init(const TCHAR* imgFileName, LPDIRECT3DDEVICE9 d3dDev, UINT segments, float x, float y )
 {
 	UINT faces = segments * segments * 2;
 	UINT vertices = (segments+1) * (segments+1);
@@ -71,12 +71,22 @@ void Picture::init(const TCHAR* imgFileName, LPDIRECT3DDEVICE9 d3dDev, UINT segm
 	{
 		exit(100);
 	}
+
+	D3DSURFACE_DESC texDesc;
+	m_d3dTex->GetLevelDesc(0, &texDesc);
+
+	m_vPos.x = x;
+	m_vPos.y = y;
+	m_vPos.z = 0;
+	m_texWidth = (float)texDesc.Width;
+	m_texHeight = (float)texDesc.Height;
+
+	
 }
 
 HRESULT Picture::initRhw( const TCHAR* imgFileName, LPDIRECT3DDEVICE9 d3dDev, float x, float y )
 {
 	HRESULT hr = S_OK;
-	const UINT segments = 1;
 
 	m_d3dDev = d3dDev;
 
@@ -91,7 +101,6 @@ HRESULT Picture::initRhw( const TCHAR* imgFileName, LPDIRECT3DDEVICE9 d3dDev, fl
 
 	VertexRhw* v = 0;
 	m_d3dVB->Lock(0, 0, (void**)&v, 0);
-	UINT i, j;
 	
 	v[0] = VertexRhw(x,                 y,                  0, 1, 0, 0);
 	v[1] = VertexRhw(x + texDesc.Width, y,                  0, 1, 1, 0);
@@ -218,4 +227,17 @@ void Picture::frameMove( float fElapsedTime )
 	D3DXMatrixTranslation(&mTranslation, m_vPos.x, m_vPos.y, m_vPos.z);
 
 	m_localXform = mScaling * mTranslation;
+}
+
+void Picture::setSizeToTexture()
+{
+	m_width = m_texWidth;
+	m_height = m_texHeight;
+
+	D3DXMATRIX rotMat, scaleMat, transMat;
+	D3DXMatrixIdentity(&rotMat);
+	D3DXMatrixScaling(&scaleMat, m_width, m_height, 1.0f);
+	D3DXMatrixTranslation(&transMat, m_vPos.x, m_vPos.y, m_vPos.z);
+	
+	m_localXform = rotMat * scaleMat * transMat;
 }

@@ -21,5 +21,12 @@ private:
 
 	Box m_Player;
 	Box m_Enemy;
-	HPBar m_hpbar;
+
+	HPBar m_hpBar;
+	HPBar m_mpBar;
+	HPBar m_expBar;
+
+	Box m_hpBg;
+	Box m_mpBg;
+	Box m_expBg;
 };

@@ -40,7 +40,7 @@ void Battle::init (LPDIRECT3DDEVICE9& d3dDev)
 
 
 
-	//m_StatusBoxPlayer.initRhw(L"BattleUI\\50x50.bmp", d3dDev, 50, 50);
+	m_StatusBoxPlayer.initRhw(L"BattleUI\\StatusBox.jpg", d3dDev, 50, 50);
 	//m_StatusBoxPlayer.setPosition (11.0f, 7.0f, 7);
 	//m_StatusBoxPlayer.setSize(0.5, 0.5);
 
@@ -70,7 +70,7 @@ void Battle::frameMove(float fElapsedTime)
 	
 	
 	
-	//m_StatusBoxPlayer.frameMove(fElapsedTime);
+	m_StatusBoxPlayer.frameMove(fElapsedTime);
 	//m_StatusBoxEnemy.frameMove(fElapsedTime);
 	//m_Player.frameMove(fElapsedTime);
 	//m_Enemy.frameMove(fElapsedTime);
@@ -85,7 +85,7 @@ void Battle::draw()
 	m_mpBar.draw();
 	m_expBg.draw();
 	m_expBar.draw();
-	//m_StatusBoxPlayer.draw();
+	m_StatusBoxPlayer.draw();
 	//m_StatusBoxEnemy.draw();
 	//m_Player.draw();
 	//m_Enemy.draw();
@@ -108,7 +108,7 @@ void Battle::release ()
 	m_hpBg.release();
 	m_mpBg.release();
 	m_expBg.release();
-	//m_StatusBoxPlayer.release();
+	m_StatusBoxPlayer.release();
 //	m_StatusBoxEnemy.release();
 	//m_Player.release();
 	//m_Enemy.release();

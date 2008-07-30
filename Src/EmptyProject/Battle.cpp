@@ -98,7 +98,7 @@ void Battle::draw()
 	
 	D3DXMATRIX mRot, mScale, mTrans, mWorld;
 	D3DXMatrixRotationZ(&mRot, D3DXToRadian(45));
-	D3DXMatrixScaling(&mScale, 280.0f, 220.0f, 1.0f);
+	D3DXMatrixScaling(&mScale, 280.0f/4, 220.0f/4, 1.0f);
 	D3DXMatrixTranslation(&mTrans, 100.0f, -100.0f, 0);
 	mWorld = mScale * mRot * mTrans;
 	m_StatusBoxPlayer.setLocalXform(&mWorld);

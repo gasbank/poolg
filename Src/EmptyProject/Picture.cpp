@@ -120,7 +120,7 @@ void Picture::release()
 	SAFE_RELEASE(m_d3dVB);
 }
 
-HRESULT Picture::draw()
+HRESULT Picture::draw(bool textured)
 {
 	HRESULT hr = S_OK;
 
@@ -128,7 +128,10 @@ HRESULT Picture::draw()
 	{
 		// Non-rhw drawing
 		m_d3dDev->SetTransform(D3DTS_WORLD, &m_localXform);
-		m_d3dDev->SetTexture(0, m_d3dTex);
+		if (textured)
+			m_d3dDev->SetTexture(0, m_d3dTex);
+		else
+			m_d3dDev->SetTexture(0, 0);
 		m_d3dxMesh->DrawSubset(0);
 	}
 	else if (m_d3dVB)

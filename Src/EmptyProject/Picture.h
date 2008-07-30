@@ -52,7 +52,7 @@ public:
 	void init(const TCHAR* imgFileName, LPDIRECT3DDEVICE9 d3dDev, UINT segments = 1, float x = 0, float y = 0);
 	HRESULT initRhw(const TCHAR* imgFileName, LPDIRECT3DDEVICE9 d3dDev, float x = 0, float y = 0);
 	void release();
-	HRESULT draw();
+	HRESULT draw(bool textured = true);
 	const D3DXMATRIX* getLocalXform() const { return &m_localXform; }
 	void setLocalXform(const D3DXMATRIX* mWorld) { m_localXform = *mWorld; }
 	void setSize(float width, float height) { m_width = width; m_height = height; }

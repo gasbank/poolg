@@ -54,6 +54,7 @@ public:
 	void release();
 	HRESULT draw();
 	const D3DXMATRIX* getLocalXform() const { return &m_localXform; }
+	void setLocalXform(const D3DXMATRIX* mWorld) { m_localXform = *mWorld; }
 	void setSize(float width, float height) { m_width = width; m_height = height; }
 	void setSizeToTexture();
 	const D3DXVECTOR3* getPos() const { return &m_vPos; }

@@ -47,8 +47,7 @@ void Battle::init (LPDIRECT3DDEVICE9& d3dDev)
 	m_selc.setSize(0.75, 1.5);
 
 
-
-	m_StatusBoxPlayer.initRhw(L"BattleUI\\StatusBox.jpg", d3dDev, 50, 50);
+	m_StatusBoxPlayer.init(L"BattleUI\\StatusBox.jpg", d3dDev);
 	//m_StatusBoxPlayer.setPosition (11.0f, 7.0f, 7);
 	//m_StatusBoxPlayer.setSize(0.5, 0.5);
 
@@ -96,7 +95,15 @@ void Battle::draw()
 	m_mpBar.draw();
 	m_expBg.draw();
 	m_expBar.draw();
+	
+	D3DXMATRIX mRot, mScale, mTrans, mWorld;
+	D3DXMatrixRotationZ(&mRot, D3DXToRadian(45));
+	D3DXMatrixScaling(&mScale, 280.0f, 220.0f, 1.0f);
+	D3DXMatrixTranslation(&mTrans, 100.0f, -100.0f, 0);
+	mWorld = mScale * mRot * mTrans;
+	m_StatusBoxPlayer.setLocalXform(&mWorld);
 	m_StatusBoxPlayer.draw();
+	
 	//m_StatusBoxEnemy.draw();
 	//m_Player.draw();
 	//m_Enemy.draw();

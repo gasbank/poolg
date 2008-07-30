@@ -37,6 +37,14 @@ void Battle::init (LPDIRECT3DDEVICE9& d3dDev)
 	m_expBar.setSize(7.0f, 0.7f);
 	m_expBar.setPosition (-8, 0, 5);
 
+	//[À±¿í]
+	m_menu.init(L"menu.bmp", d3dDev);
+	m_menu.setPosition (8.5f, -2.0f, 4);
+	m_menu.setSize(9.9, 15.75);
+
+	m_selc.init(L"triangle.bmp", d3dDev);
+	m_selc.setPosition (9.5f, 11.2f, 4);
+	m_selc.setSize(0.75, 1.5);
 
 
 
@@ -67,7 +75,10 @@ void Battle::frameMove(float fElapsedTime)
 	m_mpBar.frameMove(fElapsedTime);
 	m_expBg.frameMove(fElapsedTime);
 	m_expBar.frameMove(fElapsedTime);
-	
+
+	//[À±¿í]
+	m_menu.frameMove(fElapsedTime);
+	m_selc.frameMove(fElapsedTime);
 	
 	
 	m_StatusBoxPlayer.frameMove(fElapsedTime);
@@ -89,6 +100,10 @@ void Battle::draw()
 	//m_StatusBoxEnemy.draw();
 	//m_Player.draw();
 	//m_Enemy.draw();
+
+	//[À±¿í]
+	m_menu.draw();
+	m_selc.draw();
 	
 }
 
@@ -112,4 +127,8 @@ void Battle::release ()
 //	m_StatusBoxEnemy.release();
 	//m_Player.release();
 	//m_Enemy.release();
+
+	//[À±¿í]
+	m_menu.release();
+	m_selc.release();
 }

@@ -29,4 +29,8 @@ private:
 	Box m_hpBg;
 	Box m_mpBg;
 	Box m_expBg;
+
+	//[À±¿í]
+	Box m_menu;
+	Box m_selc;
 };

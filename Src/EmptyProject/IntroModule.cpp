@@ -20,6 +20,8 @@ IntroModule::IntroModule(void)
 	m_bItalic = false;
 	m_dwFontSize = 10;
 
+	m_backgroundVisible = false;
+
 	/*m_pStrs[0] = L"                        풀쥐의 대모험";
 	m_pStrs[1] = L"                       ~ 쥐들의 역습 ~";
 	m_pStrs[3] = L"어둠의 시대! 사악한 군주 최재영의 독재는 날로";
@@ -37,7 +39,8 @@ IntroModule::IntroModule(void)
 
 	m_pStrs[0] = L"              The Great Adventure of PoolG";
 	m_pStrs[1] = L"                ~ PoolG's Strikes Back ~";
-	m_pStrs[3] = L"It is an age of darkness! Evil lord Choi";
+	m_pStrs[3] = L"It is an age of darkness! Evil lord Choi revealed";
+	m_pStrs[4] = L"his unholy desire.";
 	
 	/*
 	m_pStrs[4] = L"혹독해져간다. 재정권과 미화권이 이미 장악되었고,";
@@ -72,7 +75,7 @@ HRESULT IntroModule::CreateTextMeshes( IDirect3DDevice9* pd3dDevice )
 			return E_FAIL;
 	}
 
-	this->m_background.init(L"ratatouille.jpg", pd3dDevice);
+	this->m_background.init(L"the Whirlpool Galaxy (M51) and Companion Galaxy.jpg", pd3dDevice);
 
 	return S_OK;
 }
@@ -160,20 +163,29 @@ void IntroModule::SetCameraAndLight( IDirect3DDevice9* pd3dDevice,
 
 void IntroModule::frameMove( double fTime )
 {
-    // Setup five rotation matrices (for rotating text strings)
-    D3DXVECTOR3 vAxis1( 0.0f,2.0f,0.0f );
-
-	//D3DXMATRIX mScale;
-    //D3DXMatrixScaling( &mScale, 0.5f, 0.5f, 0.5f );
-	//g_matObj2 *= mScale;
-
-    // Add some translational values to the matrices
-	for (int i = 0; i < NUM_OF_LINES; i++)
+	if ( fTime < 3.0f )
+	{		
+	}
+	else
 	{
-		D3DXMatrixRotationAxis( &m_matObjs[i], &vAxis1, 0.0f );		
-		m_matObjs[i]._41 = -10.0f;   
-		m_matObjs[i]._42 = -16 - ( float) i * 2.0f + ( float ) fTime / 0.5f;
-		m_matObjs[i]._43 = 0.0f;
+		double newfTime = fTime - 3.0f;
+
+		m_backgroundVisible = true;
+
+		D3DXVECTOR3 vAxis( 0.0f, 0.0f, -1.0f );
+		D3DXMatrixRotationAxis(&m_matBackground, &vAxis, D3DXToRadian(newfTime));
+
+		// Setup five rotation matrices (for rotating text strings)
+		D3DXVECTOR3 vAxis1( 0.0f,2.0f,0.0f );
+
+		// Add some translational values to the matrices
+		for (int i = 0; i < NUM_OF_LINES; i++)
+		{
+			D3DXMatrixRotationAxis( &m_matObjs[i], &vAxis1, 0.0f );		
+			m_matObjs[i]._41 = -10.0f;   
+			m_matObjs[i]._42 = -20 - ( float) i * 2.0f + ( float ) newfTime / 0.5f;
+			m_matObjs[i]._43 = 0.0f;
+		}
 	}
 }
 
@@ -189,16 +201,16 @@ void IntroModule::draw( IDirect3DDevice9* pd3dDevice, CFirstPersonCamera* pCamer
 	pd3dDevice->SetTransform(D3DTS_VIEW, &g_fixedViewMat);
 	pd3dDevice->SetTransform(D3DTS_PROJECTION, &g_orthoProjMat);
 
-	D3DXMATRIX mRot, mScale, mTrans, mWorld;
-	D3DXMatrixRotationZ(&mRot, D3DXToRadian(0));
-	D3DXMatrixScaling(&mScale, g_scrWidth, g_scrHeight, 1.0f);
-	D3DXMatrixTranslation(&mTrans, -g_scrWidth/2, -g_scrHeight/2, 50.0f);
+	D3DXMATRIX mScale, mTrans, mWorld;
+	D3DXMatrixScaling(&mScale, (FLOAT) g_scrWidth * 2.0, (FLOAT) g_scrHeight * 2.0 , 1.0f);
+	D3DXMatrixTranslation(&mTrans, (FLOAT) -g_scrWidth, (FLOAT) -g_scrHeight, 50.0f);
 
-	mWorld = mRot * mScale * mTrans;
+	mWorld = mScale * mTrans * m_matBackground;
 
 	m_background.setLocalXform(&mWorld);
 
-	m_background.draw();
+	if ( m_backgroundVisible )
+		m_background.draw();
 
 
 	// Setup view and projection xforms

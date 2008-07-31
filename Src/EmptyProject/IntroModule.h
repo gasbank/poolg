@@ -28,6 +28,8 @@ private:
 	D3DXMATRIXA16 m_matObjs[NUM_OF_LINES];	// Matrixes for transform of each text meshes
 	
 	Picture m_background;
+	bool m_backgroundVisible;
+	D3DXMATRIXA16 m_matBackground;
 
 	// Shape of text
 	TCHAR* m_pStrFont;

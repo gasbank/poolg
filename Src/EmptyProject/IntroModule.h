@@ -29,7 +29,7 @@ private:
 	
 	Picture m_background;
 	bool m_backgroundVisible;
-	D3DXMATRIXA16 m_matBackground;
+	D3DXMATRIX m_matBackground;
 
 	Picture m_pLogo;
 	bool m_logoVisible;

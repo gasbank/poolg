@@ -139,6 +139,8 @@ void Battle::frameMove(float fElapsedTime)
 
 void Battle::draw(int scrWidth, int scrHeight)
 {
+	m_pDev->SetRenderState(D3DRS_LIGHTING, FALSE);
+
 	D3DMATERIAL9 material;
 	D3DCOLORVALUE cv, cv2;
 	cv.a = 0.3f; cv.r = 0.1f; cv.g = 0.1f; cv.b = 0.1f;
@@ -239,9 +241,9 @@ void Battle::drawFixedText(int scrWidth, int scrHeight)
 
 
 	float statusBoxPlayersPositionX = 10;
-	float statusBoxPlayersPositionY = scrHeight - 10;
-	rc.top = statusBoxPlayersPositionY - 102;
-	rc.left = statusBoxPlayersPositionX + 5;
+	float statusBoxPlayersPositionY = (float)(scrHeight - 10);
+	rc.top = (LONG)(statusBoxPlayersPositionY - 102);
+	rc.left = (LONG)(statusBoxPlayersPositionX + 5);
 	StringCchPrintf(textBuffer, 512, L"HP");
 	m_lblREB->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 

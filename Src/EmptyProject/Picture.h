@@ -52,7 +52,7 @@ public:
 	void init(const TCHAR* imgFileName, LPDIRECT3DDEVICE9 d3dDev, UINT segments = 1, float x = 0, float y = 0);
 	HRESULT initRhw(const TCHAR* imgFileName, LPDIRECT3DDEVICE9 d3dDev, float x = 0, float y = 0);
 	void release();
-	HRESULT draw(bool textured = true);
+	
 	const D3DXMATRIX* getLocalXform() const { return &m_localXform; }
 	void setLocalXform(const D3DXMATRIX* mWorld) { m_localXform = *mWorld; }
 	void setSize(float width, float height) { m_width = width; m_height = height; }
@@ -60,6 +60,7 @@ public:
 	const D3DXVECTOR3* getPos() const { return &m_vPos; }
 	void setPos(const D3DXVECTOR3& val) { m_vPos = val; }
 
+	HRESULT draw(bool textured = true);
 	virtual LRESULT handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 	void frameMove(float fElapsedTime);
 

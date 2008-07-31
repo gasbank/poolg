@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Picture.h"
 
 #define NUM_OF_LINES 20
 
@@ -25,6 +26,8 @@ private:
 	TCHAR* m_pStrs[NUM_OF_LINES];
 
 	D3DXMATRIXA16 m_matObjs[NUM_OF_LINES];	// Matrixes for transform of each text meshes
+	
+	Picture m_background;
 
 	// Shape of text
 	TCHAR* m_pStrFont;

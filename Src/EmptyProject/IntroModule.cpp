@@ -1,5 +1,11 @@
 #include "EmptyProjectPCH.h"
 #include "IntroModule.h"
+#include "Picture.h"
+
+extern D3DXMATRIX						g_orthoProjMat;
+extern D3DXMATRIX						g_fixedViewMat;
+extern int						g_scrWidth;
+extern int						g_scrHeight;
 
 IntroModule::IntroModule(void)
 {
@@ -9,12 +15,12 @@ IntroModule::IntroModule(void)
 		m_pTextMeshes[i] = NULL;
 	}
 
-	m_pStrFont = L"Arial";
+	m_pStrFont = L"Georgia";
 	m_bBold = true;
 	m_bItalic = false;
 	m_dwFontSize = 10;
 
-	m_pStrs[0] = L"                        풀쥐의 대모험";
+	/*m_pStrs[0] = L"                        풀쥐의 대모험";
 	m_pStrs[1] = L"                       ~ 쥐들의 역습 ~";
 	m_pStrs[3] = L"어둠의 시대! 사악한 군주 최재영의 독재는 날로";
 	m_pStrs[4] = L"혹독해져간다. 재정권과 미화권이 이미 장악되었고,";
@@ -27,7 +33,25 @@ IntroModule::IntroModule(void)
 	m_pStrs[12] = L"사람 손을 들어 보게.";
 	m_pStrs[14] = L"이글거리는 이펙트는 의도적으로 구현한 것으로";
 	m_pStrs[15] = L"Antialiasing을 못해서 그러는게 절대 아니다.";
-	m_pStrs[17] = L"F4를 누르시오";
+	m_pStrs[17] = L"F4를 누르시오";*/
+
+	m_pStrs[0] = L"              The Great Adventure of PoolG";
+	m_pStrs[1] = L"                ~ PoolG's Strikes Back ~";
+	m_pStrs[3] = L"It is an age of darkness! Evil lord Choi";
+	
+	/*
+	m_pStrs[4] = L"혹독해져간다. 재정권과 미화권이 이미 장악되었고,";
+	m_pStrs[5] = L"자유는 사라졌다. 극심한 언론 통제 속에, 서민들은";
+	m_pStrs[6] = L"하루 20시간 코딩 노동에 시달렸다. 난세는 영웅을";
+	m_pStrs[7] = L"낳았다. 대청소로 삶의 터전을 잃은 풀쥐는 복수를";
+	m_pStrs[8] = L"다짐하였고, 오랜 세월의 코딩 수련을 마쳤다. 이제";
+	m_pStrs[9] = L"풀쥐의 험난한 여정이 시작되려 하는데...";
+	m_pStrs[11] = L"이정도면 될까? 누가 더 멋지고 웃기게 쓸 수 있는";
+	m_pStrs[12] = L"사람 손을 들어 보게.";
+	m_pStrs[14] = L"이글거리는 이펙트는 의도적으로 구현한 것으로";
+	m_pStrs[15] = L"Antialiasing을 못해서 그러는게 절대 아니다.";
+	m_pStrs[17] = L"F4를 누르시오";*/
+	
 }
 
 IntroModule::~IntroModule(void)
@@ -47,6 +71,8 @@ HRESULT IntroModule::CreateTextMeshes( IDirect3DDevice9* pd3dDevice )
 		if( FAILED( CreateD3DXTextMesh( pd3dDevice, m_pStrs[i], &(m_pTextMeshes[i]) ) ) )
 			return E_FAIL;
 	}
+
+	this->m_background.init(L"ratatouille.jpg", pd3dDevice);
 
 	return S_OK;
 }
@@ -99,7 +125,10 @@ void IntroModule::SetCameraAndLight( IDirect3DDevice9* pd3dDevice,
     pd3dDevice->SetRenderState( D3DRS_SPECULARENABLE, TRUE );
     pd3dDevice->SetRenderState( D3DRS_LIGHTING, TRUE );
     pd3dDevice->SetRenderState( D3DRS_AMBIENT, 0x80808080 );
-
+	pd3dDevice->SetRenderState( D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+	pd3dDevice->SetRenderState( D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+	pd3dDevice->SetRenderState( D3DRS_ALPHABLENDENABLE, TRUE);
+	
     D3DLIGHT9 light;
     D3DXVECTOR3 vecLightDirUnnormalized( 10.0f, -10.0f, 10.0f );
     ZeroMemory( &light, sizeof( D3DLIGHT9 ) );
@@ -154,7 +183,28 @@ void IntroModule::draw( IDirect3DDevice9* pd3dDevice, CFirstPersonCamera* pCamer
 
 	pd3dDevice->Clear( 0L, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x00000000, 1.0f, 0L );
 
+	// Background
+	pd3dDevice->SetRenderState( D3DRS_LIGHTING, FALSE );
+
+	pd3dDevice->SetTransform(D3DTS_VIEW, &g_fixedViewMat);
+	pd3dDevice->SetTransform(D3DTS_PROJECTION, &g_orthoProjMat);
+
+	D3DXMATRIX mRot, mScale, mTrans, mWorld;
+	D3DXMatrixRotationZ(&mRot, D3DXToRadian(0));
+	D3DXMatrixScaling(&mScale, g_scrWidth, g_scrHeight, 1.0f);
+	D3DXMatrixTranslation(&mTrans, -g_scrWidth/2, -g_scrHeight/2, 50.0f);
+
+	mWorld = mRot * mScale * mTrans;
+
+	m_background.setLocalXform(&mWorld);
+
+	m_background.draw();
+
+
 	// Setup view and projection xforms
+	pd3dDevice->SetRenderState( D3DRS_LIGHTING, TRUE );
+	pd3dDevice->SetTexture(0, 0);
+
 	pd3dDevice->SetTransform(D3DTS_VIEW, pCamera->GetViewMatrix());
 	pd3dDevice->SetTransform(D3DTS_PROJECTION, pCamera->GetProjMatrix());
 
@@ -176,7 +226,6 @@ void IntroModule::draw( IDirect3DDevice9* pd3dDevice, CFirstPersonCamera* pCamer
 			m_pTextMeshes[i]->DrawSubset( 0 );
 		}
 	}
-
 }
 
 void IntroModule::release()
@@ -185,4 +234,6 @@ void IntroModule::release()
 	{		
 		SAFE_RELEASE( m_pTextMeshes[i] );
 	}
+
+	m_background.release();
 }

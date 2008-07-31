@@ -1,5 +1,16 @@
 #pragma once
 
+enum UnitInput
+{
+	UNIT_MOVE_UP = 0,
+	UNIT_MOVE_DOWN,
+	UNIT_MOVE_LEFT,
+	UNIT_MOVE_RIGHT,
+	UNIT_MAX_KEYS,
+	UNIT_UNKNOWN = 0xFF
+};
+
+
 class Unit
 {
 public:
@@ -24,11 +35,19 @@ public:
 	void setScaleY(float val) { m_vScale.y = val; m_bLocalXformDirty = true; }
 	void setScaleZ(float val) { m_vScale.z = val; m_bLocalXformDirty = true; }
 
+	void setPos(const D3DXVECTOR3& val) { m_vPos = val; m_bLocalXformDirty = true; }
 	void setPosX(float val) { m_vPos.x = val; m_bLocalXformDirty = true; }
 	void setPosY(float val) { m_vPos.y = val; m_bLocalXformDirty = true; }
 	void setPosZ(float val) { m_vPos.z = val; m_bLocalXformDirty = true; }
+	const D3DXVECTOR3& getPos() const { return m_vPos; }
+
+protected:
+	virtual UnitInput mapKey( UINT nKey );
 
 private:
+	bool IsKeyDown( BYTE key ) const { return( (key & KEY_IS_DOWN_MASK) == KEY_IS_DOWN_MASK ); }
+	bool WasKeyDown( BYTE key ) const { return( (key & KEY_WAS_DOWN_MASK) == KEY_WAS_DOWN_MASK ); }
+
 	struct TeapotVertex
 	{
 		float x, y, z;
@@ -43,4 +62,10 @@ private:
 	LPDIRECT3DDEVICE9		m_pd3dDevice;
 	D3DMATERIAL9			m_material;
 	LPDIRECT3DTEXTURE9		m_d3dTex;
+	BYTE					m_aKeys[UNIT_MAX_KEYS];
+	UINT					m_cKeysDown;            // Number of camera keys that are down.
+	D3DXVECTOR3				m_vKeyboardDirection;
+	D3DXVECTOR3				m_vVelocity;
+	bool					m_bMoving;
+	float					m_fMovingTime;
 };

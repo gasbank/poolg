@@ -1,6 +1,10 @@
 #include "EmptyProjectPCH.h"
 #include "Unit.h"
 
+#define KEY_WAS_DOWN_MASK 0x80
+#define KEY_IS_DOWN_MASK  0x01
+
+
 Unit::Unit()
 {
 	m_d3dxMesh = 0;
@@ -17,8 +21,9 @@ Unit::Unit()
 	m_vRot = D3DXVECTOR3(0, 0, 0);
 	m_vPos = D3DXVECTOR3(0, 0, 0);
 	m_vScale = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
-
+	
 	m_bLocalXformDirty = true;
+	m_bMoving = false;
 }
 Unit::~Unit()
 {
@@ -55,11 +60,90 @@ HRESULT Unit::draw()
 
 LRESULT Unit::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
+	switch( uMsg )
+	{
+	case WM_KEYDOWN:
+		{
+			// Map this key to a D3DUtil_CameraKeys enum and update the
+			// state of m_aKeys[] by adding the KEY_WAS_DOWN_MASK|KEY_IS_DOWN_MASK mask
+			// only if the key is not down
+			UnitInput mappedKey = mapKey( ( UINT )wParam );
+			if( mappedKey != UNIT_UNKNOWN )
+			{
+				if( FALSE == IsKeyDown( m_aKeys[mappedKey] ) )
+				{
+					m_aKeys[ mappedKey ] = KEY_WAS_DOWN_MASK | KEY_IS_DOWN_MASK;
+					++m_cKeysDown;
+				}
+			}
+			break;
+		}
+
+	case WM_KEYUP:
+		{
+			// Map this key to a D3DUtil_CameraKeys enum and update the
+			// state of m_aKeys[] by removing the KEY_IS_DOWN_MASK mask.
+			UnitInput mappedKey = mapKey( ( UINT )wParam );
+			if( mappedKey != UNIT_UNKNOWN && ( DWORD )mappedKey < 8 )
+			{
+				m_aKeys[ mappedKey ] &= ~KEY_IS_DOWN_MASK;
+				--m_cKeysDown;
+			}
+			break;
+		}
+
+	}
+
 	return FALSE;
 }
 
 void Unit::frameMove( float fElapsedTime )
-{
+{	
+	if (m_bMoving == false)
+	{
+		m_fMovingTime = 0;
+
+		if( IsKeyDown( m_aKeys[UNIT_MOVE_UP] ) )
+		{
+			m_bMoving = true;
+			m_vKeyboardDirection = D3DXVECTOR3( 0, 0, 0 );
+			m_vKeyboardDirection.y += 2.0f;
+		}
+		else if( IsKeyDown( m_aKeys[UNIT_MOVE_DOWN] ) )
+		{
+			m_bMoving = true;
+			m_vKeyboardDirection = D3DXVECTOR3( 0, 0, 0 );
+			m_vKeyboardDirection.y -= 2.0f;
+		}
+		else if( IsKeyDown( m_aKeys[UNIT_MOVE_RIGHT] ) )
+		{
+			m_bMoving = true;
+			m_vKeyboardDirection = D3DXVECTOR3( 0, 0, 0 );
+			m_vKeyboardDirection.x += 2.0f;
+		}
+		else if( IsKeyDown( m_aKeys[UNIT_MOVE_LEFT] ) )
+		{
+			m_bMoving = true;
+			m_vKeyboardDirection = D3DXVECTOR3( 0, 0, 0 );
+			m_vKeyboardDirection.x -= 2.0f;
+		}
+	}
+	
+	if (m_bMoving && m_fMovingTime <= 1.0f)
+	{
+		// Update velocity
+		m_vVelocity = m_vKeyboardDirection;
+
+		// Simple euler method to calculate position delta
+		D3DXVECTOR3 vPosDelta = m_vVelocity * fElapsedTime;
+		m_fMovingTime += fElapsedTime;
+		setPos(getPos() + vPosDelta);
+	}
+	else
+	{
+		m_bMoving = false;
+	}
+
 	updateLocalXform();
 }
 
@@ -77,4 +161,17 @@ void Unit::updateLocalXform()
 
 		m_bLocalXformDirty = false;
 	}
+}
+
+UnitInput Unit::mapKey( UINT nKey )
+{
+	switch( nKey )
+	{
+	case 'A':	return UNIT_MOVE_LEFT;
+	case 'D':	return UNIT_MOVE_RIGHT;
+	case 'W':	return UNIT_MOVE_UP;
+	case 'S':	return UNIT_MOVE_DOWN;
+	}
+
+	return UNIT_UNKNOWN;
 }

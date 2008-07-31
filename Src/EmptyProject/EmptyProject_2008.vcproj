@@ -693,6 +693,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\EpCamera.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\EpCamera.h"
+			>
+		</File>
+		<File
 			RelativePath=".\IntroModule.cpp"
 			>
 		</File>

@@ -38,11 +38,11 @@ void Battle::init (LPDIRECT3DDEVICE9& d3dDev)
 	m_expBar.setPosition (-8, 0, 5);
 
 	//[À±¿í]
-	m_menu.init(L"menu.bmp", d3dDev);
+	m_menu.init(L"menu.png", d3dDev);
 	m_menu.setPosition (8.5f, -2.0f, 4);
 	m_menu.setSize(9.9f, 15.75f);
 
-	m_selc.init(L"triangle.bmp", d3dDev);
+	m_selc.init(L"triangle.png", d3dDev);
 	m_selc.setPosition (9.5f, 11.2f, 4);
 	m_selc.setSize(0.75, 1.5);
 

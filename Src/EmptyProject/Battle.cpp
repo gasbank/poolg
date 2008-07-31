@@ -3,6 +3,8 @@
 
 void Battle::init (LPDIRECT3DDEVICE9& d3dDev, int scrWidth, int scrHeight)
 {
+	m_pDev = d3dDev;
+
 	m_backGround.init(L"BattleUI\\BGcampus.bmp", d3dDev);
 	m_backGround.setPosition (-(float)scrWidth/2, -(float)scrHeight/2, 20);
 	m_backGround.setSize((float)scrWidth/2, (float)scrHeight/2);
@@ -132,6 +134,17 @@ void Battle::frameMove(float fElapsedTime)
 
 void Battle::draw()
 {
+	D3DMATERIAL9 material;
+	D3DCOLORVALUE cv, cv2;
+	cv.a = 0.3f; cv.r = 0.1f; cv.g = 0.1f; cv.b = 0.1f;
+	cv2.a = 0.3f; cv2.r = 1.0f; cv2.g = 0.1f; cv2.b = 0.3f;
+	material.Ambient = cv;
+	material.Diffuse = cv2;
+	material.Emissive = cv;
+	material.Power = 1.0f;
+	material.Specular = cv2;
+	m_pDev->SetMaterial(&material);
+
 	m_backGround.draw();
 	m_StatusBoxPlayer.draw();
 	m_StatusBoxEnemy.draw();

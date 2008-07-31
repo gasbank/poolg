@@ -31,11 +31,21 @@ private:
 	bool m_backgroundVisible;
 	D3DXMATRIXA16 m_matBackground;
 
+	Picture m_pLogo;
+	bool m_logoVisible;
+	float m_logoFading;
+
+	float m_mtrlControl;
+
+	Picture m_pBlack;
+
 	// Shape of text
 	TCHAR* m_pStrFont;
 	BOOL m_bBold;
 	BOOL m_bItalic;
 	DWORD m_dwFontSize;
+
+	float m_velocity;
 };
 
 /* SDKmisc.h

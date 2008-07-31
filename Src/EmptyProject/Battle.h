@@ -9,7 +9,7 @@ class Battle
 public:
 	void init (LPDIRECT3DDEVICE9& d3dDev, int scrWidth, int scrHeight);
 	void frameMove (float fElapsedTime);
-	void draw ();
+	void draw (	);
 	void handleMessages (HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	void release ();
 
@@ -39,7 +39,7 @@ private:
 	HPBarEnemy m_hpBarEnemy;
 	MPBarEnemy m_mpBarEnemy;
 	
-
+	LPDIRECT3DDEVICE9 m_pDev;
 
 	//[À±¿í]
 	Box m_menu;

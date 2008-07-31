@@ -5,20 +5,20 @@ void Battle::init (LPDIRECT3DDEVICE9& d3dDev, int scrWidth, int scrHeight)
 {
 	m_backGround.init(L"BattleUI\\BGcampus.bmp", d3dDev);
 	m_backGround.setPosition (-(float)scrWidth/2, -(float)scrHeight/2, 20);
-	m_backGround.setSize((float)scrWidth, (float)scrHeight);
+	m_backGround.setSize((float)scrWidth/2, (float)scrHeight/2);
 
-	float statusBoxWidth = (float)scrWidth*0.2344f;
-	float statusBoxHeight = (float)scrHeight*0.2083f;
+	float statusBoxWidth = 163;
+	float statusBoxHeight = 124;
 
 	float statusBoxPlayersPositionX = -(float)scrWidth/2 + 10;
 	float statusBoxPlayersPositionY = -(float)scrHeight/2 + 10;
-	m_StatusBoxPlayer.init(L"BattleUI\\StatusBox.jpg", d3dDev);
+	m_StatusBoxPlayer.init(L"BattleUI\\StatusBox.png", d3dDev);
 	m_StatusBoxPlayer.setPosition (statusBoxPlayersPositionX, statusBoxPlayersPositionY, 7);
 	m_StatusBoxPlayer.setSize(statusBoxWidth, statusBoxHeight);
 
 	float statusBoxEnemysPositionX = (float)scrWidth/2 - statusBoxWidth - 10;
 	float statusBoxEnemysPositionY = (float)scrHeight/2 - statusBoxHeight - 10;
-	m_StatusBoxEnemy.init(L"BattleUI\\StatusBox.jpg", d3dDev);
+	m_StatusBoxEnemy.init(L"BattleUI\\StatusBox.png", d3dDev);
 	m_StatusBoxEnemy.setPosition (statusBoxEnemysPositionX, statusBoxEnemysPositionY, 6.9f);
 	m_StatusBoxEnemy.setSize(statusBoxWidth, statusBoxHeight);
 
@@ -35,7 +35,7 @@ void Battle::init (LPDIRECT3DDEVICE9& d3dDev, int scrWidth, int scrHeight)
 	m_DialogBox.setSize(statusBoxWidth, statusBoxHeight);
 
 
-	float statusBarWidth = statusBoxWidth * 0.72f;
+	float statusBarWidth = statusBoxWidth * 0.67f;
 	float statusBarHeight = statusBarWidth * 0.1f;
 	m_hpBgPlayer.init(L"BattleUI\\HPbg.jpg", d3dDev);
 	m_hpBgPlayer.setPosition (statusBoxPlayersPositionX + statusBoxWidth*0.23f, statusBoxPlayersPositionY + statusBoxHeight * 0.82f, 5);

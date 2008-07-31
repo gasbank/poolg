@@ -14,7 +14,7 @@ public:
 		const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
 		CFirstPersonCamera* pCamera );
 	void frameMove( double fTime );
-	void draw( IDirect3DDevice9* pd3dDevice );
+	void draw( IDirect3DDevice9* pd3dDevice, CFirstPersonCamera* pCamera );
 	void release();
 	
 private:

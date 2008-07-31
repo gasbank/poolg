@@ -88,7 +88,6 @@ void IntroModule::SetCameraAndLight( IDirect3DDevice9* pd3dDevice,
 									const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
 									CFirstPersonCamera* pCamera )
 {
-
 	pd3dDevice->SetTextureStageState( 0, D3DTSS_COLORARG1, D3DTA_TEXTURE );
     pd3dDevice->SetTextureStageState( 0, D3DTSS_COLORARG2, D3DTA_DIFFUSE );
     pd3dDevice->SetTextureStageState( 0, D3DTSS_COLOROP, D3DTOP_MODULATE );
@@ -149,11 +148,15 @@ void IntroModule::frameMove( double fTime )
 	}
 }
 
-void IntroModule::draw( IDirect3DDevice9* pd3dDevice )
+void IntroModule::draw( IDirect3DDevice9* pd3dDevice, CFirstPersonCamera* pCamera )
 {
 	D3DMATERIAL9 mtrl;
 
 	pd3dDevice->Clear( 0L, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x00000000, 1.0f, 0L );
+
+	// Setup view and projection xforms
+	pd3dDevice->SetTransform(D3DTS_VIEW, pCamera->GetViewMatrix());
+	pd3dDevice->SetTransform(D3DTS_PROJECTION, pCamera->GetProjMatrix());
 
 	if( m_pTextMeshes[0] != NULL )
     {

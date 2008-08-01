@@ -10,6 +10,7 @@ public:
 	//void drawFixedText (int scrWidth, int scrHeight);
 	void handleMessages (HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	void release ();
+	void select(int move);
 
 	
 private:

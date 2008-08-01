@@ -41,6 +41,7 @@ Picture							g_picRhw;
 Picture							g_picSmiley;
 Picture							g_avatar;
 Menu							g_menubox;
+Menu							g_select;
 Sound							g_sound;
 Battle							g_battle;
 IntroModule						g_introModule;
@@ -581,6 +582,18 @@ void CALLBACK KeyboardProc( UINT nChar, bool bKeyDown, bool bAltDown, void* pUse
 			break;
 		}
 	}
+	//[윤욱]
+	if( bKeyDown )
+	{
+		switch( nChar )
+		{
+		case '8': g_select.select(8);
+			break;
+		case '9': g_select.select(9);
+			break;
+		}
+	}
+
 }
 
 

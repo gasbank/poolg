@@ -1,4 +1,4 @@
-//--------------------------------------------------------------------------------------
+﻿//--------------------------------------------------------------------------------------
 // File: EmptyProject.cpp
 //
 // Copyright (c) Microsoft Corporation. All rights reserved.
@@ -351,7 +351,7 @@ void renderFixedElements(IDirect3DDevice9* pd3dDevice, double fTime, float fElap
 */	
 	
 
-	//renderDebugText();
+	renderDebugText();
 }
 
 //--------------------------------------------------------------------------------------

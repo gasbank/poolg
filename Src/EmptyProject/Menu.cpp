@@ -48,7 +48,7 @@ void Menu::draw(int scrWidth, int scrHeight)
 	material.Specular = cv2;
 	m_pDev->SetMaterial(&material);
 
-	drawFixedText(scrWidth, scrHeight);
+	//drawFixedText(scrWidth, scrHeight);
 
 	m_menu.draw();
 	m_selc.draw();
@@ -72,7 +72,7 @@ void Menu::release ()
 	SAFE_RELEASE( m_lblHYnamL );
 	SAFE_RELEASE( m_lblREB);
 }
-
+/*
 void Menu::drawFixedText(int scrWidth, int scrHeight)
 {
 	WCHAR textBuffer[512];
@@ -96,3 +96,4 @@ void Menu::drawFixedText(int scrWidth, int scrHeight)
 	m_lblREB->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 }
 
+*/

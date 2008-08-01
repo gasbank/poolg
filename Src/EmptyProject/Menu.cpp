@@ -41,6 +41,7 @@ void Menu::frameMove(float fElapsedTime)
 	m_menu.frameMove(fElapsedTime);
 	m_selc.frameMove(fElapsedTime);
 	
+	m_selc.setPosition(m_selc.getPos()->x, pos, m_selc.getPos()->z);
 }
 
 void Menu::draw(int scrWidth, int scrHeight)

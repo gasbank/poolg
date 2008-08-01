@@ -356,6 +356,7 @@ void renderDebugText()
 
 void renderFixedElements(IDirect3DDevice9* pd3dDevice, double fTime, float fElapsedTime)
 {
+	pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 	pd3dDevice->SetTransform(D3DTS_VIEW, &g_fixedViewMat);
 	pd3dDevice->SetTransform(D3DTS_PROJECTION, &g_orthoProjMat);
 
@@ -410,6 +411,7 @@ void CALLBACK OnD3D9FrameRender( IDirect3DDevice9* pd3dDevice, double fTime, flo
 			//////////////////////////////////////////////////////////////////////////
 			// Perspective Rendering Phase
 
+			pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 			pd3dDevice->SetTransform(D3DTS_VIEW, g_camera.GetViewMatrix());
 			pd3dDevice->SetTransform(D3DTS_PROJECTION, g_camera.GetProjMatrix());
 
@@ -422,25 +424,7 @@ void CALLBACK OnD3D9FrameRender( IDirect3DDevice9* pd3dDevice, double fTime, flo
 			g_sampleTeapotMesh.draw();
 
 			// Draw floor gray tile (2D)
-			g_pic.draw();
-
-
-			//// Draw floor gray tile (3D)
-			//D3DXMatrixScaling(&mScale, 1.0f, 1.0f, 1.0f);
-			//pd3dDevice->SetMaterial(&material);
-			//pd3dDevice->SetTexture(0, 0);
-			////srand((unsigned int)time(0));
-			//int i, j;
-			//for (i = -10; i <= 10; ++i)
-			//{
-			//	for (j = -10; j <= 10; ++j)
-			//	{
-			//		D3DXMatrixTranslation(&mTrans, (float)j, (float)i, (((float)rand() / RAND_MAX)-0.5f)/3);
-			//		mWorld = mTrans;
-			//		pd3dDevice->SetTransform(D3DTS_WORLD, &mWorld);
-			//		g_aTile->DrawSubset(0);
-			//	}
-			//}
+			//g_pic.draw();
 
 			D3DXMATRIX transform;
 			D3DXMatrixIdentity(&transform);

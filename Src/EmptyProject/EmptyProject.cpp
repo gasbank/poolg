@@ -16,6 +16,8 @@
 #include "IntroModule.h"
 #include "Unit.h"
 #include "EpCamera.h"
+#include "Menu.h"
+
 
 enum GameTopState { GAMESTATE_INTRO, GAMESTATE_MENU, GAMESTATE_WORLD, GAMESTATE_FIGHT };
 
@@ -38,8 +40,7 @@ PictureMap						g_pic;
 Picture							g_picRhw;
 Picture							g_picSmiley;
 Picture							g_avatar;
-Picture							g_menu;
-Picture							g_selc;
+Menu							g_menubox;
 Sound							g_sound;
 Battle							g_battle;
 IntroModule						g_introModule;
@@ -113,8 +114,7 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 	//g_picSmiley.setSizeToTexture();
 
 	//[윤욱]
-	g_menu.init(L"menu.png", pd3dDevice);
-	g_selc.init(L"triangle.png", pd3dDevice);
+	g_menubox.init(pd3dDevice, g_scrWidth, g_scrHeight);
 
 
 	// Create 3D Mesh Texts for intro cinema.
@@ -256,7 +256,7 @@ void CALLBACK OnFrameMove( double fTime, float fElapsedTime, void* pUserContext 
 
 		//[재우]부분
 		g_battle.frameMove(fElapsedTime);
-
+		g_menubox.frameMove(fElapsedTime);
 
 		// Set up the vertex shader constants
 		D3DXMATRIXA16 mViewProj = *g_camera.GetViewMatrix() * *g_camera.GetProjMatrix();
@@ -308,6 +308,8 @@ void renderFixedElements(IDirect3DDevice9* pd3dDevice, double fTime, float fElap
 
 	//[재우]부분
 	g_battle.draw(g_scrWidth, g_scrHeight);
+
+	g_menubox.draw(g_scrWidth, g_scrHeight);
 	//g_picRhw.draw();
 
 	/*D3DPERF_BeginEvent(0xff00ffff, L"Draw Center Smiley~");
@@ -321,35 +323,6 @@ void renderFixedElements(IDirect3DDevice9* pd3dDevice, double fTime, float fElap
 		g_picSmiley.draw();
 	}
 	D3DPERF_EndEvent();*/
-/*
-	//[윤욱]
-	D3DPERF_BeginEvent(0xff00ffff, L"Menu");
-	{
-		D3DXMATRIX mRot, mScale, mTrans, mWorld;
-		D3DXMatrixRotationZ(&mRot, D3DXToRadian(0));
-		D3DXMatrixScaling(&mScale, 158.0f, 259.0f, 1.0f);
-		D3DXMatrixTranslation(&mTrans, 150.0f, -30.0f, -10.0f);
-		mWorld = mRot * mScale * mTrans;
-		g_menu.setLocalXform(&mWorld);
-		g_menu.draw();
-	}
-	D3DPERF_EndEvent();
-
-	D3DPERF_BeginEvent(0xff00ffff, L"Select");
-	{
-		float t_x = 170.0f;
-		float t_y = 196.0f;
-		D3DXMATRIX mRot, mScale, mTrans, mWorld;
-		D3DXMatrixRotationZ(&mRot, D3DXToRadian(0));
-		D3DXMatrixScaling(&mScale, 10.0f, 18.0f, 1.0f);
-		D3DXMatrixTranslation(&mTrans, t_x, t_y, -15.0f);
-		mWorld = mRot * mScale * mTrans;
-		g_selc.setLocalXform(&mWorld);
-		g_selc.draw();
-	}
-	D3DPERF_EndEvent();
-*/	
-	
 
 	renderDebugText();
 }
@@ -395,7 +368,6 @@ void CALLBACK OnD3D9FrameRender( IDirect3DDevice9* pd3dDevice, double fTime, flo
 
 			// Draw floor gray tile (2D)
 			g_pic.draw();
-
 
 
 			//// Draw floor gray tile (3D)
@@ -479,8 +451,7 @@ void CALLBACK OnD3D9DestroyDevice( void* pUserContext )
 	g_picSmiley.release();
 	g_avatar.release();
 	g_sound.release();
-	g_menu.release();
-	g_selc.release();
+	g_menubox.release();
 
 	//[재우]부분
 	g_battle.release();

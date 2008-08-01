@@ -43,7 +43,4 @@ private:
 	
 	LPDIRECT3DDEVICE9	m_pDev;
 
-	//[À±¿í]
-	Box m_menu;
-	Box m_selc;
 };

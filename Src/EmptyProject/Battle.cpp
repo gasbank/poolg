@@ -93,18 +93,6 @@ void Battle::init (LPDIRECT3DDEVICE9& d3dDev, int scrWidth, int scrHeight)
 	V( D3DXCreateFont(d3dDev, 17, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblHYnamL) );
 	V( D3DXCreateFont(d3dDev, 18, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Rockwell Extra Bold"), &m_lblREB) );
 
-
-
-
-
-	//[À±¿í]
-	m_menu.init(L"menu.png", d3dDev);
-	m_menu.setPosition (8.5f, -2.0f, 4);
-	m_menu.setSize(9.9f, 15.75f);
-
-	m_selc.init(L"triangle.png", d3dDev);
-	m_selc.setPosition (9.5f, 11.2f, 4);
-	m_selc.setSize(0.75, 1.5);
 }
 
 void Battle::frameMove(float fElapsedTime)
@@ -127,12 +115,6 @@ void Battle::frameMove(float fElapsedTime)
 	m_hpBarEnemy.frameMove(fElapsedTime);
 	m_mpBarEnemy.frameMove(fElapsedTime);
 
-	//[À±¿í]
-	m_menu.frameMove(fElapsedTime);
-	m_selc.frameMove(fElapsedTime);
-	
-	
-	
 	//m_Player.frameMove(fElapsedTime);
 	//m_Enemy.frameMove(fElapsedTime);
 }
@@ -179,11 +161,6 @@ void Battle::draw(int scrWidth, int scrHeight)
 //	
 	
 	//
-
-
-	//[À±¿í]
-	//m_menu.draw();
-	//m_selc.draw();
 	
 }
 
@@ -216,11 +193,6 @@ void Battle::release ()
 	m_mpBarEnemy.release();
 	
 	
-
-	//[À±¿í]
-	m_menu.release();
-	m_selc.release();
-
 	SAFE_RELEASE( m_lblHYnamL );
 	SAFE_RELEASE( m_lblREB);
 }

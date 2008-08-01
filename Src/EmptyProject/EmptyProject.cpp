@@ -18,10 +18,13 @@
 #include "EpCamera.h"
 #include "Menu.h"
 
-
-enum GameTopState { GAMESTATE_INTRO, GAMESTATE_MENU, GAMESTATE_WORLD, GAMESTATE_FIGHT };
+enum GameTopState { GAMESTATE_INTRO, GAMESTATE_WORLD, GAMESTATE_FIGHT };
 
 GameTopState					g_CurrentState			= GAMESTATE_INTRO;
+
+bool							g_IntroEnable = true;
+bool							g_WorldEnable = false;
+double							g_timeDelta = 0.0f;
 
 LPDIRECT3DVERTEXSHADER9         g_pVertexShader			= 0;
 LPD3DXCONSTANTTABLE             g_pConstantTable		= 0;
@@ -177,45 +180,25 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 	ZeroMemory(&g_light, sizeof(D3DLIGHT9));
 	D3DCOLORVALUE cv = { 0.8f, 0.8f, 0.8f, 1.0f };
 	g_light.Ambient = cv;
+	g_light.Diffuse = cv;
+	g_light.Specular = cv;
+	/*
 	g_light.Attenuation0 = 0.5f;
 	g_light.Attenuation1 = 0.0f;
 	g_light.Attenuation2 = 0.0f;
-	g_light.Diffuse = cv;
-	D3DXVECTOR3 dir(0.0f, 0.0f, 1.0f);
+	*/
+	
+	D3DXVECTOR3 dir(10.0f, -10.0f, 10.0f);
 	D3DXVec3Normalize((D3DXVECTOR3*)&g_light.Direction, &dir);
 	g_light.Falloff = 0.5f;
 	g_light.Phi = D3DXToRadian(80);
 	g_light.Theta = D3DXToRadian(10);
-	D3DXVECTOR3 pos(0.0f, 0.0f, -10.0f);
+	
+	D3DXVECTOR3 pos(-10.0f, 10.0f, -10.0f);
 	D3DXVec3Normalize((D3DXVECTOR3*)&g_light.Position, &pos);
-	g_light.Specular = cv;
+
 	g_light.Type = D3DLIGHT_DIRECTIONAL;
 	g_light.Range = 1000.0f;
-	D3DCOLORVALUE cv_diffuse = { 0.8f, 0.8f, 0.8f, 1.0f };
-	g_light.Diffuse = cv_diffuse;
-	D3DCOLORVALUE cv_specular = { 0.8f, 0.8f, 0.8f, 1.0f };
-	g_light.Specular = cv_specular;
-
-	/*D3DLIGHT9 light;
-	ZeroMemory(&light, sizeof(D3DLIGHT9));
-    D3DXVECTOR3 vecLightDirUnnormalized( 10.0f, -10.0f, 10.0f );
-    ZeroMemory( &light, sizeof( D3DLIGHT9 ) );
-    light.Type = D3DLIGHT_DIRECTIONAL;
-    light.Diffuse.r = 1.0f;
-    light.Diffuse.g = 1.0f;
-    light.Diffuse.b = 1.0f;
-	light.Specular.r = 1.0f;
-	light.Specular.g = 1.0f;
-	light.Specular.b = 1.0f;
-	light.Ambient.r = 1.0f;
-	light.Ambient.g = 1.0f;
-	light.Ambient.b = 1.0f;
-	D3DXVec3Normalize( ( D3DXVECTOR3* )&light.Direction, &vecLightDirUnnormalized );
-    light.Position.x = 5.0f;
-    light.Position.y = 5.0f;
-    light.Position.z = -5.0f;
-    light.Range = 1000.0f;*/
-
 	
 	
 	return S_OK;
@@ -257,42 +240,46 @@ HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFA
 //--------------------------------------------------------------------------------------
 // Handle updates to the scene.  This is called regardless of which D3D API is used
 //--------------------------------------------------------------------------------------
-void CALLBACK OnFrameMove( double fTime, float fElapsedTime, void* pUserContext )
+void CALLBACK OnFrameMove( double fTime_, float fElapsedTime, void* pUserContext )
 {
-	/*switch ( g_CurrentState )
-	{
-	case GAMESTATE_INTRO:
-		{*/
+	double fTime = fTime_ + g_timeDelta;
 
-	if ( fTime < 26.0f && g_CurrentState == GAMESTATE_INTRO )
+	if ( fTime < 41.0f )
 	{
-			g_introModule.frameMove(fTime);
+		g_introModule.frameMove(fTime);
 
-			// Setup the camera with view & projection matrix
-			// for intro cinema.
-			D3DXVECTOR3 vecEye( 0.0f, -30.0f, -20.0f );
-			D3DXVECTOR3 vecAt( 0.0f, 0.0f, 0.0f );
-			g_camera.SetViewParams( &vecEye, &vecAt );
+		// Setup the camera with view & projection matrix
+		// for intro cinema.
+		D3DXVECTOR3 vecEye( 0.0f, -30.0f, -20.0f );
+		D3DXVECTOR3 vecAt( 0.0f, 0.0f, 0.0f );
+		g_camera.SetViewParams( &vecEye, &vecAt );
 	}
-	else
+
+	if ( 41.0f < fTime && fTime < 44.0f)
 	{
-		if ( g_CurrentState != GAMESTATE_MENU)
-			g_CurrentState = GAMESTATE_MENU;
+		g_IntroEnable = false;
+		g_CurrentState = GAMESTATE_WORLD;
+	}
 
-		if ( 26.0f < fTime && fTime < 31.0f )
-		{
-			float newfTime = ( float )fTime - 26.0f;
+	
+	if ( 36.0f < fTime && fTime < 41.0f )
+	{
+		float newfTime = ( float )fTime - 36.0f;
 
-			D3DXVECTOR3 vecEye( 
-				0.0f, 
-				(-30.0f * (5.0f - newfTime) + 0.0f * newfTime) / 5.0f, 
-				(-20.0f * (5.0f - newfTime) -10.0f * newfTime) / 5.0f );
-			D3DXVECTOR3 vecAt ( 0.0f, 0.0f, -0.0f );
-			g_camera.SetViewParams( &vecEye, &vecAt );
-		
-			D3DCOLORVALUE cv = { newfTime / 5.0f , newfTime / 5.0f, newfTime / 5.0f, newfTime / 5.0f };
-			g_light.Ambient = cv;
-		}
+		D3DXVECTOR3 vecEye( 
+			0.0f, 
+			(-30.0f * (5.0f - newfTime) + 0.0f * newfTime) / 5.0f, 
+			(-20.0f * (5.0f - newfTime) -20.0f * newfTime) / 5.0f );
+		D3DXVECTOR3 vecAt ( 0.0f, 0.0f, -0.0f );
+		g_camera.SetViewParams( &vecEye, &vecAt );
+	
+		D3DCOLORVALUE cv = { newfTime / 5.0f , newfTime / 5.0f, newfTime / 5.0f, newfTime / 5.0f };
+		g_light.Ambient = cv;
+	}
+
+	if ( 36.0f < fTime )
+	{
+		g_WorldEnable = true;
 
 		g_pic.frameMove(fElapsedTime);
 		g_avatar.frameMove(fElapsedTime);
@@ -388,12 +375,12 @@ void CALLBACK OnD3D9FrameRender( IDirect3DDevice9* pd3dDevice, double fTime, flo
     // Render the scene
     if( SUCCEEDED( pd3dDevice->BeginScene() ) )
     {
-		switch ( g_CurrentState )
-		{
-		case GAMESTATE_INTRO:
+
+		if ( g_IntroEnable )
 			g_introModule.draw(pd3dDevice, &g_camera);
-			break;
-		default:
+
+		if ( g_WorldEnable )
+		{
 			pd3dDevice->SetLight(0, &g_light);
 
 			pd3dDevice->SetRenderState(D3DRS_LIGHTING, TRUE);
@@ -441,13 +428,8 @@ void CALLBACK OnD3D9FrameRender( IDirect3DDevice9* pd3dDevice, double fTime, flo
 			// Orthogonal and fixed Rendering Phase
 
 			renderFixedElements(pd3dDevice, fTime, fElapsedTime);
-
-			
-			
 		}
-			
-		
-	
+
         V( pd3dDevice->EndScene() );
     }
 }
@@ -459,20 +441,14 @@ void CALLBACK OnD3D9FrameRender( IDirect3DDevice9* pd3dDevice, double fTime, flo
 LRESULT CALLBACK MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
                           bool* pbNoFurtherProcessing, void* pUserContext )
 {
-	switch ( g_CurrentState )
-	{
-	case GAMESTATE_INTRO:
-		break;
-	default:
-		//g_avatar.handleMessages(hWnd, uMsg, wParam, lParam);
-		g_pic.handleMessages(hWnd, uMsg, wParam, lParam);
-		g_camera.HandleMessages(hWnd, uMsg, wParam, lParam);
-		g_sound.handleMessages(hWnd, uMsg, wParam, lParam);
-		g_sampleTeapotMesh.handleMessages(hWnd, uMsg, wParam, lParam);
+	//g_avatar.handleMessages(hWnd, uMsg, wParam, lParam);
+	g_pic.handleMessages(hWnd, uMsg, wParam, lParam);
+	g_camera.HandleMessages(hWnd, uMsg, wParam, lParam);
+	g_sound.handleMessages(hWnd, uMsg, wParam, lParam);
+	g_sampleTeapotMesh.handleMessages(hWnd, uMsg, wParam, lParam);
 
-		//[재우]부분
-		g_battle.handleMessages(hWnd, uMsg, wParam, lParam);
-	}
+	//[재우]부분
+	g_battle.handleMessages(hWnd, uMsg, wParam, lParam);
 
     return 0;
 }
@@ -529,27 +505,12 @@ void CALLBACK KeyboardProc( UINT nChar, bool bKeyDown, bool bAltDown, void* pUse
 			// F4를 누르면 인트로에서 메인 화면으로 넘어간다.
 			if ( nChar == VK_F4 )
 			{
-				g_CurrentState = GAMESTATE_MENU;
-				D3DXVECTOR3 vecEye( 0.0f, 0.0f, -10.0f );
-				D3DXVECTOR3 vecAt ( 0.0f, 0.0f, -0.0f );
-				g_camera.SetViewParams( &vecEye, &vecAt );
+				g_timeDelta += 1.0f;
 			}
 		break;
-	case GAMESTATE_MENU:
+	case GAMESTATE_WORLD:
 		if ( bKeyDown )
 		{
-			if ( nChar == (UINT) '1' )
-			{
-				g_CurrentState = GAMESTATE_WORLD;				
-				DXUTToggleFullScreen();
-				DXUTToggleFullScreen();
-			}
-			else if ( nChar == (UINT) '2' )
-			{
-				g_CurrentState = GAMESTATE_FIGHT;				
-				DXUTToggleFullScreen();
-				DXUTToggleFullScreen();
-			}
 		}
 		break;
 	}

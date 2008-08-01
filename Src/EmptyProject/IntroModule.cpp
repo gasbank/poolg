@@ -7,6 +7,24 @@ extern D3DXMATRIX						g_fixedViewMat;
 extern int						g_scrWidth;
 extern int						g_scrHeight;
 
+//The Great Adventure of PoolG"
+//~ PoolG's Strikes Back ~"
+//
+//It is an age of darkness! Evil lord Choi 
+//revealed his unholy desire. Republic's 
+//Finance and Enviroment is already in his 
+//hand. No freedom of speech, and no freedom 
+//of gaming. People suffer from 20 hours 
+//coding labor. There are heros on both sides.
+//
+//After 'Big Cleaning', PoolG lost home, food,
+//dental cream, everything. For revenge, PoolG 
+//trained coding very hard. He accepted the 
+//dark side of coding spirit. He gained power 
+//of infinite loop, memory leaking, and so on.
+//Now PoolG's difficult journey is just 
+//beginning.
+
 IntroModule::IntroModule(void)
 {
 	for( int i = 0; i < NUM_OF_LINES; i++ )
@@ -23,7 +41,7 @@ IntroModule::IntroModule(void)
 	m_backgroundVisible = false;
 	m_logoVisible = false;
 
-	m_velocity = 1.0f;
+	m_velocity = 1.2f;
 
 	/*m_pStrs[0] = L"                        풀쥐의 대모험";
 	m_pStrs[1] = L"                       ~ 쥐들의 역습 ~";
@@ -40,24 +58,21 @@ IntroModule::IntroModule(void)
 	m_pStrs[15] = L"Antialiasing을 못해서 그러는게 절대 아니다.";
 	m_pStrs[17] = L"F4를 누르시오";*/
 
-	m_pStrs[0] = L"              The Great Adventure of PoolG";
-	m_pStrs[1] = L"                ~ PoolG's Strikes Back ~";
-	m_pStrs[3] = L"It is an age of darkness! Evil lord Choi revealed";
-	m_pStrs[4] = L"his unholy desire. ";
-	
-	/*
-	m_pStrs[4] = L"혹독해져간다. 재정권과 미화권이 이미 장악되었고,";
-	m_pStrs[5] = L"자유는 사라졌다. 극심한 언론 통제 속에, 서민들은";
-	m_pStrs[6] = L"하루 20시간 코딩 노동에 시달렸다. 난세는 영웅을";
-	m_pStrs[7] = L"낳았다. 대청소로 삶의 터전을 잃은 풀쥐는 복수를";
-	m_pStrs[8] = L"다짐하였고, 오랜 세월의 코딩 수련을 마쳤다. 이제";
-	m_pStrs[9] = L"풀쥐의 험난한 여정이 시작되려 하는데...";
-	m_pStrs[11] = L"이정도면 될까? 누가 더 멋지고 웃기게 쓸 수 있는";
-	m_pStrs[12] = L"사람 손을 들어 보게.";
-	m_pStrs[14] = L"이글거리는 이펙트는 의도적으로 구현한 것으로";
-	m_pStrs[15] = L"Antialiasing을 못해서 그러는게 절대 아니다.";
-	m_pStrs[17] = L"F4를 누르시오";*/
-	
+	m_pStrs[0] = L"The Great Adventure of PoolG";
+	m_pStrs[1] = L"~ PoolG's Strikes Back ~";
+	m_pStrs[3] = L"It is an age of darkness! Evil lord Choi ";
+	m_pStrs[4] = L"revealed his unholy desire. Republic's ";
+	m_pStrs[5] = L"Finance and Enviroment is already in his ";
+	m_pStrs[6] = L"hand. No freedom of speech, and no freedom ";
+	m_pStrs[7] = L"of gaming. People suffer from 20 hours ";
+	m_pStrs[8] = L"coding labor. There are heros on both sides.";
+	m_pStrs[10] = L"After 'Big Cleaning', PoolG lost home, food,";
+	m_pStrs[11] = L"dental cream, everything. For revenge, PoolG ";
+	m_pStrs[12] = L"trained coding very hard. He accepted the ";
+	m_pStrs[13] = L"dark side of coding spirit. He gained power ";
+	m_pStrs[14] = L"of infinite loop, memory leaking, and so on.";	
+	m_pStrs[15] = L"Now PoolG's difficult journey is just";
+	m_pStrs[16] = L"beginning!";
 }
 
 IntroModule::~IntroModule(void)
@@ -107,7 +122,7 @@ HRESULT IntroModule::CreateD3DXTextMesh( IDirect3DDevice9* pd3dDevice, LPCWSTR p
     hFontOld = ( HFONT )SelectObject( hdc, hFont );
 
 	hr = D3DXCreateText( pd3dDevice, hdc, pStr,
-		0.01f, 0.1f, &pMeshNew, NULL, NULL );
+		0.01f, 0.2f, &pMeshNew, NULL, NULL );
 
     SelectObject( hdc, hFontOld );
     DeleteObject( hFont );
@@ -139,12 +154,12 @@ void IntroModule::frameMove( double fTime )
 	}
 	else
 	{
-		double newfTime = fTime - 6.0f;
+		float newfTime = fTime - 6.0f;
 
 		if ( newfTime < 5.0f )
 			m_mtrlControl = newfTime / 5.0f;
-		else if ( 15.0f < newfTime < 20.0f )
-			m_mtrlControl = 1 - (newfTime - 15.0f)  / 5.0f;
+		else if ( 35.0f < newfTime < 40.0f )
+			m_mtrlControl = 1.0f - (newfTime - 25.0f)  / 5.0f;
 
 		m_logoVisible = false;
 		m_backgroundVisible = true;
@@ -157,7 +172,7 @@ void IntroModule::frameMove( double fTime )
 		{
 			D3DXMatrixTranslation( 
 				&m_matObjs[i], 
-				-10.0f, 
+				-12.0f, 
 				-20 - ( float) i * 2.0f + ( float ) newfTime * m_velocity,
 				0.0f );
 		}
@@ -250,10 +265,12 @@ void IntroModule::draw( IDirect3DDevice9* pd3dDevice, CFirstPersonCamera* pCamer
 	if( m_pTextMeshes[0] != NULL )
     {
         ZeroMemory( &mtrl, sizeof( D3DMATERIAL9 ) );
-		mtrl.Diffuse.r = mtrl.Ambient.r = mtrl.Specular.r = 1.0f * m_mtrlControl;
-		mtrl.Diffuse.g = mtrl.Ambient.g = mtrl.Specular.g = 0.8f * m_mtrlControl;
-		mtrl.Diffuse.b = mtrl.Ambient.b = mtrl.Specular.b = 0.0f * m_mtrlControl;
-		mtrl.Diffuse.a = mtrl.Ambient.a = mtrl.Specular.a = 1.0f * m_mtrlControl ;
+		D3DCOLORVALUE cv_diffuse = { 1.0f, 0.8f, 0.0f, 1.0f };
+		mtrl.Diffuse  = cv_diffuse;
+		D3DCOLORVALUE cv_ambient = { 0.0f, 0.0f, 0.0f, 1.0f };
+		mtrl.Ambient = cv_ambient;
+		D3DCOLORVALUE cv_specular = { 1.0f, 0.8f, 0.0f, 1.0f };
+		mtrl.Ambient = cv_specular;
 		pd3dDevice->SetMaterial( &mtrl );
 
 		for (int i = 0; i < NUM_OF_LINES; i++)

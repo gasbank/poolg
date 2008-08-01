@@ -123,52 +123,6 @@ void IntroModule::SetCameraAndLight( IDirect3DDevice9* pd3dDevice,
 									const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
 									CFirstPersonCamera* pCamera )
 {
-	pd3dDevice->SetTextureStageState( 0, D3DTSS_COLORARG1, D3DTA_TEXTURE );
-    pd3dDevice->SetTextureStageState( 0, D3DTSS_COLORARG2, D3DTA_DIFFUSE );
-    pd3dDevice->SetTextureStageState( 0, D3DTSS_COLOROP, D3DTOP_MODULATE );
-   
-	pd3dDevice->SetSamplerState( 0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR );
-    pd3dDevice->SetSamplerState( 0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR );
-
-	pd3dDevice->SetRenderState( D3DRS_ZENABLE, TRUE );
-    pd3dDevice->SetRenderState( D3DRS_DITHERENABLE, TRUE );
-    pd3dDevice->SetRenderState( D3DRS_SPECULARENABLE, TRUE );
-    pd3dDevice->SetRenderState( D3DRS_LIGHTING, TRUE );
-    //pd3dDevice->SetRenderState( D3DRS_AMBIENT, 0xFFFFFFFF );
-	pd3dDevice->SetRenderState( D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-	pd3dDevice->SetRenderState( D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
-	pd3dDevice->SetRenderState( D3DRS_ALPHABLENDENABLE, TRUE);
-	
-	
-    D3DLIGHT9 light;
-    D3DXVECTOR3 vecLightDirUnnormalized( 10.0f, -10.0f, 10.0f );
-    ZeroMemory( &light, sizeof( D3DLIGHT9 ) );
-    light.Type = D3DLIGHT_DIRECTIONAL;
-    light.Diffuse.r = 1.0f;
-    light.Diffuse.g = 1.0f;
-    light.Diffuse.b = 1.0f;
-	light.Specular.r = 1.0f;
-	light.Specular.g = 1.0f;
-	light.Specular.b = 1.0f;
-	light.Ambient.r = 1.0f;
-	light.Ambient.g = 1.0f;
-	light.Ambient.b = 1.0f;
-	D3DXVec3Normalize( ( D3DXVECTOR3* )&light.Direction, &vecLightDirUnnormalized );
-    light.Position.x = 5.0f;
-    light.Position.y = 5.0f;
-    light.Position.z = -5.0f;
-    light.Range = 1000.0f;
-    pd3dDevice->SetLight( 0, &light );
-    pd3dDevice->LightEnable( 0, TRUE );
-
-    //Set the transform matrices
-
-    D3DXMATRIXA16 matWorld;
-    D3DXMatrixIdentity( &matWorld );
-    pd3dDevice->SetTransform( D3DTS_WORLD, &matWorld );
-
-	float fAspectRatio = pBackBufferSurfaceDesc->Width / ( FLOAT )pBackBufferSurfaceDesc->Height;
-    pCamera->SetProjParams( D3DX_PI / 4, fAspectRatio, 1.0f, 1000.0f );
 }
 
 void IntroModule::frameMove( double fTime )

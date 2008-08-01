@@ -185,10 +185,35 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 	g_light.Falloff = 0.5f;
 	g_light.Phi = D3DXToRadian(80);
 	g_light.Theta = D3DXToRadian(10);
-	D3DXVECTOR3 pos(0.0f, 0.0f, -20.0f);
+	D3DXVECTOR3 pos(0.0f, 0.0f, -10.0f);
 	D3DXVec3Normalize((D3DXVECTOR3*)&g_light.Position, &pos);
 	g_light.Specular = cv;
 	g_light.Type = D3DLIGHT_DIRECTIONAL;
+	g_light.Range = 1000.0f;
+	D3DCOLORVALUE cv_diffuse = { 0.8f, 0.8f, 0.8f, 1.0f };
+	g_light.Diffuse = cv_diffuse;
+	D3DCOLORVALUE cv_specular = { 0.8f, 0.8f, 0.8f, 1.0f };
+	g_light.Specular = cv_specular;
+
+	/*D3DLIGHT9 light;
+	ZeroMemory(&light, sizeof(D3DLIGHT9));
+    D3DXVECTOR3 vecLightDirUnnormalized( 10.0f, -10.0f, 10.0f );
+    ZeroMemory( &light, sizeof( D3DLIGHT9 ) );
+    light.Type = D3DLIGHT_DIRECTIONAL;
+    light.Diffuse.r = 1.0f;
+    light.Diffuse.g = 1.0f;
+    light.Diffuse.b = 1.0f;
+	light.Specular.r = 1.0f;
+	light.Specular.g = 1.0f;
+	light.Specular.b = 1.0f;
+	light.Ambient.r = 1.0f;
+	light.Ambient.g = 1.0f;
+	light.Ambient.b = 1.0f;
+	D3DXVec3Normalize( ( D3DXVECTOR3* )&light.Direction, &vecLightDirUnnormalized );
+    light.Position.x = 5.0f;
+    light.Position.y = 5.0f;
+    light.Position.z = -5.0f;
+    light.Range = 1000.0f;*/
 
 	
 	
@@ -202,32 +227,19 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
                                     void* pUserContext )
 {
-	/*switch ( g_CurrentState )
-	{
-	case GAMESTATE_INTRO:*/
+
+    pd3dDevice->SetRenderState( D3DRS_DITHERENABLE, TRUE );
+    pd3dDevice->SetRenderState( D3DRS_SPECULARENABLE, TRUE );
 	
-	g_introModule.SetCameraAndLight( pd3dDevice, pBackBufferSurfaceDesc, &g_camera );				
-
-
-	D3DXVECTOR3 vecEye( 0.0f, 0.0f, -10.0f );
-	D3DXVECTOR3 vecAt ( 0.0f, 0.0f, -0.0f );
-	g_camera.SetViewParams( &vecEye, &vecAt );
-
-	// Setup the camera with view & projection matrix
-	// for intro cinema.
-	/*D3DXVECTOR3 vecEye( 0.0f, -30.0f, -20.0f );
-	D3DXVECTOR3 vecAt( 0.0f, 0.0f, 0.0f );
-	g_camera.SetViewParams( &vecEye, &vecAt );*/
-
-	//g_fillColor = D3DCOLOR_ARGB( 0, 45, 50, 170 );
-	g_fillColor = D3DCOLOR_ARGB( 0, 0, 0, 0 );
-
 	pd3dDevice->SetRenderState(D3DRS_LIGHTING, TRUE);
 	pd3dDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
 	pd3dDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
 	pd3dDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 	pd3dDevice->SetRenderState(D3DRS_ZENABLE, TRUE);
 	pd3dDevice->SetRenderState(D3DRS_SHADEMODE, D3DSHADE_PHONG);
+
+	//g_fillColor = D3DCOLOR_ARGB( 0, 45, 50, 170 );
+	g_fillColor = D3DCOLOR_ARGB( 0, 0, 0, 0 );
 
 	pd3dDevice->SetLight(0, &g_light);
 	pd3dDevice->LightEnable(0, TRUE);
@@ -246,12 +258,38 @@ HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFA
 //--------------------------------------------------------------------------------------
 void CALLBACK OnFrameMove( double fTime, float fElapsedTime, void* pUserContext )
 {
-	switch ( g_CurrentState )
+	/*switch ( g_CurrentState )
 	{
 	case GAMESTATE_INTRO:
-		g_introModule.frameMove(fTime);
-		break;
-	default:
+		{*/
+
+	if ( fTime < 26.0f && g_CurrentState == GAMESTATE_INTRO )
+	{
+			g_introModule.frameMove(fTime);
+
+			// Setup the camera with view & projection matrix
+			// for intro cinema.
+			D3DXVECTOR3 vecEye( 0.0f, -30.0f, -20.0f );
+			D3DXVECTOR3 vecAt( 0.0f, 0.0f, 0.0f );
+			g_camera.SetViewParams( &vecEye, &vecAt );
+	}
+	else
+	{
+		if ( g_CurrentState != GAMESTATE_MENU)
+			g_CurrentState = GAMESTATE_MENU;
+
+		if ( 26.0f < fTime && fTime < 31.0f )
+		{
+			float newfTime = fTime - 26.0f;
+
+			D3DXVECTOR3 vecEye( 
+				0.0f, 
+				(-30.0f * (5.0f - newfTime) + 0.0f * newfTime) / 5.0f, 
+				(-20.0f * (5.0f - newfTime) -10.0f * newfTime) / 5.0f );
+			D3DXVECTOR3 vecAt ( 0.0f, 0.0f, -0.0f );
+			g_camera.SetViewParams( &vecEye, &vecAt );
+		}
+
 		g_pic.frameMove(fElapsedTime);
 		g_avatar.frameMove(fElapsedTime);
 		g_camera.FrameMove(fElapsedTime);
@@ -485,14 +523,12 @@ void CALLBACK KeyboardProc( UINT nChar, bool bKeyDown, bool bAltDown, void* pUse
 	case GAMESTATE_INTRO:
 		if ( bKeyDown )
 			// F4를 누르면 인트로에서 메인 화면으로 넘어간다.
-			// 웃기지만 DXUTToggleFullScreen()을 호출하면 동시에 OnD3D9ResetDevice가
-			// 호출되어 카메라 및 조명을 초기화해주기 때문에, 빠르게 두번 호출한다. 하하.
-			// by 영신.
 			if ( nChar == VK_F4 )
 			{
-				g_CurrentState = GAMESTATE_MENU;				
-				//DXUTToggleFullScreen();
-				//DXUTToggleFullScreen();				
+				g_CurrentState = GAMESTATE_MENU;
+				D3DXVECTOR3 vecEye( 0.0f, 0.0f, -10.0f );
+				D3DXVECTOR3 vecAt ( 0.0f, 0.0f, -0.0f );
+				g_camera.SetViewParams( &vecEye, &vecAt );
 			}
 		break;
 	case GAMESTATE_MENU:

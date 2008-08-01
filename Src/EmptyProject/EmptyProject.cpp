@@ -280,7 +280,7 @@ void CALLBACK OnFrameMove( double fTime, float fElapsedTime, void* pUserContext 
 
 		if ( 26.0f < fTime && fTime < 31.0f )
 		{
-			float newfTime = fTime - 26.0f;
+			float newfTime = ( float )fTime - 26.0f;
 
 			D3DXVECTOR3 vecEye( 
 				0.0f, 
@@ -288,6 +288,9 @@ void CALLBACK OnFrameMove( double fTime, float fElapsedTime, void* pUserContext 
 				(-20.0f * (5.0f - newfTime) -10.0f * newfTime) / 5.0f );
 			D3DXVECTOR3 vecAt ( 0.0f, 0.0f, -0.0f );
 			g_camera.SetViewParams( &vecEye, &vecAt );
+		
+			D3DCOLORVALUE cv = { newfTime / 5.0f , newfTime / 5.0f, newfTime / 5.0f, newfTime / 5.0f };
+			g_light.Ambient = cv;
 		}
 
 		g_pic.frameMove(fElapsedTime);
@@ -390,6 +393,8 @@ void CALLBACK OnD3D9FrameRender( IDirect3DDevice9* pd3dDevice, double fTime, flo
 			g_introModule.draw(pd3dDevice, &g_camera);
 			break;
 		default:
+			pd3dDevice->SetLight(0, &g_light);
+
 			pd3dDevice->SetRenderState(D3DRS_LIGHTING, TRUE);
 
 			//////////////////////////////////////////////////////////////////////////
@@ -401,8 +406,6 @@ void CALLBACK OnD3D9FrameRender( IDirect3DDevice9* pd3dDevice, double fTime, flo
 			// Draw picture map with shader settings
 			D3DXMATRIXA16 mWorldViewProj = *g_pic.getLocalXform() * *g_camera.GetViewMatrix() * *g_camera.GetProjMatrix();
 			g_pConstantTable->SetMatrix( DXUTGetD3D9Device(), "mWorldViewProj", &mWorldViewProj );
-
-
 			
 			
 			// Sample 3D model rendering

@@ -17,6 +17,10 @@
 #include "Unit.h"
 #include "EpCamera.h"
 #include "Menu.h"
+#include "ArnFile.h"
+#include "ArnSceneGraph.h"
+#include "ArnNode.h"
+#include "VideoMan.h"
 
 enum GameTopState { GAMESTATE_INTRO, GAMESTATE_WORLD, GAMESTATE_FIGHT };
 
@@ -57,6 +61,12 @@ D3DXMATRIX						g_fixedViewMat;
 int						g_scrWidth				= 160 * 5;
 int						g_scrHeight				= 90 * 5;
 
+VideoMan videoMan;
+LOGMANAGER logMan;
+
+ArnFileData*					g_afd;
+ArnSceneGraph*					g_sg;
+
 //--------------------------------------------------------------------------------------
 // Rejects any D3D9 devices that aren't acceptable to the app by returning false
 //--------------------------------------------------------------------------------------
@@ -96,6 +106,12 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
                                      void* pUserContext )
 {
 	HRESULT hr;
+
+	VideoMan::getSingleton().SetDev(pd3dDevice);
+	// Aran file init
+	g_afd = new ArnFileData;
+	load_arnfile(_T("gus2.arn"), *g_afd);
+	g_sg = new ArnSceneGraph(*g_afd);
 
 	//화면의 크기를 변환할 때마다 화면의 크기를 나타내는 전역변수 갱신.
 	g_scrWidth = pBackBufferSurfaceDesc->Width;
@@ -274,6 +290,10 @@ void CALLBACK OnFrameMove( double fTime_, float fElapsedTime, void* pUserContext
 		g_camera.SetViewParams( &vecEye, &vecAt );
 	
 		D3DCOLORVALUE cv = { newfTime / 5.0f , newfTime / 5.0f, newfTime / 5.0f, newfTime / 5.0f };
+		const float lightLimit = 0.2f;
+		if (cv.r > lightLimit) cv.r = lightLimit;
+		if (cv.g > lightLimit) cv.g = lightLimit;
+		if (cv.b > lightLimit) cv.b = lightLimit;
 		g_light.Ambient = cv;
 	}
 
@@ -297,6 +317,8 @@ void CALLBACK OnFrameMove( double fTime_, float fElapsedTime, void* pUserContext
 		g_pConstantTable->SetFloat( DXUTGetD3D9Device(), "fTime", ( float )fTime );
 
 		g_sampleTeapotMeshRot += fElapsedTime * D3DXToRadian(35); // 35 degrees per second
+
+		
 	}
 }
 
@@ -420,7 +442,14 @@ void CALLBACK OnD3D9FrameRender( IDirect3DDevice9* pd3dDevice, double fTime, flo
 			//	}
 			//}
 
-			
+			D3DXMATRIX transform;
+			D3DXMatrixIdentity(&transform);
+			pd3dDevice->SetTransform(D3DTS_WORLD, &transform);
+
+			pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CW);
+			pd3dDevice->SetFVF(ArnVertex::FVF);
+			videoMan.renderMeshesOnly(g_sg->getSceneRoot());
+			g_sg->getSceneRoot()->update(fTime, fElapsedTime);
 			
 
 
@@ -487,6 +516,11 @@ void CALLBACK OnD3D9DestroyDevice( void* pUserContext )
 	//SAFE_RELEASE( g_pEffect );
 	SAFE_RELEASE( g_pFont );
 	SAFE_RELEASE(g_aTile);
+
+	release_arnfile(*g_afd);
+	delete g_afd;
+	delete g_sg;
+	VideoMan::getSingleton().SetDev(0);
 }
 
 

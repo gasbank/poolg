@@ -202,36 +202,40 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
                                     void* pUserContext )
 {
-
-	switch ( g_CurrentState )
+	/*switch ( g_CurrentState )
 	{
-	case GAMESTATE_INTRO:
+	case GAMESTATE_INTRO:*/
+	
+	g_introModule.SetCameraAndLight( pd3dDevice, pBackBufferSurfaceDesc, &g_camera );				
+
+
+	D3DXVECTOR3 vecEye( 0.0f, 0.0f, -10.0f );
+	D3DXVECTOR3 vecAt ( 0.0f, 0.0f, -0.0f );
+	g_camera.SetViewParams( &vecEye, &vecAt );
+
+	// Setup the camera with view & projection matrix
+	// for intro cinema.
+	/*D3DXVECTOR3 vecEye( 0.0f, -30.0f, -20.0f );
+	D3DXVECTOR3 vecAt( 0.0f, 0.0f, 0.0f );
+	g_camera.SetViewParams( &vecEye, &vecAt );*/
+
+	//g_fillColor = D3DCOLOR_ARGB( 0, 45, 50, 170 );
+	g_fillColor = D3DCOLOR_ARGB( 0, 0, 0, 0 );
+
+	pd3dDevice->SetRenderState(D3DRS_LIGHTING, TRUE);
+	pd3dDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+	pd3dDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+	pd3dDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+	pd3dDevice->SetRenderState(D3DRS_ZENABLE, TRUE);
+	pd3dDevice->SetRenderState(D3DRS_SHADEMODE, D3DSHADE_PHONG);
+
+	pd3dDevice->SetLight(0, &g_light);
+	pd3dDevice->LightEnable(0, TRUE);
+
+	float fAspectRatio = pBackBufferSurfaceDesc->Width / ( FLOAT )pBackBufferSurfaceDesc->Height;
+	g_camera.SetProjParams( D3DX_PI / 4, fAspectRatio, 1.0f, 1000.0f );
+
 		
-		g_introModule.SetCameraAndLight( pd3dDevice, pBackBufferSurfaceDesc, &g_camera );				
-		break;
-
-	default:
-		D3DXVECTOR3 vecEye( 0.0f, 0.0f, -10.0f );
-		D3DXVECTOR3 vecAt ( 0.0f, 0.0f, -0.0f );
-		g_camera.SetViewParams( &vecEye, &vecAt );				
-
-		g_fillColor = D3DCOLOR_ARGB( 0, 45, 50, 170 );
-
-		pd3dDevice->SetRenderState(D3DRS_LIGHTING, TRUE);
-		pd3dDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
-		pd3dDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-		pd3dDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
-		pd3dDevice->SetRenderState(D3DRS_ZENABLE, TRUE);
-		pd3dDevice->SetRenderState(D3DRS_SHADEMODE, D3DSHADE_PHONG);
-
-		pd3dDevice->SetLight(0, &g_light);
-		pd3dDevice->LightEnable(0, TRUE);
-
-		float fAspectRatio = pBackBufferSurfaceDesc->Width / ( FLOAT )pBackBufferSurfaceDesc->Height;
-		g_camera.SetProjParams( D3DX_PI / 4, fAspectRatio, 0.1f, 100.0f );
-
-		
-	}
 	
     return S_OK;
 }

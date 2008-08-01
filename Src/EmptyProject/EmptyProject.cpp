@@ -491,8 +491,8 @@ void CALLBACK KeyboardProc( UINT nChar, bool bKeyDown, bool bAltDown, void* pUse
 			if ( nChar == VK_F4 )
 			{
 				g_CurrentState = GAMESTATE_MENU;				
-				DXUTToggleFullScreen();
-				DXUTToggleFullScreen();				
+				//DXUTToggleFullScreen();
+				//DXUTToggleFullScreen();				
 			}
 		break;
 	case GAMESTATE_MENU:

@@ -1,14 +1,49 @@
 #include "EmptyProjectPCH.h"
 #include "Menu.h"
 
-float pos = 25.0f;
+float pos = 90.0f;
+int loc = 0;
 
 void Menu::select(int move)
 {
-	if(move == 8)
-		pos += 35.0f;
-	if(move == 9)
-		pos -= 35.0f;
+	switch( loc )
+	{
+	case 0:
+		{
+			if(move == 9)
+			{
+			
+				pos -= 35.0f;
+				loc += 1;
+			}
+		}
+		break;
+
+	case 1:
+		{
+			if(move == 8)
+			{
+				pos += 35.0f;
+				loc -= 1;
+			}
+			if(move == 9)
+			{
+				pos -= 35.0f;
+				loc += 1;
+			}
+		}
+		break;
+
+	case 2:
+		{
+			if(move == 8)
+			{
+				pos += 35.0f;
+				loc -= 1;
+			}
+		}
+		break;
+	}
 }
 
 
@@ -26,7 +61,7 @@ void Menu::init (LPDIRECT3DDEVICE9& d3dDev, int scrWidth, int scrHeight)
 	m_menu.setPosition (menuBoxPositionX, menuBoxPositionY, 3.0f);
 	m_menu.setSize(menuBoxWidth, menuBoxHeight);
 
-	float trianglePositionX = (float)scrWidth/2 - menuBoxWidth + 5;
+	float trianglePositionX = (float)scrWidth/2 - menuBoxWidth + 7;
 	float triangleBoxPositionY = (float)scrHeight/2 - menuBoxWidth + pos;
 	m_selc.init(L"triangle.png", d3dDev);
 	m_selc.setPosition (trianglePositionX, triangleBoxPositionY, 2.9f);

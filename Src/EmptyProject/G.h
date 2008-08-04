@@ -1,5 +1,5 @@
 #pragma once
-#include "EpCamera.h"x
+#include "EpCamera.h"
 
 class G : public Singleton<G>
 {

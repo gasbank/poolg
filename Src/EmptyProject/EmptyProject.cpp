@@ -312,60 +312,36 @@ void CALLBACK OnD3D9DestroyDevice( void* pUserContext )
 //--------------------------------------------------------------------------------------
 void CALLBACK KeyboardProc( UINT nChar, bool bKeyDown, bool bAltDown, void* pUserContext )
 {
-	switch ( g_CurrentState )
+	if( bKeyDown )
 	{
-	case GAMESTATE_INTRO:
-		if ( bKeyDown )
-			// F4를 누르면 인트로에서 메인 화면으로 넘어간다.
-			if ( nChar == VK_F4 )
-			{
-				g_timeDelta += 1.0f;
-			}
-		break;
-	case GAMESTATE_WORLD:
-	
-		if( bKeyDown )
+		switch( nChar )
 		{
-			switch( nChar )
+		case VK_F1:
+			if (g_fillColor == D3DCOLOR_ARGB( 0, 45, 50, 170 ))
 			{
-			case VK_F1:
-				if (g_fillColor == D3DCOLOR_ARGB( 0, 45, 50, 170 ))
-				{
-					g_fillColor = D3DCOLOR_ARGB(0, 200, 100, 25);
-				}
-				else
-				{
-					g_fillColor = D3DCOLOR_ARGB( 0, 45, 50, 170 );
-				}
-				break;
-			case VK_F2:
-				break;
-			case VK_F3:
-				break;
-			case VK_LEFT:
-				break;
-			case VK_RIGHT:
-				break;
-			case VK_UP:
-				break;
-			case VK_DOWN:
-				break;
+				g_fillColor = D3DCOLOR_ARGB(0, 200, 100, 25);
 			}
+			else
+			{
+				g_fillColor = D3DCOLOR_ARGB( 0, 45, 50, 170 );
+			}
+			break;
+		case VK_F3:
+			break;
+		case VK_LEFT:
+			break;
+		case VK_RIGHT:
+			break;
+		case VK_UP:
+			break;
+		case VK_DOWN:
+			break;
+		case '8': g_select.select(8);
+			break;
+		case '9': g_select.select(9);
+			break;
 		}
-
-		//[윤욱]
-		if( bKeyDown )
-		{
-			switch( nChar )
-			{
-			case '8': g_select.select(8);
-				break;
-			case '9': g_select.select(9);
-				break;
-			}
-		}	
-		break;
-	}
+	}	
 }
 
 

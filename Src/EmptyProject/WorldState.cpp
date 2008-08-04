@@ -85,6 +85,8 @@ HRESULT WorldState::enter()
 	D3DXVECTOR3 vecEye( 0.0f, 0.0f, -30.0f );
 	D3DXVECTOR3 vecAt ( 0.0f, 0.0f, -0.0f );
 	G::getSingleton().m_camera.SetViewParams( &vecEye, &vecAt );
+
+	return S_OK;
 }
 
 HRESULT WorldState::leave()
@@ -94,9 +96,7 @@ HRESULT WorldState::leave()
 
 HRESULT WorldState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, float fElapsedTime)
 {		
-	D3DLIGHT9& light = G::getSingleton().m_light;
 	EpCamera& camera = G::getSingleton().m_camera;
-	
 
 	//////////////////////////////////////////////////////////////////////////
 	// Perspective Rendering Phase

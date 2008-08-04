@@ -34,12 +34,16 @@ IntroState::~IntroState(void)
 
 HRESULT IntroState::enter()
 {
+	LPDIRECT3DDEVICE9 pd3dDevice = G::getSingleton().m_dev;
+
+	// Initialize arrays as NULL
 	for( int i = 0; i < NUM_OF_LINES; i++ )
 	{
 		m_pStrs[i] = NULL;
 		m_pTextMeshes[i] = NULL;
 	}
 
+	// Initialize member variables
 	m_pStrFont = L"Georgia";
 	m_bBold = true;
 	m_bItalic = false;
@@ -49,21 +53,6 @@ HRESULT IntroState::enter()
 	m_logoVisible = false;
 
 	m_velocity = 1.2f;
-
-	/*m_pStrs[0] = L"                        풀쥐의 대모험";
-	m_pStrs[1] = L"                       ~ 쥐들의 역습 ~";
-	m_pStrs[3] = L"어둠의 시대! 사악한 군주 최재영의 독재는 날로";
-	m_pStrs[4] = L"혹독해져간다. 재정권과 미화권이 이미 장악되었고,";
-	m_pStrs[5] = L"자유는 사라졌다. 극심한 언론 통제 속에, 서민들은";
-	m_pStrs[6] = L"하루 20시간 코딩 노동에 시달렸다. 난세는 영웅을";
-	m_pStrs[7] = L"낳았다. 대청소로 삶의 터전을 잃은 풀쥐는 복수를";
-	m_pStrs[8] = L"다짐하였고, 오랜 세월의 코딩 수련을 마쳤다. 이제";
-	m_pStrs[9] = L"풀쥐의 험난한 여정이 시작되려 하는데...";
-	m_pStrs[11] = L"이정도면 될까? 누가 더 멋지고 웃기게 쓸 수 있는";
-	m_pStrs[12] = L"사람 손을 들어 보게.";
-	m_pStrs[14] = L"이글거리는 이펙트는 의도적으로 구현한 것으로";
-	m_pStrs[15] = L"Antialiasing을 못해서 그러는게 절대 아니다.";
-	m_pStrs[17] = L"F4를 누르시오";*/
 
 	m_pStrs[0] = L"The Great Adventure of PoolG";
 	m_pStrs[1] = L"~ PoolG's Strikes Back ~";
@@ -81,9 +70,15 @@ HRESULT IntroState::enter()
 	m_pStrs[15] = L"Now PoolG's difficult journey is just";
 	m_pStrs[16] = L"beginning!";
 
+	// Load background and logo
+	m_background.init(L"the Whirlpool Galaxy (M51) and Companion Galaxy.jpg", pd3dDevice);
+	//m_background.init(L"ratatouille.jpg", pd3dDevice);
+	m_pLogo.init( L"poolc.png", pd3dDevice );
 
+	// Create text meshes
 	createTextMeshes(G::getSingleton().m_dev);
 
+	// Setup light and camera
 	setupLight();
 	setupCamera();
 	
@@ -97,30 +92,34 @@ HRESULT IntroState::leave()
 
 HRESULT IntroState::frameMove( double fTime, float fElapsedTime )
 {
-	if ( fTime < 3.0f )
+	if (0.0f < fTime  && fTime < 3.0f)
 	{		
 		m_logoVisible = true;
 		m_logoFading = (float)fTime / 3.0f;
 	}
-	else if ( fTime < 6.0f )
+	else if (3.0f < fTime  && fTime < 6.0f)
 	{
 		double newfTime = (float)fTime - 3.0f;
 		m_logoFading = 1 - (float)newfTime / 3.0f;
 	}
-	else
+	else if (6.0f < fTime  && fTime < 46.0f)
 	{
-		float newfTime = (float)fTime - 6.0f;
+		fTime = (float)fTime - 6.0f;
 
-		if ( newfTime < 5.0f )
-			m_mtrlControl = newfTime / 5.0f;
-		else if ( 35.0f < newfTime && newfTime < 40.0f )
-			m_mtrlControl = 1.0f - (newfTime - 25.0f)  / 5.0f;
+		if (m_logoVisible == true)
+		{
+			m_logoVisible = false;
+			m_backgroundVisible = true;
+		}
+		
+		// Fade in, fade out
+		if (0.0f < fTime  && fTime < 5.0f)
+			m_mtrlControl = fTime / 5.0f;
+		else if ( 35.0f < fTime && fTime < 40.0f )
+			m_mtrlControl = 1.0f - (fTime - 35.0f)  / 5.0f;
 
-		m_logoVisible = false;
-		m_backgroundVisible = true;
-
-		D3DXVECTOR3 vAxis( 0.0f, 0.0f, -1.0f );
-		D3DXMatrixRotationAxis( &m_matBackground, &vAxis, D3DXToRadian( (FLOAT) newfTime ) );
+		D3DXVECTOR3 vAxis(0.0f, 0.0f, -1.0f );
+		D3DXMatrixRotationAxis( &m_matBackground, &vAxis, D3DXToRadian( (FLOAT) fTime ) );
 
 		// Add some translational values to the matrices
 		for (int i = 0; i < NUM_OF_LINES; i++)
@@ -128,12 +127,11 @@ HRESULT IntroState::frameMove( double fTime, float fElapsedTime )
 			D3DXMatrixTranslation( 
 				&m_matObjs[i], 
 				-12.0f, 
-				-20 - ( float) i * 2.0f + ( float ) newfTime * m_velocity,
+				-20 - ( float) i * 2.0f + ( float ) fTime * m_velocity,
 				0.0f );
 		}
 	}
-
-	if (36.0f < fTime)
+	else if (46.0f < fTime)
 	{
 		StateManager::getSingleton().setNextState(GAME_TOP_STATE_WORLD);
 		StateManager::getSingleton().transit();
@@ -147,24 +145,9 @@ HRESULT IntroState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, floa
 	D3DMATERIAL9 mtrl;
 
 	//pd3dDevice->Clear( 0L, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x00000000, 1.0f, 0L );
+	pd3dDevice->SetRenderState( D3DRS_LIGHTING, TRUE );
 
-	//// Black
-	//pd3dDevice->SetRenderState( D3DRS_LIGHTING, FALSE );
-
-	//pd3dDevice->SetTransform(D3DTS_VIEW, &g_fixedViewMat);
-	//pd3dDevice->SetTransform(D3DTS_PROJECTION, &g_orthoProjMat);
-
-	//D3DXMATRIX mScaleb, mTransb, mWorldb;
-	//D3DXMatrixScaling(&mScaleb, (FLOAT) g_scrWidth * 2.0, (FLOAT) g_scrHeight * 2.0 , 1.0f);
-	//D3DXMatrixTranslation(&mTransb, (FLOAT) -g_scrWidth, (FLOAT) -g_scrHeight, 50.0f);
-
-	//mWorldb = mScaleb * mTransb;
-
-	//m_pBlack.setLocalXform(&mWorldb);
-
-	//m_pBlack.draw();
-
-	// Fixed camera
+	// Apply fixed camera
 	pd3dDevice->SetTransform(D3DTS_VIEW, &g_fixedViewMat);
 	pd3dDevice->SetTransform(D3DTS_PROJECTION, &g_orthoProjMat);
 
@@ -203,25 +186,24 @@ HRESULT IntroState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, floa
 
 		mWorld2 = mScale2 * mTrans2;
 
-		D3DMATERIAL9 mtrlLogo;
-
 		ZeroMemory( &mtrl, sizeof( D3DMATERIAL9 ) );
 		mtrl.Diffuse.r = mtrl.Ambient.r = mtrl.Specular.r = m_logoFading;
 		mtrl.Diffuse.g = mtrl.Ambient.g = mtrl.Specular.g = m_logoFading;
 		mtrl.Diffuse.b = mtrl.Ambient.b = mtrl.Specular.b = m_logoFading;
 		mtrl.Diffuse.a = mtrl.Ambient.a = mtrl.Specular.a = 0.1f;
-		pd3dDevice->SetMaterial( &mtrl );
+		pd3dDevice->SetMaterial(&mtrl);
 
 		m_pLogo.setLocalXform(&mWorld2);
 
 		m_pLogo.draw();
 	}
 
-
-	// Setup view and projection xforms
-	pd3dDevice->SetRenderState( D3DRS_LIGHTING, TRUE );
+	// Setup view and projection xforms - ?
 	pd3dDevice->SetTexture(0, 0);
 
+	// Apply non-fixed camera
+	pd3dDevice->SetTransform(D3DTS_VIEW, G::getSingleton().m_camera.GetViewMatrix());
+	pd3dDevice->SetTransform(D3DTS_PROJECTION, G::getSingleton().m_camera.GetProjMatrix());
 
 	if( m_pTextMeshes[0] != NULL )
     {
@@ -249,6 +231,15 @@ HRESULT IntroState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, floa
 
 HRESULT IntroState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+	if (uMsg == WM_KEYDOWN)
+	{
+		if (wParam == VK_ESCAPE || wParam == VK_F4)
+		{
+			StateManager::getSingleton().setNextState(GAME_TOP_STATE_WORLD);
+			StateManager::getSingleton().transit();
+		}
+	}
+
 	return S_OK;
 }
 
@@ -279,13 +270,15 @@ void IntroState::setupLight()
 
 	D3DXVECTOR3 dir(10.0f, -10.0f, 10.0f);
 	D3DXVec3Normalize((D3DXVECTOR3*)&light.Direction, &dir);
-	light.Falloff = 0.5f;
-	light.Phi = D3DXToRadian(80);
-	light.Theta = D3DXToRadian(10);
-
+	
 	D3DXVECTOR3 pos(-10.0f, 10.0f, -10.0f);
 	D3DXVec3Normalize((D3DXVECTOR3*)&light.Position, &pos);
 
+	// What are these?
+	light.Falloff = 0.5f; 
+	light.Phi = D3DXToRadian(80);
+	light.Theta = D3DXToRadian(10);
+	
 	light.Type = D3DLIGHT_DIRECTIONAL;
 	light.Range = 1000.0f;
 
@@ -313,17 +306,9 @@ HRESULT IntroState::createTextMeshes( IDirect3DDevice9* pd3dDevice )
 			return E_FAIL;
 	}
 
-	m_background.init(L"the Whirlpool Galaxy (M51) and Companion Galaxy.jpg", pd3dDevice);
-	//m_background.init(L"ratatouille.jpg", pd3dDevice);
-	m_pLogo.init( L"poolc.png", pd3dDevice );
-	m_pBlack.init( L"the Whirlpool Galaxy (M51) and Companion Galaxy.jpg", pd3dDevice);
-
 	return S_OK;
 }
 
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
 HRESULT IntroState::createD3DXTextMesh( IDirect3DDevice9* pd3dDevice, LPCWSTR pStr, LPD3DXMESH* ppTextMesh )
 {
 	HRESULT hr;

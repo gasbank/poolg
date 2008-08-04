@@ -26,6 +26,12 @@ extern D3DXMATRIX						g_fixedViewMat;
 
 IntroState::IntroState(void)
 {
+	UINT i;
+	for (i = 0; i < NUM_OF_LINES; ++i)
+	{
+		// Avoid non-invertible world-view matrix
+		D3DXMatrixIdentity(&m_matObjs[i]);
+	}
 }
 
 IntroState::~IntroState(void)
@@ -114,9 +120,9 @@ HRESULT IntroState::frameMove( double fTime, float fElapsedTime )
 		
 		// Fade in, fade out
 		if (0.0f < fTime  && fTime < 5.0f)
-			m_mtrlControl = fTime / 5.0f;
+			m_mtrlControl = (float)(fTime / 5.0f);
 		else if ( 35.0f < fTime && fTime < 40.0f )
-			m_mtrlControl = 1.0f - (fTime - 35.0f)  / 5.0f;
+			m_mtrlControl = (float)(1.0f - (fTime - 35.0f)  / 5.0f);
 
 		D3DXVECTOR3 vAxis(0.0f, 0.0f, -1.0f );
 		D3DXMatrixRotationAxis( &m_matBackground, &vAxis, D3DXToRadian( (FLOAT) fTime ) );
@@ -156,7 +162,7 @@ HRESULT IntroState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, floa
 	{		
 
 		D3DXMATRIX mScale, mTrans, mWorld;
-		D3DXMatrixScaling(&mScale, (FLOAT) G::getSingleton().m_scrWidth * 2.0, (FLOAT) G::getSingleton().m_scrHeight * 2.0 , 1.0f);
+		D3DXMatrixScaling(&mScale, (FLOAT) G::getSingleton().m_scrWidth * 2.0f, (FLOAT) G::getSingleton().m_scrHeight * 2.0f, 1.0f);
 		D3DXMatrixTranslation(&mTrans, (FLOAT) -G::getSingleton().m_scrWidth, (FLOAT) -G::getSingleton().m_scrHeight, 49.0f);
 
 		mWorld = mScale * mTrans * m_matBackground;
@@ -197,34 +203,37 @@ HRESULT IntroState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, floa
 
 		m_pLogo.draw();
 	}
+	else
+	{
+		// Setup view and projection xforms - ?
+		pd3dDevice->SetTexture(0, 0);
 
-	// Setup view and projection xforms - ?
-	pd3dDevice->SetTexture(0, 0);
+		// Apply non-fixed camera
+		pd3dDevice->SetTransform(D3DTS_VIEW, G::getSingleton().m_camera.GetViewMatrix());
+		pd3dDevice->SetTransform(D3DTS_PROJECTION, G::getSingleton().m_camera.GetProjMatrix());
 
-	// Apply non-fixed camera
-	pd3dDevice->SetTransform(D3DTS_VIEW, G::getSingleton().m_camera.GetViewMatrix());
-	pd3dDevice->SetTransform(D3DTS_PROJECTION, G::getSingleton().m_camera.GetProjMatrix());
-
-	if( m_pTextMeshes[0] != NULL )
-    {
-        ZeroMemory( &mtrl, sizeof( D3DMATERIAL9 ) );
-		D3DCOLORVALUE cv_diffuse = { 0.0f, 1.0f, 0.8f, 1.0f };
-		mtrl.Diffuse  = cv_diffuse;
-		D3DCOLORVALUE cv_ambient = { 0.0f, 0.0f, 0.0f, 1.0f };
-		mtrl.Ambient = cv_ambient;
-		D3DCOLORVALUE cv_specular = { 0.0f, 1.0f, 0.8f, 1.0f };
-		mtrl.Ambient = cv_specular;
-		pd3dDevice->SetMaterial( &mtrl );
-
-		for (int i = 0; i < NUM_OF_LINES; i++)
+		if( m_pTextMeshes[0] != NULL )
 		{
-			if ( m_pTextMeshes[i] == NULL )
-				continue;
+			ZeroMemory( &mtrl, sizeof( D3DMATERIAL9 ) );
+			D3DCOLORVALUE cv_diffuse = { 0.0f, 1.0f, 0.8f, 1.0f };
+			mtrl.Diffuse  = cv_diffuse;
+			D3DCOLORVALUE cv_ambient = { 0.0f, 0.0f, 0.0f, 1.0f };
+			mtrl.Ambient = cv_ambient;
+			D3DCOLORVALUE cv_specular = { 0.0f, 1.0f, 0.8f, 1.0f };
+			mtrl.Ambient = cv_specular;
+			pd3dDevice->SetMaterial( &mtrl );
 
-			pd3dDevice->SetTransform( D3DTS_WORLD, &m_matObjs[i] );
-			m_pTextMeshes[i]->DrawSubset( 0 );
+			for (int i = 0; i < NUM_OF_LINES; i++)
+			{
+				if ( m_pTextMeshes[i] == NULL )
+					continue;
+
+				pd3dDevice->SetTransform( D3DTS_WORLD, &m_matObjs[i] );
+				m_pTextMeshes[i]->DrawSubset( 0 );
+			}
 		}
 	}
+	
 
 	return S_OK;
 }

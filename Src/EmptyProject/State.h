@@ -6,11 +6,13 @@ public:
 	State(void);
 	virtual ~State(void);
 
-	virtual void enter() = 0;
-	virtual void leave() = 0;
+	virtual HRESULT enter() = 0;
+	virtual HRESULT leave() = 0;
 
-	virtual void frameRender(IDirect3DDevice9* pd3dDevice, double fTime, float fElapsedTime) = 0;
-	virtual void frameMove(double fTime, float fElapsedTime) = 0;
+	virtual HRESULT frameRender(IDirect3DDevice9* pd3dDevice, double fTime, float fElapsedTime) = 0;
+	virtual HRESULT frameMove(double fTime, float fElapsedTime) = 0;
 
-	virtual void release() = 0;
+	virtual HRESULT handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) = 0;
+
+	virtual HRESULT release() = 0;
 };

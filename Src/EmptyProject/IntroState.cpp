@@ -1,11 +1,10 @@
 #include "EmptyProjectPCH.h"
 #include "IntroState.h"
 #include "Picture.h"
+#include "StateManager.h"
 
 extern D3DXMATRIX						g_orthoProjMat;
 extern D3DXMATRIX						g_fixedViewMat;
-extern int						g_scrWidth;
-extern int						g_scrHeight;
 
 //The Great Adventure of PoolG"
 //~ PoolG's Strikes Back ~"
@@ -33,7 +32,7 @@ IntroState::~IntroState(void)
 {
 }
 
-void IntroState::enter()
+HRESULT IntroState::enter()
 {
 	for( int i = 0; i < NUM_OF_LINES; i++ )
 	{
@@ -87,32 +86,34 @@ void IntroState::enter()
 
 	setupLight();
 	setupCamera();
-
+	
+	return S_OK;
 }
 
-void IntroState::leave()
+HRESULT IntroState::leave()
 {
+	return S_OK;
 }
 
-void IntroState::frameMove( double fTime, float fElapsedTime )
+HRESULT IntroState::frameMove( double fTime, float fElapsedTime )
 {
 	if ( fTime < 3.0f )
 	{		
 		m_logoVisible = true;
-		m_logoFading = fTime / 3.0f;
+		m_logoFading = (float)fTime / 3.0f;
 	}
 	else if ( fTime < 6.0f )
 	{
-		double newfTime = fTime - 3.0f;
-		m_logoFading = 1 - newfTime / 3.0f;
+		double newfTime = (float)fTime - 3.0f;
+		m_logoFading = 1 - (float)newfTime / 3.0f;
 	}
 	else
 	{
-		float newfTime = fTime - 6.0f;
+		float newfTime = (float)fTime - 6.0f;
 
 		if ( newfTime < 5.0f )
 			m_mtrlControl = newfTime / 5.0f;
-		else if ( 35.0f < newfTime < 40.0f )
+		else if ( 35.0f < newfTime && newfTime < 40.0f )
 			m_mtrlControl = 1.0f - (newfTime - 25.0f)  / 5.0f;
 
 		m_logoVisible = false;
@@ -131,9 +132,17 @@ void IntroState::frameMove( double fTime, float fElapsedTime )
 				0.0f );
 		}
 	}
+
+	if (36.0f < fTime)
+	{
+		StateManager::getSingleton().setNextState(GAME_TOP_STATE_WORLD);
+		StateManager::getSingleton().transit();
+	}
+
+	return S_OK;
 }
 
-void IntroState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, float fElapsedTime)
+HRESULT IntroState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, float fElapsedTime)
 {
 	D3DMATERIAL9 mtrl;
 
@@ -164,8 +173,8 @@ void IntroState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, float f
 	{		
 
 		D3DXMATRIX mScale, mTrans, mWorld;
-		D3DXMatrixScaling(&mScale, (FLOAT) g_scrWidth * 2.0, (FLOAT) g_scrHeight * 2.0 , 1.0f);
-		D3DXMatrixTranslation(&mTrans, (FLOAT) -g_scrWidth, (FLOAT) -g_scrHeight, 49.0f);
+		D3DXMatrixScaling(&mScale, (FLOAT) G::getSingleton().m_scrWidth * 2.0, (FLOAT) G::getSingleton().m_scrHeight * 2.0 , 1.0f);
+		D3DXMatrixTranslation(&mTrans, (FLOAT) -G::getSingleton().m_scrWidth, (FLOAT) -G::getSingleton().m_scrHeight, 49.0f);
 
 		mWorld = mScale * mTrans * m_matBackground;
 
@@ -234,9 +243,16 @@ void IntroState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, float f
 			m_pTextMeshes[i]->DrawSubset( 0 );
 		}
 	}
+
+	return S_OK;
 }
 
-void IntroState::release()
+HRESULT IntroState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	return S_OK;
+}
+
+HRESULT IntroState::release()
 {
 	for( int i = 0; i < NUM_OF_LINES; i++ )
 	{		
@@ -246,6 +262,8 @@ void IntroState::release()
 	m_background.release();
 	m_pLogo.release();
 	m_pBlack.release();
+
+	return S_OK;
 }
 
 void IntroState::setupLight() 

@@ -11,13 +11,15 @@ public:
 	IntroState();
 	~IntroState(void);
 
-	virtual void enter();
-	virtual void leave();
+	virtual HRESULT enter();
+	virtual HRESULT leave();
 
-	virtual void frameRender(IDirect3DDevice9* pd3dDevice, double fTime, float fElapsedTime);
-	virtual void frameMove(double fTime, float fElapsedTime);
+	virtual HRESULT frameRender(IDirect3DDevice9* pd3dDevice, double fTime, float fElapsedTime);
+	virtual HRESULT frameMove(double fTime, float fElapsedTime);
 
-	virtual void release();
+	virtual HRESULT handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+	virtual HRESULT release();
 	
 private:
 
@@ -29,7 +31,7 @@ private:
 	LPD3DXMESH m_pTextMeshes[NUM_OF_LINES];
 	TCHAR* m_pStrs[NUM_OF_LINES];
 
-	D3DXMATRIXA16 m_matObjs[NUM_OF_LINES];	// Matrixes for transform of each text meshes
+	D3DXMATRIX m_matObjs[NUM_OF_LINES];	// Matrixes for transform of each text meshes
 	
 	Picture m_background;
 	bool m_backgroundVisible;

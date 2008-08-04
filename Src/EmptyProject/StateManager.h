@@ -1,8 +1,10 @@
 #pragma once
 
+enum GameTopState {GAME_TOP_STATE_INTRO, GAME_TOP_STATE_WORLD};
+
 class State;
 
-class StateManager
+class StateManager : public Singleton<StateManager>
 {
 public:
 	StateManager(void);
@@ -11,6 +13,7 @@ public:
 	void init();
 	void release();
 	State* getCurState() const;
+	void setNextState(GameTopState);
 	void transit();
 
 private:

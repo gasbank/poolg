@@ -1,6 +1,6 @@
 ﻿//--------------------------------------------------------------------------------------
 // File: EmptyProject.cpp
-//
+//	
 // Copyright (c) Microsoft Corporation. All rights reserved.
 //
 // Modified PoolG Team, a Division of PoolC
@@ -9,50 +9,30 @@
 #include "EmptyProjectPCH.h"
 #include <time.h>
 #include "resource.h"
-#include "Picture.h"
-#include "PictureMap.h"
-#include "Sound.h"
 #include "Battle.h"
 #include "IntroState.h"
-#include "Unit.h"
 #include "EpCamera.h"
 #include "Menu.h"
-#include "ArnFile.h"
-#include "ArnSceneGraph.h"
-#include "ArnNode.h"
-#include "VideoMan.h"
 #include "StateManager.h"
+#include "VideoMan.h"
 
-enum GameTopState { GAMESTATE_INTRO, GAMESTATE_WORLD, GAMESTATE_FIGHT };
+enum GameTopStatex { GAMESTATE_INTRO, GAMESTATE_WORLD, GAMESTATE_FIGHT };
 
 
 G								g_g;
 StateManager					g_sm;
 
-GameTopState					g_CurrentState			= GAMESTATE_INTRO;
+GameTopStatex					g_CurrentState			= GAMESTATE_INTRO;
 
 bool							g_IntroEnable = true;
-bool							g_WorldEnable = false;
 double							g_timeDelta = 0.0f;
 
-LPDIRECT3DVERTEXSHADER9         g_pVertexShader			= 0;
-LPD3DXCONSTANTTABLE             g_pConstantTable		= 0;
-LPDIRECT3DVERTEXDECLARATION9    g_pVertexDeclaration	= 0;
 LPD3DXFONT						g_pFont					= 0;
 LPD3DXEFFECT		            g_pEffect				= 0;
 D3DXHANDLE						g_tech					= 0;
 
-Unit							g_sampleTeapotMesh;
-float							g_sampleTeapotMeshRot	= 0;
-LPD3DXMESH						g_aTile					= 0;
-
-PictureMap						g_pic;
-Picture							g_picRhw;
-Picture							g_picSmiley;
-Picture							g_avatar;
 Menu							g_menubox;
 Menu							g_select;
-Sound							g_sound;
 Battle							g_battle;
 IntroState						g_introModule;
 
@@ -61,14 +41,7 @@ D3DCOLOR						g_fillColor;
 D3DXMATRIX						g_orthoProjMat;
 D3DXMATRIX						g_fixedViewMat;
 
-int						g_scrWidth				= 160 * 5;
-int						g_scrHeight				= 90 * 5;
-
-VideoMan videoMan;
 LOGMANAGER logMan;
-
-ArnFileData*					g_afd;
-ArnSceneGraph*					g_sg;
 
 //--------------------------------------------------------------------------------------
 // Rejects any D3D9 devices that aren't acceptable to the app by returning false
@@ -113,87 +86,25 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 	G::getSingleton().m_dev = pd3dDevice;
 	EpCamera& g_camera = G::getSingleton().m_camera;
 
-	VideoMan::getSingleton().SetDev(pd3dDevice);
-	// Aran file init
-	g_afd = new ArnFileData;
-	load_arnfile(_T("gus2.arn"), *g_afd);
-	g_sg = new ArnSceneGraph(*g_afd);
+	// Runtime error at here. I cannot deal with this.. by KYS
+	//VideoMan::getSingleton().SetDev(pd3dDevice);
 
 	//화면의 크기를 변환할 때마다 화면의 크기를 나타내는 전역변수 갱신.
-	g_scrWidth = pBackBufferSurfaceDesc->Width;
-	g_scrHeight = pBackBufferSurfaceDesc->Height;
-
-	// Setup main camera
-	D3DXVECTOR3 vecEye( 0.0f, 0.0f, -30.0f );
-	D3DXVECTOR3 vecAt ( 0.0f, 0.0f, -0.0f );
-	g_camera.SetViewParams( &vecEye, &vecAt );
-
-	// Load sample image (vertex and index buffer creation with texture)
-	const UINT mapSegments = 32;
-	const UINT mapSize = 32;
-	g_pic.init(L"graytile.tga", pd3dDevice, mapSegments);
-	g_pic.setSize((float)mapSize, (float)mapSize);
-	g_pic.setPos(D3DXVECTOR3(g_pic.getPos()->x - mapSize/2, g_pic.getPos()->y - mapSize/2, g_pic.getPos()->z));
-	
-	g_picRhw.initRhw(L"smiley.png", pd3dDevice);
-	g_picSmiley.init(L"smiley.png", pd3dDevice);
-	//g_picSmiley.setSizeToTexture();
+	G::getSingleton().m_scrWidth = pBackBufferSurfaceDesc->Width;
+	G::getSingleton().m_scrHeight = pBackBufferSurfaceDesc->Height;
 
 	//[윤욱]
-	g_menubox.init(pd3dDevice, g_scrWidth, g_scrHeight);
+	g_menubox.init(pd3dDevice, G::getSingleton().m_scrWidth, G::getSingleton().m_scrHeight);
 	
 	//[재우] 부분
-	g_battle.init(pd3dDevice, g_scrWidth, g_scrHeight);
-	
-	g_avatar.init(L"smiley.png", pd3dDevice);
-	g_avatar.setSize(1, 1);
-	g_sound.init();
+	g_battle.init(pd3dDevice, G::getSingleton().m_scrWidth, G::getSingleton().m_scrHeight);
 	
 	V( D3DXCreateFont( pd3dDevice, 12, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Gulim"), &g_pFont) );
-
-	// Create vertex shader
-	WCHAR strPath[512];
-	LPD3DXBUFFER pCode;
-
-	D3DVERTEXELEMENT9 decl[] =
-	{
-		{ 0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 },
-		{ 0, 12, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0 },
-		D3DDECL_END()
-	};
-
-	V_RETURN( pd3dDevice->CreateVertexDeclaration( decl, &g_pVertexDeclaration ) );
-
-	V_RETURN(StringCchCopy( strPath, sizeof(strPath)/sizeof(TCHAR), L"HLSLwithoutEffects.vsh" ));
-
-	DWORD dwShaderFlags = D3DXSHADER_DEBUG | D3DXSHADER_DEBUG | D3DXSHADER_SKIPOPTIMIZATION;
-	V_RETURN( D3DXCompileShaderFromFile( strPath, NULL, NULL, "Ripple",
-		"vs_2_0", dwShaderFlags, &pCode,
-		NULL, &g_pConstantTable ) );
-
-	// Create the vertex shader
-	hr = pd3dDevice->CreateVertexShader( ( DWORD* )pCode->GetBufferPointer(),
-		&g_pVertexShader );
-	pCode->Release();
-	
-	if( FAILED( hr ) )
-		return DXTRACE_ERR( TEXT( "CreateVertexShader" ), hr );
-
 
 	// Orthogonal and fixed view xforms for GUI or fixed element rendering
 	D3DXVECTOR3 eye(0, 0, -50.0f), at(0, 0, 0), up(0, 1.0f, 0);
 	D3DXMatrixOrthoLH(&g_orthoProjMat, (FLOAT)pBackBufferSurfaceDesc->Width, (FLOAT)pBackBufferSurfaceDesc->Height, 0.1f, 100.0f);
 	D3DXMatrixLookAtLH(&g_fixedViewMat,	&eye, &at, &up);
-
-	// Create sample 3D model(!)
-	LPD3DXMESH teapot;
-	D3DXCreateTeapot(pd3dDevice, &teapot, 0);
-	g_sampleTeapotMesh.init(pd3dDevice, teapot);
-	g_sampleTeapotMesh.setPosZ(-g_sampleTeapotMesh.getUpperRight().z);
-	g_sampleTeapotMesh.setRotX(D3DXToRadian(-90));
-	g_sampleTeapotMesh.setRotZ(D3DXToRadian(90));
-	
-	D3DXCreateBox(pd3dDevice, 1.0f, 1.0f, 1.0f, &g_aTile, 0);
 
 	float fAspectRatio = pBackBufferSurfaceDesc->Width / ( FLOAT )pBackBufferSurfaceDesc->Height;
 	g_camera.SetProjParams( D3DX_PI / 4, fAspectRatio, 1.0f, 1000.0f );
@@ -225,12 +136,6 @@ HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFA
 	//g_fillColor = D3DCOLOR_ARGB( 0, 45, 50, 170 );
 	g_fillColor = D3DCOLOR_ARGB( 0, 0, 0, 0 );
 
-
-
-	
-
-		
-	
     return S_OK;
 }
 
@@ -240,11 +145,7 @@ HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFA
 //--------------------------------------------------------------------------------------
 void CALLBACK OnFrameMove( double fTime_, float fElapsedTime, void* pUserContext )
 {
-	EpCamera& g_camera = G::getSingleton().m_camera;
-	D3DLIGHT9& g_light = G::getSingleton().m_light;
-
 	double fTime = fTime_ + g_timeDelta;
-
 
 	if ( 41.0f < fTime && fTime < 44.0f)
 	{
@@ -252,48 +153,11 @@ void CALLBACK OnFrameMove( double fTime_, float fElapsedTime, void* pUserContext
 		g_CurrentState = GAMESTATE_WORLD;
 	}
 
-	
-	if ( 36.0f < fTime && fTime < 41.0f )
-	{
-		float newfTime = ( float )fTime - 36.0f;
-
-		D3DXVECTOR3 vecEye( 
-			0.0f, 
-			(-30.0f * (5.0f - newfTime) + 0.0f * newfTime) / 5.0f, 
-			(-20.0f * (5.0f - newfTime) -20.0f * newfTime) / 5.0f );
-		D3DXVECTOR3 vecAt ( 0.0f, 0.0f, -0.0f );
-		g_camera.SetViewParams( &vecEye, &vecAt );
-	
-		D3DCOLORVALUE cv = { newfTime / 5.0f , newfTime / 5.0f, newfTime / 5.0f, newfTime / 5.0f };
-		const float lightLimit = 0.2f;
-		if (cv.r > lightLimit) cv.r = lightLimit;
-		if (cv.g > lightLimit) cv.g = lightLimit;
-		if (cv.b > lightLimit) cv.b = lightLimit;
-		g_light.Ambient = cv;
-	}
-
 	if ( 36.0f < fTime )
 	{
-		g_WorldEnable = true;
-
-		g_pic.frameMove(fElapsedTime);
-		g_avatar.frameMove(fElapsedTime);
-		g_camera.FrameMove(fElapsedTime);
-		g_sound.UpdateAudio();
-		g_sampleTeapotMesh.frameMove(fElapsedTime);
-
 		//[재우]부분
 		g_battle.frameMove(fElapsedTime);
 		g_menubox.frameMove(fElapsedTime);
-
-		// Set up the vertex shader constants
-		D3DXMATRIXA16 mViewProj = *g_camera.GetViewMatrix() * *g_camera.GetProjMatrix();
-		g_pConstantTable->SetMatrix( DXUTGetD3D9Device(), "mViewProj", &mViewProj );
-		g_pConstantTable->SetFloat( DXUTGetD3D9Device(), "fTime", ( float )fTime );
-
-		g_sampleTeapotMeshRot += fElapsedTime * D3DXToRadian(35); // 35 degrees per second
-
-		
 	}
 
 	g_sm.getCurState()->frameMove(fTime, fElapsedTime);
@@ -308,8 +172,8 @@ void renderDebugText()
 	RECT rc;
 	rc.top = 0;
 	rc.left = 0;
-	rc.right = g_scrWidth;
-	rc.bottom = g_scrHeight;
+	rc.right = G::getSingleton().m_scrWidth;
+	rc.bottom = G::getSingleton().m_scrHeight;
 	
 	StringCchPrintf(debugBuffer, 512, L"カメラの位置: (%.2f, %.2f, %.2f)", g_camera.GetEyePt()->x, g_camera.GetEyePt()->y, g_camera.GetEyePt()->z);
 	g_pFont->DrawTextW(0, debugBuffer, -1, &rc, DT_NOCLIP | DT_RIGHT, D3DXCOLOR( 0.0f, 1.0f, 0.0f, 1.0f ) );
@@ -317,8 +181,8 @@ void renderDebugText()
 	StringCchPrintf(debugBuffer, 512, L"カメラの眺める場所: (%.2f, %.2f, %.2f)", g_camera.GetLookAtPt()->x, g_camera.GetLookAtPt()->y, g_camera.GetLookAtPt()->z);
 	g_pFont->DrawTextW(0, debugBuffer, -1, &rc, DT_NOCLIP | DT_RIGHT, D3DXCOLOR( 0.0f, 1.0f, 0.0f, 1.0f ) );
 	rc.top += 12;
-	StringCchPrintf(debugBuffer, 512, L"タイルの位置: (%.2f, %.2f, %.2f)", g_pic.getPos()->x, g_pic.getPos()->y, g_pic.getPos()->z);
-	g_pFont->DrawTextW(0, debugBuffer, -1, &rc, DT_NOCLIP | DT_RIGHT, D3DXCOLOR( 0.0f, 1.0f, 0.0f, 1.0f ) );
+	//StringCchPrintf(debugBuffer, 512, L"タイルの位置: (%.2f, %.2f, %.2f)", g_pic.getPos()->x, g_pic.getPos()->y, g_pic.getPos()->z);
+	//g_pFont->DrawTextW(0, debugBuffer, -1, &rc, DT_NOCLIP | DT_RIGHT, D3DXCOLOR( 0.0f, 1.0f, 0.0f, 1.0f ) );
 	rc.top += 12;
 	StringCchPrintf(debugBuffer, 512, L" - 상하좌우 화살표키를 이용해 카메라를 좌우/가까이멀리 이동 가능");
 	g_pFont->DrawTextW(0, debugBuffer, -1, &rc, DT_NOCLIP | DT_RIGHT, D3DXCOLOR( 0.0f, 1.0f, 1.0f, 1.0f ) );
@@ -342,9 +206,9 @@ void renderFixedElements(IDirect3DDevice9* pd3dDevice, double fTime, float fElap
 	
 
 	//[재우]부분
-	g_battle.draw(g_scrWidth, g_scrHeight);
+	g_battle.draw(G::getSingleton().m_scrWidth, G::getSingleton().m_scrHeight);
 
-	g_menubox.draw(g_scrWidth, g_scrHeight);
+	g_menubox.draw(G::getSingleton().m_scrWidth, G::getSingleton().m_scrHeight);
 	//g_picRhw.draw();
 
 	/*D3DPERF_BeginEvent(0xff00ffff, L"Draw Center Smiley~");
@@ -367,64 +231,21 @@ void renderFixedElements(IDirect3DDevice9* pd3dDevice, double fTime, float fElap
 //--------------------------------------------------------------------------------------
 void CALLBACK OnD3D9FrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float fElapsedTime, void* pUserContext )
 {
-    HRESULT hr;
+	HRESULT hr;
 
-	EpCamera& g_camera = G::getSingleton().m_camera;
-	D3DLIGHT9& g_light = G::getSingleton().m_light;
-	
     // Clear the render target and the zbuffer 
     V( pd3dDevice->Clear( 0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, g_fillColor, 1.0f, 0 ) );
-
-
 
     // Render the scene
     if( SUCCEEDED( pd3dDevice->BeginScene() ) )
     {
-		g_sm.getCurState()->frameRender(pd3dDevice, fTime, fElapsedTime);
-
-		if ( g_IntroEnable )
-			g_introModule.frameRender(pd3dDevice, fTime, fElapsedTime);
-
-		if ( g_WorldEnable )
-		{
-			pd3dDevice->SetLight(0, &g_light);
-
-			pd3dDevice->SetRenderState(D3DRS_LIGHTING, TRUE);
-
-			//////////////////////////////////////////////////////////////////////////
-			// Perspective Rendering Phase
-
-			pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
-			pd3dDevice->SetTransform(D3DTS_VIEW, g_camera.GetViewMatrix());
-			pd3dDevice->SetTransform(D3DTS_PROJECTION, g_camera.GetProjMatrix());
-
-			// Draw picture map with shader settings
-			D3DXMATRIXA16 mWorldViewProj = *g_pic.getLocalXform() * *g_camera.GetViewMatrix() * *g_camera.GetProjMatrix();
-			g_pConstantTable->SetMatrix( DXUTGetD3D9Device(), "mWorldViewProj", &mWorldViewProj );
-			
-			
-			// Sample 3D model rendering
-			g_sampleTeapotMesh.draw();
-
-			// Draw floor gray tile (2D)
-			//g_pic.draw();
-
-			D3DXMATRIX transform;
-			D3DXMatrixIdentity(&transform);
-			pd3dDevice->SetTransform(D3DTS_WORLD, &transform);
-
-			pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CW);
-			pd3dDevice->SetFVF(ArnVertex::FVF);
-			videoMan.renderMeshesOnly(g_sg->getSceneRoot());
-			g_sg->getSceneRoot()->update(fTime, fElapsedTime);
-			
+		g_sm.getCurState()->frameRender(pd3dDevice, fTime, fElapsedTime);			
 
 
-			//////////////////////////////////////////////////////////////////////////
-			// Orthogonal and fixed Rendering Phase
+		//////////////////////////////////////////////////////////////////////////
+		// Orthogonal and fixed Rendering Phase
 
-			renderFixedElements(pd3dDevice, fTime, fElapsedTime);
-		}
+		renderFixedElements(pd3dDevice, fTime, fElapsedTime);
 
         V( pd3dDevice->EndScene() );
     }
@@ -441,13 +262,13 @@ LRESULT CALLBACK MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
 	EpCamera& g_camera = G::getSingleton().m_camera;
 
 	//g_avatar.handleMessages(hWnd, uMsg, wParam, lParam);
-	g_pic.handleMessages(hWnd, uMsg, wParam, lParam);
 	g_camera.HandleMessages(hWnd, uMsg, wParam, lParam);
-	g_sound.handleMessages(hWnd, uMsg, wParam, lParam);
-	g_sampleTeapotMesh.handleMessages(hWnd, uMsg, wParam, lParam);
 
 	//[재우]부분
 	g_battle.handleMessages(hWnd, uMsg, wParam, lParam);
+
+	if (g_sm.getCurState() != 0)
+		g_sm.getCurState()->handleMessages(hWnd, uMsg, wParam, lParam);
 
     return 0;
 }
@@ -467,32 +288,19 @@ void CALLBACK OnD3D9LostDevice( void* pUserContext )
 //--------------------------------------------------------------------------------------
 void CALLBACK OnD3D9DestroyDevice( void* pUserContext )
 {
-	g_pic.release();
-	g_picRhw.release();
-	g_picSmiley.release();
-	g_avatar.release();
-	g_sound.release();
 	g_menubox.release();
 
 	//[재우]부분
 	g_battle.release();
 
 	g_introModule.release();
-	g_sampleTeapotMesh.release();
-
+	
 	g_sm.release();
-
-	SAFE_RELEASE( g_pVertexShader );
-	SAFE_RELEASE( g_pConstantTable );
-	SAFE_RELEASE( g_pVertexDeclaration );
+	
 	//SAFE_RELEASE( g_pEffect );
 	SAFE_RELEASE( g_pFont );
-	SAFE_RELEASE(g_aTile);
-
-	release_arnfile(*g_afd);
-	delete g_afd;
-	delete g_sg;
-	VideoMan::getSingleton().SetDev(0);
+	
+	//VideoMan::getSingleton().SetDev(0);
 }
 
 
@@ -515,52 +323,49 @@ void CALLBACK KeyboardProc( UINT nChar, bool bKeyDown, bool bAltDown, void* pUse
 			}
 		break;
 	case GAMESTATE_WORLD:
-		if ( bKeyDown )
+	
+		if( bKeyDown )
 		{
+			switch( nChar )
+			{
+			case VK_F1:
+				if (g_fillColor == D3DCOLOR_ARGB( 0, 45, 50, 170 ))
+				{
+					g_fillColor = D3DCOLOR_ARGB(0, 200, 100, 25);
+				}
+				else
+				{
+					g_fillColor = D3DCOLOR_ARGB( 0, 45, 50, 170 );
+				}
+				break;
+			case VK_F2:
+				break;
+			case VK_F3:
+				break;
+			case VK_LEFT:
+				break;
+			case VK_RIGHT:
+				break;
+			case VK_UP:
+				break;
+			case VK_DOWN:
+				break;
+			}
 		}
+
+		//[윤욱]
+		if( bKeyDown )
+		{
+			switch( nChar )
+			{
+			case '8': g_select.select(8);
+				break;
+			case '9': g_select.select(9);
+				break;
+			}
+		}	
 		break;
 	}
-
-	if( bKeyDown )
-	{
-		switch( nChar )
-		{
-		case VK_F1:
-			if (g_fillColor == D3DCOLOR_ARGB( 0, 45, 50, 170 ))
-			{
-				g_fillColor = D3DCOLOR_ARGB(0, 200, 100, 25);
-			}
-			else
-			{
-				g_fillColor = D3DCOLOR_ARGB( 0, 45, 50, 170 );
-			}
-			break;
-		case VK_F2:
-			break;
-		case VK_F3:
-			break;
-		case VK_LEFT:
-			break;
-		case VK_RIGHT:
-			break;
-		case VK_UP:
-			break;
-		case VK_DOWN:
-			break;
-		}
-	}
-	//[윤욱]
-	if( bKeyDown )
-	{
-		switch( nChar )
-		{
-		case '8': g_select.select(8);
-			break;
-		case '9': g_select.select(9);
-			break;
-		}
-	}
-
 }
 
 
@@ -603,7 +408,7 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
     DXUTSetHotkeyHandling( true, true, true );  // handle the default hotkeys
     DXUTSetCursorSettings( true, true ); // Show the cursor and clip it when in full screen
     DXUTCreateWindow( L"EmptyProject" );
-    DXUTCreateDevice( true, g_scrWidth, g_scrHeight );
+	DXUTCreateDevice( true, G::getSingleton().m_scrWidth, G::getSingleton().m_scrHeight );
 
     // Start the render loop
     DXUTMainLoop();

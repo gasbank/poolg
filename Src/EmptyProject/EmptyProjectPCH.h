@@ -3,7 +3,7 @@
 #include "DXUT.h"
 #include <xact3.h>
 #include "DXUTcamera.h"
-
+#include "G.h"
 
 // Visual Studio memory leak detection C runtime library
 // This feature is implemented somewhat different way in MFC library,

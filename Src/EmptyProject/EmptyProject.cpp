@@ -13,7 +13,7 @@
 #include "PictureMap.h"
 #include "Sound.h"
 #include "Battle.h"
-#include "IntroModule.h"
+#include "IntroState.h"
 #include "Unit.h"
 #include "EpCamera.h"
 #include "Menu.h"
@@ -21,8 +21,13 @@
 #include "ArnSceneGraph.h"
 #include "ArnNode.h"
 #include "VideoMan.h"
+#include "StateManager.h"
 
 enum GameTopState { GAMESTATE_INTRO, GAMESTATE_WORLD, GAMESTATE_FIGHT };
+
+
+G								g_g;
+StateManager					g_sm;
 
 GameTopState					g_CurrentState			= GAMESTATE_INTRO;
 
@@ -40,9 +45,7 @@ D3DXHANDLE						g_tech					= 0;
 Unit							g_sampleTeapotMesh;
 float							g_sampleTeapotMeshRot	= 0;
 LPD3DXMESH						g_aTile					= 0;
-D3DLIGHT9						g_light;
 
-EpCamera						g_camera;
 PictureMap						g_pic;
 Picture							g_picRhw;
 Picture							g_picSmiley;
@@ -51,7 +54,7 @@ Menu							g_menubox;
 Menu							g_select;
 Sound							g_sound;
 Battle							g_battle;
-IntroModule						g_introModule;
+IntroState						g_introModule;
 
 D3DCOLOR						g_fillColor;
 
@@ -107,6 +110,9 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 {
 	HRESULT hr;
 
+	G::getSingleton().m_dev = pd3dDevice;
+	EpCamera& g_camera = G::getSingleton().m_camera;
+
 	VideoMan::getSingleton().SetDev(pd3dDevice);
 	// Aran file init
 	g_afd = new ArnFileData;
@@ -135,11 +141,7 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 
 	//[윤욱]
 	g_menubox.init(pd3dDevice, g_scrWidth, g_scrHeight);
-
-
-	// Create 3D Mesh Texts for intro cinema.
-	g_introModule.CreateTextMeshes( pd3dDevice );
-
+	
 	//[재우] 부분
 	g_battle.init(pd3dDevice, g_scrWidth, g_scrHeight);
 	
@@ -193,29 +195,10 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 	
 	D3DXCreateBox(pd3dDevice, 1.0f, 1.0f, 1.0f, &g_aTile, 0);
 
-	ZeroMemory(&g_light, sizeof(D3DLIGHT9));
-	D3DCOLORVALUE cv = { 0.8f, 0.8f, 0.8f, 1.0f };
-	g_light.Ambient = cv;
-	g_light.Diffuse = cv;
-	g_light.Specular = cv;
-	/*
-	g_light.Attenuation0 = 0.5f;
-	g_light.Attenuation1 = 0.0f;
-	g_light.Attenuation2 = 0.0f;
-	*/
-	
-	D3DXVECTOR3 dir(10.0f, -10.0f, 10.0f);
-	D3DXVec3Normalize((D3DXVECTOR3*)&g_light.Direction, &dir);
-	g_light.Falloff = 0.5f;
-	g_light.Phi = D3DXToRadian(80);
-	g_light.Theta = D3DXToRadian(10);
-	
-	D3DXVECTOR3 pos(-10.0f, 10.0f, -10.0f);
-	D3DXVec3Normalize((D3DXVECTOR3*)&g_light.Position, &pos);
+	float fAspectRatio = pBackBufferSurfaceDesc->Width / ( FLOAT )pBackBufferSurfaceDesc->Height;
+	g_camera.SetProjParams( D3DX_PI / 4, fAspectRatio, 1.0f, 1000.0f );
 
-	g_light.Type = D3DLIGHT_DIRECTIONAL;
-	g_light.Range = 1000.0f;
-	
+	g_sm.transit();
 	
 	return S_OK;
 }
@@ -227,6 +210,7 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
                                     void* pUserContext )
 {
+
 
     pd3dDevice->SetRenderState( D3DRS_DITHERENABLE, TRUE );
     pd3dDevice->SetRenderState( D3DRS_SPECULARENABLE, TRUE );
@@ -241,11 +225,9 @@ HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFA
 	//g_fillColor = D3DCOLOR_ARGB( 0, 45, 50, 170 );
 	g_fillColor = D3DCOLOR_ARGB( 0, 0, 0, 0 );
 
-	pd3dDevice->SetLight(0, &g_light);
-	pd3dDevice->LightEnable(0, TRUE);
 
-	float fAspectRatio = pBackBufferSurfaceDesc->Width / ( FLOAT )pBackBufferSurfaceDesc->Height;
-	g_camera.SetProjParams( D3DX_PI / 4, fAspectRatio, 1.0f, 1000.0f );
+
+	
 
 		
 	
@@ -258,18 +240,11 @@ HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFA
 //--------------------------------------------------------------------------------------
 void CALLBACK OnFrameMove( double fTime_, float fElapsedTime, void* pUserContext )
 {
+	EpCamera& g_camera = G::getSingleton().m_camera;
+	D3DLIGHT9& g_light = G::getSingleton().m_light;
+
 	double fTime = fTime_ + g_timeDelta;
 
-	if ( fTime < 41.0f )
-	{
-		g_introModule.frameMove(fTime);
-
-		// Setup the camera with view & projection matrix
-		// for intro cinema.
-		D3DXVECTOR3 vecEye( 0.0f, -30.0f, -20.0f );
-		D3DXVECTOR3 vecAt( 0.0f, 0.0f, 0.0f );
-		g_camera.SetViewParams( &vecEye, &vecAt );
-	}
 
 	if ( 41.0f < fTime && fTime < 44.0f)
 	{
@@ -320,11 +295,15 @@ void CALLBACK OnFrameMove( double fTime_, float fElapsedTime, void* pUserContext
 
 		
 	}
+
+	g_sm.getCurState()->frameMove(fTime, fElapsedTime);
 }
 
 
 void renderDebugText()
 {
+	EpCamera& g_camera = G::getSingleton().m_camera;
+
 	WCHAR debugBuffer[512];
 	RECT rc;
 	rc.top = 0;
@@ -389,6 +368,9 @@ void renderFixedElements(IDirect3DDevice9* pd3dDevice, double fTime, float fElap
 void CALLBACK OnD3D9FrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float fElapsedTime, void* pUserContext )
 {
     HRESULT hr;
+
+	EpCamera& g_camera = G::getSingleton().m_camera;
+	D3DLIGHT9& g_light = G::getSingleton().m_light;
 	
     // Clear the render target and the zbuffer 
     V( pd3dDevice->Clear( 0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, g_fillColor, 1.0f, 0 ) );
@@ -398,9 +380,10 @@ void CALLBACK OnD3D9FrameRender( IDirect3DDevice9* pd3dDevice, double fTime, flo
     // Render the scene
     if( SUCCEEDED( pd3dDevice->BeginScene() ) )
     {
+		g_sm.getCurState()->frameRender(pd3dDevice, fTime, fElapsedTime);
 
 		if ( g_IntroEnable )
-			g_introModule.draw(pd3dDevice, &g_camera);
+			g_introModule.frameRender(pd3dDevice, fTime, fElapsedTime);
 
 		if ( g_WorldEnable )
 		{
@@ -445,6 +428,7 @@ void CALLBACK OnD3D9FrameRender( IDirect3DDevice9* pd3dDevice, double fTime, flo
 
         V( pd3dDevice->EndScene() );
     }
+
 }
 
 
@@ -454,6 +438,8 @@ void CALLBACK OnD3D9FrameRender( IDirect3DDevice9* pd3dDevice, double fTime, flo
 LRESULT CALLBACK MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
                           bool* pbNoFurtherProcessing, void* pUserContext )
 {
+	EpCamera& g_camera = G::getSingleton().m_camera;
+
 	//g_avatar.handleMessages(hWnd, uMsg, wParam, lParam);
 	g_pic.handleMessages(hWnd, uMsg, wParam, lParam);
 	g_camera.HandleMessages(hWnd, uMsg, wParam, lParam);
@@ -493,6 +479,8 @@ void CALLBACK OnD3D9DestroyDevice( void* pUserContext )
 
 	g_introModule.release();
 	g_sampleTeapotMesh.release();
+
+	g_sm.release();
 
 	SAFE_RELEASE( g_pVertexShader );
 	SAFE_RELEASE( g_pConstantTable );
@@ -608,6 +596,7 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 	DXUTSetCallbackKeyboard( KeyboardProc );
 
     // TODO: Perform any application-level initialization here
+	g_sm.init();
 
     // Initialize DXUT and create the desired Win32 window and Direct3D device for the application
     DXUTInit( true, true ); // Parse the command line and show msgboxes

@@ -1,5 +1,5 @@
 #include "EmptyProjectPCH.h"
-#include "IntroModule.h"
+#include "IntroState.h"
 #include "Picture.h"
 
 extern D3DXMATRIX						g_orthoProjMat;
@@ -12,10 +12,10 @@ extern int						g_scrHeight;
 //
 //It is an age of darkness! Evil lord Choi 
 //revealed his unholy desire. Republic's 
-//Finance and Enviroment is already in his 
+//Finance and Environment is already in his 
 //hand. No freedom of speech, and no freedom 
 //of gaming. People suffer from 20 hours 
-//coding labor. There are heros on both sides.
+//coding labor. There are heroes on both sides.
 //
 //After 'Big Cleaning', PoolG lost home, food,
 //dental cream, everything. For revenge, PoolG 
@@ -25,7 +25,15 @@ extern int						g_scrHeight;
 //Now PoolG's difficult journey is just 
 //beginning.
 
-IntroModule::IntroModule(void)
+IntroState::IntroState(void)
+{
+}
+
+IntroState::~IntroState(void)
+{
+}
+
+void IntroState::enter()
 {
 	for( int i = 0; i < NUM_OF_LINES; i++ )
 	{
@@ -62,10 +70,10 @@ IntroModule::IntroModule(void)
 	m_pStrs[1] = L"~ PoolG's Strikes Back ~";
 	m_pStrs[3] = L"It is an age of darkness! Evil lord Choi ";
 	m_pStrs[4] = L"revealed his unholy desire. Republic's ";
-	m_pStrs[5] = L"Finance and Enviroment is already in his ";
+	m_pStrs[5] = L"Finance and Environment is already in his ";
 	m_pStrs[6] = L"hand. No freedom of speech, and no freedom ";
 	m_pStrs[7] = L"of gaming. People suffer from 20 hours ";
-	m_pStrs[8] = L"coding labor. There are heros on both sides.";
+	m_pStrs[8] = L"coding labor. There are heroes on both sides.";
 	m_pStrs[10] = L"After 'Big Cleaning', PoolG lost home, food,";
 	m_pStrs[11] = L"dental cream, everything. For revenge, PoolG ";
 	m_pStrs[12] = L"trained coding very hard. He accepted the ";
@@ -73,74 +81,20 @@ IntroModule::IntroModule(void)
 	m_pStrs[14] = L"of infinite loop, memory leaking, and so on.";	
 	m_pStrs[15] = L"Now PoolG's difficult journey is just";
 	m_pStrs[16] = L"beginning!";
+
+
+	createTextMeshes(G::getSingleton().m_dev);
+
+	setupLight();
+	setupCamera();
+
 }
 
-IntroModule::~IntroModule(void)
-{
-	release();
-}
-
-HRESULT IntroModule::CreateTextMeshes( IDirect3DDevice9* pd3dDevice )
-{
-	for( int i = 0; i < NUM_OF_LINES; i++ )
-	{
-		if ( m_pStrs[i] == NULL )
-		{
-			continue;
-		}
-
-		if( FAILED( CreateD3DXTextMesh( pd3dDevice, m_pStrs[i], &(m_pTextMeshes[i]) ) ) )
-			return E_FAIL;
-	}
-
-	m_background.init(L"the Whirlpool Galaxy (M51) and Companion Galaxy.jpg", pd3dDevice);
-	//m_background.init(L"ratatouille.jpg", pd3dDevice);
-	m_pLogo.init( L"poolc.png", pd3dDevice );
-	m_pBlack.init( L"the Whirlpool Galaxy (M51) and Companion Galaxy.jpg", pd3dDevice);
-
-	return S_OK;
-}
-
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-HRESULT IntroModule::CreateD3DXTextMesh( IDirect3DDevice9* pd3dDevice, LPCWSTR pStr, LPD3DXMESH* ppTextMesh )
-{
-    HRESULT hr;
-    LPD3DXMESH pMeshNew = NULL;
-    HDC hdc = CreateCompatibleDC( NULL );
-    if( hdc == NULL )
-        return E_OUTOFMEMORY;
-    INT nHeight = -MulDiv( m_dwFontSize, GetDeviceCaps( hdc, LOGPIXELSY ), 72 );
-    HFONT hFont;
-    HFONT hFontOld;
-
-    hFont = CreateFont( nHeight, 0, 0, 0, m_bBold ? FW_BOLD : FW_NORMAL, m_bItalic, FALSE, FALSE, DEFAULT_CHARSET,
-                        OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE,
-						m_pStrFont );
-
-    hFontOld = ( HFONT )SelectObject( hdc, hFont );
-
-	hr = D3DXCreateText( pd3dDevice, hdc, pStr,
-		0.01f, 0.2f, &pMeshNew, NULL, NULL );
-
-    SelectObject( hdc, hFontOld );
-    DeleteObject( hFont );
-    DeleteDC( hdc );
-
-    if( SUCCEEDED( hr ) )
-        *ppTextMesh = pMeshNew;
-
-    return hr;
-}
-
-void IntroModule::SetCameraAndLight( IDirect3DDevice9* pd3dDevice, 
-									const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
-									CFirstPersonCamera* pCamera )
+void IntroState::leave()
 {
 }
 
-void IntroModule::frameMove( double fTime )
+void IntroState::frameMove( double fTime, float fElapsedTime )
 {
 	if ( fTime < 3.0f )
 	{		
@@ -179,7 +133,7 @@ void IntroModule::frameMove( double fTime )
 	}
 }
 
-void IntroModule::draw( IDirect3DDevice9* pd3dDevice, CFirstPersonCamera* pCamera )
+void IntroState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, float fElapsedTime)
 {
 	D3DMATERIAL9 mtrl;
 
@@ -259,8 +213,6 @@ void IntroModule::draw( IDirect3DDevice9* pd3dDevice, CFirstPersonCamera* pCamer
 	pd3dDevice->SetRenderState( D3DRS_LIGHTING, TRUE );
 	pd3dDevice->SetTexture(0, 0);
 
-	pd3dDevice->SetTransform(D3DTS_VIEW, pCamera->GetViewMatrix());
-	pd3dDevice->SetTransform(D3DTS_PROJECTION, pCamera->GetProjMatrix());
 
 	if( m_pTextMeshes[0] != NULL )
     {
@@ -284,7 +236,7 @@ void IntroModule::draw( IDirect3DDevice9* pd3dDevice, CFirstPersonCamera* pCamer
 	}
 }
 
-void IntroModule::release()
+void IntroState::release()
 {
 	for( int i = 0; i < NUM_OF_LINES; i++ )
 	{		
@@ -295,3 +247,92 @@ void IntroModule::release()
 	m_pLogo.release();
 	m_pBlack.release();
 }
+
+void IntroState::setupLight() 
+{
+	D3DLIGHT9& light = G::getSingleton().m_light;
+	LPDIRECT3DDEVICE9& pd3dDevice = G::getSingleton().m_dev;
+
+	ZeroMemory(&light, sizeof(D3DLIGHT9));
+	D3DCOLORVALUE cv = { 0.8f, 0.8f, 0.8f, 1.0f };
+	light.Ambient = cv;
+	light.Diffuse = cv;
+	light.Specular = cv;
+
+	D3DXVECTOR3 dir(10.0f, -10.0f, 10.0f);
+	D3DXVec3Normalize((D3DXVECTOR3*)&light.Direction, &dir);
+	light.Falloff = 0.5f;
+	light.Phi = D3DXToRadian(80);
+	light.Theta = D3DXToRadian(10);
+
+	D3DXVECTOR3 pos(-10.0f, 10.0f, -10.0f);
+	D3DXVec3Normalize((D3DXVECTOR3*)&light.Position, &pos);
+
+	light.Type = D3DLIGHT_DIRECTIONAL;
+	light.Range = 1000.0f;
+
+	pd3dDevice->SetLight(0, &light);
+	pd3dDevice->LightEnable(0, TRUE);
+}
+
+void IntroState::setupCamera()
+{
+	D3DXVECTOR3 vecEye( 0.0f, -30.0f, -20.0f );
+	D3DXVECTOR3 vecAt( 0.0f, 0.0f, 0.0f );
+	G::getSingleton().m_camera.SetViewParams( &vecEye, &vecAt );
+}
+
+HRESULT IntroState::createTextMeshes( IDirect3DDevice9* pd3dDevice )
+{
+	for( int i = 0; i < NUM_OF_LINES; i++ )
+	{
+		if ( m_pStrs[i] == NULL )
+		{
+			continue;
+		}
+
+		if( FAILED( createD3DXTextMesh( pd3dDevice, m_pStrs[i], &(m_pTextMeshes[i]) ) ) )
+			return E_FAIL;
+	}
+
+	m_background.init(L"the Whirlpool Galaxy (M51) and Companion Galaxy.jpg", pd3dDevice);
+	//m_background.init(L"ratatouille.jpg", pd3dDevice);
+	m_pLogo.init( L"poolc.png", pd3dDevice );
+	m_pBlack.init( L"the Whirlpool Galaxy (M51) and Companion Galaxy.jpg", pd3dDevice);
+
+	return S_OK;
+}
+
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+HRESULT IntroState::createD3DXTextMesh( IDirect3DDevice9* pd3dDevice, LPCWSTR pStr, LPD3DXMESH* ppTextMesh )
+{
+	HRESULT hr;
+	LPD3DXMESH pMeshNew = NULL;
+	HDC hdc = CreateCompatibleDC( NULL );
+	if( hdc == NULL )
+		return E_OUTOFMEMORY;
+	INT nHeight = -MulDiv( m_dwFontSize, GetDeviceCaps( hdc, LOGPIXELSY ), 72 );
+	HFONT hFont;
+	HFONT hFontOld;
+
+	hFont = CreateFont( nHeight, 0, 0, 0, m_bBold ? FW_BOLD : FW_NORMAL, m_bItalic, FALSE, FALSE, DEFAULT_CHARSET,
+		OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE,
+		m_pStrFont );
+
+	hFontOld = ( HFONT )SelectObject( hdc, hFont );
+
+	hr = D3DXCreateText( pd3dDevice, hdc, pStr,
+		0.01f, 0.2f, &pMeshNew, NULL, NULL );
+
+	SelectObject( hdc, hFontOld );
+	DeleteObject( hFont );
+	DeleteDC( hdc );
+
+	if( SUCCEEDED( hr ) )
+		*ppTextMesh = pMeshNew;
+
+	return hr;
+}
+

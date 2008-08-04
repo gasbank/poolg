@@ -1,26 +1,30 @@
 #pragma once
 
+#include "State.h"
 #include "Picture.h"
 
 #define NUM_OF_LINES 20
 
-class IntroModule
+class IntroState : public State
 {
 public:
-	IntroModule();
-	~IntroModule(void);
+	IntroState();
+	~IntroState(void);
 
-	HRESULT CreateTextMeshes( IDirect3DDevice9* pd3dDevice );
-	void SetCameraAndLight( IDirect3DDevice9* pd3dDevice, 
-		const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
-		CFirstPersonCamera* pCamera );
-	void frameMove( double fTime );
-	void draw( IDirect3DDevice9* pd3dDevice, CFirstPersonCamera* pCamera );
-	void release();
+	virtual void enter();
+	virtual void leave();
+
+	virtual void frameRender(IDirect3DDevice9* pd3dDevice, double fTime, float fElapsedTime);
+	virtual void frameMove(double fTime, float fElapsedTime);
+
+	virtual void release();
 	
 private:
-	HRESULT CreateD3DXTextMesh( IDirect3DDevice9* pd3dDevice, LPCWSTR str, LPD3DXMESH* ppTextMesh );
-	
+
+	HRESULT createTextMeshes( IDirect3DDevice9* pd3dDevice );
+	HRESULT createD3DXTextMesh( IDirect3DDevice9* pd3dDevice, LPCWSTR str, LPD3DXMESH* ppTextMesh );
+	void setupLight();
+	void setupCamera();
 
 	LPD3DXMESH m_pTextMeshes[NUM_OF_LINES];
 	TCHAR* m_pStrs[NUM_OF_LINES];

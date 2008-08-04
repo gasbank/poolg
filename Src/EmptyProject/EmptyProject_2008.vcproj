@@ -626,6 +626,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\CreditState.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\CreditState.h"
+			>
+		</File>
+		<File
 			RelativePath="EmptyProject.cpp"
 			>
 		</File>

@@ -230,7 +230,7 @@ void CALLBACK OnD3D9FrameRender( IDirect3DDevice9* pd3dDevice, double fTime, flo
 		//////////////////////////////////////////////////////////////////////////
 		// Orthogonal and fixed Rendering Phase
 
-		renderFixedElements(pd3dDevice, fTime, fElapsedTime);
+		//renderFixedElements(pd3dDevice, fTime, fElapsedTime);
 
         V( pd3dDevice->EndScene() );
     }

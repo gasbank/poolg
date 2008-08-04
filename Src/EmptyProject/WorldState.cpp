@@ -1,5 +1,6 @@
 #include "EmptyProjectPCH.h"
 #include "WorldState.h"
+#include "StateManager.h"
 
 WorldState::WorldState(void)
 {
@@ -85,11 +86,15 @@ HRESULT WorldState::enter()
 	D3DXVECTOR3 vecAt ( 0.0f, 0.0f, -0.0f );
 	G::getSingleton().m_camera.SetViewParams( &vecEye, &vecAt );
 
+	setupLight();
+
 	return S_OK;
 }
 
 HRESULT WorldState::leave()
 {
+	m_startTime = -1.0f;
+
 	return S_OK;
 }
 
@@ -195,6 +200,45 @@ HRESULT WorldState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 	m_sound.handleMessages(hWnd, uMsg, wParam, lParam);
 	m_sampleTeapotMesh.handleMessages(hWnd, uMsg, wParam, lParam);
 
+	if (uMsg == WM_KEYDOWN)
+	{
+		if (wParam == VK_F4)
+		{
+			StateManager::getSingleton().setNextState(GAME_TOP_STATE_CREDIT);
+			StateManager::getSingleton().transit();
+		}
+	}
+
 	return S_OK;
 }
 
+void WorldState::setupLight() 
+{
+	D3DLIGHT9& light = G::getSingleton().m_light;
+	LPDIRECT3DDEVICE9& pd3dDevice = G::getSingleton().m_dev;
+
+	ZeroMemory(&light, sizeof(D3DLIGHT9));
+	D3DCOLORVALUE cv = { 0.5f, 0.5f, 0.5f, 1.0f };
+	light.Ambient = cv;
+	light.Diffuse = cv;
+	light.Specular = cv;
+	
+	light.Attenuation0 = 0.5f;
+
+	D3DXVECTOR3 dir(10.0f, -10.0f, 10.0f);
+	D3DXVec3Normalize((D3DXVECTOR3*)&light.Direction, &dir);
+
+	D3DXVECTOR3 pos(-10.0f, 10.0f, -10.0f);
+	D3DXVec3Normalize((D3DXVECTOR3*)&light.Position, &pos);
+
+	// What are these?
+	/*light.Falloff = 0.5f; 
+	light.Phi = D3DXToRadian(80);
+	light.Theta = D3DXToRadian(10);*/
+
+	light.Type = D3DLIGHT_DIRECTIONAL;
+	light.Range = 1000.0f;
+
+	pd3dDevice->SetLight(0, &light);
+	pd3dDevice->LightEnable(0, TRUE);
+}

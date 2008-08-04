@@ -1,6 +1,6 @@
 #pragma once
 
-enum GameTopState {GAME_TOP_STATE_INTRO, GAME_TOP_STATE_WORLD};
+enum GameTopState {GAME_TOP_STATE_INTRO, GAME_TOP_STATE_WORLD, GAME_TOP_STATE_CREDIT};
 
 class State;
 

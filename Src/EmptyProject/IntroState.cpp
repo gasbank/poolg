@@ -208,11 +208,11 @@ HRESULT IntroState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, floa
 	if( m_pTextMeshes[0] != NULL )
     {
         ZeroMemory( &mtrl, sizeof( D3DMATERIAL9 ) );
-		D3DCOLORVALUE cv_diffuse = { 1.0f, 0.8f, 0.0f, 1.0f };
+		D3DCOLORVALUE cv_diffuse = { 0.0f, 1.0f, 0.8f, 1.0f };
 		mtrl.Diffuse  = cv_diffuse;
 		D3DCOLORVALUE cv_ambient = { 0.0f, 0.0f, 0.0f, 1.0f };
 		mtrl.Ambient = cv_ambient;
-		D3DCOLORVALUE cv_specular = { 1.0f, 0.8f, 0.0f, 1.0f };
+		D3DCOLORVALUE cv_specular = { 0.0f, 1.0f, 0.8f, 1.0f };
 		mtrl.Ambient = cv_specular;
 		pd3dDevice->SetMaterial( &mtrl );
 
@@ -233,9 +233,9 @@ HRESULT IntroState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 {
 	if (uMsg == WM_KEYDOWN)
 	{
-		if (wParam == VK_ESCAPE || wParam == VK_F4)
+		if (wParam == VK_F4)
 		{
-			StateManager::getSingleton().setNextState(GAME_TOP_STATE_WORLD);
+			StateManager::getSingleton().setNextState(GAME_TOP_STATE_CREDIT);
 			StateManager::getSingleton().transit();
 		}
 	}

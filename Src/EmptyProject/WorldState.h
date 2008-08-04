@@ -25,6 +25,9 @@ public:
 
 	virtual HRESULT release();
 
+private:
+	void setupLight();
+
 	ArnFileData*					m_afd;
 	ArnSceneGraph*					m_sg;
 	PictureMap						m_pic;

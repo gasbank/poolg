@@ -5,7 +5,7 @@
 // Hierarchy info
 struct MyFrame : public D3DXFRAME
 {
-	MyFrame():isRoot(FALSE),sibling(-1),firstChild(-1)
+	MyFrame():isRoot(FALSE),sibling(0xffffffff),firstChild(0xffffffff)
 	{
 		this->Name = this->nameFixed;
 		ZeroMemory(&combinedMatrix, sizeof(D3DXMATRIX));

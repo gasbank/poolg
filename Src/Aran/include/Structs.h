@@ -100,6 +100,7 @@ enum NODE_DATA_TYPE // or NDD_DATA_TYPE
 	NDT_RT_BONE,
 	NDT_RT_IPO,
 	NDT_RT_SYMLINK,
+	NDT_RT_SCENEGRAPH,
 	
 	NDT_FORCE_DWORD = 0x7fffffff,
 };
@@ -238,22 +239,12 @@ struct POINT4FLOAT
 typedef union tagTEXCOORD{
 	float xy[2];
 	float uv[2];
-	struct {
-		float u, v;
-	};
-	struct {
-		float x, y;
-	};
+	
 } TEXCOORD, POINT2FLOAT;
 
 typedef union tagARN_KDD // Key Data Definition
 {
-	float rst[4+3+3];
-	struct {
-		POINT4FLOAT rot;
-		POINT3FLOAT scale;
-		POINT3FLOAT trans;
-	};
+	float rst[4+3+3]; // rot 4 + scale 3 + trans 3
 } ARN_KDD;
 
 
@@ -272,10 +263,6 @@ typedef struct tagARN_VDD
 	union
 	{
 		DWORD color; // vertex color (may not be used)
-		struct 
-		{
-			unsigned char r, g, b, a;
-		};
 	};
 	
 	TEXCOORD tc;
@@ -393,21 +380,10 @@ struct ArnNodeHeader
 
 struct RST_DATA
 {
-	union
-	{
-		struct  
-		{
-			float x, y, z, w; // rotation
-			float sx, sy, sz; // scaling
-			float tx, ty, tz; // translation
-		};
-		struct 
-		{
-			D3DXQUATERNION quat;
-			D3DXVECTOR3 scale;
-			D3DXVECTOR3 trans;
-		};
-	};
+	float x, y, z, w; // rotation
+	float sx, sy, sz; // scaling
+	float tx, ty, tz; // translation
+
 	static const RST_DATA IDENTITY;
 };
 
@@ -415,6 +391,9 @@ struct DX_CONSTS
 {
 	static const D3DXVECTOR3 D3DXVEC3_ZERO;
 	static const D3DXVECTOR3 D3DXVEC3_ONE;
+	static const D3DXVECTOR3 D3DXVEC3_X;
+	static const D3DXVECTOR3 D3DXVEC3_Y;
+	static const D3DXVECTOR3 D3DXVEC3_Z;
 	static const D3DXQUATERNION D3DXQUAT_IDENTITY;
 	static const D3DXMATRIX D3DXMAT_IDENTITY;
 };

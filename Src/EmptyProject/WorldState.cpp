@@ -9,7 +9,9 @@ WorldState::WorldState(void)
 	m_pVertexShader			= 0;
 	m_pConstantTable		= 0;
 	m_pVertexDeclaration	= 0;
-	m_startTime = -1.0f;
+	m_startTime				= -1.0f;
+	m_afd					= 0;
+	m_sg					= 0;
 }
 
 WorldState::~WorldState(void)
@@ -183,9 +185,10 @@ HRESULT WorldState::release()
 	m_avatar.release();
 	m_sound.release();
 	m_sampleTeapotMesh.release();
-	release_arnfile(*m_afd);
-	delete m_afd;
-	delete m_sg;
+	if (m_afd)
+		release_arnfile(*m_afd);
+	SAFE_DELETE(m_afd);
+	SAFE_DELETE(m_sg);
 	SAFE_RELEASE( m_pVertexShader );
 	SAFE_RELEASE( m_pConstantTable );
 	SAFE_RELEASE( m_pVertexDeclaration );

@@ -302,6 +302,9 @@ public:
     static void WINAPI      StaticOnD3D9LostDevice();
     static void WINAPI      StaticOnD3D9DestroyDevice();
 
+    static HRESULT WINAPI   StaticOnD3D10CreateDevice( ID3D10Device* pd3dDevice );
+    HRESULT OnRender10( D3DXCOLOR color, const D3DXMATRIX* pmView, const D3DXMATRIX* pmProj, const D3DXVECTOR3* pEyePt );
+    static void WINAPI      StaticOnD3D10DestroyDevice();
 
     D3DXVECTOR3 GetLightDirection()         { return m_vCurrentDir; };
     void        SetLightDirection( D3DXVECTOR3 vDir ) { m_vDefaultDir = m_vCurrentDir = vDir; };

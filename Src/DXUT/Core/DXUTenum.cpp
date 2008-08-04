@@ -5,7 +5,6 @@
 //
 // Copyright (c) Microsoft Corporation. All rights reserved.
 //--------------------------------------------------------------------------------------
-#include "EmptyProjectPCH.h"
 #include "DXUT.h"
 #undef min // use __min instead
 #undef max // use __max instead

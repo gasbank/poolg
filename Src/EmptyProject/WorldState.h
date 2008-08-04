@@ -40,4 +40,6 @@ public:
 	Unit							m_sampleTeapotMesh;
 	float							m_sampleTeapotMeshRot;
 	LPD3DXMESH						m_aTile;
+
+	double							m_startTime;
 };

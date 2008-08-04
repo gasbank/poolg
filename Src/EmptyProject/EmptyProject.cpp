@@ -16,15 +16,9 @@
 #include "StateManager.h"
 #include "VideoMan.h"
 
-enum GameTopStatex { GAMESTATE_INTRO, GAMESTATE_WORLD, GAMESTATE_FIGHT };
-
-
 G								g_g;
 StateManager					g_sm;
 
-GameTopStatex					g_CurrentState			= GAMESTATE_INTRO;
-
-bool							g_IntroEnable = true;
 double							g_timeDelta = 0.0f;
 
 LPD3DXFONT						g_pFont					= 0;
@@ -87,7 +81,7 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 	EpCamera& g_camera = G::getSingleton().m_camera;
 
 	// Runtime error at here. I cannot deal with this.. by KYS
-	//VideoMan::getSingleton().SetDev(pd3dDevice);
+	G::getSingleton().m_videoMan.SetDev(pd3dDevice);
 
 	//화면의 크기를 변환할 때마다 화면의 크기를 나타내는 전역변수 갱신.
 	G::getSingleton().m_scrWidth = pBackBufferSurfaceDesc->Width;
@@ -147,18 +141,9 @@ void CALLBACK OnFrameMove( double fTime_, float fElapsedTime, void* pUserContext
 {
 	double fTime = fTime_ + g_timeDelta;
 
-	if ( 41.0f < fTime && fTime < 44.0f)
-	{
-		g_IntroEnable = false;
-		g_CurrentState = GAMESTATE_WORLD;
-	}
-
-	if ( 36.0f < fTime )
-	{
-		//[재우]부분
-		g_battle.frameMove(fElapsedTime);
-		g_menubox.frameMove(fElapsedTime);
-	}
+	//[재우]부분
+	g_battle.frameMove(fElapsedTime);
+	g_menubox.frameMove(fElapsedTime);
 
 	g_sm.getCurState()->frameMove(fTime, fElapsedTime);
 }
@@ -300,7 +285,7 @@ void CALLBACK OnD3D9DestroyDevice( void* pUserContext )
 	//SAFE_RELEASE( g_pEffect );
 	SAFE_RELEASE( g_pFont );
 	
-	//VideoMan::getSingleton().SetDev(0);
+	G::getSingleton().m_videoMan.SetDev(0);
 }
 
 

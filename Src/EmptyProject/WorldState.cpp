@@ -5,10 +5,10 @@ WorldState::WorldState(void)
 {
 	m_sampleTeapotMeshRot	= 0;
 	m_aTile					= 0;
-
 	m_pVertexShader			= 0;
 	m_pConstantTable		= 0;
 	m_pVertexDeclaration	= 0;
+	m_startTime = -1.0f;
 }
 
 WorldState::~WorldState(void)
@@ -80,7 +80,6 @@ HRESULT WorldState::enter()
 	
 	D3DXCreateBox(pd3dDevice, 1.0f, 1.0f, 1.0f, &m_aTile, 0);
 
-
 	// Setup main camera
 	D3DXVECTOR3 vecEye( 0.0f, 0.0f, -30.0f );
 	D3DXVECTOR3 vecAt ( 0.0f, 0.0f, -0.0f );
@@ -122,7 +121,7 @@ HRESULT WorldState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, floa
 
 	pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CW);
 	pd3dDevice->SetFVF(ArnVertex::FVF);
-	//VideoMan::getSingleton().renderMeshesOnly(m_sg->getSceneRoot());
+	G::getSingleton().m_videoMan.renderMeshesOnly(m_sg->getSceneRoot());
 	m_sg->getSceneRoot()->update(fTime, fElapsedTime);
 
 	return S_OK;
@@ -133,41 +132,40 @@ HRESULT WorldState::frameMove(double fTime, float fElapsedTime)
 	D3DLIGHT9& light = G::getSingleton().m_light;
 	EpCamera& camera = G::getSingleton().m_camera;
 
+	if (m_startTime <= 0.0f)
+		m_startTime = fTime;
 
-	if ( 36.0f < fTime && fTime < 41.0f )
+	fTime = fTime - m_startTime;
+
+	/*if (0.0f < fTime && fTime < 5.0f)
 	{
-		float newfTime = ( float )fTime - 36.0f;
-
 		D3DXVECTOR3 vecEye( 
 			0.0f, 
-			(-30.0f * (5.0f - newfTime) + 0.0f * newfTime) / 5.0f, 
-			(-20.0f * (5.0f - newfTime) -20.0f * newfTime) / 5.0f );
+			(-30.0f * (5.0f - fTime) + 0.0f * fTime) / 5.0f, 
+			(-20.0f * (5.0f - fTime) -20.0f * fTime) / 5.0f );
 		D3DXVECTOR3 vecAt ( 0.0f, 0.0f, -0.0f );
 		camera.SetViewParams( &vecEye, &vecAt );
-	
-		D3DCOLORVALUE cv = { newfTime / 5.0f , newfTime / 5.0f, newfTime / 5.0f, newfTime / 5.0f };
+
+		D3DCOLORVALUE cv = { fTime / 5.0f , fTime / 5.0f, fTime / 5.0f, fTime / 5.0f };
 		const float lightLimit = 0.2f;
 		if (cv.r > lightLimit) cv.r = lightLimit;
 		if (cv.g > lightLimit) cv.g = lightLimit;
 		if (cv.b > lightLimit) cv.b = lightLimit;
 		light.Ambient = cv;
-	}
+	}*/
+	
+	m_pic.frameMove(fElapsedTime);
+	m_avatar.frameMove(fElapsedTime);
+	camera.FrameMove(fElapsedTime);
+	m_sound.UpdateAudio();
+	m_sampleTeapotMesh.frameMove(fElapsedTime);
 
-	if ( 36.0f < fTime )
-	{
-		m_pic.frameMove(fElapsedTime);
-		m_avatar.frameMove(fElapsedTime);
-		camera.FrameMove(fElapsedTime);
-		m_sound.UpdateAudio();
-		m_sampleTeapotMesh.frameMove(fElapsedTime);
+	// Set up the vertex shader constants
+	D3DXMATRIXA16 mViewProj = *camera.GetViewMatrix() * *camera.GetProjMatrix();
+	m_pConstantTable->SetMatrix( DXUTGetD3D9Device(), "mViewProj", &mViewProj );
+	m_pConstantTable->SetFloat( DXUTGetD3D9Device(), "fTime", ( float )fTime );
 
-		// Set up the vertex shader constants
-		D3DXMATRIXA16 mViewProj = *camera.GetViewMatrix() * *camera.GetProjMatrix();
-		m_pConstantTable->SetMatrix( DXUTGetD3D9Device(), "mViewProj", &mViewProj );
-		m_pConstantTable->SetFloat( DXUTGetD3D9Device(), "fTime", ( float )fTime );
-
-		m_sampleTeapotMeshRot += fElapsedTime * D3DXToRadian(35); // 35 degrees per second
-	}
+	m_sampleTeapotMeshRot += fElapsedTime * D3DXToRadian(35); // 35 degrees per second
 
 	return S_OK;
 }

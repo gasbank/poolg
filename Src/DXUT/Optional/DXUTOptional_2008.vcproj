@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="9.00"
 	Name="DXUTOptional"
-	ProjectGUID="{E0CF097B-F22D-465B-A884-D89E55BD7ECD}"
+	ProjectGUID="{4F8BF3B3-DF36-41D9-8CAA-B68B5F4DCCE1}"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>

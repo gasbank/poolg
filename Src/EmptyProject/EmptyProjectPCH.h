@@ -9,7 +9,9 @@
 #include "G.h"
 #include "tcl.h"
 
-
+#ifndef EP_SAFE_RELEASE
+#define EP_SAFE_RELEASE(p)      { if (p) { (p)->release(); SAFE_DELETE(p); } }
+#endif
 
 // Visual Studio memory leak detection C runtime library
 // This feature is implemented somewhat different way in MFC library,

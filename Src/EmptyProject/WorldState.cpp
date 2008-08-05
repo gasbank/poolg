@@ -79,10 +79,10 @@ HRESULT WorldState::enter()
 	// Create sample 3D model(!)
 	LPD3DXMESH teapot;
 	D3DXCreateTeapot(pd3dDevice, &teapot, 0);
-	m_sampleTeapotMesh.init(pd3dDevice, teapot);
-	m_sampleTeapotMesh.setPosZ(-m_sampleTeapotMesh.getUpperRight().z);
-	m_sampleTeapotMesh.setRotX(D3DXToRadian(-90));
-	m_sampleTeapotMesh.setRotZ(D3DXToRadian(90));
+	m_heroUnit = Unit::createUnit( teapot );
+	m_heroUnit->setPosZ( -m_heroUnit->getUpperRight().z );
+	m_heroUnit->setRotX( D3DXToRadian( -90 ) );
+	m_heroUnit->setRotZ( D3DXToRadian(  90 ) );
 	
 	D3DXCreateBox(pd3dDevice, 1.0f, 1.0f, 1.0f, &m_aTile, 0);
 
@@ -122,7 +122,7 @@ HRESULT WorldState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, floa
 	m_pConstantTable->SetMatrix( DXUTGetD3D9Device(), "mWorldViewProj", &mWorldViewProj );
 	
 	// Sample 3D model rendering
-	m_sampleTeapotMesh.draw();
+	m_heroUnit->draw();
 
 	// Draw floor gray tile (2D)
 	//g_pic.draw();
@@ -173,7 +173,7 @@ HRESULT WorldState::frameMove(double fTime, float fElapsedTime)
 	m_avatar.frameMove(fElapsedTime);
 	camera.FrameMove(fElapsedTime);
 	m_sound.UpdateAudio();
-	m_sampleTeapotMesh.frameMove(fElapsedTime);
+	m_heroUnit->frameMove(fElapsedTime);
 
 	// Set up the vertex shader constants
 	D3DXMATRIXA16 mViewProj = *camera.GetViewMatrix() * *camera.GetProjMatrix();
@@ -195,7 +195,8 @@ HRESULT WorldState::release()
 	m_picSmiley.release();
 	m_avatar.release();
 	m_sound.release();
-	m_sampleTeapotMesh.release();
+	m_heroUnit->release();
+	SAFE_DELETE(m_heroUnit);
 	if (m_afd)
 		release_arnfile(*m_afd);
 	SAFE_DELETE(m_afd);
@@ -214,7 +215,7 @@ HRESULT WorldState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 {
 	m_pic.handleMessages(hWnd, uMsg, wParam, lParam);
 	m_sound.handleMessages(hWnd, uMsg, wParam, lParam);
-	m_sampleTeapotMesh.handleMessages(hWnd, uMsg, wParam, lParam);
+	m_heroUnit->handleMessages(hWnd, uMsg, wParam, lParam);
 
 	if (uMsg == WM_KEYDOWN)
 	{

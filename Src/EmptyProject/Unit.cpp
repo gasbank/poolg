@@ -6,6 +6,8 @@
 #define KEY_IS_DOWN_MASK  0x01
 
 
+//////////////////////////////////////////////////////////////////////////
+
 Unit::Unit()
 {
 	m_d3dxMesh = 0;
@@ -182,4 +184,11 @@ UnitInput Unit::mapKey( UINT nKey )
 	}
 
 	return UNIT_UNKNOWN;
+}
+
+Unit* Unit::createUnit( LPD3DXMESH mesh )
+{
+	Unit* u = new Unit();
+	u->init(G::getSingleton().m_dev, mesh);
+	return u;
 }

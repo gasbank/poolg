@@ -9,6 +9,8 @@
 #include "Unit.h"
 #include "VideoMan.h"
 
+typedef std::list<Unit*> UnitList;
+
 class WorldState : public State
 {
 public:
@@ -40,9 +42,12 @@ private:
 	LPD3DXCONSTANTTABLE             m_pConstantTable;
 	LPDIRECT3DVERTEXDECLARATION9    m_pVertexDeclaration;
 
-	Unit							m_sampleTeapotMesh;
+	Unit*							m_heroUnit;
 	float							m_sampleTeapotMeshRot;
 	LPD3DXMESH						m_aTile;
 
 	double							m_startTime;
+
+	
+	UnitList						m_unitList;
 };

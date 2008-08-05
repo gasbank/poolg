@@ -14,7 +14,7 @@ enum UnitInput
 class Unit
 {
 public:
-	Unit();
+	static Unit* createUnit(LPD3DXMESH mesh);
 	~Unit();
 
 	HRESULT init(LPDIRECT3DDEVICE9 pd3dDevice, LPD3DXMESH mesh);
@@ -46,6 +46,8 @@ protected:
 	virtual UnitInput mapKey( UINT nKey );
 
 private:
+	Unit();
+
 	bool IsKeyDown( BYTE key ) const { return( (key & KEY_IS_DOWN_MASK) == KEY_IS_DOWN_MASK ); }
 	bool WasKeyDown( BYTE key ) const { return( (key & KEY_WAS_DOWN_MASK) == KEY_WAS_DOWN_MASK ); }
 

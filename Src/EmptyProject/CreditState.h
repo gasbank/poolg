@@ -25,7 +25,7 @@ private:
 	LPD3DXFONT						m_d3dxFont;
 	LPD3DXFONT						m_d3dxFontBig;
 
-	Unit							m_text3D;
+	Unit*							m_text3D;
 	D3DMATERIAL9					m_textMat;
 	float							m_textMatAlpha;
 

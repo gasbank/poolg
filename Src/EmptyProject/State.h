@@ -15,4 +15,9 @@ public:
 	virtual HRESULT handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) = 0;
 
 	virtual HRESULT release() = 0;
+
+	double getStateTime(double fTime);
+
+protected:
+	double m_startTime;
 };

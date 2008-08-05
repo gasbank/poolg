@@ -33,6 +33,7 @@ IntroState::IntroState(void)
 		D3DXMatrixIdentity(&m_matObjs[i]);
 		m_pTextMeshes[i] = 0;
 	}
+
 }
 
 IntroState::~IntroState(void)
@@ -56,8 +57,8 @@ HRESULT IntroState::enter()
 	m_bItalic = false;
 	m_dwFontSize = 10;
 
+	m_logoVisible = true;
 	m_backgroundVisible = false;
-	m_logoVisible = false;
 
 	m_velocity = 1.2f;
 
@@ -94,24 +95,28 @@ HRESULT IntroState::enter()
 
 HRESULT IntroState::leave()
 {
+	m_startTime = 0;
+
 	return S_OK;
 }
 
 HRESULT IntroState::frameMove( double fTime, float fElapsedTime )
 {
-	if (0.0f < fTime  && fTime < 3.0f)
+	double fStateTime = getStateTime(fTime);
+
+	if (0.0f < fStateTime  && fStateTime < 3.0f)
 	{		
 		m_logoVisible = true;
-		m_logoFading = (float)fTime / 3.0f;
+		m_logoFading = (float)fStateTime / 3.0f;
 	}
-	else if (3.0f < fTime  && fTime < 6.0f)
+	else if (3.0f < fStateTime  && fStateTime < 6.0f)
 	{
-		double newfTime = (float)fTime - 3.0f;
+		double newfTime = (float)fStateTime - 3.0f;
 		m_logoFading = 1 - (float)newfTime / 3.0f;
 	}
-	else if (6.0f < fTime  && fTime < 46.0f)
+	else if (6.0f < fStateTime  && fStateTime < 46.0f)
 	{
-		fTime = (float)fTime - 6.0f;
+		fStateTime = (float)fStateTime - 6.0f;
 
 		if (m_logoVisible == true)
 		{
@@ -120,13 +125,13 @@ HRESULT IntroState::frameMove( double fTime, float fElapsedTime )
 		}
 		
 		// Fade in, fade out
-		if (0.0f < fTime  && fTime < 5.0f)
-			m_mtrlControl = (float)(fTime / 5.0f);
-		else if ( 35.0f < fTime && fTime < 40.0f )
-			m_mtrlControl = (float)(1.0f - (fTime - 35.0f)  / 5.0f);
+		if (0.0f < fStateTime  && fStateTime < 5.0f)
+			m_mtrlControl = (float)(fStateTime / 5.0f);
+		else if ( 35.0f < fStateTime && fStateTime < 40.0f )
+			m_mtrlControl = (float)(1.0f - (fStateTime - 35.0f)  / 5.0f);
 
 		D3DXVECTOR3 vAxis(0.0f, 0.0f, -1.0f );
-		D3DXMatrixRotationAxis( &m_matBackground, &vAxis, D3DXToRadian( (FLOAT) fTime ) );
+		D3DXMatrixRotationAxis( &m_matBackground, &vAxis, D3DXToRadian( (FLOAT) fStateTime ) );
 
 		// Add some translational values to the matrices
 		for (int i = 0; i < NUM_OF_LINES; i++)
@@ -134,11 +139,11 @@ HRESULT IntroState::frameMove( double fTime, float fElapsedTime )
 			D3DXMatrixTranslation( 
 				&m_matObjs[i], 
 				-12.0f, 
-				-20 - ( float) i * 2.0f + ( float ) fTime * m_velocity,
+				-20 - ( float) i * 2.0f + ( float ) fStateTime * m_velocity,
 				0.0f );
 		}
 	}
-	else if (46.0f < fTime)
+	else if (46.0f < fStateTime)
 	{
 		StateManager::getSingleton().setNextState(GAME_TOP_STATE_WORLD);
 	}
@@ -346,4 +351,3 @@ HRESULT IntroState::createD3DXTextMesh( IDirect3DDevice9* pd3dDevice, LPCWSTR pS
 
 	return hr;
 }
-

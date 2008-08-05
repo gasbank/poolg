@@ -610,11 +610,11 @@
 			</File>
 		</Filter>
 		<File
-			RelativePath=".\Battle.cpp"
+			RelativePath=".\BattleState.cpp"
 			>
 		</File>
 		<File
-			RelativePath=".\Battle.h"
+			RelativePath=".\BattleState.h"
 			>
 		</File>
 		<File

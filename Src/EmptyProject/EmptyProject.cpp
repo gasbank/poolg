@@ -9,7 +9,7 @@
 #include "EmptyProjectPCH.h"
 #include <time.h>
 #include "resource.h"
-#include "Battle.h"
+#include "BattleState.h"
 #include "IntroState.h"
 #include "EpCamera.h"
 #include "Menu.h"
@@ -27,8 +27,6 @@ D3DXHANDLE						g_tech					= 0;
 
 Menu							g_menubox;
 Menu							g_select;
-Battle							g_battle;
-IntroState						g_introModule;
 
 D3DCOLOR						g_fillColor;
 
@@ -90,9 +88,6 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 	//[윤욱]
 	g_menubox.init(pd3dDevice, G::getSingleton().m_scrWidth, G::getSingleton().m_scrHeight);
 	
-	//[재우] 부분
-	g_battle.init(pd3dDevice, G::getSingleton().m_scrWidth, G::getSingleton().m_scrHeight);
-	
 	V( D3DXCreateFont( pd3dDevice, 12, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Gulim"), &g_pFont) );
 
 	// Orthogonal and fixed view xforms for GUI or fixed element rendering
@@ -140,8 +135,6 @@ void CALLBACK OnFrameMove( double fTime_, float fElapsedTime, void* pUserContext
 {
 	double fTime = fTime_ + g_timeDelta;
 
-	//[재우]부분
-	g_battle.frameMove(fElapsedTime);
 	g_menubox.frameMove(fElapsedTime);
 
 	if (g_sm.getCurState())
@@ -189,11 +182,6 @@ void renderFixedElements(IDirect3DDevice9* pd3dDevice, double fTime, float fElap
 	pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 	pd3dDevice->SetTransform(D3DTS_VIEW, &g_fixedViewMat);
 	pd3dDevice->SetTransform(D3DTS_PROJECTION, &g_orthoProjMat);
-
-	
-
-	//[재우]부분
-	g_battle.draw(G::getSingleton().m_scrWidth, G::getSingleton().m_scrHeight);
 
 	g_menubox.draw(G::getSingleton().m_scrWidth, G::getSingleton().m_scrHeight);
 	//g_picRhw.draw();
@@ -251,9 +239,6 @@ LRESULT CALLBACK MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
 	//g_avatar.handleMessages(hWnd, uMsg, wParam, lParam);
 	g_camera.HandleMessages(hWnd, uMsg, wParam, lParam);
 
-	//[재우]부분
-	g_battle.handleMessages(hWnd, uMsg, wParam, lParam);
-
 	if (g_sm.getCurState() != 0)
 		g_sm.getCurState()->handleMessages(hWnd, uMsg, wParam, lParam);
 
@@ -276,11 +261,6 @@ void CALLBACK OnD3D9LostDevice( void* pUserContext )
 void CALLBACK OnD3D9DestroyDevice( void* pUserContext )
 {
 	g_menubox.release();
-
-	//[재우]부분
-	g_battle.release();
-
-	g_introModule.release();
 	
 	g_sm.release();
 	

@@ -52,6 +52,8 @@ private:
 	DWORD m_dwFontSize;
 
 	float m_velocity;
+
+	double m_startTime;
 };
 
 /* SDKmisc.h

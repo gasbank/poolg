@@ -169,12 +169,16 @@ int Tcl_AppInit(Tcl_Interp *interp){
 	if (Tcl_Init(interp) == TCL_ERROR)
 		return TCL_ERROR;
 	/* Now initialize our functions */
-	Tcl_CreateObjCommand(interp, "square", _wrap_square, (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL);
-	Tcl_CreateObjCommand(interp, "csum", _wrap_csum, (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL);
-	Tcl_CreateObjCommand(interp, "createWidget", _wrap_createWidget, (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL);
-	Tcl_CreateObjCommand(interp, "widgetGetA", _wrap_widgetGetA, (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL);
-	Tcl_CreateObjCommand(interp, "widgetGetB", _wrap_widgetGetB, (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL);
-	Tcl_CreateObjCommand(interp, "releaseWidget", _wrap_releaseWidget, (ClientData) "release~~~", (Tcl_CmdDeleteProc *) NULL);
+
+#define CREATE_SCRIPT_METHOD(funcName)	Tcl_CreateObjCommand(interp, #funcName, _wrap_##funcName, (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL)
+	CREATE_SCRIPT_METHOD(square);
+	CREATE_SCRIPT_METHOD(csum);
+	CREATE_SCRIPT_METHOD(createWidget);
+	CREATE_SCRIPT_METHOD(releaseWidget);
+	CREATE_SCRIPT_METHOD(widgetGetA);
+	CREATE_SCRIPT_METHOD(widgetGetB);
+#undef CREATE_SCRIPT_METHOD
+
 	return TCL_OK;
 }
 

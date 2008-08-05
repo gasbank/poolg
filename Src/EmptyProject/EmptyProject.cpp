@@ -13,11 +13,11 @@
 #include "IntroState.h"
 #include "EpCamera.h"
 #include "Menu.h"
-#include "StateManager.h"
+#include "TopStateManager.h"
 #include "VideoMan.h"
 
 G								g_g;
-StateManager					g_sm;
+TopStateManager					g_sm;
 
 double							g_timeDelta = 0.0f;
 
@@ -52,7 +52,7 @@ int csum(int a, int b)
 }
 int EpSetNextState(int stateID)
 {
-	StateManager::getSingleton().setNextState((GameTopState)stateID);
+	TopStateManager::getSingleton().setNextState((GameState)stateID);
 	return 0;
 }
 static int _wrap_csum(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
@@ -205,8 +205,6 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
                                     void* pUserContext )
 {
-
-
     pd3dDevice->SetRenderState( D3DRS_DITHERENABLE, TRUE );
     pd3dDevice->SetRenderState( D3DRS_SPECULARENABLE, TRUE );
 	
@@ -231,12 +229,14 @@ void CALLBACK OnFrameMove( double fTime_, float fElapsedTime, void* pUserContext
 {
 	double fTime = fTime_ + g_timeDelta;
 
+	TopStateManager::getSingleton().transit();
+
 	g_menubox.frameMove(fElapsedTime);
 
 	if (g_sm.getCurState())
 		g_sm.getCurState()->frameMove(fTime, fElapsedTime);
 
-	StateManager::getSingleton().transit();
+	
 }
 
 

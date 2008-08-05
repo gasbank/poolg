@@ -1,7 +1,7 @@
 #include "EmptyProjectPCH.h"
 #include "IntroState.h"
 #include "Picture.h"
-#include "StateManager.h"
+#include "TopStateManager.h"
 
 extern D3DXMATRIX						g_orthoProjMat;
 extern D3DXMATRIX						g_fixedViewMat;
@@ -145,7 +145,7 @@ HRESULT IntroState::frameMove( double fTime, float fElapsedTime )
 	}
 	else if (46.0f < fStateTime)
 	{
-		StateManager::getSingleton().setNextState(GAME_TOP_STATE_WORLD);
+		TopStateManager::getSingleton().setNextState(GAME_TOP_STATE_WORLD);
 	}
 
 	return S_OK;
@@ -249,7 +249,7 @@ HRESULT IntroState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 	{
 		if (wParam == VK_F4)
 		{
-			StateManager::getSingleton().setNextState(GAME_TOP_STATE_CREDIT);
+			TopStateManager::getSingleton().setNextState(GAME_TOP_STATE_CREDIT);
 		}
 	}
 

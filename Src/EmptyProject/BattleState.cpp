@@ -1,6 +1,9 @@
 #include "EmptyProjectPCH.h"
 #include "BattleState.h"
 
+extern D3DXMATRIX g_orthoProjMat;
+extern D3DXMATRIX g_fixedViewMat;
+
 HRESULT BattleState::enter()
 {
 	HRESULT hr;
@@ -99,8 +102,17 @@ HRESULT BattleState::enter()
 	return S_OK;
 }
 
+HRESULT BattleState::leave()
+{
+	return S_OK;
+}
+
 HRESULT BattleState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, float fElapsedTime)
 {
+	pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
+	pd3dDevice->SetTransform(D3DTS_VIEW, &g_fixedViewMat);
+	pd3dDevice->SetTransform(D3DTS_PROJECTION, &g_orthoProjMat);
+
 	m_pDev->SetRenderState(D3DRS_LIGHTING, FALSE);
 
 	D3DMATERIAL9 material;

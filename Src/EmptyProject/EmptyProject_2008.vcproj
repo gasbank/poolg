@@ -666,6 +666,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\FieldState.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\FieldState.h"
+			>
+		</File>
+		<File
 			RelativePath=".\G.cpp"
 			>
 		</File>
@@ -746,6 +754,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\TopStateManager.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\TopStateManager.h"
+			>
+		</File>
+		<File
 			RelativePath=".\Unit.cpp"
 			>
 		</File>
@@ -759,6 +775,14 @@
 		</File>
 		<File
 			RelativePath=".\WorldState.h"
+			>
+		</File>
+		<File
+			RelativePath=".\WorldStateManager.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\WorldStateManager.h"
 			>
 		</File>
 	</Files>

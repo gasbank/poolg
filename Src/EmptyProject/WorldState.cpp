@@ -1,6 +1,9 @@
 #include "EmptyProjectPCH.h"
 #include "WorldState.h"
-#include "StateManager.h"
+#include "WorldStateManager.h"
+#include "BattleState.h"
+
+WorldStateManager worldStateManager;
 
 WorldState::WorldState(void)
 {
@@ -90,6 +93,8 @@ HRESULT WorldState::enter()
 
 	setupLight();
 
+	WorldStateManager::getSingleton().init();
+
 	return S_OK;
 }
 
@@ -131,12 +136,15 @@ HRESULT WorldState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, floa
 	G::getSingleton().m_videoMan.renderMeshesOnly(m_sg->getSceneRoot());
 	m_sg->getSceneRoot()->update(fTime, fElapsedTime);
 
+	WorldStateManager& wsm = WorldStateManager::getSingleton();
+	wsm.getCurState()->frameRender(pd3dDevice, fTime, fElapsedTime);
+
 	return S_OK;
 }
 
 HRESULT WorldState::frameMove(double fTime, float fElapsedTime)
 {
-	D3DLIGHT9& light = G::getSingleton().m_light;
+	//D3DLIGHT9& light = G::getSingleton().m_light;
 	EpCamera& camera = G::getSingleton().m_camera;
 
 	if (m_startTime <= 0.0f)
@@ -174,6 +182,9 @@ HRESULT WorldState::frameMove(double fTime, float fElapsedTime)
 
 	m_sampleTeapotMeshRot += fElapsedTime * D3DXToRadian(35); // 35 degrees per second
 
+	WorldStateManager::getSingleton().transit();
+	WorldStateManager::getSingleton().getCurState()->frameMove(fTime, fElapsedTime);
+
 	return S_OK;
 }
 
@@ -194,6 +205,8 @@ HRESULT WorldState::release()
 	SAFE_RELEASE( m_pVertexDeclaration );
 	SAFE_RELEASE(m_aTile);
 
+	WorldStateManager::getSingleton().release();
+
 	return S_OK;
 }
 
@@ -207,9 +220,11 @@ HRESULT WorldState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 	{
 		if (wParam == VK_F4)
 		{
-			StateManager::getSingleton().setNextState(GAME_TOP_STATE_CREDIT);
+
 		}
 	}
+
+	WorldStateManager::getSingleton().getCurState()->handleMessages(hWnd, uMsg, wParam, lParam);
 
 	return S_OK;
 }

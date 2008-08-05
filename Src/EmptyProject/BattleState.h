@@ -8,7 +8,8 @@
 class BattleState : public State
 {
 public:
-	HRESULT enter ();
+	HRESULT enter();
+	HRESULT leave();
 
 	HRESULT frameRender (IDirect3DDevice9* pd3dDevice, double fTime, float fElapsedTime);
 	HRESULT frameMove (double fTime, float fElapsedTime);

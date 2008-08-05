@@ -1,7 +1,7 @@
 #include "EmptyProjectPCH.h"
 #include "CreditState.h"
 #include "EpCamera.h"
-#include "StateManager.h"
+#include "TopStateManager.h"
 #include "Unit.h"
 
 extern D3DXMATRIX				g_orthoProjMat;
@@ -174,7 +174,7 @@ HRESULT CreditState::frameMove( double fTime, float fElapsedTime )
 
 	if (fStateTime >= s_period * 4)
 	{
-		StateManager::getSingleton().setNextState(GAME_TOP_STATE_WORLD);
+		TopStateManager::getSingleton().setNextState(GAME_TOP_STATE_WORLD);
 	}
 	return S_OK;
 }
@@ -185,7 +185,7 @@ HRESULT CreditState::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 	{
 		if (wParam == VK_F4)
 		{
-			StateManager::getSingleton().setNextState(GAME_TOP_STATE_WORLD);
+			TopStateManager::getSingleton().setNextState(GAME_TOP_STATE_WORLD);
 		}
 	}
 

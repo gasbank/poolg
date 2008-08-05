@@ -21,7 +21,7 @@ void TopStateManager::init()
 	m_states[2] = new WorldState();
 	m_states[5] = new CreditState();
 	m_curStates = 0;
-	m_nextState = m_states[0];
+	m_nextState = 0;
 }
 
 void TopStateManager::release()

@@ -1,5 +1,6 @@
 #include "EmptyProjectPCH.h"
 #include "Unit.h"
+#include "ScriptManager.h"
 
 #define KEY_WAS_DOWN_MASK 0x80
 #define KEY_IS_DOWN_MASK  0x01
@@ -111,24 +112,28 @@ void Unit::frameMove( float fElapsedTime )
 			m_bMoving = true;
 			m_vKeyboardDirection = D3DXVECTOR3( 0, 0, 0 );
 			m_vKeyboardDirection.y += 2.0f;
+			ScriptManager::getSingleton().execute("EpUnitOnMove 0");
 		}
 		else if( IsKeyDown( m_aKeys[UNIT_MOVE_DOWN] ) )
 		{
 			m_bMoving = true;
 			m_vKeyboardDirection = D3DXVECTOR3( 0, 0, 0 );
 			m_vKeyboardDirection.y -= 2.0f;
+			ScriptManager::getSingleton().execute("EpUnitOnMove 1");
 		}
 		else if( IsKeyDown( m_aKeys[UNIT_MOVE_RIGHT] ) )
 		{
 			m_bMoving = true;
 			m_vKeyboardDirection = D3DXVECTOR3( 0, 0, 0 );
 			m_vKeyboardDirection.x += 2.0f;
+			ScriptManager::getSingleton().execute("EpUnitOnMove 2");
 		}
 		else if( IsKeyDown( m_aKeys[UNIT_MOVE_LEFT] ) )
 		{
 			m_bMoving = true;
 			m_vKeyboardDirection = D3DXVECTOR3( 0, 0, 0 );
 			m_vKeyboardDirection.x -= 2.0f;
+			ScriptManager::getSingleton().execute("EpUnitOnMove 3");
 		}
 	}
 	

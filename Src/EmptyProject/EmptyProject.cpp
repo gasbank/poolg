@@ -14,11 +14,12 @@
 #include "EpCamera.h"
 #include "MenuState.h"
 #include "TopStateManager.h"
+#include "ScriptManager.h"
 #include "VideoMan.h"
 
 G								g_g;
 TopStateManager					g_sm;
-
+ScriptManager					g_scriptManager;
 double							g_timeDelta = 0.0f;
 
 LPD3DXFONT						g_pFont					= 0;
@@ -34,102 +35,6 @@ D3DXMATRIX						g_orthoProjMat;
 D3DXMATRIX						g_fixedViewMat;
 
 LOGMANAGER logMan;
-
-
-
-
-//////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////
-
-
-int square (int i)
-{
-	return i*i;
-}
-int csum(int a, int b)
-{
-
-	return a+b;
-}
-int EpSetNextState(int stateID)
-{
-	TopStateManager::getSingleton().setNextState((GameState)stateID);
-	return 0;
-}
-static int _wrap_csum(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
-	int  _result;
-	int  _arg0, _arg1;
-	Tcl_Obj * tcl_result;
-	int tempint1, tempint2;
-
-	clientData = clientData; objv = objv;
-	tcl_result = Tcl_GetObjResult(interp);
-	if ((objc < 3) || (objc > 3)) {
-		Tcl_SetStringObj(tcl_result,"Wrong # args. csum a b ",-1);
-		return TCL_ERROR;
-	}
-	if (Tcl_GetIntFromObj(interp,objv[1],&tempint1) == TCL_ERROR) return TCL_ERROR;
-	if (Tcl_GetIntFromObj(interp,objv[2],&tempint2) == TCL_ERROR) return TCL_ERROR;
-	_arg0 = (int ) tempint1;
-	_arg1 = (int ) tempint2;
-	_result = (int )csum(_arg0, _arg1);
-	tcl_result = Tcl_GetObjResult(interp);
-	Tcl_SetIntObj(tcl_result,(long) _result);
-	return TCL_OK;
-}
-
-static int _wrap_square(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
-	int  _result;
-	int  _arg0;
-	Tcl_Obj * tcl_result;
-	int tempint;
-
-	clientData = clientData; objv = objv;
-	tcl_result = Tcl_GetObjResult(interp);
-	if ((objc < 2) || (objc > 2)) {
-		Tcl_SetStringObj(tcl_result,"Wrong # args. square i ",-1);
-		return TCL_ERROR;
-	}
-	if (Tcl_GetIntFromObj(interp,objv[1],&tempint) == TCL_ERROR) return TCL_ERROR;
-	_arg0 = (int ) tempint;
-	_result = (int )square(_arg0);
-	tcl_result = Tcl_GetObjResult(interp);
-	Tcl_SetIntObj(tcl_result,(long) _result);
-	return TCL_OK;
-}
-static int _wrap_EpSetNextState(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
-	int  _result;
-	int  _arg0;
-	Tcl_Obj * tcl_result;
-	int tempint;
-
-	clientData = clientData; objv = objv;
-	tcl_result = Tcl_GetObjResult(interp);
-	if ((objc < 2) || (objc > 2)) {
-		Tcl_SetStringObj(tcl_result,"Wrong # args. square i ",-1);
-		return TCL_ERROR;
-	}
-	if (Tcl_GetIntFromObj(interp,objv[1],&tempint) == TCL_ERROR) return TCL_ERROR;
-	_arg0 = (int ) tempint;
-	_result = (int )EpSetNextState(_arg0);
-	tcl_result = Tcl_GetObjResult(interp);
-	Tcl_SetIntObj(tcl_result,(long) _result);
-	return TCL_OK;
-}
-
-int Tcl_AppInit(Tcl_Interp *interp){
-	if (Tcl_Init(interp) == TCL_ERROR)
-		return TCL_ERROR;
-	/* Now initialize our functions */
-	Tcl_CreateObjCommand(interp, "square", _wrap_square, (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL);
-	Tcl_CreateObjCommand(interp, "csum", _wrap_csum, (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL);
-	Tcl_CreateObjCommand(interp, "EpSetNextState", _wrap_EpSetNextState, (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL);
-	return TCL_OK;
-}
-
-
-//////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////
 
 
 //--------------------------------------------------------------------------------------
@@ -357,11 +262,6 @@ void CALLBACK OnD3D9LostDevice( void* pUserContext )
 //--------------------------------------------------------------------------------------
 void CALLBACK OnD3D9DestroyDevice( void* pUserContext )
 {
-	//g_menubox.release();
-	
-	g_sm.release();
-	
-	//SAFE_RELEASE( g_pEffect );
 	SAFE_RELEASE( g_pFont );
 	
 	G::getSingleton().m_videoMan.SetDev(0);
@@ -437,12 +337,7 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 	SetCurrentDirectory(buf);
 
 	g_sm.init();
-
-	Tcl_Interp* interp;
-	interp = Tcl_CreateInterp();
-	Tcl_AppInit(interp);
-	assert(Tcl_EvalFile( interp, "library/EpInitScript.tcl" ) == TCL_OK) ;
-	assert(Tcl_Eval(interp, "EpInitGame") == TCL_OK);
+	g_scriptManager.init(); // Should be called after State Manager is inited
 
     // Initialize DXUT and create the desired Win32 window and Direct3D device for the application
     DXUTInit( true, true ); // Parse the command line and show msgboxes
@@ -455,8 +350,8 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
     DXUTMainLoop();
 
     // TODO: Perform any application-level cleanup here
-	Tcl_DeleteInterp(interp);
-	Tcl_Finalize();
+	g_scriptManager.release();
+	g_sm.release();
 
     return DXUTGetExitCode();
 }

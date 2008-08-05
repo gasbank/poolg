@@ -208,7 +208,6 @@ HRESULT WorldState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 		if (wParam == VK_F4)
 		{
 			StateManager::getSingleton().setNextState(GAME_TOP_STATE_CREDIT);
-			StateManager::getSingleton().transit();
 		}
 	}
 

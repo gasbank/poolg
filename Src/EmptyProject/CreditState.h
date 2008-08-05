@@ -1,6 +1,7 @@
 #pragma once
 
 #include "State.h"
+#include "Unit.h"
 
 class CreditState : public State
 {
@@ -24,5 +25,16 @@ private:
 	LPD3DXFONT						m_d3dxFont;
 	LPD3DXFONT						m_d3dxFontBig;
 
+	Unit							m_text3D;
+	D3DMATERIAL9					m_textMat;
+	float							m_textMatAlpha;
+
+	D3DXCOLOR						m_textColor;
+	float							m_creditStartTime;
+
 	double							m_startTime;
+
+	static const float				s_period;
+	static const float				s_fadeIn;
+	static const float				s_fadeOut;
 };

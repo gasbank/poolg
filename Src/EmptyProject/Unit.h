@@ -31,6 +31,7 @@ public:
 	void setRotY(float rad) { m_vRot.y = rad; m_bLocalXformDirty = true; }
 	void setRotZ(float rad) { m_vRot.z = rad; m_bLocalXformDirty = true; }
 
+	void setUniformScale(float val) { m_vScale.x = m_vScale.y = m_vScale.z = val; m_bLocalXformDirty = true; }
 	void setScaleX(float val) { m_vScale.x = val; m_bLocalXformDirty = true; }
 	void setScaleY(float val) { m_vScale.y = val; m_bLocalXformDirty = true; }
 	void setScaleZ(float val) { m_vScale.z = val; m_bLocalXformDirty = true; }

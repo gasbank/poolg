@@ -58,10 +58,13 @@ void StateManager::setNextState(GameTopState state)
 
 void StateManager::transit()
 {
-	if (m_curStates != 0)
-		m_curStates->leave();
-	if (m_nextState == 0)
-		throw std::runtime_error("Next State is NULL");
-	m_curStates = m_nextState;
-	m_curStates->enter();
+	if (m_nextState)
+	{
+		if (m_curStates != 0)
+			m_curStates->leave();
+		
+		m_curStates = m_nextState;
+		m_nextState = 0;
+		m_curStates->enter();
+	}
 }

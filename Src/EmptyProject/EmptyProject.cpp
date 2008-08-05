@@ -103,7 +103,6 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 	float fAspectRatio = pBackBufferSurfaceDesc->Width / ( FLOAT )pBackBufferSurfaceDesc->Height;
 	g_camera.SetProjParams( D3DX_PI / 4, fAspectRatio, 1.0f, 1000.0f );
 
-	g_sm.transit();
 	
 	return S_OK;
 }
@@ -145,7 +144,10 @@ void CALLBACK OnFrameMove( double fTime_, float fElapsedTime, void* pUserContext
 	g_battle.frameMove(fElapsedTime);
 	g_menubox.frameMove(fElapsedTime);
 
-	g_sm.getCurState()->frameMove(fTime, fElapsedTime);
+	if (g_sm.getCurState())
+		g_sm.getCurState()->frameMove(fTime, fElapsedTime);
+
+	StateManager::getSingleton().transit();
 }
 
 

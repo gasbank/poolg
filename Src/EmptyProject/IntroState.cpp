@@ -31,6 +31,7 @@ IntroState::IntroState(void)
 	{
 		// Avoid non-invertible world-view matrix
 		D3DXMatrixIdentity(&m_matObjs[i]);
+		m_pTextMeshes[i] = 0;
 	}
 }
 
@@ -140,7 +141,6 @@ HRESULT IntroState::frameMove( double fTime, float fElapsedTime )
 	else if (46.0f < fTime)
 	{
 		StateManager::getSingleton().setNextState(GAME_TOP_STATE_WORLD);
-		StateManager::getSingleton().transit();
 	}
 
 	return S_OK;
@@ -245,7 +245,6 @@ HRESULT IntroState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 		if (wParam == VK_F4)
 		{
 			StateManager::getSingleton().setNextState(GAME_TOP_STATE_CREDIT);
-			StateManager::getSingleton().transit();
 		}
 	}
 

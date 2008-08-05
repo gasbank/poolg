@@ -11,6 +11,7 @@ Unit::Unit()
 	m_pd3dDevice = 0;
 	m_d3dTex = 0;
 
+	ZeroMemory(&m_material, sizeof(D3DMATERIAL9));
 	m_material.Ambient.r = m_material.Ambient.g = m_material.Ambient.b = 0.6f;
 	m_material.Diffuse.r = m_material.Diffuse.g = m_material.Diffuse.b = 0.3f;
 	m_material.Specular.r = m_material.Specular.g = m_material.Specular.b = 0.2f;
@@ -24,6 +25,8 @@ Unit::Unit()
 	
 	m_bLocalXformDirty = true;
 	m_bMoving = false;
+
+	ZeroMemory(m_aKeys, sizeof(m_aKeys));
 }
 Unit::~Unit()
 {

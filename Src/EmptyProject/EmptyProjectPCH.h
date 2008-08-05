@@ -1,3 +1,6 @@
+#pragma warning(disable:4201)
+#pragma warning(disable:4100)
+
 #include "AranPCH.h"
 #include <tchar.h>
 #include "DXUT.h"
@@ -5,6 +8,8 @@
 #include "DXUTcamera.h"
 #include "G.h"
 #include "tcl.h"
+
+
 
 // Visual Studio memory leak detection C runtime library
 // This feature is implemented somewhat different way in MFC library,

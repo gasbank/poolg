@@ -122,14 +122,14 @@ MenuState::MenuState()
 {
 	HRESULT hr;
 	m_pDev = G::getSingleton().m_dev;
-	float scrWidth = G::getSingleton().m_scrWidth;
-	float scrHeight = G::getSingleton().m_scrHeight;
+	float scrWidth = (float)G::getSingleton().m_scrWidth;
+	float scrHeight = (float)G::getSingleton().m_scrHeight;
 
 	float menuBoxWidth = 158;
 	float menuBoxHeight = 127;
 
 	float menuBoxPositionX = (float)scrWidth/2 - menuBoxWidth - 10;
-	float menuBoxPositionY = (float)scrHeight/2 - menuBoxWidth - 70;
+	float menuBoxPositionY = (float)scrHeight/2 - menuBoxHeight - 70;
 	m_menu.init(L"menu.png", m_pDev);
 	m_menu.setPosition (menuBoxPositionX, menuBoxPositionY, 3.0f);
 	m_menu.setSizeToTexture();

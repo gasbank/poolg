@@ -107,7 +107,6 @@ BattleState::~BattleState()
 
 HRESULT BattleState::enter()
 {
-	HRESULT hr;
 
 	return S_OK;
 }

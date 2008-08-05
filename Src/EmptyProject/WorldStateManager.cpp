@@ -2,6 +2,7 @@
 #include "WorldStateManager.h"
 #include "BattleState.h"
 #include "FieldState.h"
+#include "MenuState.h"
 
 IMPLEMENT_SINGLETON(WorldStateManager);
 
@@ -19,6 +20,7 @@ void WorldStateManager::init()
 	m_states = new State*[10];
 	m_states[0] = new FieldState();
 	m_states[1] = new BattleState();
+	m_states[2] = new MenuState();
 	m_curStates = 0;
 	m_nextState = m_states[0];
 }
@@ -27,8 +29,10 @@ void WorldStateManager::release()
 {
 	m_states[0]->release();
 	m_states[1]->release();
+	m_states[2]->release();
 	delete m_states[0];
 	delete m_states[1];
+	delete m_states[2];
 	delete [] m_states;
 }
 
@@ -41,6 +45,9 @@ void WorldStateManager::setNextState(GameState state)
 		break;
 	case GAME_WORLD_STATE_BATTLE:
 		m_nextState = m_states[1];
+		break;
+	case GAME_WORLD_STATE_MENU:
+		m_nextState = m_states[2];
 		break;
 	}
 }

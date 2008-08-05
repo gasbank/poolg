@@ -690,11 +690,11 @@
 			>
 		</File>
 		<File
-			RelativePath=".\Menu.cpp"
+			RelativePath=".\MenuState.cpp"
 			>
 		</File>
 		<File
-			RelativePath=".\Menu.h"
+			RelativePath=".\MenuState.h"
 			>
 		</File>
 		<File

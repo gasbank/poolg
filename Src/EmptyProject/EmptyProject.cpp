@@ -12,7 +12,7 @@
 #include "BattleState.h"
 #include "IntroState.h"
 #include "EpCamera.h"
-#include "Menu.h"
+#include "MenuState.h"
 #include "TopStateManager.h"
 #include "VideoMan.h"
 
@@ -25,8 +25,8 @@ LPD3DXFONT						g_pFont					= 0;
 LPD3DXEFFECT		            g_pEffect				= 0;
 D3DXHANDLE						g_tech					= 0;
 
-Menu							g_menubox;
-Menu							g_select;
+//Menu							g_menubox;
+//Menu							g_select;
 
 D3DCOLOR						g_fillColor;
 
@@ -183,7 +183,7 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 	G::getSingleton().m_scrHeight = pBackBufferSurfaceDesc->Height;
 
 	//[윤욱]
-	g_menubox.init(pd3dDevice, G::getSingleton().m_scrWidth, G::getSingleton().m_scrHeight);
+	//g_menubox.init(pd3dDevice, G::getSingleton().m_scrWidth, G::getSingleton().m_scrHeight);
 	
 	V( D3DXCreateFont( pd3dDevice, 12, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Gulim"), &g_pFont) );
 
@@ -232,7 +232,7 @@ void CALLBACK OnFrameMove( double fTime_, float fElapsedTime, void* pUserContext
 
 	TopStateManager::getSingleton().transit();
 
-	g_menubox.frameMove(fElapsedTime);
+	//g_menubox.frameMove(fElapsedTime);
 
 	if (g_sm.getCurState())
 		g_sm.getCurState()->frameMove(fTime, fElapsedTime);
@@ -280,7 +280,7 @@ void renderFixedElements(IDirect3DDevice9* pd3dDevice, double fTime, float fElap
 	pd3dDevice->SetTransform(D3DTS_VIEW, &g_fixedViewMat);
 	pd3dDevice->SetTransform(D3DTS_PROJECTION, &g_orthoProjMat);
 
-	g_menubox.draw(G::getSingleton().m_scrWidth, G::getSingleton().m_scrHeight);
+	//g_menubox.draw(G::getSingleton().m_scrWidth, G::getSingleton().m_scrHeight);
 	//g_picRhw.draw();
 
 	/*D3DPERF_BeginEvent(0xff00ffff, L"Draw Center Smiley~");
@@ -357,7 +357,7 @@ void CALLBACK OnD3D9LostDevice( void* pUserContext )
 //--------------------------------------------------------------------------------------
 void CALLBACK OnD3D9DestroyDevice( void* pUserContext )
 {
-	g_menubox.release();
+	//g_menubox.release();
 	
 	g_sm.release();
 	
@@ -399,10 +399,6 @@ void CALLBACK KeyboardProc( UINT nChar, bool bKeyDown, bool bAltDown, void* pUse
 		case VK_UP:
 			break;
 		case VK_DOWN:
-			break;
-		case '8': g_select.select(8);
-			break;
-		case '9': g_select.select(9);
 			break;
 		}
 	}	

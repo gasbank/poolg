@@ -222,6 +222,11 @@ HRESULT WorldState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 		{
 
 		}
+		if (wParam == VK_F5)
+		{
+			WorldStateManager::getSingleton().setNextState(GAME_WORLD_STATE_MENU);
+		}
+
 	}
 
 	WorldStateManager::getSingleton().getCurState()->handleMessages(hWnd, uMsg, wParam, lParam);

@@ -1,12 +1,12 @@
 #include "EmptyProjectPCH.h"
 #include "BattleState.h"
+#include "WorldStateManager.h"
 
 extern D3DXMATRIX g_orthoProjMat;
 extern D3DXMATRIX g_fixedViewMat;
 
-HRESULT BattleState::enter()
+BattleState::BattleState()
 {
-	HRESULT hr;
 	m_pDev = G::getSingleton().m_dev;
 
 	float statusBoxWidth = 163;
@@ -26,7 +26,7 @@ HRESULT BattleState::enter()
 	m_StatusBoxEnemy.init(L"BattleUI\\StatusBox.png", m_pDev);
 	m_StatusBoxEnemy.setPosition (statusBoxEnemysPositionX, statusBoxEnemysPositionY, 6.9f);
 	m_StatusBoxEnemy.setSize(statusBoxWidth, statusBoxHeight);
-	
+
 	int skillBoxHeight = 200;
 	int skillBoxWidth = skillBoxHeight * 593 / 933;
 	int skillBoxPositionX = scrWidth/2 -skillBoxWidth - 3;
@@ -72,7 +72,7 @@ HRESULT BattleState::enter()
 	m_hpBarPlayer.setSize(statusBarWidth, statusBarHeight);
 	m_hpBarPlayer.changeRate(-20);
 	m_hpBarPlayer.setPosition (statusBoxPlayersPositionX + statusBoxWidth*0.23f, statusBoxPlayersPositionY + statusBoxHeight * 0.82f, 4.5f);
-	
+
 	m_mpBarPlayer.init(L"BattleUI\\MPbar.jpg", m_pDev);
 	m_mpBarPlayer.initRate();
 	m_mpBarPlayer.setPosition (statusBoxPlayersPositionX + statusBoxWidth*0.23f, statusBoxPlayersPositionY + statusBoxHeight * 0.65f, 4.5f);
@@ -96,8 +96,18 @@ HRESULT BattleState::enter()
 	m_mpBarEnemy.setPosition (statusBoxEnemysPositionX + statusBoxWidth*0.23f, statusBoxEnemysPositionY + statusBoxHeight * 0.65f, 4.5f);
 	m_mpBarEnemy.setSize(statusBarWidth, statusBarHeight);
 
-	V( D3DXCreateFont(m_pDev, 17, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblHYnamL) );
-	V( D3DXCreateFont(m_pDev, 18, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Rockwell Extra Bold"), &m_lblREB) );
+	D3DXCreateFont(m_pDev, 17, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblHYnamL);
+	D3DXCreateFont(m_pDev, 18, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Rockwell Extra Bold"), &m_lblREB);
+}
+
+BattleState::~BattleState()
+{
+
+}
+
+HRESULT BattleState::enter()
+{
+	HRESULT hr;
 
 	return S_OK;
 }
@@ -188,6 +198,14 @@ HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 	m_mpBarPlayer.handleMessages(hWnd, uMsg, wParam, lParam);
 	m_expBarPlayer.handleMessages(hWnd, uMsg, wParam, lParam);
 	m_mpBarEnemy.handleMessages(hWnd, uMsg, wParam, lParam);
+
+	if (uMsg == WM_KEYDOWN)
+	{
+		if (wParam == VK_F4)
+		{
+			WorldStateManager::getSingleton().setNextState(GAME_WORLD_STATE_FIELD);
+		}
+	}
 
 	return S_OK;
 }

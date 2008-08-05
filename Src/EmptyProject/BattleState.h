@@ -8,6 +8,9 @@
 class BattleState : public State
 {
 public:
+	BattleState();
+	~BattleState();
+
 	HRESULT enter();
 	HRESULT leave();
 
@@ -47,5 +50,4 @@ private:
 	LPD3DXFONT		m_lblREB;
 	
 	LPDIRECT3DDEVICE9	m_pDev;
-
 };

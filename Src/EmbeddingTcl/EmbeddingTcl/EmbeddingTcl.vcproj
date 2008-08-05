@@ -61,7 +61,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="C:\tcl8.5.3\win\Debug_VC9\tcl85tg.lib"
+				AdditionalDependencies="C:\tcl8.5.3\win\Debug_VC9\tcl85g.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories=""
 				GenerateDebugInformation="true"

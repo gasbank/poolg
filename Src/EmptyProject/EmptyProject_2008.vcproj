@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="Windows-1252"?>
+<?xml version="1.0" encoding="ks_c_5601-1987"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
@@ -45,7 +45,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../Aran/include;../DXUT/Core;../DXUT/Optional"
+				AdditionalIncludeDirectories="../Aran/include;../DXUT/Core;../DXUT/Optional;../tcl/include"
 				PreprocessorDefinitions="WIN32;_DEBUG;DEBUG;PROFILE;_WINDOWS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="0"
@@ -68,9 +68,9 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/IGNORE:4089"
-				AdditionalDependencies="Aran.lib DXUT.lib DXUTOpt.lib dxerr.lib dxguid.lib d3dx10d.lib d3d10.lib d3dx9d.lib d3d9.lib winmm.lib comctl32.lib"
+				AdditionalDependencies="Aran.lib tcl85g.lib DXUT.lib DXUTOpt.lib dxerr.lib dxguid.lib d3dx10d.lib d3d10.lib d3dx9d.lib d3d9.lib winmm.lib comctl32.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="../Aran/lib;../DXUT/Core/Debug;../DXUT/Optional/Debug"
+				AdditionalLibraryDirectories="../Aran/lib;../DXUT/Core/Debug;../DXUT/Optional/Debug;../tcl/lib"
 				GenerateManifest="true"
 				UACExecutionLevel="2"
 				DelayLoadDLLs=""

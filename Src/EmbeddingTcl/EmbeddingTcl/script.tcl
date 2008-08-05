@@ -11,4 +11,6 @@ proc printSquare {arg1} {
 # Beginning comment
 puts "Hello, World - In quotes"    ;# This is a comment after the command.
 puts " --C proc-- The square of 2 is: [square 2]"
+puts " --C proc-- The csum of 3 and 9 is: [csum 3 9]"
 puts " --Tcl proc-- The square of 2 is: [square_tcl 2]"
+

@@ -1,0 +1,1 @@
+nmake -f makefile.vc core OPTS=symbols,msvcrt STATS=memdbg

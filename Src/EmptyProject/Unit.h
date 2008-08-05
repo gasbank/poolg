@@ -10,11 +10,10 @@ enum UnitInput
 	UNIT_UNKNOWN = 0xFF
 };
 
-
 class Unit
 {
 public:
-	static Unit* createUnit(LPD3DXMESH mesh);
+	static Unit* createUnit( LPD3DXMESH mesh, float posX = 0, float posY = 0, float posZ = 0 );
 	~Unit();
 
 	HRESULT init(LPDIRECT3DDEVICE9 pd3dDevice, LPD3DXMESH mesh);

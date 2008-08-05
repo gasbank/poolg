@@ -2,56 +2,168 @@
 //
 
 #include "stdafx.h"
+#include <list>
+#include <vector>
 
-int square (int i)
+typedef unsigned long DWORD;
+
+class Widget
 {
-	return i*i;
-}
-int csum(int a, int b)
+public:
+	static Widget* createWidget(int a = 0, int b = 0) { return new Widget(a, b); }
+	~Widget()
+	{
+		std::cout << "Widget dtor() called" << std::endl;
+	}
+	int getA() { return a; }
+	int getB() { return b; }
+private:
+	int a, b;
+	Widget() {}
+	Widget(int a, int b)
+	{
+		this->a = a;
+		this->b = b;
+		std::cout << "Widget ctor() called" << std::endl;
+	}
+};
+
+
+//////////////////////////////////////////////////////////////////////////
+
+enum ArgumentType
 {
-	return a+b;
-}
-static int _wrap_csum(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
-	int  _result;
-	int  _arg0, _arg1;
-	Tcl_Obj * tcl_result;
-	int tempint1, tempint2;
+	AT_I = 1,
+	AT_PC = 2,
+	AT_D = 3,
+	AT_PV = 4,
+};
 
-	clientData = clientData; objv = objv;
-	tcl_result = Tcl_GetObjResult(interp);
-	if ((objc < 3) || (objc > 3)) {
-		Tcl_SetStringObj(tcl_result,"Wrong # args. csum a b ",-1);
-		return TCL_ERROR;
+union ScriptArgument
+{
+	int i;
+	const char* pc;
+	double d;
+	void* pv;
+};
+typedef std::vector<ScriptArgument> ScriptArgumentList;
+
+void ParseTclArgumentByTrait( DWORD trait, Tcl_Interp* interp, Tcl_Obj *CONST objv[], ScriptArgumentList& argList )
+{
+	ScriptArgument sa;
+	memset( &sa, 0, sizeof( ScriptArgument ) );
+	argList.push_back(sa); // Return value set; type is not important at this point
+	trait = trait >> 4;
+
+	if (trait == 0)
+		throw std::runtime_error("Trait value incorrect");
+
+	unsigned int i = 1;
+	int len = 0;
+	while (trait)
+	{
+		switch (trait & 0xf)
+		{
+		case AT_I:
+		case AT_PV:
+			Tcl_GetIntFromObj( interp, objv[i], &sa.i );
+			break;
+		case AT_PC:
+			sa.pc = Tcl_GetStringFromObj( objv[i], &len );
+			break;
+		case AT_D:
+			Tcl_GetDoubleFromObj( interp, objv[i], &sa.d );
+			break;
+		default:
+			throw std::runtime_error("Trait value incorrect");
+		}
+		argList.push_back(sa);
+		
+		trait = trait >> 4;
+		i++;
 	}
-	if (Tcl_GetIntFromObj(interp,objv[1],&tempint1) == TCL_ERROR) return TCL_ERROR;
-	if (Tcl_GetIntFromObj(interp,objv[2],&tempint2) == TCL_ERROR) return TCL_ERROR;
-	_arg0 = (int ) tempint1;
-	_arg1 = (int ) tempint2;
-	_result = (int )csum(_arg0, _arg1);
-	tcl_result = Tcl_GetObjResult(interp);
-	Tcl_SetIntObj(tcl_result,(long) _result);
-	return TCL_OK;
+
 }
-
-static int _wrap_square(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
-	int  _result;
-	int  _arg0;
-	Tcl_Obj * tcl_result;
-	int tempint;
-
-	clientData = clientData; objv = objv;
-	tcl_result = Tcl_GetObjResult(interp);
-	if ((objc < 2) || (objc > 2)) {
-		Tcl_SetStringObj(tcl_result,"Wrong # args. square i ",-1);
-		return TCL_ERROR;
+void SetTclResult(DWORD trait, Tcl_Obj* tcl_result, const ScriptArgumentList& argList)
+{
+	switch (trait & 0xf)
+	{
+	case AT_I:
+		Tcl_SetIntObj( tcl_result, (long)argList[0].i );
+		break;
+	case AT_PV:
+		Tcl_SetIntObj( tcl_result, reinterpret_cast<long>( argList[0].pv ) );
+		break;
+	case AT_PC:
+		Tcl_SetStringObj( tcl_result, argList[0].pc, strlen( argList[0].pc ) );
+		break;
+	case AT_D:
+		Tcl_SetDoubleObj( tcl_result, argList[0].d );
+		break;
+	default:
+		throw std::runtime_error("Trait incorrect");
 	}
-	if (Tcl_GetIntFromObj(interp,objv[1],&tempint) == TCL_ERROR) return TCL_ERROR;
-	_arg0 = (int ) tempint;
-	_result = (int )square(_arg0);
-	tcl_result = Tcl_GetObjResult(interp);
-	Tcl_SetIntObj(tcl_result,(long) _result);
-	return TCL_OK;
 }
+
+//////////////////////////////////////////////////////////////////////////
+
+#define SCRIPT_CALLABLE_0(arg0, funcName)										\
+	static const DWORD _trait_##funcName = arg0;								\
+	void funcName(ScriptArgumentList& args) {
+
+#define SCRIPT_CALLABLE_1(arg0, funcName, arg1)									\
+	static const DWORD _trait_##funcName = arg0 | (arg1 << 4);					\
+	void funcName(ScriptArgumentList& args) {
+
+#define SCRIPT_CALLABLE_2(arg0, funcName, arg1, arg2)							\
+	static const DWORD _trait_##funcName = arg0 | (arg1 << 4) | (arg2 << 8);	\
+	void funcName(ScriptArgumentList& args) {
+
+#define SCRIPT_CALLABLE_END(funcName)	}																		\
+	static int _wrap_##funcName(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[])		\
+	{																											\
+		Tcl_Obj* tcl_result = Tcl_GetObjResult(interp);															\
+		ScriptArgumentList argList;																				\
+		ParseTclArgumentByTrait(_trait_##funcName, interp, objv, argList);										\
+		funcName(argList);																						\
+		SetTclResult(_trait_##funcName, tcl_result, argList);													\
+		return TCL_OK;																							\
+	}
+
+//////////////////////////////////////////////////////////////////////////
+
+SCRIPT_CALLABLE_2(AT_PV, createWidget, AT_I, AT_I)
+	args[0].pv = Widget::createWidget(args[1].i, args[2].i);
+SCRIPT_CALLABLE_END(createWidget)
+
+
+SCRIPT_CALLABLE_1(AT_I, releaseWidget, AT_PV)
+	delete reinterpret_cast<Widget*>( args[1].pv );
+	args[0].i = 0;
+SCRIPT_CALLABLE_END(releaseWidget)
+
+
+SCRIPT_CALLABLE_1(AT_I, widgetGetA, AT_PV)
+	args[0].i = reinterpret_cast<Widget*>( args[1].pv )->getA();
+SCRIPT_CALLABLE_END(widgetGetA)
+
+
+SCRIPT_CALLABLE_1(AT_I, widgetGetB, AT_PV)
+	args[0].i = reinterpret_cast<Widget*>( args[1].pv )->getB();
+SCRIPT_CALLABLE_END(widgetGetB)
+
+
+SCRIPT_CALLABLE_1(AT_I, square, AT_I)
+	args[0].i = args[1].i * args[1].i;
+SCRIPT_CALLABLE_END(square)
+
+
+SCRIPT_CALLABLE_2(AT_I, csum, AT_I, AT_I)
+	args[0].i = args[1].i + args[2].i;
+SCRIPT_CALLABLE_END(csum)
+
+//////////////////////////////////////////////////////////////////////////
+
 
 int Tcl_AppInit(Tcl_Interp *interp){
 	if (Tcl_Init(interp) == TCL_ERROR)
@@ -59,6 +171,10 @@ int Tcl_AppInit(Tcl_Interp *interp){
 	/* Now initialize our functions */
 	Tcl_CreateObjCommand(interp, "square", _wrap_square, (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL);
 	Tcl_CreateObjCommand(interp, "csum", _wrap_csum, (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL);
+	Tcl_CreateObjCommand(interp, "createWidget", _wrap_createWidget, (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL);
+	Tcl_CreateObjCommand(interp, "widgetGetA", _wrap_widgetGetA, (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL);
+	Tcl_CreateObjCommand(interp, "widgetGetB", _wrap_widgetGetB, (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL);
+	Tcl_CreateObjCommand(interp, "releaseWidget", _wrap_releaseWidget, (ClientData) "release~~~", (Tcl_CmdDeleteProc *) NULL);
 	return TCL_OK;
 }
 

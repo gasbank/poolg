@@ -9,7 +9,7 @@
 #include "Unit.h"
 #include "VideoMan.h"
 
-typedef std::list<Unit*> UnitList;
+typedef std::set<Unit*> UnitSet;
 
 class WorldState : public State
 {
@@ -26,6 +26,8 @@ public:
 	virtual HRESULT handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	virtual HRESULT release();
+
+	void addUnit(Unit* u);
 
 private:
 	void setupLight();
@@ -49,5 +51,5 @@ private:
 	double							m_startTime;
 
 	
-	UnitList						m_unitList;
+	UnitSet							m_unitSet;
 };

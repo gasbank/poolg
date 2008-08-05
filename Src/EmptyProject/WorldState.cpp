@@ -265,3 +265,8 @@ void WorldState::setupLight()
 	pd3dDevice->SetLight(0, &light);
 	pd3dDevice->LightEnable(0, TRUE);
 }
+
+void WorldState::addUnit( Unit* u )
+{
+	m_unitSet.insert(u);
+}

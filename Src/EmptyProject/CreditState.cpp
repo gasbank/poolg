@@ -155,18 +155,18 @@ HRESULT CreditState::frameMove( double fTime, float fElapsedTime )
 	if ( m_startTime <= 0.0f)
 		m_startTime = fTime;
 
-	float fStateTime = ( float)( fTime - m_startTime );
+	float fStateTime = (float)( fTime - m_startTime );
 	m_textMat.Ambient.a = m_textMat.Specular.a = m_textMat.Diffuse.a = m_textMatAlpha;
 	m_textColor.a = m_textMatAlpha;
 
-	if ( fStateTime >= m_creditStartTime && fStateTime < m_creditStartTime + s_fadeIn)
-		m_textMatAlpha = ( float)( ( fStateTime - m_creditStartTime) / s_fadeIn );
-	else if ( fStateTime >= m_creditStartTime + s_period - s_fadeOut && fStateTime < m_creditStartTime + s_period)
-		m_textMatAlpha = ( float)( 1.0f - ( ( fStateTime - ( m_creditStartTime + s_period - s_fadeOut))) / s_fadeOut );
-	else if ( fStateTime >= m_creditStartTime + s_period)
+	if ( fStateTime >= m_creditStartTime && fStateTime < m_creditStartTime + s_fadeIn )
+		m_textMatAlpha = (float)( ( fStateTime - m_creditStartTime) / s_fadeIn );
+	else if ( fStateTime >= m_creditStartTime + s_period - s_fadeOut && fStateTime < m_creditStartTime + s_period )
+		m_textMatAlpha = (float)( 1.0f - ( ( fStateTime - ( m_creditStartTime + s_period - s_fadeOut))) / s_fadeOut );
+	else if ( fStateTime >= m_creditStartTime + s_period )
 		m_creditStartTime = fStateTime;
 
-	if ( m_textMatAlpha < 0)
+	if ( m_textMatAlpha < 0 )
 		m_textMatAlpha = 0;
 
 	m_text3D->frameMove( fElapsedTime );

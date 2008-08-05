@@ -14,3 +14,8 @@ puts " --C proc-- The square of 2 is: [square 2]"
 puts " --C proc-- The csum of 3 and 9 is: [csum 3 9]"
 puts " --Tcl proc-- The square of 2 is: [square_tcl 2]"
 
+puts "== OBJECT ALLOCATION =="
+set widget [createWidget 5 7];
+puts " Widget: a = [widgetGetA $widget] / b = [widgetGetB $widget] "
+
+releaseWidget $widget

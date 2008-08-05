@@ -186,9 +186,10 @@ UnitInput Unit::mapKey( UINT nKey )
 	return UNIT_UNKNOWN;
 }
 
-Unit* Unit::createUnit( LPD3DXMESH mesh )
+Unit* Unit::createUnit( LPD3DXMESH mesh, float posX, float posY, float posZ )
 {
 	Unit* u = new Unit();
-	u->init(G::getSingleton().m_dev, mesh);
+	u->init( G::getSingleton().m_dev, mesh );
+	u->setPos( D3DXVECTOR3( posX, posY, posZ ) );
 	return u;
 }

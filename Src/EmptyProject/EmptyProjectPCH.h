@@ -3,6 +3,7 @@
 
 #include "AranPCH.h"
 #include <tchar.h>
+#include <set>
 #include "DXUT.h"
 #include <xact3.h>
 #include "DXUTcamera.h"

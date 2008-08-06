@@ -81,7 +81,7 @@ HRESULT IntroState::enter()
 	// Load background and logo
 	m_background.init(L"the Whirlpool Galaxy (M51) and Companion Galaxy.jpg", pd3dDevice);
 	//m_background.init(L"ratatouille.jpg", pd3dDevice);
-	m_pLogo.init( L"poolc.png", pd3dDevice );
+	m_pLogo.init( L"poolc logo by ooo.png", pd3dDevice );
 
 	// Create text meshes
 	createTextMeshes(GetG().m_dev);
@@ -95,7 +95,7 @@ HRESULT IntroState::enter()
 
 HRESULT IntroState::leave()
 {
-	m_startTime = 0;
+	m_startTime = -1.0f;
 
 	return S_OK;
 }
@@ -103,6 +103,8 @@ HRESULT IntroState::leave()
 HRESULT IntroState::frameMove( double fTime, float fElapsedTime )
 {
 	double fStateTime = getStateTime(fTime);
+
+	fStateTime -= 2.0f;
 
 	if (0.0f < fStateTime  && fStateTime < 3.0f)
 	{		
@@ -220,11 +222,11 @@ HRESULT IntroState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, floa
 		if( m_pTextMeshes[0] != NULL )
 		{
 			ZeroMemory( &mtrl, sizeof( D3DMATERIAL9 ) );
-			D3DCOLORVALUE cv_diffuse = { 0.0f, 1.0f, 0.8f, 1.0f };
+			D3DCOLORVALUE cv_diffuse = { 198.0f / 255.0f, 198.0f / 255.0f, 198.0f / 255.0f, 1.0f };
 			mtrl.Diffuse  = cv_diffuse;
 			D3DCOLORVALUE cv_ambient = { 0.0f, 0.0f, 0.0f, 1.0f };
 			mtrl.Ambient = cv_ambient;
-			D3DCOLORVALUE cv_specular = { 0.0f, 1.0f, 0.8f, 1.0f };
+			D3DCOLORVALUE cv_specular = { 198.0f / 255.0f, 198.0f / 255.0f, 198.0f / 255.0f, 1.0f };
 			mtrl.Ambient = cv_specular;
 			pd3dDevice->SetMaterial( &mtrl );
 

@@ -1,5 +1,6 @@
 #include "EmptyProjectPCH.h"
 #include "MenuState.h"
+#include "WorldStateManager.h"
 
 extern D3DXMATRIX g_orthoProjMat;
 extern D3DXMATRIX g_fixedViewMat;
@@ -99,6 +100,9 @@ HRESULT MenuState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 				break;
 			case '9':
 				select( 9 );
+				break;
+			case VK_F5:
+				WorldStateManager::getSingleton().setNextStateAsPrevState();
 				break;
 		}
 	}

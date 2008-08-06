@@ -29,6 +29,8 @@ public:
 
 	void addUnit(Unit* u);
 
+	const D3DXVECTOR3& getBattlePos();
+
 private:
 	void setupLight();
 
@@ -44,9 +46,10 @@ private:
 	LPD3DXCONSTANTTABLE             m_pConstantTable;
 	LPDIRECT3DVERTEXDECLARATION9    m_pVertexDeclaration;
 
-	Unit*							m_heroUnit;
+	
 	float							m_sampleTeapotMeshRot;
 	LPD3DXMESH						m_aTile;
+	Unit*							m_heroUnit;
 
 	double							m_startTime;
 

@@ -16,11 +16,13 @@ public:
 	virtual void release() = 0;
 	virtual void setNextState(GameState) = 0;
 
+	void setNextStateAsPrevState();
 	State* getCurState() const;
 	void transit();
 
 protected:
 	State** m_states;
+	State* m_prevStates;
 	State* m_curStates;
 	State* m_nextState;
 };

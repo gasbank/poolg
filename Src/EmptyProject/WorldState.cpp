@@ -155,10 +155,7 @@ HRESULT WorldState::frameMove(double fTime, float fElapsedTime)
 	//D3DLIGHT9& light = GetG().m_light;
 	EpCamera& camera = GetG().m_camera;
 
-	if (m_startTime <= 0.0f)
-		m_startTime = fTime;
-
-	fTime = fTime - m_startTime;
+	//double fStateTime = getStateTime(fTime);
 
 	/*if (0.0f < fTime && fTime < 5.0f)
 	{
@@ -261,10 +258,9 @@ void WorldState::setupLight()
 	D3DXVECTOR3 pos(-10.0f, 10.0f, -10.0f);
 	D3DXVec3Normalize((D3DXVECTOR3*)&light.Position, &pos);
 
-	// What are these?
-	/*light.Falloff = 0.5f; 
+	light.Falloff = 0.5f; 
 	light.Phi = D3DXToRadian(80);
-	light.Theta = D3DXToRadian(10);*/
+	light.Theta = D3DXToRadian(10);
 
 	light.Type = D3DLIGHT_DIRECTIONAL;
 	light.Range = 1000.0f;
@@ -276,4 +272,9 @@ void WorldState::setupLight()
 void WorldState::addUnit( Unit* u )
 {
 	m_unitSet.insert(u);
+}
+
+const D3DXVECTOR3& WorldState::getBattlePos()
+{
+	return m_heroUnit->getPos();
 }

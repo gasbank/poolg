@@ -12,7 +12,7 @@ State::~State(void)
 
 double State::getStateTime(double fTime)
 {
-	if (m_startTime <= 0.0f)
+	if (m_startTime < 0.0f)
 		m_startTime = fTime;
 	return fTime - m_startTime;
 }

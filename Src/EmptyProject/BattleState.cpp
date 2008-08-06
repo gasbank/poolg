@@ -1,11 +1,17 @@
 #include "EmptyProjectPCH.h"
 #include "BattleState.h"
 #include "WorldStateManager.h"
+#include "TopStateManager.h"
+#include "WorldState.h"
 
 extern D3DXMATRIX g_orthoProjMat;
 extern D3DXMATRIX g_fixedViewMat;
 
-BattleState::BattleState()
+BattleState::BattleState() : 
+m_vecAtFrom(0.0f, 0.0f, 0.0f),
+m_vecAtTo(0.0f, 0.0f, 0.0f),
+m_vecEyeFrom(0.0f, 0.0f, 0.0f),
+m_vecEyeTo(0.0f, 0.0f, 0.0f)
 {
 	m_pDev = GetG().m_dev;
 
@@ -167,6 +173,8 @@ HRESULT BattleState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, flo
 
 HRESULT BattleState::frameMove(double fTime, float fElapsedTime)
 {
+	double fStateTime = getStateTime(fTime);
+
 	m_StatusBoxPlayer.frameMove(fElapsedTime);
 	m_StatusBoxEnemy.frameMove(fElapsedTime);
 	m_SkillBox.frameMove(fElapsedTime);
@@ -187,6 +195,24 @@ HRESULT BattleState::frameMove(double fTime, float fElapsedTime)
 
 	//m_Player.frameMove(fElapsedTime);
 	//m_Enemy.frameMove(fElapsedTime);
+
+
+	if (fStateTime < 1.0f)
+	{
+		//WorldState* worldState = (WorldState*) TopStateManager::getSingleton().getCurState();
+		//const D3DXVECTOR3& battlePos = worldState->getBattlePos();		
+		const D3DXVECTOR3& battlePos = ((WorldState*) TopStateManager::getSingleton().getCurState())->getBattlePos();
+
+		EpCamera& refCamera = G::getSingleton().m_camera;
+		
+
+		D3DXVECTOR3 vecAt( battlePos );
+		D3DXVECTOR3 vecEye( -10.0, -10.0f, -10.0f );
+
+		refCamera.SetViewParams( &vecEye, &vecAt );
+
+
+	}
 
 	return S_OK;
 }

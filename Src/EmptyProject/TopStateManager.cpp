@@ -49,4 +49,8 @@ void TopStateManager::setNextState(GameState state)
 		m_nextState = m_states[5];
 		break;
 	}
+
+	// 다음 state가 현재 state와 같으면 state를 바꾸지 않는다.
+	if (m_curStates == m_nextState)
+		m_nextState = 0;
 }

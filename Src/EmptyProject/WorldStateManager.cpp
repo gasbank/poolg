@@ -27,13 +27,13 @@ void WorldStateManager::init()
 
 void WorldStateManager::release()
 {
-	m_states[0]->release();
-	m_states[1]->release();
-	m_states[2]->release();
-	delete m_states[0];
-	delete m_states[1];
-	delete m_states[2];
-	delete [] m_states;
+	if (m_states)
+	{
+		EP_SAFE_RELEASE( m_states[0] );
+		EP_SAFE_RELEASE( m_states[1] );
+		EP_SAFE_RELEASE( m_states[2] );
+		delete [] m_states;
+	}
 }
 
 void WorldStateManager::setNextState(GameState state)

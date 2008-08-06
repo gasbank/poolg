@@ -15,6 +15,7 @@ WorldState::WorldState(void)
 	m_startTime				= -1.0f;
 	m_afd					= 0;
 	m_sg					= 0;
+	m_heroUnit				= 0;
 }
 
 WorldState::~WorldState(void)
@@ -195,8 +196,7 @@ HRESULT WorldState::release()
 	m_picSmiley.release();
 	m_avatar.release();
 	m_sound.release();
-	m_heroUnit->release();
-	SAFE_DELETE(m_heroUnit);
+	EP_SAFE_RELEASE(m_heroUnit);
 	if (m_afd)
 		release_arnfile(*m_afd);
 	SAFE_DELETE(m_afd);

@@ -18,11 +18,14 @@ WorldState::WorldState(void)
 	m_sg					= 0;
 	m_heroUnit				= 0;
 
-	GetScriptManager().execute("EpWorldState::init");
+	char command[128];
+	StringCchPrintfA(command, 128, "EpWorldState::init 0x%p", this);
+	GetScriptManager().execute(command);
 }
 
 WorldState::~WorldState(void)
 {
+	detachAllUnits();
 }
 
 HRESULT WorldState::enter()
@@ -81,12 +84,12 @@ HRESULT WorldState::enter()
 		return DXTRACE_ERR( TEXT( "CreateVertexShader" ), hr );
 
 	// Create sample 3D model(!)
-	LPD3DXMESH teapot;
+	/*LPD3DXMESH teapot;
 	D3DXCreateTeapot(pd3dDevice, &teapot, 0);
 	m_heroUnit = Unit::createUnit( teapot );
 	m_heroUnit->setPosZ( -m_heroUnit->getUpperRight().z );
 	m_heroUnit->setRotX( D3DXToRadian( -90 ) );
-	m_heroUnit->setRotZ( D3DXToRadian(  90 ) );
+	m_heroUnit->setRotZ( D3DXToRadian(  90 ) );*/
 	
 	D3DXCreateBox(pd3dDevice, 1.0f, 1.0f, 1.0f, &m_aTile, 0);
 
@@ -130,7 +133,13 @@ HRESULT WorldState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, floa
 	m_pConstantTable->SetMatrix( DXUTGetD3D9Device(), "mWorldViewProj", &mWorldViewProj );
 	
 	// Sample 3D model rendering
-	m_heroUnit->draw();
+	//m_heroUnit->draw();
+
+	UnitSet::iterator it = m_unitSet.begin();
+	for ( ; it != m_unitSet.end(); ++it )
+	{
+		(*it)->draw();
+	}
 
 	// Draw floor gray tile (2D)
 	//g_pic.draw();
@@ -178,7 +187,13 @@ HRESULT WorldState::frameMove(double fTime, float fElapsedTime)
 	m_avatar.frameMove(fElapsedTime);
 	camera.FrameMove(fElapsedTime);
 	m_sound.UpdateAudio();
-	m_heroUnit->frameMove(fElapsedTime);
+	//m_heroUnit->frameMove(fElapsedTime);
+
+	UnitSet::iterator it = m_unitSet.begin();
+	for ( ; it != m_unitSet.end(); ++it )
+	{
+		(*it)->frameMove(fElapsedTime);
+	}
 
 	// Set up the vertex shader constants
 	D3DXMATRIXA16 mViewProj = *camera.GetViewMatrix() * *camera.GetProjMatrix();
@@ -195,12 +210,14 @@ HRESULT WorldState::frameMove(double fTime, float fElapsedTime)
 
 HRESULT WorldState::release()
 {
+	// DO NOT RELEASE THIS POINTER: m_heroUnit
+
 	m_pic.release();
 	m_picRhw.release();
 	m_picSmiley.release();
 	m_avatar.release();
 	m_sound.release();
-	EP_SAFE_RELEASE(m_heroUnit);
+	
 	if (m_afd)
 		release_arnfile(*m_afd);
 	SAFE_DELETE(m_afd);
@@ -219,7 +236,14 @@ HRESULT WorldState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 {
 	m_pic.handleMessages(hWnd, uMsg, wParam, lParam);
 	m_sound.handleMessages(hWnd, uMsg, wParam, lParam);
-	m_heroUnit->handleMessages(hWnd, uMsg, wParam, lParam);
+	//m_heroUnit->handleMessages(hWnd, uMsg, wParam, lParam);
+
+	UnitSet::iterator it = m_unitSet.begin();
+	for ( ; it != m_unitSet.end(); ++it )
+	{
+		if ((*it)->getControllable())
+			(*it)->handleMessages(hWnd, uMsg, wParam, lParam);
+	}
 
 	if (uMsg == WM_KEYDOWN)
 	{
@@ -258,10 +282,6 @@ void WorldState::setupLight()
 	D3DXVECTOR3 pos(-10.0f, 10.0f, -10.0f);
 	D3DXVec3Normalize((D3DXVECTOR3*)&light.Position, &pos);
 
-	light.Falloff = 0.5f; 
-	light.Phi = D3DXToRadian(80);
-	light.Theta = D3DXToRadian(10);
-
 	light.Type = D3DLIGHT_DIRECTIONAL;
 	light.Range = 1000.0f;
 
@@ -269,11 +289,25 @@ void WorldState::setupLight()
 	pd3dDevice->LightEnable(0, TRUE);
 }
 
-void WorldState::addUnit( Unit* u )
+UINT WorldState::addUnit( Unit* u )
 {
 	m_unitSet.insert(u);
+	// TODO controllable means it is hero?
+	if (u->getControllable())
+		m_heroUnit = u;
+
+	return m_unitSet.size();
 }
 
+void WorldState::detachAllUnits()
+{
+	UnitSet::iterator it = m_unitSet.begin();
+	for ( ; it != m_unitSet.end(); ++it )
+	{
+		EP_SAFE_RELEASE( *it );
+	}
+	m_unitSet.clear();
+}
 const D3DXVECTOR3& WorldState::getBattlePos()
 {
 	return m_heroUnit->getPos();

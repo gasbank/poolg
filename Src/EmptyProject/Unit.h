@@ -13,7 +13,7 @@ enum UnitInput
 class Unit
 {
 public:
-	static Unit* createUnit( LPD3DXMESH mesh, float posX = 0, float posY = 0, float posZ = 0 );
+	static Unit* createUnit( LPD3DXMESH mesh, float posX = 0, float posY = 0, float posZ = 0, bool bCtrl = false );
 	~Unit();
 
 	HRESULT init(LPDIRECT3DDEVICE9 pd3dDevice, LPD3DXMESH mesh);
@@ -21,6 +21,7 @@ public:
 	const D3DXVECTOR3& getUpperRight() const { return m_upperRight; }
 	LPD3DXMESH getMesh() const { return m_d3dxMesh; }
 	void release() { SAFE_RELEASE(m_d3dxMesh); }
+	bool getControllable() const { return m_bControllable; }
 
 	HRESULT draw();
 	virtual LRESULT handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
@@ -29,6 +30,7 @@ public:
 	void setRotX(float rad) { m_vRot.x = rad; m_bLocalXformDirty = true; }
 	void setRotY(float rad) { m_vRot.y = rad; m_bLocalXformDirty = true; }
 	void setRotZ(float rad) { m_vRot.z = rad; m_bLocalXformDirty = true; }
+	void setControllable(bool bCtrl) { m_bControllable = bCtrl; }
 
 	void setUniformScale(float val) { m_vScale.x = m_vScale.y = m_vScale.z = val; m_bLocalXformDirty = true; }
 	void setScaleX(float val) { m_vScale.x = val; m_bLocalXformDirty = true; }
@@ -70,5 +72,6 @@ private:
 	D3DXVECTOR3				m_vVelocity;
 	bool					m_bMoving;
 	float					m_fMovingTime;
+	bool					m_bControllable;
 };
 

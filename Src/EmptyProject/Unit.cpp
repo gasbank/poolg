@@ -2,7 +2,7 @@
 #include "Unit.h"
 #include "SingletonCreators.h"
 #include "ScriptManager.h"
-
+#include "WorldState.h"
 #define KEY_WAS_DOWN_MASK 0x80
 #define KEY_IS_DOWN_MASK  0x01
 
@@ -187,10 +187,11 @@ UnitInput Unit::mapKey( UINT nKey )
 	return UNIT_UNKNOWN;
 }
 
-Unit* Unit::createUnit( LPD3DXMESH mesh, float posX, float posY, float posZ )
+Unit* Unit::createUnit( LPD3DXMESH mesh, float posX, float posY, float posZ, bool bControllable )
 {
 	Unit* u = new Unit();
 	u->init( GetG().m_dev, mesh );
+	u->setControllable( bControllable );
 	u->setPos( D3DXVECTOR3( posX, posY, posZ ) );
 	return u;
 }
@@ -200,18 +201,29 @@ Unit* Unit::createUnit( LPD3DXMESH mesh, float posX, float posY, float posZ )
 
 Unit* EpCreateUnit( int tileX, int tileY, int controllable )
 {
-	return 0;
+	LPD3DXMESH d3dxMesh;
+	D3DXCreateTeapot( GetG().m_dev, &d3dxMesh, 0 );
+	return Unit::createUnit( d3dxMesh, (float)tileX, (float)tileY, 0, controllable?true:false );
 
 } SCRIPT_CALLABLE_PV_I_I_I( EpCreateUnit )
 
-
-class EpUnitScriptFactory
+int EpReleaseUnit( void* pv )
 {
-public:
-	EpUnitScriptFactory()
-	{
-		CreateScriptManagerIfNotExist();
-		CREATE_OBJ_COMMAND( EpCreateUnit );
-	}
-};
-static EpUnitScriptFactory EpUnitScriptFactoryInstance;
+	Unit* u = reinterpret_cast<Unit*>(pv);
+	EP_SAFE_RELEASE( u );
+	return 0;
+
+} SCRIPT_CALLABLE_I_PV( EpReleaseUnit )
+
+int EpRegisterToWorld( void* pv1, void* pv2 )
+{
+	WorldState* w = reinterpret_cast<WorldState*>(pv1);
+	Unit* u = reinterpret_cast<Unit*>(pv2);
+	return w->addUnit(u);;
+} SCRIPT_CALLABLE_I_PV_PV( EpRegisterToWorld )
+
+START_SCRIPT_FACTORY(Unit)
+	CREATE_OBJ_COMMAND( EpCreateUnit )
+	CREATE_OBJ_COMMAND( EpReleaseUnit )
+	CREATE_OBJ_COMMAND( EpRegisterToWorld )
+END_SCRIPT_FACTORY(Unit)

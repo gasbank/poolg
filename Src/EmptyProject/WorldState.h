@@ -27,8 +27,8 @@ public:
 
 	virtual HRESULT release();
 
-	void addUnit(Unit* u);
-
+	UINT addUnit(Unit* u);
+	void detachAllUnits();
 	const D3DXVECTOR3& getBattlePos();
 
 private:

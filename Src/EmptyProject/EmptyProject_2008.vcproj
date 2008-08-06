@@ -72,8 +72,7 @@
 				AdditionalDependencies="Aran.lib tcl85g.lib DXUT.lib DXUTOpt.lib dxerr.lib dxguid.lib d3dx10d.lib d3d10.lib d3dx9d.lib d3d9.lib winmm.lib comctl32.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="../Aran/lib;../DXUT/Core/Debug;../DXUT/Optional/Debug;../tcl/lib"
-				GenerateManifest="true"
-				UACExecutionLevel="2"
+				GenerateManifest="false"
 				DelayLoadDLLs=""
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/EmptyProject.pdb"
@@ -87,7 +86,7 @@
 			/>
 			<Tool
 				Name="VCManifestTool"
-				EmbedManifest="false"
+				EmbedManifest="true"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"

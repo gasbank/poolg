@@ -27,7 +27,18 @@ enum ArgumentType
 	AT_D = 3,
 	AT_PV = 4,
 };
-
+class SuperVoidPointer
+{
+public:
+	SuperVoidPointer(void* realPtr = 0) { m_realPtr = realPtr; }
+	template<class newType>
+	operator newType()
+	{
+		return reinterpret_cast<newType>(m_realPtr);
+	}
+private:
+	void* m_realPtr;
+};
 union ScriptArgument
 {
 	int i;
@@ -59,6 +70,7 @@ static const DWORD _trait_I_I		= AT_I | (AT_I << 4);
 static const DWORD _trait_I_I_I		= AT_I | (AT_I << 4) | (AT_I << 8);
 static const DWORD _trait_I_PC		= AT_I | (AT_PC << 4);
 static const DWORD _trait_I_PV		= AT_I | (AT_PV << 4);
+static const DWORD _trait_I_PV_PV	= AT_I | (AT_PV << 4) | (AT_PV << 8);
 static const DWORD _trait_PV		= AT_PV;
 static const DWORD _trait_PV_I_I	= AT_PV | (AT_I << 4) | (AT_I << 8);
 static const DWORD _trait_PV_I_I_I	= AT_PV | (AT_I << 4) | (AT_I << 8) | (AT_I << 12);
@@ -113,6 +125,27 @@ static const DWORD _trait_PV_I_I_I	= AT_PV | (AT_I << 4) | (AT_I << 8) | (AT_I <
 	}																			\
 	SCRIPT_CALLABLE_END(funcName, PV_I_I_I)
 
+#define SCRIPT_CALLABLE_I_PV_PV(funcName)										\
+	void _wrap_##funcName(ScriptArgumentList& args)								\
+	{																			\
+		args[0].i = funcName(args[1].pv, args[2].pv);							\
+	}																			\
+	SCRIPT_CALLABLE_END(funcName, I_PV_PV)
 
-#define CREATE_OBJ_COMMAND(funcName)	Tcl_CreateObjCommand(ScriptManager::getSingleton().getInterp(), #funcName, _tcl_wrap_##funcName, (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL)
-//////////////////////////////////////////////////////////////////////////
+
+
+#define CREATE_OBJ_COMMAND(funcName)	Tcl_CreateObjCommand(ScriptManager::getSingleton().getInterp(), #funcName, _tcl_wrap_##funcName, (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL);
+
+#define START_SCRIPT_FACTORY(className)											\
+	class _script_factory_##className											\
+	{																			\
+	public:																		\
+		_script_factory_##className()											\
+		{																		\
+			CreateScriptManagerIfNotExist();
+
+#define END_SCRIPT_FACTORY(className)											\
+		}																		\
+	};																			\
+	static _script_factory_##className _script_factory_##className_instance_;
+

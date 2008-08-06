@@ -76,6 +76,7 @@ void ScriptManager::execute( const char* command )
 {
 	if ( Tcl_Eval( m_interpreter, command ) != TCL_OK )
 		throw std::runtime_error( "Script eval failed" );
+
 }
 
 void ScriptManager::executeFile( const char* fileName )
@@ -103,14 +104,21 @@ void ParseTclArgumentByTrait( DWORD trait, Tcl_Interp* interp, Tcl_Obj *CONST ob
 		switch (trait & 0xf)
 		{
 		case AT_I:
+			if ( Tcl_GetIntFromObj( interp, objv[i], &sa.i ) != TCL_OK )
+				throw std::runtime_error("Integer argument access failed");
+			break;
 		case AT_PV:
-			Tcl_GetIntFromObj( interp, objv[i], &sa.i );
+			if ( Tcl_GetLongFromObj( interp, objv[i], (long*)&sa.i ) != TCL_OK )
+				throw std::runtime_error("Long(raw pointer) argument access failed");
 			break;
 		case AT_PC:
 			sa.pc = Tcl_GetStringFromObj( objv[i], &len );
+			if (sa.pc == 0)
+				throw std::runtime_error("char* argument access failed");
 			break;
 		case AT_D:
-			Tcl_GetDoubleFromObj( interp, objv[i], &sa.d );
+			if ( Tcl_GetDoubleFromObj( interp, objv[i], &sa.d ) != TCL_OK )
+				throw std::runtime_error("Double argument access failed");
 			break;
 		default:
 			throw std::runtime_error("Trait value incorrect");

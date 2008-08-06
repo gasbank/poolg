@@ -201,7 +201,9 @@ HRESULT BattleState::frameMove(double fTime, float fElapsedTime)
 	{
 		//WorldState* worldState = (WorldState*) TopStateManager::getSingleton().getCurState();
 		//const D3DXVECTOR3& battlePos = worldState->getBattlePos();		
-		const D3DXVECTOR3& battlePos = ((WorldState*) TopStateManager::getSingleton().getCurState())->getBattlePos();
+		TopStateManager& tsm = TopStateManager::getSingleton();
+		WorldState* ws = static_cast<WorldState*>( tsm.getCurState() );
+		const D3DXVECTOR3& battlePos = ws->getBattlePos();
 
 		EpCamera& refCamera = G::getSingleton().m_camera;
 		

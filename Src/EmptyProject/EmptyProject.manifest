@@ -3,10 +3,10 @@
 <assemblyIdentity
     version="1.0.0.0"
     processorArchitecture="*"
-    name="Microsoft.DirectX SDK.EmptyProject"
+    name="Microsoft.DirectX SDK.EmptyProject.PoolCModified"
     type="win32"
 />
-<description>DirectX SDK Sample Program.</description>
+<description>PoolG</description>
 
 <ms_asmv2:trustInfo xmlns:ms_asmv2="urn:schemas-microsoft-com:asm.v2">
   <ms_asmv2:security>

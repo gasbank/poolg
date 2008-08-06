@@ -78,8 +78,17 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
                                      void* pUserContext )
 {
 	HRESULT hr;
-
 	GetG().m_dev = pd3dDevice;
+	//////////////////////////////////////////////////////////////////////////
+
+	// State Manager Initialization
+	g_sm.init();
+
+	// Init Script
+	ScriptManager::getSingleton().execute( "EpInitGame" );
+
+	//////////////////////////////////////////////////////////////////////////
+
 	EpCamera& g_camera = GetG().m_camera;
 
 	// Runtime error at here. I cannot deal with this.. by KYS
@@ -375,12 +384,6 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 	CREATE_OBJ_COMMAND( EpInit );
 	ScriptManager::getSingleton().executeFile( "library/EpInitScript.tcl" );
 	ScriptManager::getSingleton().executeFile( "library/EpWorldState.tcl" );
-
-	// State Manager Initialization
-	g_sm.init();
-
-	ScriptManager::getSingleton().execute( "EpInitGame" );
-	
 
     // Initialize DXUT and create the desired Win32 window and Direct3D device for the application
     DXUTInit( true, true ); // Parse the command line and show msgboxes

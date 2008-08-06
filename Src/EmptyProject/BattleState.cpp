@@ -217,6 +217,10 @@ HRESULT BattleState::frameMove(double fTime, float fElapsedTime)
 		D3DXQUATERNION viewQuot;
 		float theta = (float)fStateTime;
 
+		vecAxis.x = vecAxis.x / sqrt(vecAxis.x * vecAxis.x + vecAxis.y * vecAxis.y + vecAxis.z * vecAxis.z);
+		vecAxis.y = vecAxis.y / sqrt(vecAxis.x * vecAxis.x + vecAxis.y * vecAxis.y + vecAxis.z * vecAxis.z);
+		vecAxis.z = vecAxis.z / sqrt(vecAxis.x * vecAxis.x + vecAxis.y * vecAxis.y + vecAxis.z * vecAxis.z);
+
 		viewQuot.x = sin( theta / 2.0f ) * vecAxis.x;
 		viewQuot.y = sin( theta / 2.0f ) * vecAxis.y;
 		viewQuot.z = sin( theta / 2.0f ) * vecAxis.z;
@@ -225,8 +229,8 @@ HRESULT BattleState::frameMove(double fTime, float fElapsedTime)
 		camera.SetModelCenter( battlePos );
 		camera.SetAttachCameraToModel(true);
 	
-		//if (fStateTime < 5.0f)
-		//	camera.SetViewParams( &vecEye, &vecAt );
+		if (fStateTime < 5.0f)
+			camera.SetViewParams( &vecEye, &vecAt );
 
 		camera.SetViewQuat( viewQuot );
 		camera.SetRadius( 30.0f );		

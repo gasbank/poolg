@@ -146,6 +146,8 @@ void CALLBACK OnFrameMove( double fTime_, float fElapsedTime, void* pUserContext
 {
 	double fTime = fTime_ + g_timeDelta;
 
+	GetG().m_camera.FrameMove( fElapsedTime );
+
 	TopStateManager::getSingleton().transit();
 
 	//g_menubox.frameMove(fElapsedTime);

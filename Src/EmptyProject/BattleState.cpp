@@ -199,23 +199,37 @@ HRESULT BattleState::frameMove(double fTime, float fElapsedTime)
 	//m_Enemy.frameMove(fElapsedTime);
 
 
-	if (fStateTime < 1.0f)
+	if (fStateTime < 30.0f)
 	{
 		//WorldState* worldState = (WorldState*) TopStateManager::getSingleton().getCurState();
 		//const D3DXVECTOR3& battlePos = worldState->getBattlePos();		
+		
 		TopStateManager& tsm = TopStateManager::getSingleton();
 		WorldState* ws = static_cast<WorldState*>( tsm.getCurState() );
 		const D3DXVECTOR3& battlePos = ws->getBattlePos();
 
 		EpCamera& camera = G::getSingleton().m_camera;
 
+		D3DXVECTOR3 vecEye( battlePos.x - 10.0f, battlePos.y - 10.0f, battlePos.z - 10.0f );
 		D3DXVECTOR3 vecAt( battlePos );
-		D3DXVECTOR3 vecEye( -10.0, -10.0f, -10.0f );
-		D3DXVECTOR3 vecUp( 0.0f, 0.0f, -1.0f );
+		D3DXVECTOR3 vecAxis = vecAt - vecEye;
 
-		camera.SetViewParams( &vecEye, &vecAt );
-		camera.SetUpVector( &vecUp );
+		D3DXQUATERNION viewQuot;
+		float theta = (float)fStateTime;
 
+		viewQuot.x = sin( theta / 2.0f ) * vecAxis.x;
+		viewQuot.y = sin( theta / 2.0f ) * vecAxis.y;
+		viewQuot.z = sin( theta / 2.0f ) * vecAxis.z;
+		viewQuot.w = cos( theta / 2.0f );
+		
+		camera.SetModelCenter( battlePos );
+		camera.SetAttachCameraToModel(true);
+	
+		//if (fStateTime < 5.0f)
+		//	camera.SetViewParams( &vecEye, &vecAt );
+
+		camera.SetViewQuat( viewQuot );
+		camera.SetRadius( 30.0f );		
 	}
 
 	return S_OK;

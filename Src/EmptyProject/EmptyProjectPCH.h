@@ -1,5 +1,6 @@
 #pragma warning(disable:4201)
 #pragma warning(disable:4100)
+#pragma warning(disable:4505) // disable 'unreferenced local function has been removed' warning
 
 #include "AranPCH.h"
 #include <tchar.h>

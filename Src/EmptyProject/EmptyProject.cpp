@@ -16,11 +16,13 @@
 #include "TopStateManager.h"
 #include "ScriptManager.h"
 #include "VideoMan.h"
+#include "SingletonCreators.h"
+
 
 G								g_g;
 TopStateManager					g_sm;
-ScriptManager					g_scriptManager;
-double							g_timeDelta = 0.0f;
+ScriptManager*					g_scriptManager			= 0;		// Set to zero is 'CRUCIAL!'
+double							g_timeDelta				= 0.0f;
 
 LPD3DXFONT						g_pFont					= 0;
 LPD3DXEFFECT		            g_pEffect				= 0;
@@ -77,18 +79,18 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 {
 	HRESULT hr;
 
-	G::getSingleton().m_dev = pd3dDevice;
-	EpCamera& g_camera = G::getSingleton().m_camera;
+	GetG().m_dev = pd3dDevice;
+	EpCamera& g_camera = GetG().m_camera;
 
 	// Runtime error at here. I cannot deal with this.. by KYS
-	G::getSingleton().m_videoMan.SetDev(pd3dDevice);
+	GetG().m_videoMan.SetDev(pd3dDevice);
 
 	//화면의 크기를 변환할 때마다 화면의 크기를 나타내는 전역변수 갱신.
-	G::getSingleton().m_scrWidth = pBackBufferSurfaceDesc->Width;
-	G::getSingleton().m_scrHeight = pBackBufferSurfaceDesc->Height;
+	GetG().m_scrWidth = pBackBufferSurfaceDesc->Width;
+	GetG().m_scrHeight = pBackBufferSurfaceDesc->Height;
 
 	//[윤욱]
-	//g_menubox.init(pd3dDevice, G::getSingleton().m_scrWidth, G::getSingleton().m_scrHeight);
+	//g_menubox.init(pd3dDevice, GetG().m_scrWidth, GetG().m_scrHeight);
 	
 	V( D3DXCreateFont( pd3dDevice, 12, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Gulim"), &g_pFont) );
 
@@ -148,14 +150,14 @@ void CALLBACK OnFrameMove( double fTime_, float fElapsedTime, void* pUserContext
 
 void renderDebugText()
 {
-	EpCamera& g_camera = G::getSingleton().m_camera;
+	EpCamera& g_camera = GetG().m_camera;
 
 	WCHAR debugBuffer[512];
 	RECT rc;
 	rc.top = 0;
 	rc.left = 0;
-	rc.right = G::getSingleton().m_scrWidth;
-	rc.bottom = G::getSingleton().m_scrHeight;
+	rc.right = GetG().m_scrWidth;
+	rc.bottom = GetG().m_scrHeight;
 	
 	StringCchPrintf(debugBuffer, 512, L"カメラの位置: (%.2f, %.2f, %.2f)", g_camera.GetEyePt()->x, g_camera.GetEyePt()->y, g_camera.GetEyePt()->z);
 	g_pFont->DrawTextW(0, debugBuffer, -1, &rc, DT_NOCLIP | DT_RIGHT, D3DXCOLOR( 0.0f, 1.0f, 0.0f, 1.0f ) );
@@ -185,7 +187,7 @@ void renderFixedElements(IDirect3DDevice9* pd3dDevice, double fTime, float fElap
 	pd3dDevice->SetTransform(D3DTS_VIEW, &g_fixedViewMat);
 	pd3dDevice->SetTransform(D3DTS_PROJECTION, &g_orthoProjMat);
 
-	//g_menubox.draw(G::getSingleton().m_scrWidth, G::getSingleton().m_scrHeight);
+	//g_menubox.draw(GetG().m_scrWidth, GetG().m_scrHeight);
 	//g_picRhw.draw();
 
 	/*D3DPERF_BeginEvent(0xff00ffff, L"Draw Center Smiley~");
@@ -236,7 +238,7 @@ void CALLBACK OnD3D9FrameRender( IDirect3DDevice9* pd3dDevice, double fTime, flo
 LRESULT CALLBACK MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
                           bool* pbNoFurtherProcessing, void* pUserContext )
 {
-	EpCamera& g_camera = G::getSingleton().m_camera;
+	EpCamera& g_camera = GetG().m_camera;
 
 	//g_avatar.handleMessages(hWnd, uMsg, wParam, lParam);
 	g_camera.HandleMessages(hWnd, uMsg, wParam, lParam);
@@ -264,7 +266,7 @@ void CALLBACK OnD3D9DestroyDevice( void* pUserContext )
 {
 	SAFE_RELEASE( g_pFont );
 	
-	G::getSingleton().m_videoMan.SetDev(0);
+	GetG().m_videoMan.SetDev(0);
 }
 
 
@@ -305,12 +307,44 @@ void CALLBACK KeyboardProc( UINT nChar, bool bKeyDown, bool bAltDown, void* pUse
 }
 
 
+
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+
+
 int EpInit()
 {
 	OutputDebugStringW(L"EpInit() called by script caller\n");
 	return 100;
 
 } SCRIPT_CALLABLE_I( EpInit )
+
+static bool isCurrentWorkingDir = false;
+void SetCurrentWorkingDirectory()
+{
+	if ( isCurrentWorkingDir == false )
+	{
+		TCHAR buf[MAX_PATH];
+		TCHAR drive[_MAX_DRIVE];
+		TCHAR dir[_MAX_DIR];
+		GetModuleFileName(NULL, buf, MAX_PATH);
+		_tsplitpath_s(buf, drive, _MAX_DRIVE, dir, _MAX_DIR, 0, 0, 0, 0);
+		StringCchPrintf(buf, MAX_PATH, _T("%s%s"), drive, dir);
+		SetCurrentDirectory(buf);
+
+		isCurrentWorkingDir = true;
+	}
+}
+
+void CreateScriptManagerIfNotExist()
+{
+	SetCurrentWorkingDirectory();
+	if ( !g_scriptManager )
+	{
+		g_scriptManager = new ScriptManager;
+		ScriptManager::getSingleton().init();
+	}
+}
 
 //--------------------------------------------------------------------------------------
 // Initialize everything and go into a render loop
@@ -334,23 +368,18 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 	DXUTSetCallbackKeyboard( KeyboardProc );
 	
     // TODO: Perform any application-level initialization here
-	// Setup working directory
-	TCHAR buf[MAX_PATH];
-	TCHAR drive[_MAX_DRIVE];
-	TCHAR dir[_MAX_DIR];
-	GetModuleFileName(NULL, buf, MAX_PATH);
-	_tsplitpath_s(buf, drive, _MAX_DRIVE, dir, _MAX_DIR, 0, 0, 0, 0);
-	StringCchPrintf(buf, MAX_PATH, _T("%s%s"), drive, dir);
-	SetCurrentDirectory(buf);
+	SetCurrentWorkingDirectory();
 
-	g_sm.init();
-	ScriptManager::getSingleton().init(); // Should be called after State Manager is inited
-
+	// Script Manager Initialization
+	CreateScriptManagerIfNotExist();
 	CREATE_OBJ_COMMAND( EpInit );
-
 	ScriptManager::getSingleton().executeFile( "library/EpInitScript.tcl" );
-	ScriptManager::getSingleton().execute( "EpInitGame" );
+	ScriptManager::getSingleton().executeFile( "library/EpWorldState.tcl" );
 
+	// State Manager Initialization
+	g_sm.init();
+
+	ScriptManager::getSingleton().execute( "EpInitGame" );
 	
 
     // Initialize DXUT and create the desired Win32 window and Direct3D device for the application
@@ -358,14 +387,15 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
     DXUTSetHotkeyHandling( true, true, true );  // handle the default hotkeys
     DXUTSetCursorSettings( true, true ); // Show the cursor and clip it when in full screen
     DXUTCreateWindow( L"EmptyProject" );
-	DXUTCreateDevice( true, G::getSingleton().m_scrWidth, G::getSingleton().m_scrHeight );
+	DXUTCreateDevice( true, GetG().m_scrWidth, GetG().m_scrHeight );
 
     // Start the render loop
     DXUTMainLoop();
 
     // TODO: Perform any application-level cleanup here
-	g_scriptManager.release();
+	EP_SAFE_RELEASE( g_scriptManager );
 	g_sm.release();
 
     return DXUTGetExitCode();
 }
+

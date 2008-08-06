@@ -2,6 +2,7 @@
 #include "WorldState.h"
 #include "WorldStateManager.h"
 #include "BattleState.h"
+#include "ScriptManager.h"
 
 WorldStateManager worldStateManager;
 
@@ -16,6 +17,8 @@ WorldState::WorldState(void)
 	m_afd					= 0;
 	m_sg					= 0;
 	m_heroUnit				= 0;
+
+	GetScriptManager().execute("EpWorldState::init");
 }
 
 WorldState::~WorldState(void)
@@ -26,7 +29,7 @@ HRESULT WorldState::enter()
 {
 	HRESULT hr;
 
-	LPDIRECT3DDEVICE9& pd3dDevice =  G::getSingleton().m_dev;
+	LPDIRECT3DDEVICE9& pd3dDevice =  GetG().m_dev;
 
 	// Aran file init
 	m_afd = new ArnFileData;
@@ -90,11 +93,13 @@ HRESULT WorldState::enter()
 	// Setup main camera
 	D3DXVECTOR3 vecEye( 0.0f, 0.0f, -30.0f );
 	D3DXVECTOR3 vecAt ( 0.0f, 0.0f, -0.0f );
-	G::getSingleton().m_camera.SetViewParams( &vecEye, &vecAt );
+	GetG().m_camera.SetViewParams( &vecEye, &vecAt );
 
 	setupLight();
 
 	WorldStateManager::getSingleton().init();
+
+	GetScriptManager().execute("EpWorldState::enter");
 
 	return S_OK;
 }
@@ -103,12 +108,14 @@ HRESULT WorldState::leave()
 {
 	m_startTime = -1.0f;
 
+	GetScriptManager().execute("EpWorldState::leave");
+
 	return S_OK;
 }
 
 HRESULT WorldState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, float fElapsedTime)
 {		
-	EpCamera& camera = G::getSingleton().m_camera;
+	EpCamera& camera = GetG().m_camera;
 
 	//////////////////////////////////////////////////////////////////////////
 	// Perspective Rendering Phase
@@ -134,7 +141,7 @@ HRESULT WorldState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, floa
 
 	pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CW);
 	pd3dDevice->SetFVF(ArnVertex::FVF);
-	G::getSingleton().m_videoMan.renderMeshesOnly(m_sg->getSceneRoot());
+	GetG().m_videoMan.renderMeshesOnly(m_sg->getSceneRoot());
 	m_sg->getSceneRoot()->update(fTime, fElapsedTime);
 
 	WorldStateManager& wsm = WorldStateManager::getSingleton();
@@ -145,8 +152,8 @@ HRESULT WorldState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, floa
 
 HRESULT WorldState::frameMove(double fTime, float fElapsedTime)
 {
-	//D3DLIGHT9& light = G::getSingleton().m_light;
-	EpCamera& camera = G::getSingleton().m_camera;
+	//D3DLIGHT9& light = GetG().m_light;
+	EpCamera& camera = GetG().m_camera;
 
 	if (m_startTime <= 0.0f)
 		m_startTime = fTime;
@@ -237,8 +244,8 @@ HRESULT WorldState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 
 void WorldState::setupLight() 
 {
-	D3DLIGHT9& light = G::getSingleton().m_light;
-	LPDIRECT3DDEVICE9& pd3dDevice = G::getSingleton().m_dev;
+	D3DLIGHT9& light = GetG().m_light;
+	LPDIRECT3DDEVICE9& pd3dDevice = GetG().m_dev;
 
 	ZeroMemory(&light, sizeof(D3DLIGHT9));
 	D3DCOLORVALUE cv = { 0.5f, 0.5f, 0.5f, 1.0f };

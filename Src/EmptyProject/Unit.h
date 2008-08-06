@@ -71,3 +71,4 @@ private:
 	bool					m_bMoving;
 	float					m_fMovingTime;
 };
+

@@ -17,3 +17,4 @@ public:
 	int					m_scrWidth;
 	int					m_scrHeight;
 };
+inline G& GetG() { return G::getSingleton(); }

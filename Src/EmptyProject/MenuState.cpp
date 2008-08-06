@@ -121,9 +121,9 @@ HRESULT MenuState::release()
 MenuState::MenuState()
 {
 	HRESULT hr;
-	m_pDev = G::getSingleton().m_dev;
-	float scrWidth = (float)G::getSingleton().m_scrWidth;
-	float scrHeight = (float)G::getSingleton().m_scrHeight;
+	m_pDev = GetG().m_dev;
+	float scrWidth = (float)GetG().m_scrWidth;
+	float scrHeight = (float)GetG().m_scrHeight;
 
 	float menuBoxWidth = 158;
 	float menuBoxHeight = 127;

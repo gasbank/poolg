@@ -19,3 +19,4 @@ set widget [createWidget 5 7];
 puts " Widget: a = [widgetGetA $widget] / b = [widgetGetB $widget] "
 
 releaseWidget $widget
+

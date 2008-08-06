@@ -1,5 +1,6 @@
 #include "EmptyProjectPCH.h"
 #include "Unit.h"
+#include "SingletonCreators.h"
 #include "ScriptManager.h"
 
 #define KEY_WAS_DOWN_MASK 0x80
@@ -189,7 +190,28 @@ UnitInput Unit::mapKey( UINT nKey )
 Unit* Unit::createUnit( LPD3DXMESH mesh, float posX, float posY, float posZ )
 {
 	Unit* u = new Unit();
-	u->init( G::getSingleton().m_dev, mesh );
+	u->init( GetG().m_dev, mesh );
 	u->setPos( D3DXVECTOR3( posX, posY, posZ ) );
 	return u;
 }
+
+
+//////////////////////////////////////////////////////////////////////////
+
+Unit* EpCreateUnit( int tileX, int tileY, int controllable )
+{
+	return 0;
+
+} SCRIPT_CALLABLE_PV_I_I_I( EpCreateUnit )
+
+
+class EpUnitScriptFactory
+{
+public:
+	EpUnitScriptFactory()
+	{
+		CreateScriptManagerIfNotExist();
+		CREATE_OBJ_COMMAND( EpCreateUnit );
+	}
+};
+static EpUnitScriptFactory EpUnitScriptFactoryInstance;

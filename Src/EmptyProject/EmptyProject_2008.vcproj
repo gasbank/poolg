@@ -747,6 +747,10 @@
 			>
 		</File>
 		<File
+			RelativePath=".\SingletonCreators.h"
+			>
+		</File>
+		<File
 			RelativePath=".\Sound.cpp"
 			>
 		</File>

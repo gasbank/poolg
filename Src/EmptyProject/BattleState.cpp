@@ -7,13 +7,13 @@ extern D3DXMATRIX g_fixedViewMat;
 
 BattleState::BattleState()
 {
-	m_pDev = G::getSingleton().m_dev;
+	m_pDev = GetG().m_dev;
 
 	float statusBoxWidth = 163;
 	float statusBoxHeight = 124;
 
-	int scrWidth = G::getSingleton().m_scrWidth;
-	int scrHeight = G::getSingleton().m_scrHeight;
+	int scrWidth = GetG().m_scrWidth;
+	int scrHeight = GetG().m_scrHeight;
 
 	float statusBoxPlayersPositionX = -(float)scrWidth/2 + 10;
 	float statusBoxPlayersPositionY = -(float)scrHeight/2 + 10;
@@ -151,7 +151,7 @@ HRESULT BattleState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, flo
 	m_hpBarEnemy.draw();
 	m_mpBarEnemy.draw();
 
-	drawFixedText(G::getSingleton().m_scrWidth, G::getSingleton().m_scrHeight);
+	drawFixedText(GetG().m_scrWidth, GetG().m_scrHeight);
 	
 //	D3DXMATRIX mRot, mScale, mTrans, mWorld;
 //	D3DXMatrixRotationZ(&mRot, D3DXToRadian(45));

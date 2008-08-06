@@ -61,7 +61,7 @@ CreditState::~CreditState( void )
 
 HRESULT CreditState::enter()
 {
-	LPDIRECT3DDEVICE9& pd3dDevice = G::getSingleton().m_dev;
+	LPDIRECT3DDEVICE9& pd3dDevice = GetG().m_dev;
 	
 	pd3dDevice->SetRenderState( D3DRS_CULLMODE, D3DCULL_CCW );
 	pd3dDevice->SetTransform( D3DTS_VIEW, &g_fixedViewMat );
@@ -100,8 +100,8 @@ HRESULT CreditState::frameRender( IDirect3DDevice9* pd3dDevice, double fTime, fl
 	RECT rc;
 	rc.top = 20;
 	rc.left = 20;
-	rc.right = G::getSingleton().m_scrWidth - 20;
-	rc.bottom = G::getSingleton().m_scrHeight - 20;
+	rc.right = GetG().m_scrWidth - 20;
+	rc.bottom = GetG().m_scrHeight - 20;
 
 	double fStateTime = fTime - m_startTime;
 
@@ -202,8 +202,8 @@ HRESULT CreditState::release()
 
 void CreditState::setupLight() 
 {
-	D3DLIGHT9& light = G::getSingleton().m_light;
-	LPDIRECT3DDEVICE9& pd3dDevice = G::getSingleton().m_dev;
+	D3DLIGHT9& light = GetG().m_light;
+	LPDIRECT3DDEVICE9& pd3dDevice = GetG().m_dev;
 
 	ZeroMemory( &light, sizeof( D3DLIGHT9) );
 	light.Ambient.r = light.Ambient.g = light.Ambient.b = light.Ambient.a = 1.0f;

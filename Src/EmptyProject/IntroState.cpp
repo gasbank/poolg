@@ -42,7 +42,7 @@ IntroState::~IntroState(void)
 
 HRESULT IntroState::enter()
 {
-	LPDIRECT3DDEVICE9 pd3dDevice = G::getSingleton().m_dev;
+	LPDIRECT3DDEVICE9 pd3dDevice = GetG().m_dev;
 
 	// Initialize arrays as NULL
 	for( int i = 0; i < NUM_OF_LINES; i++ )
@@ -84,7 +84,7 @@ HRESULT IntroState::enter()
 	m_pLogo.init( L"poolc.png", pd3dDevice );
 
 	// Create text meshes
-	createTextMeshes(G::getSingleton().m_dev);
+	createTextMeshes(GetG().m_dev);
 
 	// Setup light and camera
 	setupLight();
@@ -167,8 +167,8 @@ HRESULT IntroState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, floa
 	{		
 
 		D3DXMATRIX mScale, mTrans, mWorld;
-		D3DXMatrixScaling(&mScale, (FLOAT) G::getSingleton().m_scrWidth * 2.0f, (FLOAT) G::getSingleton().m_scrHeight * 2.0f, 1.0f);
-		D3DXMatrixTranslation(&mTrans, (FLOAT) -G::getSingleton().m_scrWidth, (FLOAT) -G::getSingleton().m_scrHeight, 49.0f);
+		D3DXMatrixScaling(&mScale, (FLOAT) GetG().m_scrWidth * 2.0f, (FLOAT) GetG().m_scrHeight * 2.0f, 1.0f);
+		D3DXMatrixTranslation(&mTrans, (FLOAT) -GetG().m_scrWidth, (FLOAT) -GetG().m_scrHeight, 49.0f);
 
 		mWorld = mScale * mTrans * m_matBackground;
 
@@ -214,8 +214,8 @@ HRESULT IntroState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, floa
 		pd3dDevice->SetTexture(0, 0);
 
 		// Apply non-fixed camera
-		pd3dDevice->SetTransform(D3DTS_VIEW, G::getSingleton().m_camera.GetViewMatrix());
-		pd3dDevice->SetTransform(D3DTS_PROJECTION, G::getSingleton().m_camera.GetProjMatrix());
+		pd3dDevice->SetTransform(D3DTS_VIEW, GetG().m_camera.GetViewMatrix());
+		pd3dDevice->SetTransform(D3DTS_PROJECTION, GetG().m_camera.GetProjMatrix());
 
 		if( m_pTextMeshes[0] != NULL )
 		{
@@ -272,8 +272,8 @@ HRESULT IntroState::release()
 
 void IntroState::setupLight() 
 {
-	D3DLIGHT9& light = G::getSingleton().m_light;
-	LPDIRECT3DDEVICE9& pd3dDevice = G::getSingleton().m_dev;
+	D3DLIGHT9& light = GetG().m_light;
+	LPDIRECT3DDEVICE9& pd3dDevice = GetG().m_dev;
 
 	ZeroMemory(&light, sizeof(D3DLIGHT9));
 	D3DCOLORVALUE cv = { 0.8f, 0.8f, 0.8f, 1.0f };
@@ -303,7 +303,7 @@ void IntroState::setupCamera()
 {
 	D3DXVECTOR3 vecEye( 0.0f, -30.0f, -20.0f );
 	D3DXVECTOR3 vecAt( 0.0f, 0.0f, 0.0f );
-	G::getSingleton().m_camera.SetViewParams( &vecEye, &vecAt );
+	GetG().m_camera.SetViewParams( &vecEye, &vecAt );
 }
 
 HRESULT IntroState::createTextMeshes( IDirect3DDevice9* pd3dDevice )

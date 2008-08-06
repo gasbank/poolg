@@ -115,28 +115,28 @@ void Unit::frameMove( float fElapsedTime )
 			m_bMoving = true;
 			m_vKeyboardDirection = D3DXVECTOR3( 0, 0, 0 );
 			m_vKeyboardDirection.y += 2.0f;
-			ScriptManager::getSingleton().execute("EpUnitOnMove 0");
+			GetScriptManager().execute("EpUnitOnMove 0");
 		}
 		else if( IsKeyDown( m_aKeys[UNIT_MOVE_DOWN] ) )
 		{
 			m_bMoving = true;
 			m_vKeyboardDirection = D3DXVECTOR3( 0, 0, 0 );
 			m_vKeyboardDirection.y -= 2.0f;
-			ScriptManager::getSingleton().execute("EpUnitOnMove 1");
+			GetScriptManager().execute("EpUnitOnMove 1");
 		}
 		else if( IsKeyDown( m_aKeys[UNIT_MOVE_RIGHT] ) )
 		{
 			m_bMoving = true;
 			m_vKeyboardDirection = D3DXVECTOR3( 0, 0, 0 );
 			m_vKeyboardDirection.x += 2.0f;
-			ScriptManager::getSingleton().execute("EpUnitOnMove 2");
+			GetScriptManager().execute("EpUnitOnMove 2");
 		}
 		else if( IsKeyDown( m_aKeys[UNIT_MOVE_LEFT] ) )
 		{
 			m_bMoving = true;
 			m_vKeyboardDirection = D3DXVECTOR3( 0, 0, 0 );
 			m_vKeyboardDirection.x -= 2.0f;
-			ScriptManager::getSingleton().execute("EpUnitOnMove 3");
+			GetScriptManager().execute("EpUnitOnMove 3");
 		}
 	}
 	
@@ -222,8 +222,57 @@ int EpRegisterToWorld( void* pv1, void* pv2 )
 	return w->addUnit(u);;
 } SCRIPT_CALLABLE_I_PV_PV( EpRegisterToWorld )
 
+
+
+
+
+
+int EpUnitSetRotX( void* ptr, double val )
+{
+	Unit* instance = reinterpret_cast<Unit*>( ptr );
+	instance->Unit::setRotX( (float)val );
+	return 0;
+} SCRIPT_CALLABLE_I_PV_D( EpUnitSetRotX )
+
+int EpUnitSetRotY( void* ptr, double val )
+{
+	Unit* instance = reinterpret_cast<Unit*>( ptr );
+	instance->Unit::setRotY( (float)val );
+	return 0;
+} SCRIPT_CALLABLE_I_PV_D( EpUnitSetRotY )
+
+int EpUnitSetRotZ( void* ptr, double val )
+{
+	Unit* instance = reinterpret_cast<Unit*>( ptr );
+	instance->Unit::setRotZ( (float)val );
+	return 0;
+} SCRIPT_CALLABLE_I_PV_D( EpUnitSetRotZ )
+
+int EpUnitSetPosZ( void* ptr, double val )
+{
+	Unit* instance = reinterpret_cast<Unit*>( ptr );
+	instance->Unit::setPosZ( (float)val );
+	return 0;
+} SCRIPT_CALLABLE_I_PV_D( EpUnitSetPosZ )
+
+
+
+double EpUnitGetUpperRightZ( void* ptr )
+{
+	Unit* instance = reinterpret_cast<Unit*>( ptr );
+	return instance->Unit::getUpperRight().z;
+} SCRIPT_CALLABLE_D_PV( EpUnitGetUpperRightZ )
+
+
+
+
 START_SCRIPT_FACTORY(Unit)
 	CREATE_OBJ_COMMAND( EpCreateUnit )
 	CREATE_OBJ_COMMAND( EpReleaseUnit )
 	CREATE_OBJ_COMMAND( EpRegisterToWorld )
+	CREATE_OBJ_COMMAND( EpUnitSetRotX )
+	CREATE_OBJ_COMMAND( EpUnitSetRotY )
+	CREATE_OBJ_COMMAND( EpUnitSetRotZ )
+	CREATE_OBJ_COMMAND( EpUnitSetPosZ )
+	CREATE_OBJ_COMMAND( EpUnitGetUpperRightZ )
 END_SCRIPT_FACTORY(Unit)

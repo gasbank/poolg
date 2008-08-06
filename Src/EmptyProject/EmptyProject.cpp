@@ -85,7 +85,7 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 	g_sm.init();
 
 	// Init Script
-	ScriptManager::getSingleton().execute( "EpInitGame" );
+	GetScriptManager().execute( "EpInitGame" );
 
 	//////////////////////////////////////////////////////////////////////////
 
@@ -321,13 +321,6 @@ void CALLBACK KeyboardProc( UINT nChar, bool bKeyDown, bool bAltDown, void* pUse
 //////////////////////////////////////////////////////////////////////////
 
 
-int EpInit()
-{
-	OutputDebugStringW(L"EpInit() called by script caller\n");
-	return 100;
-
-} SCRIPT_CALLABLE_I( EpInit )
-
 static bool isCurrentWorkingDir = false;
 void SetCurrentWorkingDirectory()
 {
@@ -351,7 +344,7 @@ void CreateScriptManagerIfNotExist()
 	if ( !g_scriptManager )
 	{
 		g_scriptManager = new ScriptManager;
-		ScriptManager::getSingleton().init();
+		GetScriptManager().init();
 	}
 }
 
@@ -381,9 +374,10 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 
 	// Script Manager Initialization
 	CreateScriptManagerIfNotExist();
-	CREATE_OBJ_COMMAND( EpInit );
-	ScriptManager::getSingleton().executeFile( "library/EpInitScript.tcl" );
-	ScriptManager::getSingleton().executeFile( "library/EpWorldState.tcl" );
+	GetScriptManager().executeFile( "library/EpInitScript.tcl" );
+	GetScriptManager().executeFile( "library/EpWorldState.tcl" );
+
+	GetScriptManager().execute( "EpInitApp" );
 
     // Initialize DXUT and create the desired Win32 window and Direct3D device for the application
     DXUTInit( true, true ); // Parse the command line and show msgboxes

@@ -2,47 +2,7 @@
 #include "ScriptManager.h"
 #include "TopStateManager.h"
 
-
-
-int square( int i )
-{
-	return i*i;
-
-} SCRIPT_CALLABLE_I_I( square )
-
-int csum( int a, int b )
-{
-	return a+b;
-
-} SCRIPT_CALLABLE_I_I_I( csum )
-
-int EpSetNextState(int stateID)
-{
-	TopStateManager::getSingleton().setNextState((GameState)stateID);
-	return 0;
-
-} SCRIPT_CALLABLE_I_I( EpSetNextState )
-
-int EpOutputDebugString( const char* msg )
-{
-	OutputDebugStringA( msg );
-	return 0;
-
-} SCRIPT_CALLABLE_I_PC( EpOutputDebugString )
-
-//////////////////////////////////////////////////////////////////////////
-
-
-int Tcl_AppInit(Tcl_Interp *interp){
-	if (Tcl_Init(interp) == TCL_ERROR)
-		return TCL_ERROR;
-	/* Now initialize our functions */
-	CREATE_OBJ_COMMAND( square );
-	CREATE_OBJ_COMMAND( csum );
-	CREATE_OBJ_COMMAND( EpSetNextState );
-	CREATE_OBJ_COMMAND( EpOutputDebugString );
-	return TCL_OK;
-}
+int Tcl_AppInit(Tcl_Interp *interp);
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -75,15 +35,65 @@ HRESULT ScriptManager::release()
 void ScriptManager::execute( const char* command )
 {
 	if ( Tcl_Eval( m_interpreter, command ) != TCL_OK )
-		throw std::runtime_error( "Script eval failed" );
-
+		throwScriptErrorWithMessage();
 }
 
 void ScriptManager::executeFile( const char* fileName )
 {
 	if ( Tcl_EvalFile( m_interpreter, fileName ) != TCL_OK )
-		throw std::runtime_error( "Script eval file failed" );
+		throwScriptErrorWithMessage();
 }
+
+void ScriptManager::throwScriptErrorWithMessage()
+{
+	char lineNo[32];
+	StringCchPrintfA( lineNo, 32, "Line: %d\n", m_interpreter->errorLine );
+	OutputDebugStringA( "\n@@@------------------------- SCRIPT ERROR -------------------------@@@\n" );
+	OutputDebugStringA( lineNo );
+	OutputDebugStringA( m_interpreter->result );
+	OutputDebugStringA( "\n@@@------------------------- SCRIPT ERROR -------------------------@@@\n\n" );
+	throw std::runtime_error( m_interpreter->result );
+}
+
+//////////////////////////////////////////////////////////////////////////
+
+int EpSetNextState(int stateID)
+{
+	TopStateManager::getSingleton().setNextState((GameState)stateID);
+	return 0;
+
+} SCRIPT_CALLABLE_I_I( EpSetNextState )
+
+int EpOutputDebugString( const char* msg )
+{
+	OutputDebugStringA( msg );
+	return 0;
+
+} SCRIPT_CALLABLE_I_PC( EpOutputDebugString )
+
+int EpSetWindowSize(int w, int h)
+{
+	GetG().m_scrWidth = w;
+	GetG().m_scrHeight = h;
+	OutputDebugStringW(L" - Window size set\n");
+	return 0;
+
+} SCRIPT_CALLABLE_I_I_I( EpSetWindowSize )
+
+//////////////////////////////////////////////////////////////////////////
+
+
+int Tcl_AppInit(Tcl_Interp *interp)
+{
+	if (Tcl_Init(interp) == TCL_ERROR)
+		return TCL_ERROR;
+	/* Now initialize our functions */
+	CREATE_OBJ_COMMAND( EpSetNextState );
+	CREATE_OBJ_COMMAND( EpOutputDebugString );
+	CREATE_OBJ_COMMAND( EpSetWindowSize );
+	return TCL_OK;
+}
+
 //////////////////////////////////////////////////////////////////////////
 
 

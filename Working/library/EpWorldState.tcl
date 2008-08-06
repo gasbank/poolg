@@ -1,3 +1,4 @@
+
 namespace eval EpWorldState {
 	variable pWorld			0
 	variable pHeroUnit		0
@@ -19,6 +20,10 @@ namespace eval EpWorldState {
 		
 		set pHeroUnit			[EpCreateUnit 3 4 1];
 		set curUnitCount		[EpRegisterToWorld $pWorld $pHeroUnit];
+		
+		EpUnitSetRotX $pHeroUnit [ToRadian -90]
+		EpUnitSetRotZ $pHeroUnit [ToRadian 90]
+		EpUnitSetPosZ $pHeroUnit -[EpUnitGetUpperRightZ $pHeroUnit]
 		
 		EpOutputDebugString " -- Current Unit Count: $curUnitCount\n"
 	}

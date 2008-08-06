@@ -5,10 +5,6 @@ EpCamera::EpCamera(void)
 {
 }
 
-void EpCamera::move( D3DVECTOR* posA, D3DVECTOR* posB, float duration )
-{
-}
-
 D3DUtil_CameraKeys EpCamera::MapKey( UINT nKey )
 {
 	// This could be upgraded to a method that's user-definable but for 

@@ -32,3 +32,8 @@ D3DUtil_CameraKeys EpCamera::MapKey( UINT nKey )
 
 	return CAM_UNKNOWN;
 }
+
+void EpCamera::SetUpVector( D3DXVECTOR3* vecUp )
+{
+	 *(D3DXVECTOR3*)&m_mCameraWorld._21 = *vecUp;
+}

@@ -207,13 +207,15 @@ HRESULT BattleState::frameMove(double fTime, float fElapsedTime)
 		WorldState* ws = static_cast<WorldState*>( tsm.getCurState() );
 		const D3DXVECTOR3& battlePos = ws->getBattlePos();
 
-		EpCamera& refCamera = G::getSingleton().m_camera;
-		
+		EpCamera& camera = G::getSingleton().m_camera;
 
 		D3DXVECTOR3 vecAt( battlePos );
 		D3DXVECTOR3 vecEye( -10.0, -10.0f, -10.0f );
+		D3DXVECTOR3 vecUp( 0.0f, 0.0f, -1.0f );
 
-		refCamera.SetViewParams( &vecEye, &vecAt );
+		camera.SetViewParams( &vecEye, &vecAt );
+		camera.SetUpVector( &vecUp );
+
 	}
 
 	return S_OK;

@@ -109,58 +109,97 @@ void SetTclResult(DWORD trait, Tcl_Obj* tcl_result, const ScriptArgumentList& ar
 
 #define SCRIPT_CALLABLE_0(arg0, funcName)										\
 	static const DWORD _trait_##funcName = arg0;								\
-	void funcName(ScriptArgumentList& args) {
+	void _wrap_##funcName(ScriptArgumentList& args)
 
 #define SCRIPT_CALLABLE_1(arg0, funcName, arg1)									\
 	static const DWORD _trait_##funcName = arg0 | (arg1 << 4);					\
-	void funcName(ScriptArgumentList& args) {
+	void _wrap_##funcName(ScriptArgumentList& args)
 
 #define SCRIPT_CALLABLE_2(arg0, funcName, arg1, arg2)							\
 	static const DWORD _trait_##funcName = arg0 | (arg1 << 4) | (arg2 << 8);	\
-	void funcName(ScriptArgumentList& args) {
+	void _wrap_##funcName(ScriptArgumentList& args)
 
-#define SCRIPT_CALLABLE_END(funcName)	}																		\
-	static int _wrap_##funcName(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[])		\
-	{																											\
-		Tcl_Obj* tcl_result = Tcl_GetObjResult(interp);															\
-		ScriptArgumentList argList;																				\
-		ParseTclArgumentByTrait(_trait_##funcName, interp, objv, argList);										\
-		funcName(argList);																						\
-		SetTclResult(_trait_##funcName, tcl_result, argList);													\
-		return TCL_OK;																							\
+#define SCRIPT_CALLABLE_END(funcName)																				\
+	static int _tcl_wrap_##funcName(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[])		\
+	{																												\
+		Tcl_Obj* tcl_result = Tcl_GetObjResult(interp);																\
+		ScriptArgumentList argList;																					\
+		ParseTclArgumentByTrait(_trait_##funcName, interp, objv, argList);											\
+		_wrap_##funcName(argList);																					\
+		SetTclResult(_trait_##funcName, tcl_result, argList);														\
+		return TCL_OK;																								\
 	}
+#define SCRIPT_CALLABLE_PV_I_I(funcName)										\
+	static const DWORD _trait_##funcName = AT_PV | (AT_I << 4) | (AT_I << 8);	\
+	void _wrap_##funcName(ScriptArgumentList& args)								\
+	{																			\
+		args[0].pv = funcName(args[1].i, args[2].i);							\
+	}																			\
+	SCRIPT_CALLABLE_END(funcName)
+
+#define SCRIPT_CALLABLE_I_PV(funcName)											\
+	static const DWORD _trait_##funcName = AT_I | (AT_PV << 4);					\
+	void _wrap_##funcName(ScriptArgumentList& args)								\
+	{																			\
+		args[0].i = funcName(args[1].pv);										\
+	}																			\
+	SCRIPT_CALLABLE_END(funcName)
+
+#define SCRIPT_CALLABLE_I_I(funcName)											\
+	static const DWORD _trait_##funcName = AT_I | (AT_I << 4);					\
+	void _wrap_##funcName(ScriptArgumentList& args)								\
+	{																			\
+		args[0].i = funcName(args[1].i);										\
+	}																			\
+	SCRIPT_CALLABLE_END(funcName)
+
+#define SCRIPT_CALLABLE_I_I_I(funcName)											\
+	static const DWORD _trait_##funcName = AT_I | (AT_I << 4) | (AT_I << 8);	\
+	void _wrap_##funcName(ScriptArgumentList& args)								\
+	{																			\
+		args[0].i = funcName(args[1].i, args[2].i);								\
+	}																			\
+	SCRIPT_CALLABLE_END(funcName)
+
 
 //////////////////////////////////////////////////////////////////////////
 
-SCRIPT_CALLABLE_2(AT_PV, createWidget, AT_I, AT_I)
-	args[0].pv = Widget::createWidget(args[1].i, args[2].i);
-SCRIPT_CALLABLE_END(createWidget)
+Widget* createWidget( int a, int b )
+{
+	return Widget::createWidget(a, b);
 
+} SCRIPT_CALLABLE_PV_I_I(createWidget)
 
-SCRIPT_CALLABLE_1(AT_I, releaseWidget, AT_PV)
-	delete reinterpret_cast<Widget*>( args[1].pv );
-	args[0].i = 0;
-SCRIPT_CALLABLE_END(releaseWidget)
+int releaseWidget( void* w )
+{
+	delete reinterpret_cast<Widget*>( w );
+	return 0;
 
+} SCRIPT_CALLABLE_I_PV(releaseWidget)
 
-SCRIPT_CALLABLE_1(AT_I, widgetGetA, AT_PV)
-	args[0].i = reinterpret_cast<Widget*>( args[1].pv )->getA();
-SCRIPT_CALLABLE_END(widgetGetA)
+int widgetGetA( void* w )
+{
+	return reinterpret_cast<Widget*>( w )->getA();
 
+} SCRIPT_CALLABLE_I_PV(widgetGetA)
 
-SCRIPT_CALLABLE_1(AT_I, widgetGetB, AT_PV)
-	args[0].i = reinterpret_cast<Widget*>( args[1].pv )->getB();
-SCRIPT_CALLABLE_END(widgetGetB)
+int widgetGetB( void* w )
+{
+	return reinterpret_cast<Widget*>( w )->getB();
 
+} SCRIPT_CALLABLE_I_PV(widgetGetB)
 
-SCRIPT_CALLABLE_1(AT_I, square, AT_I)
-	args[0].i = args[1].i * args[1].i;
-SCRIPT_CALLABLE_END(square)
+int square( int a )
+{
+	return a * a;
 
+} SCRIPT_CALLABLE_I_I(square)
 
-SCRIPT_CALLABLE_2(AT_I, csum, AT_I, AT_I)
-	args[0].i = args[1].i + args[2].i;
-SCRIPT_CALLABLE_END(csum)
+int csum( int a, int b )
+{
+	return a + b;
+
+} SCRIPT_CALLABLE_I_I_I(csum)
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -170,7 +209,7 @@ int Tcl_AppInit(Tcl_Interp *interp){
 		return TCL_ERROR;
 	/* Now initialize our functions */
 
-#define CREATE_SCRIPT_METHOD(funcName)	Tcl_CreateObjCommand(interp, #funcName, _wrap_##funcName, (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL)
+#define CREATE_SCRIPT_METHOD(funcName)	Tcl_CreateObjCommand(interp, #funcName, _tcl_wrap_##funcName, (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL)
 	CREATE_SCRIPT_METHOD(square);
 	CREATE_SCRIPT_METHOD(csum);
 	CREATE_SCRIPT_METHOD(createWidget);

@@ -12,6 +12,13 @@ FieldState::~FieldState(void)
 
 HRESULT FieldState::enter()
 {
+	EpCamera& camera = G::getSingleton().m_camera;
+
+	D3DXVECTOR3 vecAt( 0.0f, 0.0f, 0.0f );
+	D3DXVECTOR3 vecEye( -0.0f, -0.0f, -30.0f );
+
+	camera.SetViewParams( &vecEye, &vecAt );
+
 	return S_OK;
 }
 

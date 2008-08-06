@@ -119,6 +119,8 @@ HRESULT BattleState::enter()
 
 HRESULT BattleState::leave()
 {
+	m_startTime = -1.0f;
+
 	return S_OK;
 }
 
@@ -212,8 +214,6 @@ HRESULT BattleState::frameMove(double fTime, float fElapsedTime)
 		D3DXVECTOR3 vecEye( -10.0, -10.0f, -10.0f );
 
 		refCamera.SetViewParams( &vecEye, &vecAt );
-
-
 	}
 
 	return S_OK;

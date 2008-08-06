@@ -1163,7 +1163,7 @@ HRESULT WINAPI DXUTCreateWindow( const WCHAR* strWindowTitle, HINSTANCE hInstanc
         StringCchCopy( strCachedWindowTitle, 256, strWindowTitle );
 
         // Create the render window
-        HWND hWnd = CreateWindow( L"Direct3DWindowClass", strWindowTitle, WS_OVERLAPPEDWINDOW,
+        HWND hWnd = CreateWindow( L"Direct3DWindowClass", strWindowTitle, WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU /*WS_OVERLAPPEDWINDOW*/,
                                   x, y, ( rc.right - rc.left ), ( rc.bottom - rc.top ), 0,
                                   hMenu, hInstance, 0 );
         if( hWnd == NULL )

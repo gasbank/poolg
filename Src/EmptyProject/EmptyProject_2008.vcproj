@@ -674,6 +674,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\Character.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\Character.h"
+			>
+		</File>
+		<File
 			RelativePath="EmptyProject.cpp"
 			>
 		</File>

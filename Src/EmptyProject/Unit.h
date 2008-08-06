@@ -46,7 +46,8 @@ public:
 protected:
 	virtual UnitInput mapKey( UINT nKey );
 
-private:
+//[재우]상속받은 객체가 접근하기 위해 protected로.
+//private:
 	Unit();
 
 	bool IsKeyDown( BYTE key ) const { return( (key & KEY_IS_DOWN_MASK) == KEY_IS_DOWN_MASK ); }

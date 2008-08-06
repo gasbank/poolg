@@ -305,6 +305,13 @@ void CALLBACK KeyboardProc( UINT nChar, bool bKeyDown, bool bAltDown, void* pUse
 }
 
 
+int EpInit()
+{
+	OutputDebugStringW(L"EpInit() called by script caller\n");
+	return 100;
+
+} SCRIPT_CALLABLE_I( EpInit )
+
 //--------------------------------------------------------------------------------------
 // Initialize everything and go into a render loop
 //--------------------------------------------------------------------------------------
@@ -325,7 +332,7 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
     DXUTSetCallbackMsgProc( MsgProc );
     DXUTSetCallbackFrameMove( OnFrameMove );
 	DXUTSetCallbackKeyboard( KeyboardProc );
-
+	
     // TODO: Perform any application-level initialization here
 	// Setup working directory
 	TCHAR buf[MAX_PATH];
@@ -337,7 +344,14 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 	SetCurrentDirectory(buf);
 
 	g_sm.init();
-	g_scriptManager.init(); // Should be called after State Manager is inited
+	ScriptManager::getSingleton().init(); // Should be called after State Manager is inited
+
+	CREATE_OBJ_COMMAND( EpInit );
+
+	ScriptManager::getSingleton().executeFile( "library/EpInitScript.tcl" );
+	ScriptManager::getSingleton().execute( "EpInitGame" );
+
+	
 
     // Initialize DXUT and create the desired Win32 window and Direct3D device for the application
     DXUTInit( true, true ); // Parse the command line and show msgboxes
@@ -355,4 +369,3 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 
     return DXUTGetExitCode();
 }
-

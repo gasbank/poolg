@@ -3,115 +3,47 @@
 #include "TopStateManager.h"
 
 
-int square (int i)
+
+int square( int i )
 {
 	return i*i;
-}
-int csum(int a, int b)
-{
 
+} SCRIPT_CALLABLE_I_I( square )
+
+int csum( int a, int b )
+{
 	return a+b;
-}
+
+} SCRIPT_CALLABLE_I_I_I( csum )
+
 int EpSetNextState(int stateID)
 {
 	TopStateManager::getSingleton().setNextState((GameState)stateID);
 	return 0;
-}
-int EpOutputDebugString(const char* msg)
+
+} SCRIPT_CALLABLE_I_I( EpSetNextState )
+
+int EpOutputDebugString( const char* msg )
 {
-	OutputDebugStringA(msg);
+	OutputDebugStringA( msg );
 	return 0;
-}
-static int _wrap_csum(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
-	int  _result;
-	int  _arg0, _arg1;
-	Tcl_Obj * tcl_result;
-	int tempint1, tempint2;
 
-	clientData = clientData; objv = objv;
-	tcl_result = Tcl_GetObjResult(interp);
-	if ((objc < 3) || (objc > 3)) {
-		Tcl_SetStringObj(tcl_result,"Wrong # args. csum a b ",-1);
-		return TCL_ERROR;
-	}
-	if (Tcl_GetIntFromObj(interp,objv[1],&tempint1) == TCL_ERROR) return TCL_ERROR;
-	if (Tcl_GetIntFromObj(interp,objv[2],&tempint2) == TCL_ERROR) return TCL_ERROR;
-	_arg0 = (int ) tempint1;
-	_arg1 = (int ) tempint2;
-	_result = (int )csum(_arg0, _arg1);
-	tcl_result = Tcl_GetObjResult(interp);
-	Tcl_SetIntObj(tcl_result,(long) _result);
-	return TCL_OK;
-}
-static int _wrap_EpOutputDebugString(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
-	int  _result;
-	Tcl_Obj * tcl_result;
-	
-	clientData = clientData; objv = objv;
-	tcl_result = Tcl_GetObjResult(interp);
-	if ((objc < 2) || (objc > 2)) {
-		Tcl_SetStringObj(tcl_result,"Wrong # args. square i ",-1);
-		return TCL_ERROR;
-	}
-	const char* msg;
-	int msgLen;
-	msg = Tcl_GetStringFromObj( objv[1], &msgLen );
-	_result = (int )EpOutputDebugString(msg);
-	tcl_result = Tcl_GetObjResult(interp);
-	Tcl_SetIntObj(tcl_result,(long) _result);
-	return TCL_OK;
-}
-static int _wrap_square(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
-	int  _result;
-	int  _arg0;
-	Tcl_Obj * tcl_result;
-	int tempint;
+} SCRIPT_CALLABLE_I_PC( EpOutputDebugString )
 
-	clientData = clientData; objv = objv;
-	tcl_result = Tcl_GetObjResult(interp);
-	if ((objc < 2) || (objc > 2)) {
-		Tcl_SetStringObj(tcl_result,"Wrong # args. square i ",-1);
-		return TCL_ERROR;
-	}
-	if (Tcl_GetIntFromObj(interp,objv[1],&tempint) == TCL_ERROR) return TCL_ERROR;
-	_arg0 = (int ) tempint;
-	_result = (int )square(_arg0);
-	tcl_result = Tcl_GetObjResult(interp);
-	Tcl_SetIntObj(tcl_result,(long) _result);
-	return TCL_OK;
-}
-static int _wrap_EpSetNextState(ClientData clientData, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
-	int  _result;
-	int  _arg0;
-	Tcl_Obj * tcl_result;
-	int tempint;
+//////////////////////////////////////////////////////////////////////////
 
-	clientData = clientData; objv = objv;
-	tcl_result = Tcl_GetObjResult(interp);
-	if ((objc < 2) || (objc > 2)) {
-		Tcl_SetStringObj(tcl_result,"Wrong # args. square i ",-1);
-		return TCL_ERROR;
-	}
-	if (Tcl_GetIntFromObj(interp,objv[1],&tempint) == TCL_ERROR) return TCL_ERROR;
-	_arg0 = (int ) tempint;
-	_result = (int )EpSetNextState(_arg0);
-	tcl_result = Tcl_GetObjResult(interp);
-	Tcl_SetIntObj(tcl_result,(long) _result);
-	return TCL_OK;
-}
 
 int Tcl_AppInit(Tcl_Interp *interp){
 	if (Tcl_Init(interp) == TCL_ERROR)
 		return TCL_ERROR;
 	/* Now initialize our functions */
-	Tcl_CreateObjCommand(interp, "square", _wrap_square, (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL);
-	Tcl_CreateObjCommand(interp, "csum", _wrap_csum, (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL);
-	Tcl_CreateObjCommand(interp, "EpSetNextState", _wrap_EpSetNextState, (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL);
-	Tcl_CreateObjCommand(interp, "EpOutputDebugString", _wrap_EpOutputDebugString, (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL);
+	CREATE_OBJ_COMMAND( square );
+	CREATE_OBJ_COMMAND( csum );
+	CREATE_OBJ_COMMAND( EpSetNextState );
+	CREATE_OBJ_COMMAND( EpOutputDebugString );
 	return TCL_OK;
 }
 
-//////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
 
 IMPLEMENT_SINGLETON(ScriptManager);
@@ -123,15 +55,13 @@ ScriptManager::ScriptManager(void)
 
 ScriptManager::~ScriptManager(void)
 {
-	
 }
 
 HRESULT ScriptManager::init()
 {
 	m_interpreter = Tcl_CreateInterp();
-	Tcl_AppInit( m_interpreter );
-	assert( Tcl_EvalFile( m_interpreter, "library/EpInitScript.tcl" ) == TCL_OK );
-	assert( Tcl_Eval( m_interpreter, "EpInitGame" ) == TCL_OK );
+	if ( Tcl_AppInit( m_interpreter ) != TCL_OK ) throw std::runtime_error( "Script init error" );
+	
 	return S_OK;
 }
 
@@ -142,7 +72,73 @@ HRESULT ScriptManager::release()
 	return S_OK;
 }
 
-HRESULT ScriptManager::execute( const char* command )
+void ScriptManager::execute( const char* command )
 {
-	return Tcl_Eval( m_interpreter, command );
+	if ( Tcl_Eval( m_interpreter, command ) != TCL_OK )
+		throw std::runtime_error( "Script eval failed" );
+}
+
+void ScriptManager::executeFile( const char* fileName )
+{
+	if ( Tcl_EvalFile( m_interpreter, fileName ) != TCL_OK )
+		throw std::runtime_error( "Script eval file failed" );
+}
+//////////////////////////////////////////////////////////////////////////
+
+
+void ParseTclArgumentByTrait( DWORD trait, Tcl_Interp* interp, Tcl_Obj *CONST objv[], ScriptArgumentList& argList )
+{
+	if (trait == 0)
+		throw std::runtime_error("Trait value incorrect");
+
+	ScriptArgument sa;
+	memset( &sa, 0, sizeof( ScriptArgument ) );
+	argList.push_back(sa); // Return value set; type is not important at this point
+	trait = trait >> 4;
+
+	unsigned int i = 1;
+	int len = 0;
+	while (trait)
+	{
+		switch (trait & 0xf)
+		{
+		case AT_I:
+		case AT_PV:
+			Tcl_GetIntFromObj( interp, objv[i], &sa.i );
+			break;
+		case AT_PC:
+			sa.pc = Tcl_GetStringFromObj( objv[i], &len );
+			break;
+		case AT_D:
+			Tcl_GetDoubleFromObj( interp, objv[i], &sa.d );
+			break;
+		default:
+			throw std::runtime_error("Trait value incorrect");
+		}
+		argList.push_back(sa);
+
+		trait = trait >> 4;
+		i++;
+	}
+
+}
+void SetTclResult(DWORD trait, Tcl_Obj* tcl_result, const ScriptArgumentList& argList)
+{
+	switch (trait & 0xf)
+	{
+	case AT_I:
+		Tcl_SetIntObj( tcl_result, (long)argList[0].i );
+		break;
+	case AT_PV:
+		Tcl_SetIntObj( tcl_result, reinterpret_cast<long>( argList[0].pv ) );
+		break;
+	case AT_PC:
+		Tcl_SetStringObj( tcl_result, argList[0].pc, strlen( argList[0].pc ) );
+		break;
+	case AT_D:
+		Tcl_SetDoubleObj( tcl_result, argList[0].d );
+		break;
+	default:
+		throw std::runtime_error("Trait incorrect");
+	}
 }

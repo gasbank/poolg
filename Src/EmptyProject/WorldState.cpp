@@ -93,6 +93,13 @@ HRESULT WorldState::enter()
 	
 	D3DXCreateBox(pd3dDevice, 1.0f, 1.0f, 1.0f, &m_aTile, 0);
 
+	// [재우] 캐릭터 구현
+	/*
+	LPD3DXMESH d3dxMesh;
+	D3DXCreateTeapot( GetG().m_dev, &d3dxMesh, 0 );
+	m_player.createUnit (d3dxMesh, 20, 20, 0, true);
+	addUnit(&m_player);*/
+
 	// Setup main camera
 	D3DXVECTOR3 vecEye( 0.0f, 0.0f, -30.0f );
 	D3DXVECTOR3 vecAt ( 0.0f, 0.0f, -0.0f );
@@ -134,6 +141,8 @@ HRESULT WorldState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, floa
 	
 	// Sample 3D model rendering
 	//m_heroUnit->draw();
+
+	//[재우] 캐릭터
 
 	UnitSet::iterator it = m_unitSet.begin();
 	for ( ; it != m_unitSet.end(); ++it )

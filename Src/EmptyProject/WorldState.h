@@ -8,6 +8,7 @@
 #include "Sound.h"
 #include "Unit.h"
 #include "VideoMan.h"
+#include "Character.h"
 
 typedef std::set<Unit*> UnitSet;
 
@@ -53,6 +54,9 @@ private:
 
 	double							m_startTime;
 
+	
+
+	Character						m_player;
 	
 	UnitSet							m_unitSet;
 };

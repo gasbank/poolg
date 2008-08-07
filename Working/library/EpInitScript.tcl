@@ -1,5 +1,3 @@
-package require Thread
-
 proc EpInitApp {} {
 	# 16:9 widescreen resolution
 	set w1 16

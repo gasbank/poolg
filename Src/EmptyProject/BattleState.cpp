@@ -142,6 +142,7 @@ HRESULT BattleState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, flo
 	material.Specular = cv2;
 	m_pDev->SetMaterial(&material);
 
+	m_pDev->SetRenderState(D3DRS_ZENABLE, FALSE);
 	m_StatusBoxPlayer.draw();
 	m_StatusBoxEnemy.draw();
 	m_SkillBox.draw();
@@ -157,6 +158,7 @@ HRESULT BattleState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, flo
 	m_expBarPlayer.draw();
 	m_hpBarEnemy.draw();
 	m_mpBarEnemy.draw();
+	m_pDev->SetRenderState(D3DRS_ZENABLE, TRUE);
 
 	drawFixedText(GetG().m_scrWidth, GetG().m_scrHeight);
 	

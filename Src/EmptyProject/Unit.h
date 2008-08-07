@@ -43,6 +43,8 @@ public:
 	void setPosZ(float val) { m_vPos.z = val; m_bLocalXformDirty = true; }
 	const D3DXVECTOR3& getPos() const { return m_vPos; }
 
+	void setMoveDuration(float val) { m_moveDuration = val; }
+
 protected:
 	virtual UnitInput mapKey( UINT nKey );
 
@@ -74,5 +76,8 @@ protected:
 	bool					m_bMoving;
 	float					m_fMovingTime;
 	bool					m_bControllable;
+
+private:
+	float					m_moveDuration; // A time needed to move one time(tile) in seconds
 };
 

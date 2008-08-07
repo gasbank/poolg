@@ -11,24 +11,23 @@
 
 Unit::Unit()
 {
-	m_d3dxMesh = 0;
-	m_pd3dDevice = 0;
-	m_d3dTex = 0;
+	m_d3dxMesh			= 0;
+	m_pd3dDevice		= 0;
+	m_d3dTex			= 0;
+	m_moveDuration		= 1.0f;
+	m_vRot				= D3DXVECTOR3(0, 0, 0);
+	m_vPos				= D3DXVECTOR3(0, 0, 0);
+	m_vScale			= D3DXVECTOR3(1.0f, 1.0f, 1.0f);
+	m_bLocalXformDirty	= true;
+	m_bMoving			= false;
+
+	D3DXMatrixIdentity(&m_localXform);
 
 	ZeroMemory(&m_material, sizeof(D3DMATERIAL9));
 	m_material.Ambient.r = m_material.Ambient.g = m_material.Ambient.b = 0.6f;
 	m_material.Diffuse.r = m_material.Diffuse.g = m_material.Diffuse.b = 0.3f;
 	m_material.Specular.r = m_material.Specular.g = m_material.Specular.b = 0.2f;
 	m_material.Ambient.a = m_material.Diffuse.a = m_material.Specular.a = 1.0f;
-	
-	D3DXMatrixIdentity(&m_localXform);
-
-	m_vRot = D3DXVECTOR3(0, 0, 0);
-	m_vPos = D3DXVECTOR3(0, 0, 0);
-	m_vScale = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
-	
-	m_bLocalXformDirty = true;
-	m_bMoving = false;
 
 	ZeroMemory(m_aKeys, sizeof(m_aKeys));
 }
@@ -140,10 +139,11 @@ void Unit::frameMove( float fElapsedTime )
 		}
 	}
 	
-	if (m_bMoving && m_fMovingTime <= 1.0f)
+	
+	if (m_bMoving && m_fMovingTime <= m_moveDuration)
 	{
 		// Update velocity
-		m_vVelocity = m_vKeyboardDirection;
+		m_vVelocity = m_vKeyboardDirection / m_moveDuration;
 
 		// Simple euler method to calculate position delta
 		D3DXVECTOR3 vPosDelta = m_vVelocity * fElapsedTime;
@@ -255,6 +255,12 @@ int EpUnitSetPosZ( void* ptr, double val )
 	return 0;
 } SCRIPT_CALLABLE_I_PV_D( EpUnitSetPosZ )
 
+int EpUnitSetMoveDuration( void* ptr, double val )
+{
+	Unit* instance = reinterpret_cast<Unit*>( ptr );
+	instance->Unit::setMoveDuration( (float)val );
+	return 0;
+} SCRIPT_CALLABLE_I_PV_D( EpUnitSetMoveDuration )
 
 
 double EpUnitGetUpperRightZ( void* ptr )
@@ -274,5 +280,6 @@ START_SCRIPT_FACTORY(Unit)
 	CREATE_OBJ_COMMAND( EpUnitSetRotY )
 	CREATE_OBJ_COMMAND( EpUnitSetRotZ )
 	CREATE_OBJ_COMMAND( EpUnitSetPosZ )
+	CREATE_OBJ_COMMAND( EpUnitSetMoveDuration )
 	CREATE_OBJ_COMMAND( EpUnitGetUpperRightZ )
 END_SCRIPT_FACTORY(Unit)

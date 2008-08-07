@@ -39,7 +39,7 @@ namespace eval EpWorldState {
 		variable pWorld
 		
 		set pHeroUnit			[EpCreateUnit 0 0 1];
-		set pEnemyUnit			[EpCreateUnit 5 0 0];
+		set pEnemyUnit			[EpCreateUnit 7 0 0];
 		set curUnitCount		[EpRegisterToWorld $pWorld $pHeroUnit];
 		set curUnitCount		[EpRegisterToWorld $pWorld $pEnemyUnit];
 		

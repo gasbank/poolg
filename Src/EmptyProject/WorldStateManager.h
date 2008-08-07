@@ -11,4 +11,5 @@ public:
 	virtual void release();
 	virtual void setNextState(GameState);
 	virtual GameState curStateEnum();
+	virtual GameState prevStateEnum();
 };

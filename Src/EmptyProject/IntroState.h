@@ -21,8 +21,6 @@ public:
 	virtual HRESULT handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	virtual HRESULT release();
-
-	Sound	m_sound; // 사운드 변수
 	
 private:
 
@@ -55,6 +53,8 @@ private:
 	DWORD m_dwFontSize;
 
 	float m_velocity;
+
+	Sound	m_sound; // 사운드 변수
 };
 
 /* SDKmisc.h

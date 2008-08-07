@@ -54,3 +54,25 @@ void TopStateManager::setNextState(GameState state)
 	if (m_curStates == m_nextState)
 		m_nextState = 0;
 }
+
+GameState TopStateManager::curStateEnum()
+{
+	if (m_curStates == m_states[0])
+		return GAME_TOP_STATE_INTRO;
+	else if (m_curStates == m_states[2])
+		return GAME_TOP_STATE_WORLD;
+	else if (m_curStates == m_states[5])
+		return GAME_TOP_STATE_CREDIT;
+	return NULL_STATE;
+}
+
+GameState TopStateManager::prevStateEnum()
+{
+	if (m_prevStates == m_states[0])
+		return GAME_TOP_STATE_INTRO;
+	else if (m_prevStates == m_states[2])
+		return GAME_WORLD_STATE_BATTLE;
+	else if (m_prevStates == m_states[5])
+		return GAME_TOP_STATE_CREDIT;
+	return NULL_STATE;
+}

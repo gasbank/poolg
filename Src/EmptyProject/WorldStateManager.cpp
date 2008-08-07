@@ -64,5 +64,16 @@ GameState WorldStateManager::curStateEnum()
 		return GAME_WORLD_STATE_BATTLE;
 	else if (m_curStates == m_states[2])
 		return GAME_WORLD_STATE_MENU;
-	return GAME_WORLD_STATE_FIELD;
+	return NULL_STATE;
+}
+
+GameState WorldStateManager::prevStateEnum()
+{
+	if (m_prevStates == m_states[0])
+		return GAME_WORLD_STATE_FIELD;
+	else if (m_prevStates == m_states[1])
+		return GAME_WORLD_STATE_BATTLE;
+	else if (m_prevStates == m_states[2])
+		return GAME_WORLD_STATE_MENU;
+	return NULL_STATE;
 }

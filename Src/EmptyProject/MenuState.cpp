@@ -78,9 +78,9 @@ HRESULT MenuState::frameRender(IDirect3DDevice9* pd3dDevice,  double fTime, floa
 
 	//drawFixedText(scrWidth, scrHeight);
 
+	m_pDev->SetRenderState(D3DRS_ZENABLE, FALSE);
 	m_menu.draw();
 	m_selc.draw();
-	m_dae.draw();
 	
 	if ( loc == 0)
 	{
@@ -91,6 +91,8 @@ HRESULT MenuState::frameRender(IDirect3DDevice9* pd3dDevice,  double fTime, floa
 		m_sadb.draw();
 	}
 
+	m_dae.draw();
+	m_pDev->SetRenderState(D3DRS_ZENABLE, TRUE);
 	return S_OK;
 	
 }

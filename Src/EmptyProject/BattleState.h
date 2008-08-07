@@ -50,9 +50,5 @@ private:
 	LPD3DXFONT		m_lblREB;
 	
 	LPDIRECT3DDEVICE9	m_pDev;
-
-	D3DXVECTOR3		m_vecEyeFrom;
-	D3DXVECTOR3		m_vecAtFrom;
-	D3DXVECTOR3		m_vecEyeTo;
-	D3DXVECTOR3		m_vecAtTo;
+	D3DXVECTOR3		m_vWorldEye;
 };

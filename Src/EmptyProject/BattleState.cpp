@@ -7,11 +7,7 @@
 extern D3DXMATRIX g_orthoProjMat;
 extern D3DXMATRIX g_fixedViewMat;
 
-BattleState::BattleState() : 
-m_vecAtFrom(0.0f, 0.0f, 0.0f),
-m_vecAtTo(0.0f, 0.0f, 0.0f),
-m_vecEyeFrom(0.0f, 0.0f, 0.0f),
-m_vecEyeTo(0.0f, 0.0f, 0.0f)
+BattleState::BattleState()
 {
 	m_pDev = GetG().m_dev;
 
@@ -113,6 +109,8 @@ BattleState::~BattleState()
 
 HRESULT BattleState::enter()
 {
+	EpCamera& camera = G::getSingleton().m_camera;
+	m_vWorldEye = *camera.GetEyePt();
 
 	return S_OK;
 }
@@ -199,31 +197,28 @@ HRESULT BattleState::frameMove(double fTime, float fElapsedTime)
 	//m_Enemy.frameMove(fElapsedTime);
 
 
-	if (fStateTime < 30.0f)
+	if (fStateTime < 1.0f)
 	{
-		//WorldState* worldState = (WorldState*) TopStateManager::getSingleton().getCurState();
-		//const D3DXVECTOR3& battlePos = worldState->getBattlePos();		
-		
 		TopStateManager& tsm = TopStateManager::getSingleton();
 		WorldState* ws = static_cast<WorldState*>( tsm.getCurState() );
-		const D3DXVECTOR3& battlePos = ws->getBattlePos();
+		const D3DXVECTOR3& vBattlePos = ws->getBattlePos();
 
 		EpCamera& camera = G::getSingleton().m_camera;
 
-		D3DXVECTOR3 vecEye( battlePos.x + 10.0f, battlePos.y - 10.0f, battlePos.z - 10.0f );
-		D3DXVECTOR3 vecAt( battlePos );
-		D3DXVECTOR3 vecAxis = vecAt - vecEye;
+		D3DXVECTOR3 vCurEye;
+		D3DXVECTOR3 vLookAt( vBattlePos );
+		D3DXVECTOR3 vEye0( m_vWorldEye.x - 10.0f, m_vWorldEye.y - 10.0f, m_vWorldEye.z );
+		D3DXVECTOR3 vEye1( m_vWorldEye.x + 10.0f, m_vWorldEye.y - 10.0f, m_vWorldEye.z );		
+		D3DXVECTOR3 vEye2( vBattlePos.x + 10.0f, vBattlePos.y + 10.0f, vBattlePos.z - 10.0f );
+		D3DXVECTOR3 vEye3( vBattlePos.x - 10.0f, vBattlePos.y + 10.0f, vBattlePos.z - 10.0f );
+		
+		
 
-		D3DXVec3Normalize( &vecAxis, &vecAxis );
-		//camera.SetModelCenter( battlePos );
-		//camera.SetAttachCameraToModel(true);
-		D3DXVECTOR3 upVecNew3;
-		upVecNew3.x = 0;
-		upVecNew3.y = 0;
-		upVecNew3.z = -1.0f;
-		D3DXVec3Normalize( &upVecNew3, &upVecNew3 );
+		D3DXVec3CatmullRom( &vCurEye, &vEye0, &vEye1, &vEye2, &vEye3, (FLOAT)fStateTime );
 
-		camera.SetViewParamsWithUp( &vecEye, &vecAt, upVecNew3 );
+		const D3DXVECTOR3 vUp( 0.0f, 0.0f, -1.0f );
+
+		camera.SetViewParamsWithUp( &vCurEye, &vLookAt, vUp );
 	}
 
 	return S_OK;

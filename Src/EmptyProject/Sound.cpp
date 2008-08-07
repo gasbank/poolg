@@ -255,12 +255,11 @@ void WINAPI XACTNotificationCallback( const XACT_NOTIFICATION* pNotification )
     // and sound designer to decide what to do when a notification is received. 
     if( pNotification->type == XACTNOTIFICATIONTYPE_CUESTOP &&
         ( pNotification->cue.cueIndex == audioState.iSong[0] ||
-          pNotification->cue.cueIndex == audioState.iSong[1] ||
-          pNotification->cue.cueIndex == audioState.iSong[2] ) )
+          pNotification->cue.cueIndex == audioState.iSong[1] ) )
     {
         // The previous background song ended, so pick and new song to play it
         EnterCriticalSection( &audioState.cs );
-        audioState.nCurSongPlaying++; audioState.nCurSongPlaying %= 4;
+        audioState.nCurSongPlaying++; audioState.nCurSongPlaying %= 2;
         audioState.bHandleSongStopped = true;
         LeaveCriticalSection( &audioState.cs );
     }

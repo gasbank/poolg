@@ -1,5 +1,9 @@
+package require Thread
 
 namespace eval EpWorldState {
+	
+
+
 	variable pWorld			0
 	variable pHeroUnit		0
 	
@@ -10,6 +14,7 @@ namespace eval EpWorldState {
 		variable pWorld
 		
 		set pWorld				$pCurWorld;
+		
 	}
 
 	proc enter {} {

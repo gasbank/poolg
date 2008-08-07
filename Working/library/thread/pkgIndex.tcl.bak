@@ -1,11 +1,11 @@
 #
 # Tcl package index file, version 1.1
 #
-if {[package vsatisfies [package provide Tcl] 8.4]} {
+if {[package vsatisfies [package provide Tcl] 8.6]} {
     package ifneeded Thread 2.6.5 [list thread_load $dir]
     package ifneeded Ttrace 2.6.5 [list thread_source $dir]
     proc thread_load {dir} {
-        load [file join $dir thread265.dll]
+        load [file join $dir thread26.dll]
         rename thread_load {}
     }
     proc thread_source {dir} {

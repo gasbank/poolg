@@ -10,43 +10,35 @@ int loc = 0;
 
 void MenuState::select(int move)
 {
-	switch( loc )
+
+	if ( loc == 0)
 	{
-	case 0:
+		if ( move == 9 )
 		{
-			if(move == 9)
-			{
-			
-				pos -= 35.0f;
-				loc += 1;
-			}
+			pos -= 35.0f;
+			loc += 1;
 		}
-		break;
-
-	case 1:
+	}
+	else if ( loc == 1 || loc == 2 || loc == 3 )
+	{
+		if (move == 8)
 		{
-			if(move == 8)
-			{
-				pos += 35.0f;
-				loc -= 1;
-			}
-			if(move == 9)
-			{
-				pos -= 35.0f;
-				loc += 1;
-			}
+			pos += 35.0f;
+			loc -= 1;
 		}
-		break;
-
-	case 2:
+		if (move == 9)
 		{
-			if(move == 8)
-			{
-				pos += 35.0f;
-				loc -= 1;
-			}
+			pos -= 35.0f;
+			loc += 1;
 		}
-		break;
+	}
+	else if ( loc == 4 )
+	{
+		if (move == 8)
+		{
+			pos += 35.0f;
+			loc -= 1;
+		}
 	}
 }
 
@@ -57,6 +49,9 @@ HRESULT MenuState::frameMove(double fTime, float fElapsedTime)
 	m_menu.frameMove(fElapsedTime);
 	m_selc.frameMove(fElapsedTime);
 	m_dae.frameMove(fElapsedTime);
+	
+	m_stdb.frameMove(fElapsedTime);
+	m_sadb.frameMove(fElapsedTime);
 	
 	m_selc.setPosition(m_selc.getPos()->x, pos, m_selc.getPos()->z);
 
@@ -86,6 +81,15 @@ HRESULT MenuState::frameRender(IDirect3DDevice9* pd3dDevice,  double fTime, floa
 	m_menu.draw();
 	m_selc.draw();
 	m_dae.draw();
+	
+	if ( loc == 0)
+	{
+		m_stdb.draw();
+	}
+	if ( loc == 1 )
+	{
+		m_sadb.draw();
+	}
 
 	return S_OK;
 	
@@ -119,6 +123,9 @@ HRESULT MenuState::release()
 	m_selc.release();
 	m_dae.release();
 
+	m_stdb.release();
+	m_sadb.release();
+
 	SAFE_RELEASE( m_lblHYnamL );
 	SAFE_RELEASE( m_lblREB);
 
@@ -148,8 +155,16 @@ MenuState::MenuState()
 	m_selc.setSizeToTexture();
 
 	m_dae.init(L"dae-sa.png", m_pDev);
-	m_dae.setPosition (0, -50, 2.8f);
+	m_dae.setPosition (-50, -50, 2.8f);
 	m_dae.setSizeToTexture();
+	
+	m_stdb.init(L"status_down_button.png", m_pDev);
+	m_stdb.setPosition (198, 143, 2.7f);
+	m_stdb.setSize(184, 44);
+
+	m_sadb.init(L"save_down_button.png", m_pDev);
+	m_sadb.setPosition (198, 91, 2.7f);
+	m_sadb.setSize(184, 44);
 
 	V( D3DXCreateFont(m_pDev, 17, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblHYnamL) );
 	V( D3DXCreateFont(m_pDev, 18, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Rockwell Extra Bold"), &m_lblREB) );

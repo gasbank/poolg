@@ -3,6 +3,7 @@
 #include "WorldStateManager.h"
 #include "BattleState.h"
 #include "ScriptManager.h"
+#include "Dialog.h"
 
 WorldStateManager worldStateManager;
 
@@ -55,6 +56,7 @@ HRESULT WorldState::enter()
 	m_avatar.setSize(1, 1);
 
 	m_sound.init();
+	m_dialog.init();
 
 	// Create vertex shader
 	WCHAR strPath[512];
@@ -166,6 +168,9 @@ HRESULT WorldState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, floa
 	WorldStateManager& wsm = WorldStateManager::getSingleton();
 	wsm.getCurState()->frameRender(pd3dDevice, fTime, fElapsedTime);
 
+	if( m_dialog.OK )
+		m_dialog.print(L"이건 테스트다!");
+
 	return S_OK;
 }
 
@@ -236,6 +241,7 @@ HRESULT WorldState::release()
 	m_picSmiley.release();
 	m_avatar.release();
 	m_sound.release();
+	m_dialog.release();
 	
 	if (m_afd)
 		release_arnfile(*m_afd);
@@ -276,6 +282,10 @@ HRESULT WorldState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 		if (wParam == VK_F5)
 		{
 			WorldStateManager::getSingleton().setNextState(GAME_WORLD_STATE_MENU);
+		}
+		if (wParam == VK_SPACE)
+		{
+			m_dialog.Toggle();
 		}
 
 	}

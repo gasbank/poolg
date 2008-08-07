@@ -9,6 +9,7 @@
 #include "Unit.h"
 #include "VideoMan.h"
 #include "Character.h"
+#include "Dialog.h"
 
 typedef std::set<Unit*> UnitSet;
 
@@ -45,6 +46,7 @@ private:
 	Picture							m_picSmiley;
 	Picture							m_avatar;
 	Sound							m_sound;
+	Dialog							m_dialog;
 
 	LPDIRECT3DVERTEXSHADER9         m_pVertexShader;
 	LPD3DXCONSTANTTABLE             m_pConstantTable;

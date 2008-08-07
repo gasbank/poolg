@@ -56,6 +56,7 @@ HRESULT MenuState::frameMove(double fTime, float fElapsedTime)
 {
 	m_menu.frameMove(fElapsedTime);
 	m_selc.frameMove(fElapsedTime);
+	m_dae.frameMove(fElapsedTime);
 	
 	m_selc.setPosition(m_selc.getPos()->x, pos, m_selc.getPos()->z);
 
@@ -84,6 +85,7 @@ HRESULT MenuState::frameRender(IDirect3DDevice9* pd3dDevice,  double fTime, floa
 
 	m_menu.draw();
 	m_selc.draw();
+	m_dae.draw();
 
 	return S_OK;
 	
@@ -115,6 +117,7 @@ HRESULT MenuState::release()
 {
 	m_menu.release();
 	m_selc.release();
+	m_dae.release();
 
 	SAFE_RELEASE( m_lblHYnamL );
 	SAFE_RELEASE( m_lblREB);
@@ -129,20 +132,24 @@ MenuState::MenuState()
 	float scrWidth = (float)GetG().m_scrWidth;
 	float scrHeight = (float)GetG().m_scrHeight;
 
-	float menuBoxWidth = 158;
-	float menuBoxHeight = 127;
+	float menuBoxWidth = 200;
+	float menuBoxHeight = 300;
 
 	float menuBoxPositionX = (float)scrWidth/2 - menuBoxWidth - 10;
-	float menuBoxPositionY = (float)scrHeight/2 - menuBoxHeight - 70;
-	m_menu.init(L"menu.png", m_pDev);
+	float menuBoxPositionY = (float)scrHeight/2 - menuBoxHeight - 8;
+	m_menu.init(L"example_menu_window.png", m_pDev);
 	m_menu.setPosition (menuBoxPositionX, menuBoxPositionY, 3.0f);
-	m_menu.setSizeToTexture();
+	m_menu.setSize(200, 300);
 
 	float trianglePositionX = (float)scrWidth/2 - menuBoxWidth + 7;
 	float triangleBoxPositionY = (float)scrHeight/2 - menuBoxWidth + pos;
 	m_selc.init(L"triangle.png", m_pDev);
 	m_selc.setPosition (trianglePositionX, triangleBoxPositionY, 2.9f);
 	m_selc.setSizeToTexture();
+
+	m_dae.init(L"dae-sa.png", m_pDev);
+	m_dae.setPosition (0, -50, 2.8f);
+	m_dae.setSizeToTexture();
 
 	V( D3DXCreateFont(m_pDev, 17, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblHYnamL) );
 	V( D3DXCreateFont(m_pDev, 18, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Rockwell Extra Bold"), &m_lblREB) );

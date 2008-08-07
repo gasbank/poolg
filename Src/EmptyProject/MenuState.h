@@ -27,4 +27,5 @@ private:
 
 	Box m_menu;
 	Box m_selc;
+	Box m_dae;
 };

@@ -159,7 +159,7 @@ HRESULT Sound::init()
     // Note that if the cue does not exist in the sound bank, the index will be XACTINDEX_INVALID
     // however this is ok especially during development.  The Play or Prepare call will just fail.
     audioState.iSE = audioState.pSoundBank->GetCueIndex( "se" );
-	for( int i = 0; i < 4; i++ )
+	for( int i = 0; i < 2; i++ )
     {
         CHAR sz[256];
         StringCchPrintfA( sz, 256, "song%d", i + 1 );

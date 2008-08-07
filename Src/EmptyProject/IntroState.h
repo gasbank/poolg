@@ -2,6 +2,7 @@
 
 #include "State.h"
 #include "Picture.h"
+#include "Sound.h" // 사운드 헤더파일
 
 #define NUM_OF_LINES 20
 
@@ -20,6 +21,8 @@ public:
 	virtual HRESULT handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	virtual HRESULT release();
+
+	Sound	m_sound; // 사운드 변수
 	
 private:
 

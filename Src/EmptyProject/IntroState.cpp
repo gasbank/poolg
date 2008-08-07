@@ -89,6 +89,8 @@ HRESULT IntroState::enter()
 	// Setup light and camera
 	setupLight();
 	setupCamera();
+
+	m_sound.init(); // 사운드 초기화
 	
 	return S_OK;
 }
@@ -135,6 +137,7 @@ HRESULT IntroState::frameMove( double fTime, float fElapsedTime )
 		D3DXVECTOR3 vAxis(0.0f, 0.0f, -1.0f );
 		D3DXMatrixRotationAxis( &m_matBackground, &vAxis, D3DXToRadian( (FLOAT) fStateTime ) );
 
+		m_sound.Opening(); // 오프닝 사운드 시작
 		// Add some translational values to the matrices
 		for (int i = 0; i < NUM_OF_LINES; i++)
 		{

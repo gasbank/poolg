@@ -165,6 +165,7 @@ HRESULT Sound::init()
         StringCchPrintfA( sz, 256, "song%d", i + 1 );
         audioState.iSong[i] = audioState.pSoundBank->GetCueIndex( sz );
     }
+	audioState.iOpening = audioState.pSoundBank->GetCueIndex( "opening" );
 
     return S_OK;
 }
@@ -339,4 +340,31 @@ void Sound::UpdateAudio()
         audioState.pEngine->DoWork();
 
 	Sleep( 10 ); // Yield CPU time to other apps.  Note that this is not normally needed when rendering
+}
+
+void Sound::Opening()
+{
+    EnterCriticalSection( &audioState.cs );
+    bool bHandleStreamingWaveBankPrepared = audioState.bHandleStreamingWaveBankPrepared;
+    LeaveCriticalSection( &audioState.cs );
+
+    if( bHandleStreamingWaveBankPrepared )
+    {
+        EnterCriticalSection( &audioState.cs );
+        audioState.bHandleStreamingWaveBankPrepared = false;
+        LeaveCriticalSection( &audioState.cs );
+
+        // Starting playing background music after the streaming wave bank 
+        // has been prepared but no sooner.  The background music does not need to be 
+        // zero-latency so the cues do not need to be prepared first 
+		audioState.pSoundBank->Play( audioState.iOpening, 0, 0, NULL );
+    }
+
+    // It is important to allow XACT to do periodic work by calling pEngine->DoWork().  
+    // However this must function be call often enough.  If you call it too infrequently, 
+    // streaming will suffer and resources will not be managed promptly.  On the other hand 
+    // if you call it too frequently, it will negatively affect performance. Calling it once 
+    // per frame is usually a good balance.
+    if( audioState.pEngine )
+        audioState.pEngine->DoWork();
 }

@@ -5,7 +5,8 @@
 struct AUDIO_STATE
 {
 	XACTINDEX iSE;
-    XACTINDEX iSong[4];
+    XACTINDEX iSong[2];
+	XACTINDEX iOpening;
 
     IXACT3Engine* pEngine;
 	IXACT3WaveBank* pInMemoryWaveBank;
@@ -34,6 +35,7 @@ public:
 	LRESULT handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 	void release();
 	void UpdateAudio();
+	void Opening();
 
 private:
 	HRESULT hr;

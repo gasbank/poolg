@@ -214,6 +214,15 @@ HRESULT WorldState::frameMove(double fTime, float fElapsedTime)
 	WorldStateManager::getSingleton().transit();
 	WorldStateManager::getSingleton().getCurState()->frameMove(fTime, fElapsedTime);
 
+	// Detect collision always.
+	it = m_unitSet.begin();
+	for ( ; it != m_unitSet.end(); ++it )
+	{
+		if ( (*it) != m_heroUnit )
+			if ( isCollide( &m_heroUnit->getPos(), &(*it)->getPos() ) == true )
+				handleCollision( m_heroUnit, (*it) );
+	}
+
 	return S_OK;
 }
 
@@ -258,14 +267,6 @@ HRESULT WorldState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 
 	if (uMsg == WM_KEYDOWN)
 	{
-		// Detect collision when any key down.
-		it = m_unitSet.begin();
-		for ( ; it != m_unitSet.end(); ++it )
-		{
-			if ( (*it) != m_heroUnit )
-				if ( isCollide( &m_heroUnit->getPos(), &(*it)->getPos() ) == true )
-					handleCollision( m_heroUnit, (*it) );
-		}
 
 		if (wParam == VK_F4)
 		{

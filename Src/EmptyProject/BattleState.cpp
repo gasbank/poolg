@@ -210,30 +210,20 @@ HRESULT BattleState::frameMove(double fTime, float fElapsedTime)
 
 		EpCamera& camera = G::getSingleton().m_camera;
 
-		D3DXVECTOR3 vecEye( battlePos.x - 10.0f, battlePos.y - 10.0f, battlePos.z - 10.0f );
+		D3DXVECTOR3 vecEye( battlePos.x + 10.0f, battlePos.y - 10.0f, battlePos.z - 10.0f );
 		D3DXVECTOR3 vecAt( battlePos );
 		D3DXVECTOR3 vecAxis = vecAt - vecEye;
 
-		D3DXQUATERNION viewQuot;
-		float theta = (float)fStateTime;
+		D3DXVec3Normalize( &vecAxis, &vecAxis );
+		//camera.SetModelCenter( battlePos );
+		//camera.SetAttachCameraToModel(true);
+		D3DXVECTOR3 upVecNew3;
+		upVecNew3.x = 0;
+		upVecNew3.y = 0;
+		upVecNew3.z = -1.0f;
+		D3DXVec3Normalize( &upVecNew3, &upVecNew3 );
 
-		vecAxis.x = vecAxis.x / sqrt(vecAxis.x * vecAxis.x + vecAxis.y * vecAxis.y + vecAxis.z * vecAxis.z);
-		vecAxis.y = vecAxis.y / sqrt(vecAxis.x * vecAxis.x + vecAxis.y * vecAxis.y + vecAxis.z * vecAxis.z);
-		vecAxis.z = vecAxis.z / sqrt(vecAxis.x * vecAxis.x + vecAxis.y * vecAxis.y + vecAxis.z * vecAxis.z);
-
-		viewQuot.x = sin( theta / 2.0f ) * vecAxis.x;
-		viewQuot.y = sin( theta / 2.0f ) * vecAxis.y;
-		viewQuot.z = sin( theta / 2.0f ) * vecAxis.z;
-		viewQuot.w = cos( theta / 2.0f );
-		
-		camera.SetModelCenter( battlePos );
-		camera.SetAttachCameraToModel(true);
-	
-		if (fStateTime < 5.0f)
-			camera.SetViewParams( &vecEye, &vecAt );
-
-		camera.SetViewQuat( viewQuot );
-		camera.SetRadius( 30.0f );		
+		camera.SetViewParamsWithUp( &vecEye, &vecAt, upVecNew3 );
 	}
 
 	return S_OK;

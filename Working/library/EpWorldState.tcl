@@ -18,7 +18,7 @@ namespace eval EpWorldState {
 		variable pHeroUnit
 		variable pWorld
 		
-		set pHeroUnit			[EpCreateUnit 3 4 1];
+		set pHeroUnit			[EpCreateUnit 0 0 1];
 		set curUnitCount		[EpRegisterToWorld $pWorld $pHeroUnit];
 		
 		EpUnitSetRotX $pHeroUnit [ToRadian -90]

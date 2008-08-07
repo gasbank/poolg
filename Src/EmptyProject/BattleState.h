@@ -51,4 +51,6 @@ private:
 	
 	LPDIRECT3DDEVICE9	m_pDev;
 	D3DXVECTOR3		m_vWorldEye;
+	D3DXVECTOR3		m_vWorldLookAt;
+
 };

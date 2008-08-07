@@ -111,6 +111,7 @@ HRESULT BattleState::enter()
 {
 	EpCamera& camera = G::getSingleton().m_camera;
 	m_vWorldEye = *camera.GetEyePt();
+	m_vWorldLookAt = *camera.GetLookAtPt();
 
 	return S_OK;
 }
@@ -226,9 +227,10 @@ HRESULT BattleState::frameMove(double fTime, float fElapsedTime)
 
 		const D3DXVECTOR3 vWorldUp( 0.0f, 1.0f, 0.0f );
 		const D3DXVECTOR3 vUp( 0.0f, 0.0f, -1.0f );
-		D3DXVECTOR3 vCurUp;
-
+		D3DXVECTOR3 vCurUp(0, 1, 0);
+		
 		D3DXVec3Lerp( &vCurUp, &vWorldUp, &vUp, (float)fStateTime );
+		D3DXVec3Lerp( &vLookAt, &m_vWorldLookAt, &vBattlePos, (float)fStateTime);
 
 		camera.SetViewParamsWithUp( &vCurEye, &vLookAt, vCurUp );
 	}

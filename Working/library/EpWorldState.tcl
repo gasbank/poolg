@@ -56,4 +56,9 @@ namespace eval EpWorldState {
 		EpReleaseUnit $pEnemyUnit1
 		EpReleaseUnit $pEnemyUnit2
 	}
+
+
+	proc printDialogText {} {
+		EpWriteDialog "ÇÑ±ÛÁ«¶óarlsdgklgtulsdu;asjd;tjhklsaerlushldfhlzxcvhxhjzvbkjzxcfjha;srhqwieutpuiwetp;oiweoptyiisauhljkdflkhzx"
+	}
 }

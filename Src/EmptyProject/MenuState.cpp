@@ -48,7 +48,6 @@ HRESULT MenuState::frameMove(double fTime, float fElapsedTime)
 {
 	m_menu.frameMove(fElapsedTime);
 	m_selc.frameMove(fElapsedTime);
-	m_dae.frameMove(fElapsedTime);
 	
 	m_stdb.frameMove(fElapsedTime);
 	m_sadb.frameMove(fElapsedTime);
@@ -91,7 +90,6 @@ HRESULT MenuState::frameRender(IDirect3DDevice9* pd3dDevice,  double fTime, floa
 		m_sadb.draw();
 	}
 
-	m_dae.draw();
 	m_pDev->SetRenderState(D3DRS_ZENABLE, TRUE);
 	return S_OK;
 	
@@ -123,7 +121,6 @@ HRESULT MenuState::release()
 {
 	m_menu.release();
 	m_selc.release();
-	m_dae.release();
 
 	m_stdb.release();
 	m_sadb.release();
@@ -156,10 +153,6 @@ MenuState::MenuState()
 	m_selc.setPosition (trianglePositionX, triangleBoxPositionY, 2.9f);
 	m_selc.setSizeToTexture();
 
-	m_dae.init(L"dae-sa.png", m_pDev);
-	m_dae.setPosition (-50, -50, 2.8f);
-	m_dae.setSizeToTexture();
-	
 	m_stdb.init(L"status_down_button.png", m_pDev);
 	m_stdb.setPosition (198, 143, 2.7f);
 	m_stdb.setSize(184, 44);

@@ -155,6 +155,7 @@ HRESULT WorldState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, floa
 
 	// Draw floor gray tile (2D)
 	//g_pic.draw();
+	
 
 	D3DXMATRIX transform;
 	D3DXMatrixIdentity(&transform);
@@ -167,9 +168,7 @@ HRESULT WorldState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, floa
 
 	WorldStateManager& wsm = WorldStateManager::getSingleton();
 	wsm.getCurState()->frameRender(pd3dDevice, fTime, fElapsedTime);
-
-	if( m_dialog.OK )
-		m_dialog.print(L"이건 테스트다!");
+	m_dialog.frameRender(pd3dDevice, fTime, fElapsedTime);
 
 	return S_OK;
 }
@@ -202,6 +201,7 @@ HRESULT WorldState::frameMove(double fTime, float fElapsedTime)
 	m_avatar.frameMove(fElapsedTime);
 	camera.FrameMove(fElapsedTime);
 	m_sound.UpdateAudio();
+	m_dialog.frameMove(fTime, fElapsedTime);
 	//m_heroUnit->frameMove(fElapsedTime);
 
 	UnitSet::iterator it = m_unitSet.begin();
@@ -261,6 +261,7 @@ HRESULT WorldState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 {
 	m_pic.handleMessages(hWnd, uMsg, wParam, lParam);
 	m_sound.handleMessages(hWnd, uMsg, wParam, lParam);
+	m_dialog.handleMessages(hWnd, uMsg, wParam, lParam);
 	//m_heroUnit->handleMessages(hWnd, uMsg, wParam, lParam);
 
 	UnitSet::iterator it = m_unitSet.begin();
@@ -283,11 +284,6 @@ HRESULT WorldState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 		{
 			WorldStateManager::getSingleton().setNextState(GAME_WORLD_STATE_MENU);
 		}
-		if (wParam == VK_SPACE)
-		{
-			m_dialog.Toggle();
-		}
-
 	}
 
 	WorldStateManager::getSingleton().getCurState()->handleMessages(hWnd, uMsg, wParam, lParam);

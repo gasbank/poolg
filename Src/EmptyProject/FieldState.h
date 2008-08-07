@@ -17,4 +17,8 @@ public:
 	virtual HRESULT handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	virtual HRESULT release();
+
+private:
+	D3DXVECTOR3 m_vPrevEye;
+	D3DXVECTOR3 m_vPrevLookAt;
 };

@@ -15,6 +15,18 @@ namespace eval EpWorldState {
 		
 		set pWorld				$pCurWorld;
 		
+		thread::create {
+			puts "xxx"
+			variable cx 0
+			proc passTheTime { } {
+				variable cx
+				puts "cx: $cx\n"
+				incr cx
+				after 1000 passTheTime
+			}
+ 			passTheTime
+			vwait forever
+		}
 	}
 
 	proc enter {} {

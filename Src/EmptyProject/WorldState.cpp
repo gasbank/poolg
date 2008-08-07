@@ -251,11 +251,22 @@ HRESULT WorldState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 	for ( ; it != m_unitSet.end(); ++it )
 	{
 		if ((*it)->getControllable())
+		{
 			(*it)->handleMessages(hWnd, uMsg, wParam, lParam);
+		}
 	}
 
 	if (uMsg == WM_KEYDOWN)
 	{
+		// Detect collision when any key down.
+		it = m_unitSet.begin();
+		for ( ; it != m_unitSet.end(); ++it )
+		{
+			if ( (*it) != m_heroUnit )
+				if ( isCollide( &m_heroUnit->getPos(), &(*it)->getPos() ) == true )
+					handleCollision( m_heroUnit, (*it) );
+		}
+
 		if (wParam == VK_F4)
 		{
 
@@ -319,11 +330,26 @@ void WorldState::detachAllUnits()
 }
 const D3DXVECTOR3& WorldState::getEnemyPos()
 {
-	return m_heroUnit->getPos();
+	UnitSet::iterator it = m_unitSet.begin();
+	it++;
+	return (*it)->getPos();
 }
 
 const D3DXVECTOR3& WorldState::getHeroPos()
 {
 	return m_heroUnit->getPos();
+}
 
+bool WorldState::isCollide( const D3DXVECTOR3* vec0, const D3DXVECTOR3* vec1 )
+{
+	if ( -5.0 <= (vec0->x - vec1->x) && (vec0->x - vec1->x) <= 5.0 )
+		if ( -5.0 <= (vec0->y - vec1->y) && (vec0->y - vec1->y) <= 5.0 )
+				return true;
+
+	return false;
+}
+
+void WorldState::handleCollision( Unit* heroUnit, Unit* enemyUnit )
+{
+	WorldStateManager::getSingleton().setNextState(GAME_WORLD_STATE_BATTLE);
 }

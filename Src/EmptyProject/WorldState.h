@@ -35,6 +35,8 @@ public:
 
 private:
 	void setupLight();
+	bool isCollide( const D3DXVECTOR3* vec0, const D3DXVECTOR3* vec1 );
+	void handleCollision( Unit* heroUnit, Unit* enemyUnit );
 
 	ArnFileData*					m_afd;
 	ArnSceneGraph*					m_sg;

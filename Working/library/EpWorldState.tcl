@@ -6,11 +6,13 @@ namespace eval EpWorldState {
 
 	variable pWorld			0
 	variable pHeroUnit		0
+	variable pEnemyUnit		1
 	
 	proc init {pCurWorld} {
 		EpOutputDebugString " - WorldState init Ptr: $pCurWorld\n"
 		
 		variable pHeroUnit
+		variable pEnemyUnit
 		variable pWorld
 		
 		set pWorld				$pCurWorld;
@@ -33,10 +35,13 @@ namespace eval EpWorldState {
 		EpOutputDebugString " - WorldState enter\n"
 		
 		variable pHeroUnit
+		variable pEnemyUnit		
 		variable pWorld
 		
 		set pHeroUnit			[EpCreateUnit 0 0 1];
+		set pEnemyUnit			[EpCreateUnit 5 0 0];
 		set curUnitCount		[EpRegisterToWorld $pWorld $pHeroUnit];
+		set curUnitCount		[EpRegisterToWorld $pWorld $pEnemyUnit];
 		
 		EpUnitSetRotX $pHeroUnit [ToRadian -90]
 		EpUnitSetRotZ $pHeroUnit [ToRadian 90]
@@ -49,6 +54,7 @@ namespace eval EpWorldState {
 		EpOutputDebugString " - WorldState leave\n"
 		
 		EpReleaseUnit $pHeroUnit
+		EpReleaseUnit $pEnemyUnit
 	}
 
 }

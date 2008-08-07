@@ -38,29 +38,33 @@ HRESULT FieldState::frameMove( double fTime, float fElapsedTime )
 {
 	float fStateTime = (float)getStateTime(fTime);
 
+	EpCamera& camera = G::getSingleton().m_camera;
+
+	// Get hero position
+	TopStateManager& tsm = TopStateManager::getSingleton();
+	WorldState* ws = static_cast<WorldState*>( tsm.getCurState() );
+	const D3DXVECTOR3& vHeroPos = ws->getHeroPos();
+
+	// Setup camera position.
+	D3DXVECTOR3 vEye( vHeroPos.x, vHeroPos.y, vHeroPos.z - 30.0f );
+	D3DXVECTOR3 vLookAt( vHeroPos );
+	const D3DXVECTOR3 vUp( 0.0f, 1.0f, 0.0f );
+
 	if (fStateTime < 1.0f)
 	{
-		TopStateManager& tsm = TopStateManager::getSingleton();
-		WorldState* ws = static_cast<WorldState*>( tsm.getCurState() );
-		const D3DXVECTOR3& vHeroPos = ws->getHeroPos();
-
-		EpCamera& camera = G::getSingleton().m_camera;
-
-		D3DXVECTOR3 vLookEye( 0.0f, 0.0f, -30.0f );
-		D3DXVECTOR3 vLookAt( vHeroPos );
-		const D3DXVECTOR3 vUp( 0.0f, 1.0f, 0.0f );
-
 		D3DXVECTOR3 vPrevUp( 0.0f, 0.0f, -1.0f );
 
 		D3DXVECTOR3 vCurEye;
 		D3DXVECTOR3 vCurLookAt;
 		D3DXVECTOR3 vCurUp;
 
-		D3DXVec3Lerp( &vCurEye, &m_vPrevEye, &vLookEye, fStateTime );
+		D3DXVec3Lerp( &vCurEye, &m_vPrevEye, &vEye, fStateTime );
 		D3DXVec3Lerp( &vCurLookAt, &m_vPrevLookAt, &vLookAt, fStateTime );
 		D3DXVec3Lerp( &vCurUp, &vPrevUp, &vUp, fStateTime );
 
 		camera.SetViewParamsWithUp( &vCurEye, &vCurLookAt, vCurUp );
+	} else {
+		camera.SetViewParamsWithUp( &vEye, &vLookAt, vUp );
 	}
 
 	return S_OK;

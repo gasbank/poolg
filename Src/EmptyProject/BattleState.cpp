@@ -201,7 +201,13 @@ HRESULT BattleState::frameMove(double fTime, float fElapsedTime)
 	{
 		TopStateManager& tsm = TopStateManager::getSingleton();
 		WorldState* ws = static_cast<WorldState*>( tsm.getCurState() );
-		const D3DXVECTOR3& vBattlePos = ws->getBattlePos();
+		const D3DXVECTOR3& vEnemyPos = ws->getEnemyPos();
+		const D3DXVECTOR3& vHeroPos = ws->getHeroPos();
+
+		D3DXVECTOR3 vBattlePos;
+		vBattlePos.x = (vEnemyPos.x + vHeroPos.x) / 2.0f;
+		vBattlePos.y = (vEnemyPos.y + vHeroPos.y) / 2.0f;
+		vBattlePos.z = (vEnemyPos.x + vHeroPos.z) / 2.0f;
 
 		EpCamera& camera = G::getSingleton().m_camera;
 
@@ -209,8 +215,8 @@ HRESULT BattleState::frameMove(double fTime, float fElapsedTime)
 		D3DXVECTOR3 vLookAt( vBattlePos );
 		D3DXVECTOR3 vEye0( m_vWorldEye );
 		D3DXVECTOR3 vEye1( m_vWorldEye.x - 10.0f, m_vWorldEye.y - 10.0f, m_vWorldEye.z -15.0f );		
-		D3DXVECTOR3 vEye2( vBattlePos.x - 10.0f, vBattlePos.y + 10.0f, vBattlePos.z - 10.0f );
-		D3DXVECTOR3 vEye3( vBattlePos.x + 10.0f, vBattlePos.y - 10.0f, vBattlePos.z - 5.0f );
+		D3DXVECTOR3 vEye2( vBattlePos.x - 5.0f, vBattlePos.y + 5.0f, vBattlePos.z - 10.0f );
+		D3DXVECTOR3 vEye3( vBattlePos.x + 5.0f, vBattlePos.y - 5.0f, vBattlePos.z - 5.0f );
 		
 		
 

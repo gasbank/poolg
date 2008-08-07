@@ -317,7 +317,7 @@ void WorldState::detachAllUnits()
 	}
 	m_unitSet.clear();
 }
-const D3DXVECTOR3& WorldState::getBattlePos()
+const D3DXVECTOR3& WorldState::getEnemyPos()
 {
 	return m_heroUnit->getPos();
 }

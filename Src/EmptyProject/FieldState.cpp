@@ -50,7 +50,7 @@ HRESULT FieldState::frameMove( double fTime, float fElapsedTime )
 	D3DXVECTOR3 vLookAt( vHeroPos );
 	const D3DXVECTOR3 vUp( 0.0f, 1.0f, 0.0f );
 
-	if (fStateTime < 1.0f)
+	if (fStateTime < 1.0f && WorldStateManager::getSingleton().prevStateEnum() == GAME_WORLD_STATE_BATTLE)
 	{
 		D3DXVECTOR3 vPrevUp( 0.0f, 0.0f, -1.0f );
 

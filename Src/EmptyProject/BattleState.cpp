@@ -204,7 +204,7 @@ HRESULT BattleState::frameMove(double fTime, float fElapsedTime)
 	if ( ws->isCollide( &vEnemyPos, &vHeroPos ) == false )
 		WorldStateManager::getSingleton().setNextState(GAME_WORLD_STATE_FIELD);
 
-	if (fStateTime < 1.0f)
+	if (fStateTime < 1.0f && WorldStateManager::getSingleton().prevStateEnum() == GAME_WORLD_STATE_FIELD)
 	{
 		D3DXVECTOR3 vBattlePos;
 		vBattlePos.x = (vEnemyPos.x + vHeroPos.x) / 2.0f;

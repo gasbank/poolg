@@ -31,6 +31,7 @@ public:
 	UINT addUnit(Unit* u);
 	void detachAllUnits();
 	const D3DXVECTOR3& getBattlePos();
+	const D3DXVECTOR3& getHeroPos();
 
 private:
 	void setupLight();

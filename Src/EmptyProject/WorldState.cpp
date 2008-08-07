@@ -321,3 +321,9 @@ const D3DXVECTOR3& WorldState::getBattlePos()
 {
 	return m_heroUnit->getPos();
 }
+
+const D3DXVECTOR3& WorldState::getHeroPos()
+{
+	return m_heroUnit->getPos();
+
+}

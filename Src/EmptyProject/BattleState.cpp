@@ -215,8 +215,8 @@ HRESULT BattleState::frameMove(double fTime, float fElapsedTime)
 
 		D3DXVECTOR3 vCurEye;
 		D3DXVECTOR3 vLookAt( vBattlePos );
-		D3DXVECTOR3 vEye0( m_vWorldEye );
-		D3DXVECTOR3 vEye1( m_vWorldEye.x - 10.0f, m_vWorldEye.y - 10.0f, m_vWorldEye.z -15.0f );		
+		D3DXVECTOR3 vEye0( m_vWorldEye.x + 10.0f, m_vWorldEye.y + 10.0f, m_vWorldEye.z - 10.0f );
+		D3DXVECTOR3 vEye1( m_vWorldEye );		
 		D3DXVECTOR3 vEye2( vBattlePos.x - 5.0f, vBattlePos.y + 5.0f, vBattlePos.z - 10.0f );
 		D3DXVECTOR3 vEye3( vBattlePos.x + 5.0f, vBattlePos.y - 5.0f, vBattlePos.z - 5.0f );
 		
@@ -224,9 +224,13 @@ HRESULT BattleState::frameMove(double fTime, float fElapsedTime)
 
 		D3DXVec3CatmullRom( &vCurEye, &vEye0, &vEye1, &vEye2, &vEye3, (FLOAT)fStateTime );
 
+		const D3DXVECTOR3 vWorldUp( 0.0f, 1.0f, 0.0f );
 		const D3DXVECTOR3 vUp( 0.0f, 0.0f, -1.0f );
+		D3DXVECTOR3 vCurUp;
 
-		camera.SetViewParamsWithUp( &vCurEye, &vLookAt, vUp );
+		D3DXVec3Lerp( &vCurUp, &vWorldUp, &vUp, (float)fStateTime );
+
+		camera.SetViewParamsWithUp( &vCurEye, &vLookAt, vCurUp );
 	}
 
 	return S_OK;

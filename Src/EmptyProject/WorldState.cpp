@@ -359,5 +359,6 @@ bool WorldState::isCollide( const D3DXVECTOR3* vec0, const D3DXVECTOR3* vec1 )
 void WorldState::handleCollision( Unit* heroUnit, Unit* enemyUnit )
 {
 	m_curEnemyUnit = enemyUnit;
-	WorldStateManager::getSingleton().setNextState(GAME_WORLD_STATE_BATTLE);
+	if ( WorldStateManager::getSingleton().curStateEnum() == GAME_WORLD_STATE_FIELD )
+		WorldStateManager::getSingleton().setNextState(GAME_WORLD_STATE_BATTLE);
 }

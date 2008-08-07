@@ -55,3 +55,14 @@ void WorldStateManager::setNextState(GameState state)
 	if (m_curStates == m_nextState)
 		m_nextState = 0;
 }
+
+GameState WorldStateManager::curStateEnum()
+{
+	if (m_curStates == m_states[0])
+		return GAME_WORLD_STATE_FIELD;
+	else if (m_curStates == m_states[1])
+		return GAME_WORLD_STATE_BATTLE;
+	else if (m_curStates == m_states[2])
+		return GAME_WORLD_STATE_MENU;
+	return GAME_WORLD_STATE_FIELD;
+}

@@ -230,7 +230,7 @@ HRESULT BattleState::frameMove(double fTime, float fElapsedTime)
 }
 
 HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-{	
+{
 	m_hpBarPlayer.handleMessages(hWnd, uMsg, wParam, lParam);
 	m_mpBarPlayer.handleMessages(hWnd, uMsg, wParam, lParam);
 	m_expBarPlayer.handleMessages(hWnd, uMsg, wParam, lParam);

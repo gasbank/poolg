@@ -196,14 +196,16 @@ HRESULT BattleState::frameMove(double fTime, float fElapsedTime)
 	//m_Player.frameMove(fElapsedTime);
 	//m_Enemy.frameMove(fElapsedTime);
 
+	TopStateManager& tsm = TopStateManager::getSingleton();
+	WorldState* ws = static_cast<WorldState*>( tsm.getCurState() );
+	const D3DXVECTOR3& vEnemyPos = ws->getEnemyPos();
+	const D3DXVECTOR3& vHeroPos = ws->getHeroPos();
+
+	if ( ws->isCollide( &vEnemyPos, &vHeroPos ) == false )
+		WorldStateManager::getSingleton().setNextState(GAME_WORLD_STATE_FIELD);
 
 	if (fStateTime < 1.0f)
 	{
-		TopStateManager& tsm = TopStateManager::getSingleton();
-		WorldState* ws = static_cast<WorldState*>( tsm.getCurState() );
-		const D3DXVECTOR3& vEnemyPos = ws->getEnemyPos();
-		const D3DXVECTOR3& vHeroPos = ws->getHeroPos();
-
 		D3DXVECTOR3 vBattlePos;
 		vBattlePos.x = (vEnemyPos.x + vHeroPos.x) / 2.0f;
 		vBattlePos.y = (vEnemyPos.y + vHeroPos.y) / 2.0f;
@@ -225,7 +227,7 @@ HRESULT BattleState::frameMove(double fTime, float fElapsedTime)
 		const D3DXVECTOR3 vUp( 0.0f, 0.0f, -1.0f );
 
 		camera.SetViewParamsWithUp( &vCurEye, &vLookAt, vUp );
-	} 
+	}
 
 	return S_OK;
 }

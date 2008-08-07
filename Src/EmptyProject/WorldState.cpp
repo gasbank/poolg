@@ -17,6 +17,7 @@ WorldState::WorldState(void)
 	m_afd					= 0;
 	m_sg					= 0;
 	m_heroUnit				= 0;
+	m_curEnemyUnit			= 0;
 
 	char command[128];
 	StringCchPrintfA(command, 128, "EpWorldState::init 0x%p", this);
@@ -331,9 +332,14 @@ void WorldState::detachAllUnits()
 }
 const D3DXVECTOR3& WorldState::getEnemyPos()
 {
-	UnitSet::iterator it = m_unitSet.begin();
-	it++;
-	return (*it)->getPos();
+	if ( m_curEnemyUnit != NULL )
+	{
+		return m_curEnemyUnit->getPos();
+	} else {
+		UnitSet::iterator it = m_unitSet.begin();
+		it++;
+		return (*it)->getPos();
+	}
 }
 
 const D3DXVECTOR3& WorldState::getHeroPos()
@@ -352,11 +358,6 @@ bool WorldState::isCollide( const D3DXVECTOR3* vec0, const D3DXVECTOR3* vec1 )
 
 void WorldState::handleCollision( Unit* heroUnit, Unit* enemyUnit )
 {
-	static Unit* prevEnemyUnit;
-
-	if (prevEnemyUnit != enemyUnit)
-	{
-		WorldStateManager::getSingleton().setNextState(GAME_WORLD_STATE_BATTLE);
-		prevEnemyUnit = enemyUnit;
-	}
+	m_curEnemyUnit = enemyUnit;
+	WorldStateManager::getSingleton().setNextState(GAME_WORLD_STATE_BATTLE);
 }

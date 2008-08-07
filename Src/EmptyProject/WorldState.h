@@ -32,10 +32,10 @@ public:
 	void detachAllUnits();
 	const D3DXVECTOR3& getEnemyPos();
 	const D3DXVECTOR3& getHeroPos();
+	bool isCollide( const D3DXVECTOR3* vec0, const D3DXVECTOR3* vec1 );
 
 private:
 	void setupLight();
-	bool isCollide( const D3DXVECTOR3* vec0, const D3DXVECTOR3* vec1 );
 	void handleCollision( Unit* heroUnit, Unit* enemyUnit );
 
 	ArnFileData*					m_afd;
@@ -54,6 +54,7 @@ private:
 	float							m_sampleTeapotMeshRot;
 	LPD3DXMESH						m_aTile;
 	Unit*							m_heroUnit;
+	Unit*							m_curEnemyUnit;
 
 	double							m_startTime;
 

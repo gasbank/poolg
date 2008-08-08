@@ -4,14 +4,15 @@
 class Dialog
 {
 public:
-	bool OK;
-	
+	bool dlg_ON;
+	bool startTalk;
+	bool endTalk;
 
 	Dialog(void);
 	~Dialog(void);
 	HRESULT init();
 	HRESULT release();
-	void Toggle();
+	void Toggle(bool *OK);
 	void printDialog();
 	void printName();
 	void NextDialog();

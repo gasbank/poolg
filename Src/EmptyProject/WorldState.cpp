@@ -58,6 +58,13 @@ HRESULT WorldState::enter()
 	m_sound.init();
 	m_dialog.init();
 
+	abc.a.bottom = -5;
+	abc.a.left = -5;
+	abc.a.right = -3;
+	abc.a.top = -3;
+	abc.onetime = false;
+	abc.endless = true;
+
 	// Create vertex shader
 	WCHAR strPath[512];
 	LPD3DXBUFFER pCode;
@@ -228,7 +235,7 @@ HRESULT WorldState::frameMove(double fTime, float fElapsedTime)
 			if ( isCollide( &m_heroUnit->getPos(), &(*it)->getPos() ) == true )
 				handleCollision( m_heroUnit, (*it) );
 	}
-
+	
 	return S_OK;
 }
 
@@ -285,6 +292,31 @@ HRESULT WorldState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 			WorldStateManager::getSingleton().setNextState(GAME_WORLD_STATE_MENU);
 		}
 	}
+	if (uMsg == WM_KEYUP)
+	{
+		if (wParam == VK_RETURN)
+		{
+			if ( (m_heroUnit->getPos().x > (float)abc.a.left)&&(m_heroUnit->getPos().x < (float)abc.a.right) && (m_heroUnit->getPos().y > (float)abc.a.bottom)&&(m_heroUnit->getPos().y < (float)abc.a.top) )
+			{
+				if ( abc.onetime )
+				{
+					abc.onetime = false;
+					m_dialog.startTalk = true;
+					if ( !m_dialog.dlg_ON )
+						m_dialog.Toggle(&m_dialog.dlg_ON);
+				}
+				if ( !abc.onetime && !m_dialog.endTalk)
+				{
+					m_dialog.startTalk = true;
+					if ( !m_dialog.dlg_ON )
+						m_dialog.Toggle(&m_dialog.dlg_ON);
+				}
+				if ( m_dialog.endTalk )
+					m_dialog.Toggle(&m_dialog.endTalk);
+			}
+		}
+	}
+
 
 	WorldStateManager::getSingleton().getCurState()->handleMessages(hWnd, uMsg, wParam, lParam);
 

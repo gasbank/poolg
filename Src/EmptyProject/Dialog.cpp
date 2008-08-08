@@ -50,7 +50,9 @@ HRESULT Dialog::init()
 	bufferPointer = debugBuffer.begin();
 	namePointer = &nameBuffer;
 
-	OK = false;
+	dlg_ON = false;
+	startTalk = false;
+	endTalk = false;
 
 	V( D3DXCreateFont( GetG().m_dev, 12, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Gulim"), &pFont) );
 	V( D3DXCreateFont( GetG().m_dev, 12, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("msgothic"), &qFont) );
@@ -81,12 +83,12 @@ START_SCRIPT_FACTORY(Dialog)
 	CREATE_OBJ_COMMAND( EpWriteDialog )
 END_SCRIPT_FACTORY(Dialog)
 
-void Dialog::Toggle()
+void Dialog::Toggle(bool *OK)
 {
-	if(	OK == true )
-		OK = false;
+	if(	*OK == true )
+		*OK = false;
 	else
-		OK = true;
+		*OK = true;
 }
 
 HRESULT Dialog::frameMove(double fTime, float fElapsedTime)
@@ -119,7 +121,7 @@ HRESULT Dialog::frameRender(IDirect3DDevice9* pd3dDevice,  double fTime, float f
 
 	m_pDev->SetRenderState(D3DRS_ZENABLE, FALSE);
 	
-	if( OK )
+	if( dlg_ON )
 	{
 		dialog.draw();
 		name.draw();
@@ -141,7 +143,8 @@ HRESULT Dialog::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 		switch ( wParam )
 		{
 			case VK_SPACE:
-				Toggle();
+				Toggle(&dlg_ON);
+				Toggle(&startTalk);
 				break;
 			case VK_RETURN:
 				NextDialog();
@@ -164,11 +167,16 @@ void Dialog::printName()
 
 void Dialog::NextDialog()
 {
-	if(OK && ((bufferPointer+1) != debugBuffer.end()))
+	if(dlg_ON && ((bufferPointer+1) != debugBuffer.end()))
 		bufferPointer++;
 	else
 	{
-		Toggle();
-		bufferPointer = debugBuffer.begin();
+		if ( dlg_ON && startTalk )
+		{
+			Toggle(&dlg_ON);
+			Toggle(&startTalk);
+			Toggle(&endTalk);
+			bufferPointer = debugBuffer.begin();
+		}
 	}
 }

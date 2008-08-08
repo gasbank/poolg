@@ -1,8 +1,8 @@
 proc EpInitApp {} {
 	# 16:9 widescreen resolution
-	set w1 16
-	set h1 9
-	set multiplier 50
+	set w1 4
+	set h1 3
+	set multiplier 200
 	EpSetWindowSize [expr $w1 * $multiplier] [expr $h1 * $multiplier]
 }
 

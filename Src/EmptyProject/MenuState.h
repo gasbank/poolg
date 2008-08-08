@@ -26,8 +26,18 @@ private:
 	LPDIRECT3DDEVICE9	m_pDev;
 
 	Box m_menu;
-	Box m_selc;
+
+	Box m_stub;
+	Box m_saub;
+	Box m_loub;
+	Box m_seub;
+	Box m_exub;
 
 	Box m_stdb;
 	Box m_sadb;
+	Box m_lodb;
+	Box m_sedb;
+	Box m_exdb;
+
+	Box m_stwin;
 };

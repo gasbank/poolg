@@ -10,6 +10,7 @@
 #include "DXUTcamera.h"
 #include "G.h"
 #include "tcl.h"
+#include <string>
 
 #ifndef EP_SAFE_RELEASE
 #define EP_SAFE_RELEASE(p)      { if (p) { (p)->release(); SAFE_DELETE(p); } }

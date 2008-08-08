@@ -7,7 +7,7 @@ proc EpInitApp {} {
 }
 
 proc EpInitGame {} {
-	EpSetNextState 3
+	EpSetNextState 4
 }
 
 proc EpUnitOnMove {direction} {

@@ -3,25 +3,35 @@
 
 class Dialog
 {
-public:\
-	   	bool OK;
+public:
+	bool OK;
+	
 
 	Dialog(void);
 	~Dialog(void);
 	HRESULT init();
 	HRESULT release();
 	void Toggle();
+	void printDialog();
+	void printName();
+	void NextDialog();
 
 	HRESULT frameMove (double fTime, float fElapsedTime);
 	HRESULT frameRender(IDirect3DDevice9* pd3dDevice,  double fTime, float fElapsedTime);
 	HRESULT handleMessages (HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	static LPD3DXFONT pFont;
-	static RECT rc;
+	static LPD3DXFONT qFont;
+	static RECT pRc;
+	static RECT qRc;
 private:
-	
-	
-	Box dial;
+	Box dialog;
+	Box name;
 
 	LPDIRECT3DDEVICE9	m_pDev;
+
+	std::vector<std::string> debugBuffer;
+	std::vector<std::string>::iterator bufferPointer;
+	std::string nameBuffer;
+	std::string* namePointer;
 };

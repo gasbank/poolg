@@ -63,7 +63,6 @@ HRESULT WorldState::enter()
 	abc.a.right = -3;
 	abc.a.top = -3;
 	abc.onetime = false;
-	abc.endless = true;
 
 	// Create vertex shader
 	WCHAR strPath[512];

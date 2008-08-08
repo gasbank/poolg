@@ -17,7 +17,6 @@ struct abc
 {
 	RECT a;
 	bool onetime;
-	bool endless;
 };
 
 class WorldState : public State

@@ -208,15 +208,17 @@ PictureInput Picture::mapKey( UINT nKey )
 void Picture::frameMove( float fElapsedTime )
 {
 	m_vKeyboardDirection = D3DXVECTOR3( 0, 0, 0 );
-	// Update acceleration vector based on keyboard state
-	if( IsKeyDown( m_aKeys[PIC_MOVE_UP] ) )
-		m_vKeyboardDirection.y += 0.5f;
-	if( IsKeyDown( m_aKeys[PIC_MOVE_DOWN] ) )
-		m_vKeyboardDirection.y -= 0.5f;
-	if( IsKeyDown( m_aKeys[PIC_MOVE_RIGHT] ) )
-		m_vKeyboardDirection.x += 0.5f;
-	if( IsKeyDown( m_aKeys[PIC_MOVE_LEFT] ) )
-		m_vKeyboardDirection.x -= 0.5f;
+
+	//// Update acceleration vector based on keyboard state
+	
+	//if( IsKeyDown( m_aKeys[PIC_MOVE_UP] ) )
+	//	m_vKeyboardDirection.y += 0.5f;
+	//if( IsKeyDown( m_aKeys[PIC_MOVE_DOWN] ) )
+	//	m_vKeyboardDirection.y -= 0.5f;
+	//if( IsKeyDown( m_aKeys[PIC_MOVE_RIGHT] ) )
+	//	m_vKeyboardDirection.x += 0.5f;
+	//if( IsKeyDown( m_aKeys[PIC_MOVE_LEFT] ) )
+	//	m_vKeyboardDirection.x -= 0.5f;
 
 	// Update velocity
 	m_vVelocity = m_vKeyboardDirection;

@@ -13,3 +13,4 @@ public:
 	virtual GameState curStateEnum();
 	virtual GameState prevStateEnum();
 };
+inline TopStateManager& GetTopStateManager() { return TopStateManager::getSingleton(); }

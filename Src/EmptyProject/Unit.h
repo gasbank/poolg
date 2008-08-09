@@ -45,6 +45,10 @@ public:
 
 	void setMoveDuration(float val) { m_moveDuration = val; }
 
+	int getCurHp() const { return m_curHp; }
+	int getMaxHp() const { return m_maxHp; }
+	void damage(int point);
+
 protected:
 	virtual UnitInput mapKey( UINT nKey );
 
@@ -76,6 +80,9 @@ protected:
 	bool					m_bMoving;
 	float					m_fMovingTime;
 	bool					m_bControllable;
+	
+	int						m_maxHp;
+	int						m_curHp;
 
 private:
 	float					m_moveDuration; // A time needed to move one time(tile) in seconds

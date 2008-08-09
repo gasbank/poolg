@@ -1,5 +1,5 @@
 #pragma once
-#include "Box.h"
+#include "Picture.h"
 #include "State.h"
 
 class MenuState : public State
@@ -25,19 +25,19 @@ private:
 	
 	LPDIRECT3DDEVICE9	m_pDev;
 
-	Box m_menu;
+	Picture m_menu;
 
-	Box m_stub;
-	Box m_saub;
-	Box m_loub;
-	Box m_seub;
-	Box m_exub;
+	Picture m_stub;
+	Picture m_saub;
+	Picture m_loub;
+	Picture m_seub;
+	Picture m_exub;
 
-	Box m_stdb;
-	Box m_sadb;
-	Box m_lodb;
-	Box m_sedb;
-	Box m_exdb;
+	Picture m_stdb;
+	Picture m_sadb;
+	Picture m_lodb;
+	Picture m_sedb;
+	Picture m_exdb;
 
-	Box m_stwin;
+	Picture m_stwin;
 };

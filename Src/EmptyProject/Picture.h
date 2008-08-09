@@ -59,10 +59,11 @@ public:
 	void setSizeToTexture();
 	const D3DXVECTOR3* getPos() const { return &m_vPos; }
 	void setPos(const D3DXVECTOR3& val) { m_vPos = val; }
+	void setPos(float x, float y, float z) { m_vPos.x = x; m_vPos.y = y; m_vPos.z = z;}
 
 	HRESULT draw(bool textured = true);
 	virtual LRESULT handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
-	void frameMove(float fElapsedTime);
+	virtual void frameMove(float fElapsedTime);
 
 protected:
 	virtual PictureInput mapKey( UINT nKey );

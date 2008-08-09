@@ -20,6 +20,10 @@ Unit::Unit()
 	m_vScale			= D3DXVECTOR3(1.0f, 1.0f, 1.0f);
 	m_bLocalXformDirty	= true;
 	m_bMoving			= false;
+	// Character status info
+	m_maxHp				= 5;
+	m_curHp				= m_maxHp;
+	
 
 	D3DXMatrixIdentity(&m_localXform);
 
@@ -196,6 +200,10 @@ Unit* Unit::createUnit( LPD3DXMESH mesh, float posX, float posY, float posZ, boo
 	return u;
 }
 
+void Unit::damage( int point )
+{
+	m_curHp -= point;
+}
 
 //////////////////////////////////////////////////////////////////////////
 

@@ -116,9 +116,11 @@ HRESULT WorldState::enter()
 
 	setupLight();
 
-	WorldStateManager::getSingleton().init();
-
 	GetScriptManager().execute("EpWorldState::enter");
+
+	GetWorldStateManager().init();
+
+	
 
 	return S_OK;
 }
@@ -223,8 +225,8 @@ HRESULT WorldState::frameMove(double fTime, float fElapsedTime)
 
 	m_sampleTeapotMeshRot += fElapsedTime * D3DXToRadian(35); // 35 degrees per second
 
-	WorldStateManager::getSingleton().transit();
-	WorldStateManager::getSingleton().getCurState()->frameMove(fTime, fElapsedTime);
+	GetWorldStateManager().transit();
+	GetWorldStateManager().getCurState()->frameMove(fTime, fElapsedTime);
 
 	// Detect collision always.
 	it = m_unitSet.begin();
@@ -258,7 +260,7 @@ HRESULT WorldState::release()
 	SAFE_RELEASE( m_pVertexDeclaration );
 	SAFE_RELEASE(m_aTile);
 
-	WorldStateManager::getSingleton().release();
+	GetWorldStateManager().release();
 
 	return S_OK;
 }
@@ -288,7 +290,7 @@ HRESULT WorldState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 		}
 		if (wParam == VK_F5)
 		{
-			WorldStateManager::getSingleton().setNextState(GAME_WORLD_STATE_MENU);
+			GetWorldStateManager().setNextState(GAME_WORLD_STATE_MENU);
 		}
 	}
 	if (uMsg == WM_KEYUP)
@@ -317,7 +319,7 @@ HRESULT WorldState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 	}
 
 
-	WorldStateManager::getSingleton().getCurState()->handleMessages(hWnd, uMsg, wParam, lParam);
+	GetWorldStateManager().getCurState()->handleMessages(hWnd, uMsg, wParam, lParam);
 
 	return S_OK;
 }
@@ -396,6 +398,6 @@ bool WorldState::isCollide( const D3DXVECTOR3* vec0, const D3DXVECTOR3* vec1 )
 void WorldState::handleCollision( Unit* heroUnit, Unit* enemyUnit )
 {
 	m_curEnemyUnit = enemyUnit;
-	if ( WorldStateManager::getSingleton().curStateEnum() == GAME_WORLD_STATE_FIELD )
-		WorldStateManager::getSingleton().setNextState(GAME_WORLD_STATE_BATTLE);
+	if ( GetWorldStateManager().curStateEnum() == GAME_WORLD_STATE_FIELD )
+		GetWorldStateManager().setNextState(GAME_WORLD_STATE_BATTLE);
 }

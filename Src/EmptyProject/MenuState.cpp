@@ -69,7 +69,7 @@ HRESULT MenuState::frameMove(double fTime, float fElapsedTime)
 
 	m_stwin.frameMove(fElapsedTime);
 	
-	//m_selc.setPosition(m_selc.getPos()->x, pos, m_selc.getPos()->z);
+	//m_selc.setPos(m_selc.getPos()->x, pos, m_selc.getPos()->z);
 
 	return S_OK;
 }
@@ -151,7 +151,7 @@ HRESULT MenuState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 				select( 0 );
 				break;
 			case VK_F5:
-				WorldStateManager::getSingleton().setNextStateAsPrevState();
+				GetWorldStateManager().setNextStateAsPrevState();
 				break;
 		}
 	}
@@ -200,55 +200,55 @@ MenuState::MenuState()
 	float menuBoxPositionX = (float)scrWidth/2 - menuBoxWidth - 12;
 	float menuBoxPositionY = (float)scrHeight/2 - menuBoxHeight - 20;
 	m_menu.init(L"menu_window.png", m_pDev);
-	m_menu.setPosition (menuBoxPositionX, menuBoxPositionY, 3.0f);
+	m_menu.setPos (menuBoxPositionX, menuBoxPositionY, 3.0f);
 	m_menu.setSize( menuBoxWidth, menuBoxHeight );
 
 	//float trianglePositionX = (float)scrWidth/2 - menuBoxWidth + 7;
 	//float triangleBoxPositionY = (float)scrHeight/2 - menuBoxWidth + pos;
 
 	m_stub.init(L"status_up_button.png", m_pDev);
-	m_stub.setPosition ( (float)scrWidth/2 - menuButtonWidth - 20, (float)scrHeight/2 - menuButtonHeight - 30, 2.8f);
+	m_stub.setPos ( (float)scrWidth/2 - menuButtonWidth - 20, (float)scrHeight/2 - menuButtonHeight - 30, 2.8f);
 	m_stub.setSize( menuButtonWidth, menuButtonHeight);
 
 	m_saub.init(L"save_up_button.png", m_pDev);
-	m_saub.setPosition ( (float)scrWidth/2 - menuButtonWidth - 20, (float)scrHeight/2 - menuButtonHeight - 80, 2.8f);
+	m_saub.setPos ( (float)scrWidth/2 - menuButtonWidth - 20, (float)scrHeight/2 - menuButtonHeight - 80, 2.8f);
 	m_saub.setSize( menuButtonWidth, menuButtonHeight);
 
 	m_loub.init(L"load_up_button.png", m_pDev);
-	m_loub.setPosition ( (float)scrWidth/2 - menuButtonWidth - 20, (float)scrHeight/2 - menuButtonHeight - 130, 2.8f);
+	m_loub.setPos ( (float)scrWidth/2 - menuButtonWidth - 20, (float)scrHeight/2 - menuButtonHeight - 130, 2.8f);
 	m_loub.setSize( menuButtonWidth, menuButtonHeight);
 
 	m_seub.init(L"setting_up_button.png", m_pDev);
-	m_seub.setPosition ( (float)scrWidth/2 - menuButtonWidth - 20, (float)scrHeight/2 - menuButtonHeight - 180, 2.8f);
+	m_seub.setPos ( (float)scrWidth/2 - menuButtonWidth - 20, (float)scrHeight/2 - menuButtonHeight - 180, 2.8f);
 	m_seub.setSize( menuButtonWidth, menuButtonHeight);
 
 	m_exub.init(L"exit_up_button.png", m_pDev);
-	m_exub.setPosition ( (float)scrWidth/2 - menuButtonWidth - 20, (float)scrHeight/2 - menuButtonHeight - 230, 2.8f);
+	m_exub.setPos ( (float)scrWidth/2 - menuButtonWidth - 20, (float)scrHeight/2 - menuButtonHeight - 230, 2.8f);
 	m_exub.setSize( menuButtonWidth, menuButtonHeight);
 
 
 	m_stdb.init(L"status_down_button.png", m_pDev);
-	m_stdb.setPosition ( (float)scrWidth/2 - menuButtonWidth - 20, (float)scrHeight/2 - menuButtonHeight - 30, 2.7f);
+	m_stdb.setPos ( (float)scrWidth/2 - menuButtonWidth - 20, (float)scrHeight/2 - menuButtonHeight - 30, 2.7f);
 	m_stdb.setSize( menuButtonWidth, menuButtonHeight);
 
 	m_sadb.init(L"save_down_button.png", m_pDev);
-	m_sadb.setPosition ( (float)scrWidth/2 - menuButtonWidth - 20, (float)scrHeight/2 - menuButtonHeight - 80, 2.7f);
+	m_sadb.setPos ( (float)scrWidth/2 - menuButtonWidth - 20, (float)scrHeight/2 - menuButtonHeight - 80, 2.7f);
 	m_sadb.setSize( menuButtonWidth, menuButtonHeight);
 
 	m_lodb.init(L"load_down_button.png", m_pDev);
-	m_lodb.setPosition ( (float)scrWidth/2 - menuButtonWidth - 20, (float)scrHeight/2 - menuButtonHeight - 130, 2.7f);
+	m_lodb.setPos ( (float)scrWidth/2 - menuButtonWidth - 20, (float)scrHeight/2 - menuButtonHeight - 130, 2.7f);
 	m_lodb.setSize( menuButtonWidth, menuButtonHeight);
 
 	m_sedb.init(L"setting_down_button.png", m_pDev);
-	m_sedb.setPosition ( (float)scrWidth/2 - menuButtonWidth - 20, (float)scrHeight/2 - menuButtonHeight - 180, 2.7f);
+	m_sedb.setPos ( (float)scrWidth/2 - menuButtonWidth - 20, (float)scrHeight/2 - menuButtonHeight - 180, 2.7f);
 	m_sedb.setSize( menuButtonWidth, menuButtonHeight);
 
 	m_exdb.init(L"exit_down_button.png", m_pDev);
-	m_exdb.setPosition ( (float)scrWidth/2 - menuButtonWidth - 20, (float)scrHeight/2 - menuButtonHeight - 230, 2.7f);
+	m_exdb.setPos ( (float)scrWidth/2 - menuButtonWidth - 20, (float)scrHeight/2 - menuButtonHeight - 230, 2.7f);
 	m_exdb.setSize( menuButtonWidth, menuButtonHeight);
 
 	m_stwin.init(L"status_window.png", m_pDev);
-	m_stwin.setPosition ( 0 - scrWidth / 2, 0 - scrHeight / 2, 2.6f);
+	m_stwin.setPos ( 0 - scrWidth / 2, 0 - scrHeight / 2, 2.6f);
 	m_stwin.setSize(scrWidth, scrHeight);
 
 

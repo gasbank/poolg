@@ -1,9 +1,11 @@
 #pragma once
-#include "Box.h"
+
 #include "StatusBar.h"
 #include "ProgressBar.h"
 #include "StatusBar.h"
 #include "State.h"
+
+class WorldState;
 
 class BattleState : public State
 {
@@ -21,30 +23,32 @@ public:
 
 	HRESULT release ();
 
-	void drawFixedText (int scrWidth, int scrHeight);
+	void renderFixedText (int scrWidth, int scrHeight);
+
+	void passTurn();
 	
 private:
 	/*이곳부터가 컴포넌트*/
-	Box				m_StatusBoxPlayer;
-	Box				m_StatusBoxEnemy;
+	Picture				m_StatusBoxPlayer;
+	Picture				m_StatusBoxEnemy;
 
-	Box				m_SkillBox;
-	Box				m_SkillContentBox;
-	Box				m_DialogBox;
+	Picture				m_SkillBox;
+	Picture				m_SkillContentBox;
+	Picture				m_DialogBox;
 
-	Box				m_hpBgPlayer;
-	Box				m_mpBgPlayer;
-	Box				m_expBgPlayer;
+	Picture				m_hpBgPlayer;
+	Picture				m_mpBgPlayer;
+	Picture				m_expBgPlayer;
 
-	Box				m_hpBgEnemy;
-	Box				m_mpBgEnemy;
+	Picture				m_hpBgEnemy;
+	Picture				m_mpBgEnemy;
 
-	HPBarPlayer		m_hpBarPlayer;
-	MPBarPlayer		m_mpBarPlayer;
-	EXPBarPlayer	m_expBarPlayer;
+	ProgressBar			m_hpBarPlayer;
+	ProgressBar			m_mpBarPlayer;
+	ProgressBar			m_expBarPlayer;
 	
-	HPBarEnemy		m_hpBarEnemy;
-	MPBarEnemy		m_mpBarEnemy;
+	ProgressBar			m_hpBarEnemy;
+	ProgressBar			m_mpBarEnemy;
 
 	LPD3DXFONT		m_lblHYnamL;
 	LPD3DXFONT		m_lblREB;
@@ -53,4 +57,8 @@ private:
 	D3DXVECTOR3		m_vWorldEye;
 	D3DXVECTOR3		m_vWorldLookAt;
 
+	typedef std::list<std::string> StringList;
+	StringList m_battleLog;
+
+	WorldState*		m_ws;
 };

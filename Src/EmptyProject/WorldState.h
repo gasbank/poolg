@@ -41,6 +41,9 @@ public:
 	const D3DXVECTOR3& getHeroPos();
 	bool isCollide( const D3DXVECTOR3* vec0, const D3DXVECTOR3* vec1 );
 
+	Unit* getHero() { return m_heroUnit; }
+	Unit* getCurEnemy() { return m_curEnemyUnit; }
+
 private:
 	void setupLight();
 	void handleCollision( Unit* heroUnit, Unit* enemyUnit );

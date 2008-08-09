@@ -2,7 +2,7 @@ package require Thread
 
 namespace eval EpWorldState {
 	variable pWorld
-	variable pHeroUnit pEnemyUnit1 pEnemyUnit2
+	variable pHeroUnit pEnemyUnit1 pEnemyUnit2 pEnemyUnit3
 	
 	proc init {pCurWorld} {
 		EpOutputDebugString " - WorldState init Ptr: $pCurWorld\n"
@@ -17,15 +17,18 @@ namespace eval EpWorldState {
 		
 		variable pHeroUnit
 		variable pEnemyUnit1
-		variable pEnemyUnit2		
+		variable pEnemyUnit2
+		variable pEnemyUnit3
 		variable pWorld
 		
-		set pHeroUnit			[EpCreateUnit 0 0 1];
+		set pHeroUnit			[EpCreateUnit 0 -24 1];
 		set pEnemyUnit1			[EpCreateUnit 7 0 0];
 		set pEnemyUnit2			[EpCreateUnit 10 -10 0];
+		set pEnemyUnit3			[EpCreateUnit 0 -30 0];
 		set curUnitCount		[EpRegisterToWorld $pWorld $pHeroUnit];
 		set curUnitCount		[EpRegisterToWorld $pWorld $pEnemyUnit1];
 		set curUnitCount		[EpRegisterToWorld $pWorld $pEnemyUnit2];
+		set curUnitCount		[EpRegisterToWorld $pWorld $pEnemyUnit3];
 		
 		EpUnitSetRotX			$pHeroUnit [ToRadian -90]
 		EpUnitSetRotZ			$pHeroUnit [ToRadian 90]

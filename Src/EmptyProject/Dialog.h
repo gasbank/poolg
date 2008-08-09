@@ -1,5 +1,6 @@
 #pragma once
-#include "Box.h"
+
+#include "Picture.h"
 
 class Dialog
 {
@@ -26,8 +27,8 @@ public:
 	static RECT pRc;
 	static RECT qRc;
 private:
-	Box dialog;
-	Box name;
+	Picture dialog;
+	Picture name;
 
 	LPDIRECT3DDEVICE9	m_pDev;
 

@@ -50,7 +50,7 @@ HRESULT FieldState::frameMove( double fTime, float fElapsedTime )
 	D3DXVECTOR3 vLookAt( vHeroPos );
 	const D3DXVECTOR3 vUp( 0.0f, 1.0f, 0.0f );
 
-	if (fStateTime < 1.0f && WorldStateManager::getSingleton().prevStateEnum() == GAME_WORLD_STATE_BATTLE)
+	if (fStateTime < 1.0f && GetWorldStateManager().prevStateEnum() == GAME_WORLD_STATE_BATTLE)
 	{
 		D3DXVECTOR3 vPrevUp( 0.0f, 0.0f, -1.0f );
 
@@ -76,7 +76,7 @@ HRESULT FieldState::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 	{
 		if (wParam == VK_F4)
 		{
-			WorldStateManager::getSingleton().setNextState(GAME_WORLD_STATE_BATTLE);
+			GetWorldStateManager().setNextState(GAME_WORLD_STATE_BATTLE);
 		}
 	}
 

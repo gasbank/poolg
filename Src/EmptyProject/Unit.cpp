@@ -24,6 +24,8 @@ Unit::Unit()
 	m_maxHp				= 5;
 	m_curHp				= m_maxHp;
 	
+	m_tileX				= 0;
+	m_tileY				= 0;
 
 	D3DXMatrixIdentity(&m_localXform);
 
@@ -118,6 +120,7 @@ void Unit::frameMove( float fElapsedTime )
 			m_bMoving = true;
 			m_vKeyboardDirection = D3DXVECTOR3( 0, 0, 0 );
 			m_vKeyboardDirection.y += 2.0f;
+			m_tileY++;
 			GetScriptManager().execute("EpUnitOnMove 0");
 		}
 		else if( IsKeyDown( m_aKeys[UNIT_MOVE_DOWN] ) )
@@ -125,6 +128,7 @@ void Unit::frameMove( float fElapsedTime )
 			m_bMoving = true;
 			m_vKeyboardDirection = D3DXVECTOR3( 0, 0, 0 );
 			m_vKeyboardDirection.y -= 2.0f;
+			m_tileY--;
 			GetScriptManager().execute("EpUnitOnMove 1");
 		}
 		else if( IsKeyDown( m_aKeys[UNIT_MOVE_RIGHT] ) )
@@ -132,6 +136,7 @@ void Unit::frameMove( float fElapsedTime )
 			m_bMoving = true;
 			m_vKeyboardDirection = D3DXVECTOR3( 0, 0, 0 );
 			m_vKeyboardDirection.x += 2.0f;
+			m_tileX++;
 			GetScriptManager().execute("EpUnitOnMove 2");
 		}
 		else if( IsKeyDown( m_aKeys[UNIT_MOVE_LEFT] ) )
@@ -139,6 +144,7 @@ void Unit::frameMove( float fElapsedTime )
 			m_bMoving = true;
 			m_vKeyboardDirection = D3DXVECTOR3( 0, 0, 0 );
 			m_vKeyboardDirection.x -= 2.0f;
+			m_tileX--;
 			GetScriptManager().execute("EpUnitOnMove 3");
 		}
 	}
@@ -157,6 +163,9 @@ void Unit::frameMove( float fElapsedTime )
 	else
 	{
 		m_bMoving = false;
+
+		//타일에 맞도록 위치보정
+		setTilePos( m_tileX, m_tileY );
 	}
 
 	updateLocalXform();
@@ -191,19 +200,27 @@ UnitInput Unit::mapKey( UINT nKey )
 	return UNIT_UNKNOWN;
 }
 
-Unit* Unit::createUnit( LPD3DXMESH mesh, float posX, float posY, float posZ, bool bControllable )
+Unit* Unit::createUnit( LPD3DXMESH mesh, int tileX, int tileY, float posZ, bool bControllable )
 {
 	Unit* u = new Unit();
 	u->init( GetG().m_dev, mesh );
 	u->setControllable( bControllable );
-	u->setPos( D3DXVECTOR3( posX, posY, posZ ) );
+	u->setTilePos( tileX, tileY );
 	return u;
 }
 
+void Unit::setTilePos( int tileX, int tileY )
+{
+	m_tileX = tileX;
+	m_tileY = tileY;
+	
+	setPos( D3DXVECTOR3( (float)(tileX - 13) * G::s_tileSize, (float)(tileY  - 13) * G::s_tileSize, 0 ) );
+}
 void Unit::damage( int point )
 {
 	m_curHp -= point;
 }
+
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -211,7 +228,8 @@ Unit* EpCreateUnit( int tileX, int tileY, int controllable )
 {
 	LPD3DXMESH d3dxMesh;
 	D3DXCreateTeapot( GetG().m_dev, &d3dxMesh, 0 );
-	return Unit::createUnit( d3dxMesh, (float)tileX, (float)tileY, 0, controllable?true:false );
+
+	return Unit::createUnit( d3dxMesh, tileX, tileY, 0, controllable?true:false );
 
 } SCRIPT_CALLABLE_PV_I_I_I( EpCreateUnit )
 

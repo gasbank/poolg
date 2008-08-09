@@ -13,7 +13,7 @@ enum UnitInput
 class Unit
 {
 public:
-	static Unit* createUnit( LPD3DXMESH mesh, float posX = 0, float posY = 0, float posZ = 0, bool bCtrl = false );
+	static Unit* createUnit( LPD3DXMESH mesh, int tileX = 0, int tileY = 0, float posZ = 0, bool bCtrl = false );
 	~Unit();
 
 	HRESULT init(LPDIRECT3DDEVICE9 pd3dDevice, LPD3DXMESH mesh);
@@ -42,6 +42,10 @@ public:
 	void setPosY(float val) { m_vPos.y = val; m_bLocalXformDirty = true; }
 	void setPosZ(float val) { m_vPos.z = val; m_bLocalXformDirty = true; }
 	const D3DXVECTOR3& getPos() const { return m_vPos; }
+
+	void setTilePos(int tileX, int tileY);
+	int getTilePosX() { return m_tileX; }
+	int getTilePosY() { return m_tileY; }
 
 	void setMoveDuration(float val) { m_moveDuration = val; }
 
@@ -86,5 +90,7 @@ protected:
 
 private:
 	float					m_moveDuration; // A time needed to move one time(tile) in seconds
+	int						m_tileX;
+	int						m_tileY;
 };
 

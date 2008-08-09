@@ -3,9 +3,11 @@
 #include "WorldStateManager.h"
 #include "BattleState.h"
 #include "ScriptManager.h"
-#include "Dialog.h"
+#include "TileManager.h"
 
 WorldStateManager worldStateManager;
+TileManager	tileManager;
+
 
 WorldState::WorldState(void)
 {
@@ -58,11 +60,9 @@ HRESULT WorldState::enter()
 	m_sound.init();
 	m_dialog.init();
 
-	abc.a.bottom = -5;
-	abc.a.left = -5;
-	abc.a.right = -3;
-	abc.a.top = -3;
-	abc.onetime = false;
+	tileManager.tile[8][10].movable = false;
+	tileManager.tile[9][9].talkable = true;
+	tileManager.tile[9][9].talkonetime = false;
 
 	// Create vertex shader
 	WCHAR strPath[512];
@@ -292,27 +292,32 @@ HRESULT WorldState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 		{
 			GetWorldStateManager().setNextState(GAME_WORLD_STATE_MENU);
 		}
+		if (wParam == 'P')
+		{
+			printf("이녀석의 x 위치 : %.2f\n", m_heroUnit->getPos().x);
+			printf("이녀석의 y 위치 : %.2f\n", m_heroUnit->getPos().y);
+		}
 	}
 	if (uMsg == WM_KEYUP)
 	{
 		if (wParam == VK_RETURN)
 		{
-			if ( (m_heroUnit->getPos().x > (float)abc.a.left)&&(m_heroUnit->getPos().x < (float)abc.a.right) && (m_heroUnit->getPos().y > (float)abc.a.bottom)&&(m_heroUnit->getPos().y < (float)abc.a.top) )
+			if ( (m_heroUnit->getTilePosX() == 9) && (m_heroUnit->getTilePosY() == 9) )
 			{
-				if ( abc.onetime )
+				if ( tileManager.tile[9][9].talkable && tileManager.tile[9][9].talkonetime )
 				{
-					abc.onetime = false;
+					tileManager.tile[9][9].talkonetime = false;
 					m_dialog.startTalk = true;
 					if ( !m_dialog.dlg_ON )
 						m_dialog.Toggle(&m_dialog.dlg_ON);
 				}
-				if ( !abc.onetime && !m_dialog.endTalk)
+				if ( tileManager.tile[9][9].talkable && !tileManager.tile[9][9].talkonetime && !m_dialog.endTalk)
 				{
 					m_dialog.startTalk = true;
 					if ( !m_dialog.dlg_ON )
 						m_dialog.Toggle(&m_dialog.dlg_ON);
 				}
-				if ( m_dialog.endTalk && !abc.onetime)
+				if ( tileManager.tile[9][9].talkable && m_dialog.endTalk && !tileManager.tile[9][9].talkonetime)
 					m_dialog.Toggle(&m_dialog.endTalk);
 			}
 		}

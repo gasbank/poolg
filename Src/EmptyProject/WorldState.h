@@ -13,12 +13,6 @@
 
 typedef std::set<Unit*> UnitSet;
 
-struct abc
-{
-	RECT a;
-	bool onetime;
-};
-
 class WorldState : public State
 {
 public:
@@ -74,6 +68,4 @@ private:
 	Character						m_player;
 	
 	UnitSet							m_unitSet;
-
-	struct abc						abc;
 };

@@ -4,6 +4,7 @@
 void WINAPI XACTNotificationCallback( const XACT_NOTIFICATION* pNotification );
 AUDIO_STATE audioState;
 
+
 Sound::Sound(void)
 {
 }

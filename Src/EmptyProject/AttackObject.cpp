@@ -3,6 +3,9 @@
 #include "WorldStateManager.h"
 #include "BattleState.h"
 #include "Character.h"
+#include "Sound.h"
+
+extern AUDIO_STATE audioState;
 
 AttackObject::~AttackObject(void)
 {
@@ -46,6 +49,7 @@ bool BallAttackObject::frameMove( float fElapsedTime )
 			getBattleState()->pushBattleLog("데미지를 입혔다!");
 			getBattleState()->setNextTurnType(TT_COMPUTER);
 			getBattleState()->passTurn();
+			audioState.pSoundBank->Play( audioState.iSE, 0, 0, NULL );
 		}
 		return false;
 	}

@@ -6,10 +6,10 @@
 class TileManager
 {
 public:
+	TileManager(void);
+	~TileManager(void);
+
 	int x, y;
 
 	Tile	tile[X][Y];
-
-	TileManager(void);
-	~TileManager(void);
 };

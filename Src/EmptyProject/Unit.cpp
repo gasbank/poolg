@@ -13,15 +13,11 @@ Unit::Unit()
 	m_d3dxMesh			= 0;
 	m_pd3dDevice		= 0;
 	m_d3dTex			= 0;
-	m_moveDuration		= 1.0f;
+
 	m_vRot				= D3DXVECTOR3(0, 0, 0);
 	m_vPos				= D3DXVECTOR3(0, 0, 0);
 	m_vScale			= D3DXVECTOR3(1.0f, 1.0f, 1.0f);
 	m_bLocalXformDirty	= true;
-	m_bMoving			= false;
-	
-	m_tileX				= 0;
-	m_tileY				= 0;
 
 	D3DXMatrixIdentity(&m_localXform);
 
@@ -107,62 +103,7 @@ LRESULT Unit::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 
 bool Unit::frameMove( float fElapsedTime )
 {	
-	if (m_bMoving == false)
-	{
-		m_fMovingTime = 0;
-
-		if( IsKeyDown( m_aKeys[UNIT_MOVE_UP] ) )
-		{
-			m_bMoving = true;
-			m_vKeyboardDirection = D3DXVECTOR3( 0, 0, 0 );
-			m_vKeyboardDirection.y += 2.0f;
-			m_tileY++;
-			GetScriptManager().execute("EpUnitOnMove 0");
-		}
-		else if( IsKeyDown( m_aKeys[UNIT_MOVE_DOWN] ) )
-		{
-			m_bMoving = true;
-			m_vKeyboardDirection = D3DXVECTOR3( 0, 0, 0 );
-			m_vKeyboardDirection.y -= 2.0f;
-			m_tileY--;
-			GetScriptManager().execute("EpUnitOnMove 1");
-		}
-		else if( IsKeyDown( m_aKeys[UNIT_MOVE_RIGHT] ) )
-		{
-			m_bMoving = true;
-			m_vKeyboardDirection = D3DXVECTOR3( 0, 0, 0 );
-			m_vKeyboardDirection.x += 2.0f;
-			m_tileX++;
-			GetScriptManager().execute("EpUnitOnMove 2");
-		}
-		else if( IsKeyDown( m_aKeys[UNIT_MOVE_LEFT] ) )
-		{
-			m_bMoving = true;
-			m_vKeyboardDirection = D3DXVECTOR3( 0, 0, 0 );
-			m_vKeyboardDirection.x -= 2.0f;
-			m_tileX--;
-			GetScriptManager().execute("EpUnitOnMove 3");
-		}
-	}
 	
-	
-	if (m_bMoving && m_fMovingTime <= m_moveDuration)
-	{
-		// Update velocity
-		m_vVelocity = m_vKeyboardDirection / m_moveDuration;
-
-		// Simple euler method to calculate position delta
-		D3DXVECTOR3 vPosDelta = m_vVelocity * fElapsedTime;
-		m_fMovingTime += fElapsedTime;
-		setPos(getPos() + vPosDelta);
-	}
-	else
-	{
-		m_bMoving = false;
-
-		//타일에 맞도록 위치보정
-		setTilePos( m_tileX, m_tileY );
-	}
 
 	updateLocalXform();
 
@@ -203,22 +144,8 @@ Unit* Unit::createUnit( LPD3DXMESH mesh, int tileX, int tileY, float posZ, bool 
 	Unit* u = new Unit();
 	u->init( GetG().m_dev, mesh );
 	u->setControllable( bControllable );
-	u->setTilePos( tileX, tileY );
 	return u;
 }
-
-void Unit::setTilePos( int tileX, int tileY )
-{
-	m_tileX = tileX;
-	m_tileY = tileY;
-	
-	setPos( D3DXVECTOR3( (float)(tileX - 13) * G::s_tileSize, (float)(tileY  - 13) * G::s_tileSize, 0 ) );
-}
-void Unit::damage( int point )
-{
-	m_curHp -= point;
-}
-
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -279,14 +206,6 @@ int EpUnitSetPosZ( void* ptr, double val )
 	return 0;
 } SCRIPT_CALLABLE_I_PV_D( EpUnitSetPosZ )
 
-int EpUnitSetMoveDuration( void* ptr, double val )
-{
-	Unit* instance = reinterpret_cast<Unit*>( ptr );
-	instance->Unit::setMoveDuration( (float)val );
-	return 0;
-} SCRIPT_CALLABLE_I_PV_D( EpUnitSetMoveDuration )
-
-
 double EpUnitGetUpperRightZ( void* ptr )
 {
 	Unit* instance = reinterpret_cast<Unit*>( ptr );
@@ -304,6 +223,5 @@ START_SCRIPT_FACTORY(Unit)
 	CREATE_OBJ_COMMAND( EpUnitSetRotY )
 	CREATE_OBJ_COMMAND( EpUnitSetRotZ )
 	CREATE_OBJ_COMMAND( EpUnitSetPosZ )
-	CREATE_OBJ_COMMAND( EpUnitSetMoveDuration )
 	CREATE_OBJ_COMMAND( EpUnitGetUpperRightZ )
 END_SCRIPT_FACTORY(Unit)

@@ -43,11 +43,6 @@ public:
 	void setPosZ(float val) { m_vPos.z = val; m_bLocalXformDirty = true; }
 	const D3DXVECTOR3& getPos() const { return m_vPos; }
 
-	void setTilePos(int tileX, int tileY);
-	int getTilePosX() { return m_tileX; }
-	int getTilePosY() { return m_tileY; }
-
-	void setMoveDuration(float val) { m_moveDuration = val; }
 	bool isControllable() const { return m_bControllable; }
 
 protected:
@@ -78,14 +73,7 @@ protected:
 	UINT					m_cKeysDown;            // Number of camera keys that are down.
 	D3DXVECTOR3				m_vKeyboardDirection;
 	D3DXVECTOR3				m_vVelocity;
-	bool					m_bMoving;
-	float					m_fMovingTime;
 	bool					m_bControllable;
 	
-
-private:
-	float					m_moveDuration; // A time needed to move one time(tile) in seconds
-	int						m_tileX;
-	int						m_tileY;
 };
 

@@ -58,8 +58,8 @@ private:
 	float							m_sampleTeapotMeshRot;
 	LPD3DXMESH						m_aTile;
 
-	Unit*							m_heroUnit;
-	Unit*							m_curEnemyUnit;
+	Character*						m_heroUnit;
+	Character*						m_curEnemyUnit;
 	
 	UnitSet							m_unitSet;
 };

@@ -6,7 +6,7 @@ class AttackObject;
 class Character : public Unit
 {
 public:
-	static Unit* createCharacter( LPD3DXMESH mesh, float posX = 0, float posY = 0, float posZ = 0, bool bCtrl = false );
+	static Unit* createCharacter( LPD3DXMESH mesh, int tileX, int tileY, float posZ, bool bControllable );
 	~Character();
 
 	void attack(int type, Character* enemy);
@@ -19,6 +19,13 @@ public:
 	int getMaxHp() const { return m_maxHp; }
 	void damage( int point ) { m_curHp -= point; }
 
+
+	void setTilePos(int tileX, int tileY);
+	int getTilePosX() { return m_tileX; }
+	int getTilePosY() { return m_tileY; }
+
+	void setMoveDuration(float val) { m_moveDuration = val; }
+
 protected:
 	Character();
 
@@ -26,7 +33,11 @@ private:
 	typedef std::list<AttackObject*> AttackObjectList;
 	AttackObjectList m_attackObjectList;
 
-
+	bool					m_bMoving;
+	float					m_fMovingTime;
 	int						m_maxHp;
 	int						m_curHp;
+	float					m_moveDuration; // A time needed to move one time(tile) in seconds
+	int						m_tileX;
+	int						m_tileY;
 };

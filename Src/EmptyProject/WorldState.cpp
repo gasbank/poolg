@@ -359,7 +359,7 @@ UINT WorldState::addUnit( Unit* u )
 	m_unitSet.insert(u);
 	// TODO controllable means it is hero?
 	if (u->getControllable())
-		m_heroUnit = u;
+		m_heroUnit = dynamic_cast<Character*>( u );
 
 	return m_unitSet.size();
 }
@@ -402,7 +402,7 @@ bool WorldState::isCollide( const D3DXVECTOR3* vec0, const D3DXVECTOR3* vec1 )
 
 void WorldState::handleCollision( Unit* heroUnit, Unit* enemyUnit )
 {
-	m_curEnemyUnit = enemyUnit;
+	m_curEnemyUnit = dynamic_cast<Character*>( enemyUnit );
 	if ( GetWorldStateManager().curStateEnum() == GAME_WORLD_STATE_FIELD )
 		GetWorldStateManager().setNextState(GAME_WORLD_STATE_BATTLE);
 }

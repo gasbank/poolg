@@ -293,8 +293,8 @@ HRESULT WorldState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 		}
 		if (wParam == 'P')
 		{
-			printf("이녀석의 x 위치 : %.2f\n", m_heroUnit->getPos().x);
-			printf("이녀석의 y 위치 : %.2f\n", m_heroUnit->getPos().y);
+			printf("이녀석의 x 위치 : %d\n", m_heroUnit->getTilePosX());
+			printf("이녀석의 y 위치 : %d\n", m_heroUnit->getTilePosY());
 		}
 	}
 	if (uMsg == WM_KEYUP)

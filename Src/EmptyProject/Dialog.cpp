@@ -16,7 +16,7 @@ Dialog::Dialog(void)
 	dialog.init(L"dae-sa.png", m_pDev);
 	dialog.setPos (-(GetG().m_scrWidth / 2.0f), -(GetG().m_scrHeight / 2.0f), 2.8f);
 	dialog.setSize(200, 200);
-	name.init(L"dae-sa.png", m_pDev);
+	name.init(L"name_window.png", m_pDev);
 	name.setPos (-(GetG().m_scrWidth / 2.0f), -(GetG().m_scrHeight / 2.0f) + 200, 2.8f);
 	name.setSize(21 + 40, 13 + 40);
 }

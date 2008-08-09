@@ -3,9 +3,6 @@
 #include "SingletonCreators.h"
 #include "ScriptManager.h"
 
-extern D3DXMATRIX	g_orthoProjMat;
-extern D3DXMATRIX	g_fixedViewMat;
-
 LPD3DXFONT	Dialog::pFont;
 RECT		Dialog::pRc;
 LPD3DXFONT	Dialog::qFont;
@@ -103,8 +100,8 @@ HRESULT Dialog::frameRender(IDirect3DDevice9* pd3dDevice,  double fTime, float f
 {
 	m_pDev->SetRenderState(D3DRS_LIGHTING, FALSE);
 	pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
-	pd3dDevice->SetTransform(D3DTS_VIEW, &g_fixedViewMat);
-	pd3dDevice->SetTransform(D3DTS_PROJECTION, &g_orthoProjMat);
+	pd3dDevice->SetTransform(D3DTS_VIEW, &GetG().g_fixedViewMat);
+	pd3dDevice->SetTransform(D3DTS_PROJECTION, &GetG().g_orthoProjMat);
 
 	D3DMATERIAL9 material;
 	D3DCOLORVALUE cv, cv2;

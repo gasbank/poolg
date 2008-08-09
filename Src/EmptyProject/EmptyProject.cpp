@@ -33,9 +33,6 @@ D3DXHANDLE						g_tech					= 0;
 
 D3DCOLOR						g_fillColor;
 
-D3DXMATRIX						g_orthoProjMat;
-D3DXMATRIX						g_fixedViewMat;
-
 LOGMANAGER logMan;
 
 
@@ -105,8 +102,8 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 
 	// Orthogonal and fixed view xforms for GUI or fixed element rendering
 	D3DXVECTOR3 eye(0, 0, -50.0f), at(0, 0, 0), up(0, 1.0f, 0);
-	D3DXMatrixOrthoLH(&g_orthoProjMat, (FLOAT)pBackBufferSurfaceDesc->Width, (FLOAT)pBackBufferSurfaceDesc->Height, 0.1f, 100.0f);
-	D3DXMatrixLookAtLH(&g_fixedViewMat,	&eye, &at, &up);
+	D3DXMatrixOrthoLH(&GetG().g_orthoProjMat, (FLOAT)pBackBufferSurfaceDesc->Width, (FLOAT)pBackBufferSurfaceDesc->Height, 0.1f, 100.0f);
+	D3DXMatrixLookAtLH(&GetG().g_fixedViewMat,	&eye, &at, &up);
 
 	float fAspectRatio = pBackBufferSurfaceDesc->Width / ( FLOAT )pBackBufferSurfaceDesc->Height;
 	g_camera.SetProjParams( D3DX_PI / 4, fAspectRatio, 1.0f, 1000.0f );
@@ -195,8 +192,8 @@ void renderDebugText()
 void renderFixedElements(IDirect3DDevice9* pd3dDevice, double fTime, float fElapsedTime)
 {
 	pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
-	pd3dDevice->SetTransform(D3DTS_VIEW, &g_fixedViewMat);
-	pd3dDevice->SetTransform(D3DTS_PROJECTION, &g_orthoProjMat);
+	pd3dDevice->SetTransform(D3DTS_VIEW, &GetG().g_fixedViewMat);
+	pd3dDevice->SetTransform(D3DTS_PROJECTION, &GetG().g_orthoProjMat);
 
 	//g_menubox.draw(GetG().m_scrWidth, GetG().m_scrHeight);
 	//g_picRhw.draw();

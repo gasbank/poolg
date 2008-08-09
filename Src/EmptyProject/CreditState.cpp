@@ -4,9 +4,6 @@
 #include "TopStateManager.h"
 #include "Unit.h"
 
-extern D3DXMATRIX				g_orthoProjMat;
-extern D3DXMATRIX				g_fixedViewMat;
-
 const float CreditState::s_period = 7.0f;
 const float CreditState::s_fadeIn = 2.0f;
 const float CreditState::s_fadeOut = 2.0f;
@@ -64,8 +61,8 @@ HRESULT CreditState::enter()
 	LPDIRECT3DDEVICE9& pd3dDevice = GetG().m_dev;
 	
 	pd3dDevice->SetRenderState( D3DRS_CULLMODE, D3DCULL_CCW );
-	pd3dDevice->SetTransform( D3DTS_VIEW, &g_fixedViewMat );
-	pd3dDevice->SetTransform( D3DTS_PROJECTION, &g_orthoProjMat );
+	pd3dDevice->SetTransform( D3DTS_VIEW, &GetG().g_fixedViewMat );
+	pd3dDevice->SetTransform( D3DTS_PROJECTION, &GetG().g_orthoProjMat );
 
 	D3DXCreateFont( pd3dDevice, 26, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T( "Palatino Linotype"), &m_d3dxFont );
 	D3DXCreateFont( pd3dDevice, 32, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T( "Palatino Linotype"), &m_d3dxFontBig );

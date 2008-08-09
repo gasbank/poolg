@@ -310,7 +310,7 @@ HRESULT WorldState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 					if ( !m_dialog.dlg_ON )
 						m_dialog.Toggle(&m_dialog.dlg_ON);
 				}
-				if ( m_dialog.endTalk )
+				if ( m_dialog.endTalk && !abc.onetime)
 					m_dialog.Toggle(&m_dialog.endTalk);
 			}
 		}

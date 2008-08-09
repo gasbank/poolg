@@ -4,9 +4,6 @@
 #include "TopStateManager.h"
 #include "WorldState.h"
 
-extern D3DXMATRIX g_orthoProjMat;
-extern D3DXMATRIX g_fixedViewMat;
-
 BattleState::BattleState()
 {
 	m_pDev = GetG().m_dev;
@@ -126,8 +123,8 @@ HRESULT BattleState::leave()
 HRESULT BattleState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, float fElapsedTime)
 {
 	pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
-	pd3dDevice->SetTransform(D3DTS_VIEW, &g_fixedViewMat);
-	pd3dDevice->SetTransform(D3DTS_PROJECTION, &g_orthoProjMat);
+	pd3dDevice->SetTransform(D3DTS_VIEW, &GetG().g_fixedViewMat);
+	pd3dDevice->SetTransform(D3DTS_PROJECTION, &GetG().g_orthoProjMat);
 
 	m_pDev->SetRenderState(D3DRS_LIGHTING, FALSE);
 

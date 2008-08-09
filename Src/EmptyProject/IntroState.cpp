@@ -3,9 +3,6 @@
 #include "Picture.h"
 #include "TopStateManager.h"
 
-extern D3DXMATRIX						g_orthoProjMat;
-extern D3DXMATRIX						g_fixedViewMat;
-
 //The Great Adventure of PoolG"
 //~ PoolG's Strikes Back ~"
 //
@@ -164,8 +161,8 @@ HRESULT IntroState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, floa
 	pd3dDevice->SetRenderState( D3DRS_LIGHTING, TRUE );
 
 	// Apply fixed camera
-	pd3dDevice->SetTransform(D3DTS_VIEW, &g_fixedViewMat);
-	pd3dDevice->SetTransform(D3DTS_PROJECTION, &g_orthoProjMat);
+	pd3dDevice->SetTransform(D3DTS_VIEW, &GetG().g_fixedViewMat);
+	pd3dDevice->SetTransform(D3DTS_PROJECTION, &GetG().g_orthoProjMat);
 
 	// Background
 	if ( m_backgroundVisible )

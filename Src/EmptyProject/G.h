@@ -16,5 +16,7 @@ public:
 	
 	int					m_scrWidth;
 	int					m_scrHeight;
+	D3DXMATRIX			g_orthoProjMat;
+	D3DXMATRIX			g_fixedViewMat;
 };
 inline G& GetG() { return G::getSingleton(); }

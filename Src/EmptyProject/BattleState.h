@@ -7,9 +7,14 @@
 
 class WorldState;
 
+enum TurnType { TT_NATURAL, TT_COMPUTER, TT_PLAYER };
+enum PlayerSide { PS_NOTSET, PS_COMPUTER, PS_PLAYER };
+
 class BattleState : public State
 {
 public:
+	
+
 	BattleState();
 	~BattleState();
 
@@ -25,9 +30,16 @@ public:
 
 	void renderFixedText (int scrWidth, int scrHeight);
 
+	void setNextTurnType( TurnType tt ) { m_nextTurnType = tt; }
 	void passTurn();
+	void pushBattleLog( const char* log ) { m_battleLog.push_back( log ); }
 	
 private:
+
+	void doComputerAction();
+	Character* getHero();
+	Character* getEnemy();
+
 	/*이곳부터가 컴포넌트*/
 	Picture				m_StatusBoxPlayer;
 	Picture				m_StatusBoxEnemy;
@@ -61,4 +73,9 @@ private:
 	StringList m_battleLog;
 
 	WorldState*		m_ws;
+
+	
+	TurnType		m_curTurnType;
+	TurnType		m_nextTurnType;
+	PlayerSide		m_battleWinner;
 };

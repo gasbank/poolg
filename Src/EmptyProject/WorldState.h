@@ -55,17 +55,11 @@ private:
 	LPD3DXCONSTANTTABLE             m_pConstantTable;
 	LPDIRECT3DVERTEXDECLARATION9    m_pVertexDeclaration;
 
-	
 	float							m_sampleTeapotMeshRot;
 	LPD3DXMESH						m_aTile;
+
 	Unit*							m_heroUnit;
 	Unit*							m_curEnemyUnit;
-
-	double							m_startTime;
-
-	
-
-	Character						m_player;
 	
 	UnitSet							m_unitSet;
 };

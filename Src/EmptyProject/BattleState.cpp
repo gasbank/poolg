@@ -94,6 +94,9 @@ BattleState::BattleState()
 	
 	D3DXCreateFont(m_pDev, 17, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblHYnamL);
 	D3DXCreateFont(m_pDev, 18, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Rockwell Extra Bold"), &m_lblREB);
+
+	m_curTurnType = TT_NATURAL;
+	m_nextTurnType = TT_NATURAL;
 }
 
 BattleState::~BattleState()
@@ -107,12 +110,13 @@ HRESULT BattleState::enter()
 	m_vWorldEye = *camera.GetEyePt();
 	m_vWorldLookAt = *camera.GetLookAtPt();
 
-	m_hpBarPlayer.initRate((float)m_ws->getHero()->getMaxHp());
-	m_hpBarEnemy.initRate((float)m_ws->getCurEnemy()->getMaxHp());
+	m_hpBarPlayer.initRate((float)getHero()->getMaxHp());
+	m_hpBarEnemy.initRate((float)getEnemy()->getMaxHp());
 
-	m_battleLog.push_back(std::string("전투 시작!!!!!"));
-	m_battleLog.push_back(std::string("당신이 공격할 차례입니다."));
-
+	m_battleLog.push_back(std::string("전투 개시~~~~~~~~~!!!"));
+	m_battleWinner = PS_NOTSET;
+	setNextTurnType( TT_PLAYER );
+	passTurn();
 	return S_OK;
 }
 
@@ -194,15 +198,15 @@ HRESULT BattleState::frameMove(double fTime, float fElapsedTime)
 	//m_Player.frameMove(fElapsedTime);
 	//m_Enemy.frameMove(fElapsedTime);
 
-	m_hpBarPlayer.setRate((float)m_ws->getHero()->getCurHp());
-	m_hpBarEnemy.setRate((float)m_ws->getCurEnemy()->getCurHp());
+	m_hpBarPlayer.setRate((float)getHero()->getCurHp());
+	m_hpBarEnemy.setRate((float)getEnemy()->getCurHp());
 	
 	TopStateManager& tsm = TopStateManager::getSingleton();
 	WorldState* ws = static_cast<WorldState*>( tsm.getCurState() );
 	const D3DXVECTOR3& vEnemyPos = ws->getEnemyPos();
 	const D3DXVECTOR3& vHeroPos = ws->getHeroPos();
 
-	if ( ws->isCollide( &vEnemyPos, &vHeroPos ) == false )
+	if ( ws->isCollide( &vEnemyPos, &vHeroPos ) == false || m_battleWinner != PS_NOTSET )
 		GetWorldStateManager().setNextState(GAME_WORLD_STATE_FIELD);
 
 	if (fStateTime < 1.0f && GetWorldStateManager().prevStateEnum() == GAME_WORLD_STATE_FIELD)
@@ -247,14 +251,14 @@ HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 
 	if (uMsg == WM_KEYDOWN)
 	{
-		if (wParam == VK_F4)
+		if ( wParam == VK_F4 )
 		{
 			GetWorldStateManager().setNextState(GAME_WORLD_STATE_FIELD);
 		}
-		if (wParam == 'G')
+		if ( wParam == 'G' && m_curTurnType == TT_PLAYER )
 		{
-			m_ws->getCurEnemy()->damage(1);
-			passTurn();
+			m_curTurnType = TT_NATURAL;
+			getHero()->attack( 0, getEnemy() );
 		}
 	}
 
@@ -327,5 +331,31 @@ void BattleState::renderFixedText(int scrWidth, int scrHeight)
 
 void BattleState::passTurn()
 {
-	m_battleLog.push_back(std::string("콤퓨타 차례입니다."));
+	m_curTurnType = m_nextTurnType;
+	m_nextTurnType = TT_NATURAL;
+
+	if (m_curTurnType == TT_PLAYER)
+	{
+		m_battleLog.push_back(std::string("당신이 공격할 차례입니다."));
+	}
+	else if (m_curTurnType == TT_COMPUTER)
+	{
+		m_battleLog.push_back(std::string("콤퓨타 차례입니다."));
+		doComputerAction();
+	}
+}
+
+void BattleState::doComputerAction()
+{
+	getEnemy()->attack(0, getHero());
+}
+
+Character* BattleState::getHero()
+{
+	return static_cast<Character*>( m_ws->getHero() );
+}
+
+Character* BattleState::getEnemy()
+{
+	return static_cast<Character*>( m_ws->getCurEnemy() );
 }

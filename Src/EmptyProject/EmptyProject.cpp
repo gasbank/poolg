@@ -16,7 +16,6 @@
 #include "TopStateManager.h"
 #include "ScriptManager.h"
 #include "VideoMan.h"
-#include "SingletonCreators.h"
 
 
 G								g_g;

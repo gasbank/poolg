@@ -14,7 +14,7 @@ class Unit
 {
 public:
 	static Unit* createUnit( LPD3DXMESH mesh, int tileX = 0, int tileY = 0, float posZ = 0, bool bCtrl = false );
-	~Unit();
+	virtual ~Unit();
 
 	HRESULT init(LPDIRECT3DDEVICE9 pd3dDevice, LPD3DXMESH mesh);
 	const D3DXVECTOR3& getLowerLeft() const { return m_lowerLeft; }
@@ -23,9 +23,9 @@ public:
 	void release() { SAFE_RELEASE(m_d3dxMesh); }
 	bool getControllable() const { return m_bControllable; }
 
-	HRESULT draw();
+	virtual HRESULT frameRender();
 	virtual LRESULT handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
-	void frameMove(float fElapsedTime);
+	virtual bool frameMove(float fElapsedTime);
 
 	void setRotX(float rad) { m_vRot.x = rad; m_bLocalXformDirty = true; }
 	void setRotY(float rad) { m_vRot.y = rad; m_bLocalXformDirty = true; }
@@ -48,10 +48,7 @@ public:
 	int getTilePosY() { return m_tileY; }
 
 	void setMoveDuration(float val) { m_moveDuration = val; }
-
-	int getCurHp() const { return m_curHp; }
-	int getMaxHp() const { return m_maxHp; }
-	void damage(int point);
+	bool isControllable() const { return m_bControllable; }
 
 protected:
 	virtual UnitInput mapKey( UINT nKey );
@@ -85,8 +82,6 @@ protected:
 	float					m_fMovingTime;
 	bool					m_bControllable;
 	
-	int						m_maxHp;
-	int						m_curHp;
 
 private:
 	float					m_moveDuration; // A time needed to move one time(tile) in seconds

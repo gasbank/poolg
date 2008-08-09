@@ -1,6 +1,5 @@
 #include "EmptyProjectPCH.h"
 #include "Dialog.h"
-#include "SingletonCreators.h"
 #include "ScriptManager.h"
 
 LPD3DXFONT	Dialog::pFont;

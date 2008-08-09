@@ -1,6 +1,5 @@
 #include "EmptyProjectPCH.h"
 #include "Unit.h"
-#include "SingletonCreators.h"
 #include "ScriptManager.h"
 #include "WorldState.h"
 #define KEY_WAS_DOWN_MASK 0x80
@@ -20,9 +19,6 @@ Unit::Unit()
 	m_vScale			= D3DXVECTOR3(1.0f, 1.0f, 1.0f);
 	m_bLocalXformDirty	= true;
 	m_bMoving			= false;
-	// Character status info
-	m_maxHp				= 5;
-	m_curHp				= m_maxHp;
 	
 	m_tileX				= 0;
 	m_tileY				= 0;
@@ -59,7 +55,7 @@ HRESULT Unit::init( LPDIRECT3DDEVICE9 pd3dDevice, LPD3DXMESH mesh )
 	return hr;
 }
 
-HRESULT Unit::draw()
+HRESULT Unit::frameRender()
 {
 	HRESULT hr = S_OK;
 
@@ -109,7 +105,7 @@ LRESULT Unit::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 	return FALSE;
 }
 
-void Unit::frameMove( float fElapsedTime )
+bool Unit::frameMove( float fElapsedTime )
 {	
 	if (m_bMoving == false)
 	{
@@ -169,6 +165,8 @@ void Unit::frameMove( float fElapsedTime )
 	}
 
 	updateLocalXform();
+
+	return true;
 }
 
 void Unit::updateLocalXform()

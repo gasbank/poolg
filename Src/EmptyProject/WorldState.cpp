@@ -16,7 +16,6 @@ WorldState::WorldState(void)
 	m_pVertexShader			= 0;
 	m_pConstantTable		= 0;
 	m_pVertexDeclaration	= 0;
-	m_startTime				= -1.0f;
 	m_afd					= 0;
 	m_sg					= 0;
 	m_heroUnit				= 0;
@@ -127,7 +126,7 @@ HRESULT WorldState::enter()
 
 HRESULT WorldState::leave()
 {
-	m_startTime = -1.0f;
+
 
 	GetScriptManager().execute("EpWorldState::leave");
 
@@ -158,7 +157,7 @@ HRESULT WorldState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, floa
 	UnitSet::iterator it = m_unitSet.begin();
 	for ( ; it != m_unitSet.end(); ++it )
 	{
-		(*it)->draw();
+		(*it)->frameRender();
 	}
 
 	// Draw floor gray tile (2D)
@@ -393,8 +392,9 @@ const D3DXVECTOR3& WorldState::getHeroPos()
 
 bool WorldState::isCollide( const D3DXVECTOR3* vec0, const D3DXVECTOR3* vec1 )
 {
-	if ( -5.0 <= (vec0->x - vec1->x) && (vec0->x - vec1->x) <= 5.0 )
-		if ( -5.0 <= (vec0->y - vec1->y) && (vec0->y - vec1->y) <= 5.0 )
+	const float collideRange = 10.0f;
+	if ( -collideRange <= (vec0->x - vec1->x) && (vec0->x - vec1->x) <= collideRange )
+		if ( -collideRange <= (vec0->y - vec1->y) && (vec0->y - vec1->y) <= collideRange )
 				return true;
 
 	return false;

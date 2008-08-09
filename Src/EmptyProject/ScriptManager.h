@@ -1,4 +1,5 @@
 #pragma once
+#include "SingletonCreators.h"
 
 class ScriptManager : public Singleton<ScriptManager>
 {
@@ -72,6 +73,7 @@ static const DWORD _trait_I_I		= AT_I | (AT_I << 4);
 static const DWORD _trait_I_I_I		= AT_I | (AT_I << 4) | (AT_I << 8);
 static const DWORD _trait_I_PC		= AT_I | (AT_PC << 4);
 static const DWORD _trait_I_PV		= AT_I | (AT_PV << 4);
+static const DWORD _trait_I_PV_I_I	= AT_I | (AT_PV << 4) | (AT_I << 8) | (AT_I << 12);
 static const DWORD _trait_I_PV_D	= AT_I | (AT_PV << 4) | (AT_D << 8);
 static const DWORD _trait_I_PV_PV	= AT_I | (AT_PV << 4) | (AT_PV << 8);
 static const DWORD _trait_PV		= AT_PV;
@@ -128,6 +130,14 @@ static const DWORD _trait_D_PV		= AT_D | (AT_PV << 4);
 		args[0].pv = funcName(args[1].i, args[2].i, args[3].i);					\
 	}																			\
 	SCRIPT_CALLABLE_END(funcName, PV_I_I_I)
+
+#define SCRIPT_CALLABLE_I_PV_I_I(funcName)										\
+	void _wrap_##funcName(ScriptArgumentList& args)								\
+	{																			\
+		args[0].i = funcName(args[1].pv, args[2].i, args[3].i);					\
+	}																			\
+	SCRIPT_CALLABLE_END(funcName, PV_I_I_I)
+
 
 #define SCRIPT_CALLABLE_I_PV_PV(funcName)										\
 	void _wrap_##funcName(ScriptArgumentList& args)								\

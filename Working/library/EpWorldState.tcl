@@ -21,19 +21,20 @@ namespace eval EpWorldState {
 		variable pEnemyUnit3
 		variable pWorld
 		
-		set pHeroUnit			[EpCreateUnit 0 -24 1];
-		set pEnemyUnit1			[EpCreateUnit 7 0 0];
-		set pEnemyUnit2			[EpCreateUnit 10 -10 0];
-		set pEnemyUnit3			[EpCreateUnit 0 -30 0];
-		set curUnitCount		[EpRegisterToWorld $pWorld $pHeroUnit];
-		set curUnitCount		[EpRegisterToWorld $pWorld $pEnemyUnit1];
-		set curUnitCount		[EpRegisterToWorld $pWorld $pEnemyUnit2];
-		set curUnitCount		[EpRegisterToWorld $pWorld $pEnemyUnit3];
+		set pHeroUnit				[EpCreateCharacter 0 -24 1];
+		set pEnemyUnit1				[EpCreateCharacter 7 0 0];
+		set pEnemyUnit2				[EpCreateCharacter 10 -10 0];
+		set pEnemyUnit3				[EpCreateCharacter 0 -30 0];
+		set curUnitCount			[EpRegisterToWorld $pWorld $pHeroUnit];
+		set curUnitCount			[EpRegisterToWorld $pWorld $pEnemyUnit1];
+		set curUnitCount			[EpRegisterToWorld $pWorld $pEnemyUnit2];
+		set curUnitCount			[EpRegisterToWorld $pWorld $pEnemyUnit3];
 		
-		EpUnitSetRotX			$pHeroUnit [ToRadian -90]
-		EpUnitSetRotZ			$pHeroUnit [ToRadian 90]
-		EpUnitSetPosZ			$pHeroUnit -[EpUnitGetUpperRightZ $pHeroUnit]
-		EpUnitSetMoveDuration	$pHeroUnit 0.25
+		EpCharacterSetMaxAndCurHp	$pHeroUnit 50 50
+		EpUnitSetRotX				$pHeroUnit [ToRadian -90]
+		EpUnitSetRotZ				$pHeroUnit [ToRadian 90]
+		EpUnitSetPosZ				$pHeroUnit -[EpUnitGetUpperRightZ $pHeroUnit]
+		EpUnitSetMoveDuration		$pHeroUnit 0.25
 		
 		EpOutputDebugString " -- Current Unit Count: $curUnitCount\n"
 		

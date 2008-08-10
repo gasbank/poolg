@@ -253,11 +253,6 @@ MenuState::MenuState()
 	//float trianglePositionX = (float)scrWidth/2 - menuBoxWidth + 7;
 	//float triangleBoxPositionY = (float)scrHeight/2 - menuBoxWidth + pos;
 
-	m_saub.init(L"save_unusable_button.png", m_pDev);
-	m_saub.setPos ( (float)scrWidth/2 - menuButtonWidth - 20, (float)scrHeight/2 - menuButtonHeight - 80, 2.8f);
-	m_saub.setSize( menuButtonWidth, menuButtonHeight);
-
-
 	m_stub.init(L"status_up_button.png", m_pDev);
 	m_stub.setPos ( (float)scrWidth/2 - menuButtonWidth - 20, (float)scrHeight/2 - menuButtonHeight - 30, 2.8f);
 	m_stub.setSize( menuButtonWidth, menuButtonHeight);
@@ -265,6 +260,10 @@ MenuState::MenuState()
 	m_saub.init(L"save_up_button.png", m_pDev);
 	m_saub.setPos ( (float)scrWidth/2 - menuButtonWidth - 20, (float)scrHeight/2 - menuButtonHeight - 80, 2.8f);
 	m_saub.setSize( menuButtonWidth, menuButtonHeight);
+
+	m_sanub.init(L"save_unusable_button.png", m_pDev);
+	m_sanub.setPos ( (float)scrWidth/2 - menuButtonWidth - 20, (float)scrHeight/2 - menuButtonHeight - 80, 2.8f);
+	m_sanub.setSize( menuButtonWidth, menuButtonHeight);
 
 	m_loub.init(L"load_up_button.png", m_pDev);
 	m_loub.setPos ( (float)scrWidth/2 - menuButtonWidth - 20, (float)scrHeight/2 - menuButtonHeight - 130, 2.8f);

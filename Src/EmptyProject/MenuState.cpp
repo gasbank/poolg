@@ -3,7 +3,9 @@
 #include "WorldStateManager.h"
 
 int loc = 0;
-bool op = false;
+bool op_st = false;
+bool op_sa = false;
+bool op_lo = false;
 
 void MenuState::select(int move)
 {
@@ -33,18 +35,44 @@ void MenuState::select(int move)
 		}
 	}
 	
+
 	if ( loc == 0 )
 	{
 		if ( move == 0 )
 		{
-			if ( op == false )
+			if ( op_st == false )
 			{
-				op = true;
+				op_st = true;
 			}
-			else op = false;
+			else op_st = false;
 		}
 	}
-	if ( loc == 4 )
+
+	if ( loc == 1 )
+	{
+		if ( move == 0 )
+		{
+			if ( op_sa == false )
+			{
+				op_sa = true;
+			}
+			else op_sa = false;
+		}
+	}
+
+	if ( loc == 2 )
+	{
+		if ( move == 0 )
+		{
+			if ( op_lo == false )
+			{
+				op_lo = true;
+			}
+			else op_lo = false;
+		}
+	}
+
+	if ( loc ==4 )
 		if ( move == 0 )
 			exit(0);
 }
@@ -54,6 +82,8 @@ void MenuState::select(int move)
 HRESULT MenuState::frameMove(double fTime, float fElapsedTime)
 {
 	m_menu.frameMove(fElapsedTime);
+
+	//m_sanub.frameMove(fElapsedTime);
 
 	m_stub.frameMove(fElapsedTime);
 	m_saub.frameMove(fElapsedTime);
@@ -68,6 +98,8 @@ HRESULT MenuState::frameMove(double fTime, float fElapsedTime)
 	m_exdb.frameMove(fElapsedTime);
 
 	m_stwin.frameMove(fElapsedTime);
+	m_sawin.frameMove(fElapsedTime);
+	m_lowin.frameMove(fElapsedTime);
 	
 	//m_selc.setPos(m_selc.getPos()->x, pos, m_selc.getPos()->z);
 
@@ -98,7 +130,9 @@ HRESULT MenuState::frameRender(IDirect3DDevice9* pd3dDevice,  double fTime, floa
 	m_menu.draw();
 	
 	m_stub.draw();
-	m_saub.draw();
+	//if ( m_nextState == m_states[1] )
+		m_sanub.draw();
+	//else m_saub.draw();
 	m_loub.draw();
 	m_seub.draw();
 	m_exub.draw();
@@ -109,7 +143,8 @@ HRESULT MenuState::frameRender(IDirect3DDevice9* pd3dDevice,  double fTime, floa
 		m_stdb.draw();
 		break;
 	case 1 :
-		m_sadb.draw();
+		//if ( m_nextState != m_states[1] )
+			m_sadb.draw();
 		break;
 	case 2 :
 		m_lodb.draw();
@@ -122,9 +157,17 @@ HRESULT MenuState::frameRender(IDirect3DDevice9* pd3dDevice,  double fTime, floa
 		break;
 	}
 
-	if ( op == true )
+	if ( op_st == true )
 	{
 		m_stwin.draw();
+	}
+	if ( op_sa == true )
+	{
+		m_sawin.draw();
+	}
+	if ( op_lo == true )
+	{
+		m_lowin.draw();
 	}
 	
 	m_pDev->SetRenderState(D3DRS_ZENABLE, TRUE);
@@ -140,11 +183,11 @@ HRESULT MenuState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 		{
 
 			case VK_UP:
-				if (!op)
+				if ( !op_st && !op_sa && !op_lo )
 					select( 8 );
 				break;
 			case VK_DOWN:
-				if (!op)
+				if ( !op_st && !op_sa && !op_lo )
 					select( 9 );
 				break;
 			case VK_RETURN:
@@ -164,6 +207,8 @@ HRESULT MenuState::release()
 {
 	m_menu.release();
 
+	//m_sanub.release();
+
 	m_stub.release();
 	m_saub.release();
 	m_loub.release();
@@ -177,6 +222,8 @@ HRESULT MenuState::release()
 	m_exdb.release();
 
 	m_stwin.release();
+	m_sawin.release();
+	m_lowin.release();
 
 	SAFE_RELEASE( m_lblHYnamL );
 	SAFE_RELEASE( m_lblREB);
@@ -205,6 +252,11 @@ MenuState::MenuState()
 
 	//float trianglePositionX = (float)scrWidth/2 - menuBoxWidth + 7;
 	//float triangleBoxPositionY = (float)scrHeight/2 - menuBoxWidth + pos;
+
+	m_saub.init(L"save_unusable_button.png", m_pDev);
+	m_saub.setPos ( (float)scrWidth/2 - menuButtonWidth - 20, (float)scrHeight/2 - menuButtonHeight - 80, 2.8f);
+	m_saub.setSize( menuButtonWidth, menuButtonHeight);
+
 
 	m_stub.init(L"status_up_button.png", m_pDev);
 	m_stub.setPos ( (float)scrWidth/2 - menuButtonWidth - 20, (float)scrHeight/2 - menuButtonHeight - 30, 2.8f);
@@ -250,6 +302,14 @@ MenuState::MenuState()
 	m_stwin.init(L"status_window.png", m_pDev);
 	m_stwin.setPos ( 0 - scrWidth / 2, 0 - scrHeight / 2, 2.6f);
 	m_stwin.setSize(scrWidth, scrHeight);
+
+	m_sawin.init(L"save_window.png", m_pDev);
+	m_sawin.setPos ( 0 - scrWidth / 2, 0 - scrHeight / 2, 2.6f);
+	m_sawin.setSize(scrWidth, scrHeight);
+
+	m_lowin.init(L"load_window.png", m_pDev);
+	m_lowin.setPos ( 0 - scrWidth / 2, 0 - scrHeight / 2, 2.6f);
+	m_lowin.setSize(scrWidth, scrHeight);
 
 
 	V( D3DXCreateFont(m_pDev, 17, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblHYnamL) );

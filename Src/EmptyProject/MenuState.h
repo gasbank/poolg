@@ -39,5 +39,9 @@ private:
 	Picture m_sedb;
 	Picture m_exdb;
 
+	Picture m_sanub;
+
 	Picture m_stwin;
+	Picture m_sawin;
+	Picture m_lowin;
 };

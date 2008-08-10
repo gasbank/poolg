@@ -74,7 +74,7 @@ void MenuState::select(int move)
 
 	if ( loc ==4 )
 		if ( move == 0 )
-			exit(0);
+			SendMessage( DXUTGetHWND(), WM_CLOSE, 0, 0 );
 }
 
 

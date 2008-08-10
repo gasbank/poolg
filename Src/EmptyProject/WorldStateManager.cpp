@@ -8,16 +8,19 @@ IMPLEMENT_SINGLETON(WorldStateManager);
 
 WorldStateManager::WorldStateManager(void)
 {
-
+	m_states = new State*[TOTAL_STATE_COUNT];
+	ZeroMemory( m_states, sizeof(State*) * TOTAL_STATE_COUNT );
+	init();
 }
 
 WorldStateManager::~WorldStateManager(void)
 {
+	release();
+	delete [] m_states;
 }
 
 void WorldStateManager::init()
 {
-	m_states = new State*[10];
 	m_states[0] = new FieldState();
 	m_states[1] = new BattleState();
 	m_states[2] = new MenuState();
@@ -27,12 +30,10 @@ void WorldStateManager::init()
 
 void WorldStateManager::release()
 {
-	if (m_states)
+	UINT i;
+	for ( i = 0; i < TOTAL_STATE_COUNT; ++i )
 	{
-		EP_SAFE_RELEASE( m_states[0] );
-		EP_SAFE_RELEASE( m_states[1] );
-		EP_SAFE_RELEASE( m_states[2] );
-		delete [] m_states;
+		EP_SAFE_RELEASE( m_states[ i ] );
 	}
 }
 

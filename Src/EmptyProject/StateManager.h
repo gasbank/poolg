@@ -12,11 +12,9 @@ class State;
 class StateManager
 {
 	public:
-		StateManager(void);
-		virtual ~StateManager(void);
+	StateManager(void);
+	virtual ~StateManager(void);
 
-	virtual void init() = 0;
-	virtual void release() = 0;
 	virtual void setNextState(GameState) = 0;
 	virtual GameState curStateEnum() = 0;
 	virtual GameState prevStateEnum() = 0;
@@ -30,4 +28,8 @@ protected:
 	State* m_prevStates;
 	State* m_curStates;
 	State* m_nextState;
+
+private:
+	virtual void init() = 0;
+	virtual void release() = 0;
 };

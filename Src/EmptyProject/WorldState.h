@@ -12,6 +12,7 @@
 #include "Dialog.h"
 
 typedef std::set<Unit*> UnitSet;
+typedef std::list<Dialog*> DialogList;
 
 class WorldState : public State
 {
@@ -49,7 +50,8 @@ private:
 	Picture							m_picSmiley;
 	Picture							m_avatar;
 	Sound							m_sound;
-	Dialog							m_dialog;
+	//Dialog						m_dialog;
+	DialogList						m_scriptedDialog;
 
 	LPDIRECT3DVERTEXSHADER9         m_pVertexShader;
 	LPD3DXCONSTANTTABLE             m_pConstantTable;

@@ -8,31 +8,34 @@ IMPLEMENT_SINGLETON(TopStateManager);
 
 TopStateManager::TopStateManager(void)
 {
+	m_states = new State*[TOTAL_STATE_COUNT];
+	ZeroMemory( m_states, sizeof(State*) * TOTAL_STATE_COUNT );
+	init();
 }
 
 TopStateManager::~TopStateManager(void)
 {
+	release();
+	delete [] m_states;
 }
 
 void TopStateManager::init()
-{
-	m_states = new State*[10];
+{	
 	m_states[0] = new IntroState();
 	m_states[2] = new WorldState();
 	m_states[5] = new CreditState();
+
 	m_curStates = 0;
 	m_nextState = 0;
 }
 
 void TopStateManager::release()
 {
-	m_states[0]->release();
-	m_states[2]->release();
-	m_states[5]->release();
-	delete m_states[0];
-	delete m_states[2];
-	delete m_states[5];
-	delete [] m_states;
+	UINT i;
+	for ( i = 0; i < TOTAL_STATE_COUNT; ++i )
+	{
+		EP_SAFE_RELEASE( m_states[ i ] );
+	}	
 }
 
 void TopStateManager::setNextState(GameState state)

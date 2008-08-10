@@ -2,28 +2,35 @@
 #include "Dialog.h"
 #include "ScriptManager.h"
 
-LPD3DXFONT	Dialog::pFont;
+LPD3DXFONT	Dialog::pFont = 0;
 RECT		Dialog::pRc;
-LPD3DXFONT	Dialog::qFont;
+LPD3DXFONT	Dialog::qFont = 0;
 RECT		Dialog::qRc;
 
 Dialog::Dialog(void)
 {
-	pFont = 0;
-	qFont = 0;
-	m_pDev = GetG().m_dev;
+	ctorDialogPane();
 
-	dialog.init(L"dae-sa.png", m_pDev);
-	dialog.setPos (-(GetG().m_scrWidth / 2.0f), -(GetG().m_scrHeight / 2.0f), 2.8f);
-	dialog.setSize(200, 200);
-	name.init(L"name_window.png", m_pDev);
-	name.setPos (-(GetG().m_scrWidth / 2.0f), -(GetG().m_scrHeight / 2.0f) + 200, 2.8f);
-	name.setSize(21 + 40, 13 + 40);
+	m_speakArray = 0;
+	m_speakCount = 0;
+	m_curSpeakIdx = 0;
 }
 
+Dialog::Dialog( Speak* speakArray, UINT speakCount, const RECT& region, bool bOneTime )
+{
+	ctorDialogPane();
+	m_speakArray	= speakArray;
+	m_speakCount	= speakCount;
+	m_curSpeakIdx	= 0;
+	m_region		= region;
+	m_bOneTime		= bOneTime;
+}
 Dialog::~Dialog(void)
 {
+	
 }
+
+
 
 HRESULT Dialog::init()
 {
@@ -38,20 +45,15 @@ HRESULT Dialog::init()
 	qRc.right = 53 - 20;
 	qRc.bottom = (GetG().m_scrHeight - 200) - 20;
 
-	std::string dialog1 = "1234";
-	debugBuffer.push_back(dialog1);
-	dialog1 = "4567";
-	debugBuffer.push_back(dialog1);
-	nameBuffer = "PoolG";
-	bufferPointer = debugBuffer.begin();
-	namePointer = &nameBuffer;
-
+	
 	dlg_ON = false;
 	startTalk = false;
 	endTalk = false;
 
-	V( D3DXCreateFont( GetG().m_dev, 12, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Gulim"), &pFont) );
-	V( D3DXCreateFont( GetG().m_dev, 12, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("msgothic"), &qFont) );
+	if ( !pFont )
+		V( D3DXCreateFont( GetG().m_dev, 12, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Gulim"), &pFont) );
+	if ( !qFont )
+		V( D3DXCreateFont( GetG().m_dev, 12, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("msgothic"), &qFont) );
 
 	return hr;
 }
@@ -63,21 +65,10 @@ HRESULT Dialog::release()
 
 	SAFE_RELEASE( pFont );
 	SAFE_RELEASE( qFont );
-	
+	SAFE_DELETE_ARRAY( m_speakArray );
+
 	return S_OK;
 }
-
-
-int EpWriteDialog( const char* c )
-{
-	Dialog::pFont->DrawTextA(0, c, -1, &Dialog::pRc, DT_NOCLIP | DT_WORDBREAK, D3DXCOLOR( 0.0f, 1.0f, 1.0f, 1.0f ) );
-
-	return 0;
-} SCRIPT_CALLABLE_I_PC( EpWriteDialog )
-
-START_SCRIPT_FACTORY(Dialog)
-	CREATE_OBJ_COMMAND( EpWriteDialog )
-END_SCRIPT_FACTORY(Dialog)
 
 void Dialog::Toggle(bool *OK)
 {
@@ -97,10 +88,10 @@ HRESULT Dialog::frameMove(double fTime, float fElapsedTime)
 
 HRESULT Dialog::frameRender(IDirect3DDevice9* pd3dDevice,  double fTime, float fElapsedTime)
 {
-	m_pDev->SetRenderState(D3DRS_LIGHTING, FALSE);
-	pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
-	pd3dDevice->SetTransform(D3DTS_VIEW, &GetG().g_fixedViewMat);
-	pd3dDevice->SetTransform(D3DTS_PROJECTION, &GetG().g_orthoProjMat);
+	GetG().m_dev->SetRenderState(D3DRS_LIGHTING, FALSE);
+	GetG().m_dev->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
+	GetG().m_dev->SetTransform(D3DTS_VIEW, &GetG().g_fixedViewMat);
+	GetG().m_dev->SetTransform(D3DTS_PROJECTION, &GetG().g_orthoProjMat);
 
 	D3DMATERIAL9 material;
 	D3DCOLORVALUE cv, cv2;
@@ -111,24 +102,25 @@ HRESULT Dialog::frameRender(IDirect3DDevice9* pd3dDevice,  double fTime, float f
 	material.Emissive = cv;
 	material.Power = 1.0f;
 	material.Specular = cv2;
-	m_pDev->SetMaterial(&material);
+	GetG().m_dev->SetMaterial(&material);
 
 	//drawFixedText(scrWidth, scrHeight);
 
-	m_pDev->SetRenderState(D3DRS_ZENABLE, FALSE);
+	GetG().m_dev->SetRenderState(D3DRS_ZENABLE, FALSE);
 	
 	if( dlg_ON )
 	{
+		D3DPERF_BeginEvent(0x12345678, L"Draw Dialog Pane");
 		dialog.draw();
 		name.draw();
+		D3DPERF_EndEvent();
 
 		printDialog();
 		printName();
-		//GetScriptManager().execute("EpWorldState::printDialogText");
 
 	}
 
-	m_pDev->SetRenderState(D3DRS_ZENABLE, TRUE);
+	GetG().m_dev->SetRenderState(D3DRS_ZENABLE, TRUE);
 	return S_OK;
 }
 
@@ -153,18 +145,18 @@ HRESULT Dialog::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 
 void Dialog::printDialog()
 {
-	pFont->DrawTextA(0, bufferPointer->c_str(), -1, &pRc, DT_NOCLIP | DT_WORDBREAK, D3DXCOLOR( 0.0f, 1.0f, 1.0f, 1.0f ) );
+	pFont->DrawTextA(0, m_speakArray[m_curSpeakIdx].content, -1, &pRc, DT_NOCLIP | DT_WORDBREAK, D3DXCOLOR( 0.0f, 1.0f, 1.0f, 1.0f ) );
 }
 
 void Dialog::printName()
 {
-	qFont->DrawTextA(0, namePointer->c_str(), -1, &qRc, DT_NOCLIP | DT_WORDBREAK, D3DXCOLOR( 1.0f, 1.0f, 0.0f, 1.0f ) );
+	qFont->DrawTextA(0, m_speakArray[m_curSpeakIdx].name, -1, &qRc, DT_NOCLIP | DT_WORDBREAK, D3DXCOLOR( 1.0f, 1.0f, 0.0f, 1.0f ) );
 }
 
 void Dialog::NextDialog()
 {
-	if(dlg_ON && ((bufferPointer+1) != debugBuffer.end()))
-		bufferPointer++;
+	if(dlg_ON && (m_curSpeakIdx < m_speakCount - 1))
+		m_curSpeakIdx++;
 	else
 	{
 		if ( dlg_ON && startTalk )
@@ -172,7 +164,48 @@ void Dialog::NextDialog()
 			Toggle(&dlg_ON);
 			Toggle(&startTalk);
 			Toggle(&endTalk);
-			bufferPointer = debugBuffer.begin();
+			m_curSpeakIdx = 0;
 		}
 	}
+}
+
+Dialog* Dialog::createDialogByScript( const char* dialogName )
+{
+	char tempBuf[256];
+	Tcl_Interp* interp = GetScriptManager().getInterp();
+	
+	StringCchPrintfA( tempBuf, 256, "%s::region", dialogName );
+	RECT region;
+	GetScriptManager().readRect( tempBuf, region );
+
+	StringCchPrintfA( tempBuf, 256, "%s::dialog", dialogName );
+	Tcl_Obj* dialogObj = GetScriptManager().getObject( tempBuf );
+	int dialogTokenCount;
+	Tcl_ListObjLength( interp, dialogObj, &dialogTokenCount );
+	UINT speakCount = dialogTokenCount / 2;
+	Dialog::Speak* speakArray = new Dialog::Speak[ speakCount ];
+	UINT i;
+	for ( i = 0; i < speakCount; ++i )
+	{
+		Tcl_Obj* elem;
+		int length;
+		Tcl_ListObjIndex( interp, dialogObj, i*2 + 0, &elem );
+		speakArray[ i ].name = Tcl_GetStringFromObj( elem, &length );
+		Tcl_ListObjIndex( interp, dialogObj, i*2 + 1, &elem );
+		speakArray[ i ].content = Tcl_GetStringFromObj( elem, &length );
+	}
+
+	StringCchPrintfA( tempBuf, 256, "%s::oneTime", dialogName );
+	int oneTime = GetScriptManager().readInt( tempBuf );
+	return new Dialog( speakArray, speakCount, region, oneTime?true:false );
+}
+
+void Dialog::ctorDialogPane()
+{
+	dialog.init(L"dae-sa.png", GetG().m_dev);
+	dialog.setPos (-(GetG().m_scrWidth / 2.0f), -(GetG().m_scrHeight / 2.0f), 2.8f);
+	dialog.setSize(200, 200);
+	name.init(L"name_window.png", GetG().m_dev);
+	name.setPos (-(GetG().m_scrWidth / 2.0f), -(GetG().m_scrHeight / 2.0f) + 200, 2.8f);
+	name.setSize(21 + 40, 13 + 40);
 }

@@ -7,8 +7,8 @@
 BattleState::BattleState()
 {
 	m_pDev = GetG().m_dev;
-	m_ws = dynamic_cast<WorldState*>( GetTopStateManager().getCurState() );
-	assert( m_ws );
+	assert( m_pDev );
+	m_ws = 0;
 
 	/*UI 초기화 부분입니다.*/
 	float statusBoxWidth = 163;
@@ -102,12 +102,15 @@ BattleState::BattleState()
 
 BattleState::~BattleState()
 {
-
+	release();
 }
 
 /* 전투 시작 시 다음 함수가 호출됨*/
 HRESULT BattleState::enter()
 {
+	m_ws = dynamic_cast<WorldState*>( GetTopStateManager().getCurState() );
+	assert( m_ws );
+
 	EpCamera& camera = G::getSingleton().m_camera;
 	m_vWorldEye = *camera.GetEyePt();
 	m_vWorldLookAt = *camera.GetLookAtPt();

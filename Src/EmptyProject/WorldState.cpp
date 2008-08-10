@@ -5,7 +5,7 @@
 #include "ScriptManager.h"
 #include "TileManager.h"
 
-WorldStateManager worldStateManager;
+
 TileManager	tileManager;
 
 
@@ -24,11 +24,18 @@ WorldState::WorldState(void)
 	char command[128];
 	StringCchPrintfA(command, 128, "EpWorldState::init 0x%p", this);
 	GetScriptManager().execute(command);
+
+	
 }
 
 WorldState::~WorldState(void)
 {
 	detachAllUnits();
+	DialogList::iterator it = m_scriptedDialog.begin();
+	for ( ; it != m_scriptedDialog.end(); ++it )
+	{
+		EP_SAFE_RELEASE( *it );
+	}
 }
 
 HRESULT WorldState::enter()
@@ -57,7 +64,7 @@ HRESULT WorldState::enter()
 	m_avatar.setSize(1, 1);
 
 	m_sound.init();
-	m_dialog.init();
+
 
 	tileManager.tile[8][10].movable = false;
 	tileManager.tile[9][9].talkable = true;
@@ -116,11 +123,16 @@ HRESULT WorldState::enter()
 	setupLight();
 
 	GetScriptManager().execute("EpWorldState::enter");
-
-	GetWorldStateManager().init();
-
 	
-
+	// Load dialogs from script
+	std::list<const char*> dialogList;
+	GetScriptManager().readCharPtrList( "EpDialogList", dialogList );
+	std::list<const char*>::iterator itDialogList = dialogList.begin();
+	for ( ; itDialogList != dialogList.end(); ++itDialogList )
+	{
+		m_scriptedDialog.push_back( Dialog::createDialogByScript( *itDialogList ) );
+		(*m_scriptedDialog.rbegin())->init();
+	}
 	return S_OK;
 }
 
@@ -175,7 +187,14 @@ HRESULT WorldState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, floa
 
 	WorldStateManager& wsm = WorldStateManager::getSingleton();
 	wsm.getCurState()->frameRender(pd3dDevice, fTime, fElapsedTime);
-	m_dialog.frameRender(pd3dDevice, fTime, fElapsedTime);
+	
+	
+	DialogList::iterator itDialog = m_scriptedDialog.begin();
+	for ( ; itDialog != m_scriptedDialog.end(); ++itDialog )
+	{
+		(*itDialog)->frameRender(pd3dDevice, fTime, fElapsedTime);
+	}
+	
 
 	return S_OK;
 }
@@ -208,8 +227,13 @@ HRESULT WorldState::frameMove(double fTime, float fElapsedTime)
 	m_avatar.frameMove(fElapsedTime);
 	camera.FrameMove(fElapsedTime);
 	m_sound.UpdateAudio();
-	m_dialog.frameMove(fTime, fElapsedTime);
-	//m_heroUnit->frameMove(fElapsedTime);
+	
+	DialogList::iterator itDialog = m_scriptedDialog.begin();
+	for ( ; itDialog != m_scriptedDialog.end(); ++itDialog )
+	{
+		(*itDialog)->frameMove( fTime, fElapsedTime );
+	}
+	
 
 	UnitSet::iterator it = m_unitSet.begin();
 	for ( ; it != m_unitSet.end(); ++it )
@@ -248,7 +272,12 @@ HRESULT WorldState::release()
 	m_picSmiley.release();
 	m_avatar.release();
 	m_sound.release();
-	m_dialog.release();
+	//m_dialog.release();
+	DialogList::iterator it = m_scriptedDialog.begin();
+	for ( ; it != m_scriptedDialog.end(); ++it )
+	{
+		(*it)->release();
+	}
 	
 	if (m_afd)
 		release_arnfile(*m_afd);
@@ -259,7 +288,6 @@ HRESULT WorldState::release()
 	SAFE_RELEASE( m_pVertexDeclaration );
 	SAFE_RELEASE(m_aTile);
 
-	GetWorldStateManager().release();
 
 	return S_OK;
 }
@@ -268,8 +296,13 @@ HRESULT WorldState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 {
 	m_pic.handleMessages(hWnd, uMsg, wParam, lParam);
 	m_sound.handleMessages(hWnd, uMsg, wParam, lParam);
-	m_dialog.handleMessages(hWnd, uMsg, wParam, lParam);
-	//m_heroUnit->handleMessages(hWnd, uMsg, wParam, lParam);
+	
+	DialogList::iterator itDialog = m_scriptedDialog.begin();
+	for ( ; itDialog != m_scriptedDialog.end(); ++itDialog )
+	{
+		(*itDialog)->handleMessages( hWnd, uMsg, wParam, lParam );
+	}
+	
 
 	UnitSet::iterator it = m_unitSet.begin();
 	for ( ; it != m_unitSet.end(); ++it )
@@ -301,29 +334,35 @@ HRESULT WorldState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 	{
 		if (wParam == VK_RETURN)
 		{
-			if ( (m_heroUnit->getTilePosX() == 9) && (m_heroUnit->getTilePosY() == 9) )
+			DialogList::iterator it = m_scriptedDialog.begin();
+			for ( ; it != m_scriptedDialog.end(); ++it )
 			{
-				if ( tileManager.tile[9][9].talkable && tileManager.tile[9][9].talkonetime )
+				Dialog* dialog = (*it);
+				if ( (m_heroUnit->getTilePosX() == dialog->getRegion().left)
+					&& (m_heroUnit->getTilePosY() == dialog->getRegion().top) )
 				{
-					tileManager.tile[9][9].talkonetime = false;
-					m_dialog.startTalk = true;
-					if ( !m_dialog.dlg_ON )
-						m_dialog.Toggle(&m_dialog.dlg_ON);
+					if ( dialog->isOneTime() )
+					{
+						dialog->setOneTime( false );
+						dialog->startTalk = true;
+						if ( !dialog->dlg_ON )
+							dialog->Toggle(&dialog->dlg_ON);
+					}
+					if ( !dialog->isOneTime() && !dialog->endTalk)
+					{
+						dialog->startTalk = true;
+						if ( !dialog->dlg_ON )
+							dialog->Toggle( &dialog->dlg_ON );
+					}
+					if ( dialog->endTalk && !dialog->isOneTime() )
+						dialog->Toggle( &dialog->endTalk );
 				}
-				if ( tileManager.tile[9][9].talkable && !tileManager.tile[9][9].talkonetime && !m_dialog.endTalk)
-				{
-					m_dialog.startTalk = true;
-					if ( !m_dialog.dlg_ON )
-						m_dialog.Toggle(&m_dialog.dlg_ON);
-				}
-				if ( tileManager.tile[9][9].talkable && m_dialog.endTalk && !tileManager.tile[9][9].talkonetime)
-					m_dialog.Toggle(&m_dialog.endTalk);
 			}
 		}
 	}
 
-
-	GetWorldStateManager().getCurState()->handleMessages(hWnd, uMsg, wParam, lParam);
+	if ( GetWorldStateManager().getCurState() )
+		GetWorldStateManager().getCurState()->handleMessages(hWnd, uMsg, wParam, lParam);
 
 	return S_OK;
 }

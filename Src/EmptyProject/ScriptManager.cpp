@@ -10,7 +10,7 @@ IMPLEMENT_SINGLETON(ScriptManager);
 
 ScriptManager::ScriptManager(void)
 {	
-	m_interpreter = 0;
+	m_interp = 0;
 }
 
 ScriptManager::~ScriptManager(void)
@@ -19,42 +19,93 @@ ScriptManager::~ScriptManager(void)
 
 HRESULT ScriptManager::init()
 {
-	m_interpreter = Tcl_CreateInterp();
-	if ( Tcl_AppInit( m_interpreter ) != TCL_OK ) throw std::runtime_error( "Script init error" );
+	m_interp = Tcl_CreateInterp();
+	if ( Tcl_AppInit( m_interp ) != TCL_OK ) throw std::runtime_error( "Script init error" );
 	
 	return S_OK;
 }
 
 HRESULT ScriptManager::release()
 {
-	Tcl_DeleteInterp( m_interpreter );
+	Tcl_DeleteInterp( m_interp );
 	Tcl_Finalize();
 	return S_OK;
 }
 
 void ScriptManager::execute( const char* command )
 {
-	if ( Tcl_Eval( m_interpreter, command ) != TCL_OK )
+	if ( Tcl_Eval( m_interp, command ) != TCL_OK )
 		throwScriptErrorWithMessage();
 }
 
 void ScriptManager::executeFile( const char* fileName )
 {
-	if ( Tcl_EvalFile( m_interpreter, fileName ) != TCL_OK )
+	if ( Tcl_EvalFile( m_interp, fileName ) != TCL_OK )
 		throwScriptErrorWithMessage();
 }
 
 void ScriptManager::throwScriptErrorWithMessage()
 {
 	char lineNo[32];
-	StringCchPrintfA( lineNo, 32, "Line: %d\n", m_interpreter->errorLine );
+	StringCchPrintfA( lineNo, 32, "Line: %d\n", m_interp->errorLine );
 	OutputDebugStringA( "\n@@@------------------------- SCRIPT ERROR -------------------------@@@\n" );
 	OutputDebugStringA( lineNo );
-	OutputDebugStringA( m_interpreter->result );
+	OutputDebugStringA( m_interp->result );
 	OutputDebugStringA( "\n@@@------------------------- SCRIPT ERROR -------------------------@@@\n\n" );
-	throw std::runtime_error( m_interpreter->result );
+	throw std::runtime_error( m_interp->result );
 }
 
+bool ScriptManager::readRect( const char* variableName, RECT& rect )
+{
+	Tcl_Obj* retObj;
+	Tcl_Obj* aObj;	
+	int retObjLength;	
+	retObj = Tcl_GetVar2Ex( m_interp, variableName, 0, 0 );
+	Tcl_ListObjLength( m_interp, retObj, &retObjLength );
+	assert(retObjLength == 4);
+	Tcl_ListObjIndex( m_interp, retObj, 0, &aObj );
+	Tcl_GetLongFromObj( m_interp, aObj, &rect.left );
+	Tcl_ListObjIndex( m_interp, retObj, 1, &aObj );
+	Tcl_GetLongFromObj( m_interp, aObj, &rect.top );
+	Tcl_ListObjIndex( m_interp, retObj, 2, &aObj );
+	Tcl_GetLongFromObj( m_interp, aObj, &rect.right );
+	Tcl_ListObjIndex( m_interp, retObj, 3, &aObj );
+	Tcl_GetLongFromObj( m_interp, aObj, &rect.bottom );
+
+	
+	return true;
+}
+
+Tcl_Obj* ScriptManager::getObject( const char* variableName )
+{
+	return Tcl_GetVar2Ex( m_interp, variableName, 0, 0 );
+}
+
+int ScriptManager::readInt( const char* variableName )
+{
+	Tcl_Obj* obj = Tcl_GetVar2Ex( m_interp, variableName, 0, 0 );
+	int ret;
+	Tcl_GetIntFromObj( m_interp, obj, &ret );
+	return ret;
+}
+
+bool ScriptManager::readCharPtrList( const char* variableName, std::list<const char*>& strList )
+{
+	Tcl_Obj* retObj;
+	Tcl_Obj* aObj;	
+	int retObjLength;	
+	retObj = Tcl_GetVar2Ex( m_interp, variableName, 0, 0 );
+	Tcl_ListObjLength( m_interp, retObj, &retObjLength );
+	assert( strList.size() == 0 );
+	UINT i;
+	for ( i = 0; i < (UINT)retObjLength; ++i )
+	{
+		int len;
+		Tcl_ListObjIndex( m_interp, retObj, i, &aObj );
+		strList.push_back( Tcl_GetStringFromObj( aObj, &len ) );
+	}
+	return true;
+}
 //////////////////////////////////////////////////////////////////////////
 
 int EpSetNextState(int stateID)

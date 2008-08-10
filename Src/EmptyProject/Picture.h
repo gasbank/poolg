@@ -89,4 +89,6 @@ protected:
 	LPDIRECT3DVERTEXBUFFER9 m_d3dVB;
 
 	float m_texWidth, m_texHeight;
+
+	bool m_bInit;
 };

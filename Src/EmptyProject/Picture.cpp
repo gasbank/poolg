@@ -7,6 +7,7 @@ Picture::Picture(void)
 	m_d3dTex = 0;
 	m_d3dVB = 0;
 	m_width = m_height = 0;
+	m_bInit = false;
 }
 
 Picture::~Picture(void)
@@ -16,6 +17,10 @@ Picture::~Picture(void)
 
 void Picture::init(const TCHAR* imgFileName, LPDIRECT3DDEVICE9 d3dDev, UINT segments, float x, float y )
 {
+	if ( m_bInit )
+	{
+		throw std::runtime_error( "Double init on the same instance! You must release before reinit this instance." );
+	}
 	UINT faces = segments * segments * 2;
 	UINT vertices = (segments+1) * (segments+1);
 
@@ -25,7 +30,7 @@ void Picture::init(const TCHAR* imgFileName, LPDIRECT3DDEVICE9 d3dDev, UINT segm
 
 	if (FAILED(D3DXCreateMeshFVF(faces, vertices, D3DXMESH_MANAGED, D3DFVF_XYZ | D3DFVF_TEX1, d3dDev, &m_d3dxMesh)))
 	{
-		exit(10);
+		throw std::runtime_error("Mesh creation failed. Check your D3D device");
 	}
 
 	Vertex* v = 0;
@@ -69,7 +74,7 @@ void Picture::init(const TCHAR* imgFileName, LPDIRECT3DDEVICE9 d3dDev, UINT segm
 
 	if (FAILED(D3DXCreateTextureFromFile(d3dDev, imgFileName, &m_d3dTex)))
 	{
-		exit(100);
+		throw std::runtime_error("Texture creation failed; Maybe file name error?");
 	}
 
 	D3DSURFACE_DESC texDesc;
@@ -81,7 +86,7 @@ void Picture::init(const TCHAR* imgFileName, LPDIRECT3DDEVICE9 d3dDev, UINT segm
 	m_texWidth = (float)texDesc.Width;
 	m_texHeight = (float)texDesc.Height;
 
-	
+	m_bInit = true;
 }
 
 HRESULT Picture::initRhw( const TCHAR* imgFileName, LPDIRECT3DDEVICE9 d3dDev, float x, float y )
@@ -144,7 +149,7 @@ HRESULT Picture::draw(bool textured)
 	}
 	else
 	{
-		V(0 && "Should not be called");
+		assert( !"Should not be called" );
 	}
 	return hr;
 }

@@ -40,6 +40,12 @@ void ScriptManager::execute( const char* command )
 
 void ScriptManager::executeFile( const char* fileName )
 {
+#ifdef DEBUG
+	FILE* f;
+	fopen_s( &f, fileName, "r" );
+	if (!f)
+		throw std::runtime_error("Script file opening failed");
+#endif
 	if ( Tcl_EvalFile( m_interp, fileName ) != TCL_OK )
 		throwScriptErrorWithMessage();
 }

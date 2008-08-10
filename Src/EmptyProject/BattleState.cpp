@@ -10,6 +10,7 @@ BattleState::BattleState()
 	m_ws = dynamic_cast<WorldState*>( GetTopStateManager().getCurState() );
 	assert( m_ws );
 
+	/*UI 초기화 부분입니다.*/
 	float statusBoxWidth = 163;
 	float statusBoxHeight = 124;
 
@@ -104,6 +105,7 @@ BattleState::~BattleState()
 
 }
 
+/* 전투 시작 시 다음 함수가 호출됨*/
 HRESULT BattleState::enter()
 {
 	EpCamera& camera = G::getSingleton().m_camera;

@@ -168,6 +168,9 @@ HRESULT Sound::init()
     }
 	audioState.iOpening = audioState.pSoundBank->GetCueIndex( "opening" );
 
+	audioState.iMusicCategory = audioState.pEngine->GetCategory( "Music" );
+	audioState.bMusicPaused = false;
+
     return S_OK;
 }
 
@@ -194,6 +197,19 @@ LRESULT Sound::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 		case WM_KEYDOWN:
 			if( wParam == VK_SPACE )
                 audioState.pSoundBank->Play( audioState.iSE, 0, 0, NULL );
+			if( wParam == 'M' )
+			{
+				if(	audioState.bMusicPaused )
+				{
+					audioState.bMusicPaused = false;
+					audioState.pSoundBank->Play( audioState.iSong[audioState.nCurSongPlaying], 0, 0, NULL );
+				}
+				else
+				{
+					audioState.bMusicPaused = true;
+					audioState.pSoundBank->Stop( audioState.iSong[audioState.nCurSongPlaying], 0 );
+				}
+			}
 			break;
 	}
 
@@ -255,6 +271,10 @@ void WINAPI XACTNotificationCallback( const XACT_NOTIFICATION* pNotification )
     // In this simple tutorial, we will respond to a cue stop notification for the song 
     // cues by simply playing another song but its ultimately it's up the application 
     // and sound designer to decide what to do when a notification is received. 
+
+	if( audioState.bMusicPaused )
+		return;
+
     if( pNotification->type == XACTNOTIFICATIONTYPE_CUESTOP &&
         ( pNotification->cue.cueIndex == audioState.iSong[0] ||
           pNotification->cue.cueIndex == audioState.iSong[1] ) )

@@ -8,6 +8,8 @@ struct AUDIO_STATE
     XACTINDEX iSong[2];
 	XACTINDEX iOpening;
 
+	XACTCATEGORY iMusicCategory;
+
     IXACT3Engine* pEngine;
 	IXACT3WaveBank* pInMemoryWaveBank;
     IXACT3WaveBank* pStreamingWaveBank;
@@ -20,6 +22,7 @@ struct AUDIO_STATE
 	CRITICAL_SECTION cs;
     bool bHandleStreamingWaveBankPrepared;
     bool bHandleSongStopped;
+	bool bMusicPaused;
 
     int nCurSongPlaying;
 };

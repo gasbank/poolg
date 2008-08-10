@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include <list>
 #include <vector>
-
+#include <assert.h>
 typedef unsigned long DWORD;
 
 class Widget
@@ -280,13 +280,59 @@ int _tmain(int argc, _TCHAR* argv[])
 		return 1 ;
 	}
 
+	rc = Tcl_Eval(interp, "listTest");
+	if ( rc != TCL_OK )
+	{
+		fprintf( stderr, "Error loading script library\n" ) ;
+		return 1 ;
+	}
+	Tcl_Obj* retObj = Tcl_GetObjResult(interp);
+	int retLen, retObjLength;
+	Tcl_ListObjLength(interp, retObj, &retObjLength);
+	assert(retObjLength == 5);
+	Tcl_Obj* aObj;
+
+	const char* firstString;
+	const char* secondString;
+	int firstInt, secondInt, thirdInt;
+
+	Tcl_ListObjIndex( interp, retObj, 0, &aObj );
+	firstString = Tcl_GetStringFromObj( aObj, &retLen );
+
+	Tcl_ListObjIndex( interp, retObj, 1, &aObj );
+	secondString = Tcl_GetStringFromObj( aObj, &retLen );
+
+	Tcl_ListObjIndex( interp, retObj, 2, &aObj );
+	Tcl_GetIntFromObj( interp, aObj, &firstInt );
+
+	Tcl_ListObjIndex( interp, retObj, 3, &aObj );
+	Tcl_GetIntFromObj( interp, aObj, &secondInt );
+
+	Tcl_ListObjIndex( interp, retObj, 4, &aObj );
+	Tcl_GetIntFromObj( interp, aObj, &thirdInt );
+
+
+	rc = Tcl_Eval(interp, "arrayTest");
+	if ( rc != TCL_OK )
+	{
+		fprintf( stderr, "Error loading script library\n" ) ;
+		return 1 ;
+	}
+	retObj = Tcl_GetObjResult(interp);
+	Tcl_ListObjLength(interp, retObj, &retObjLength);
 	
 
 	free( pstr ) ;
 
-	std::cout << "Hello" << std::endl;
+	std::cout << "Delete interpreter.." << std::endl;
 	Tcl_DeleteInterp(interp);
 	Tcl_Finalize();
+
+
+	Widget* w = Widget::createWidget(17, 62);
+	void* wv = w;
+	std::cout << "w : " << typeid(wv).name() << std::endl;
+
 	return 0;
 }
 

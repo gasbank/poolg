@@ -1,3 +1,5 @@
+#package require Thread
+
 set g_x 1985
 
 proc square_tcl {arg1} {
@@ -20,3 +22,45 @@ puts " Widget: a = [widgetGetA $widget] / b = [widgetGetB $widget] "
 
 releaseWidget $widget
 
+
+
+proc every {ms body} {eval $body; after $ms [info level 0]}
+every 500 {puts "hello world~~~~~~~~~~~~~~~~~~"}
+
+
+proc helloForever {} {
+	
+	thread::create {
+		proc every {ms body} {eval $body; after $ms [info level 0]}
+
+
+		every 500 {puts "xxxxx"}
+		vwait forever
+	}
+	
+}
+
+proc helloForever2 {} {
+	
+	thread::create {
+		proc every {ms body} {eval $body; after $ms [info level 0]}
+
+
+		every 500 {puts "yyyy"}
+		vwait forever
+	}
+	
+}
+
+proc listTest {} {
+	puts "List Test Called.................................."
+	return [list "kimgoyub is my name" ganada 1 2 3]
+}
+
+proc arrayTest {} {
+	puts "Array Test Called.................................."
+	set test(best) "This is the best!!!!!!! bestItem"
+	set test(worst) "Sh*t! worstItem"
+	set test(ok) "...justGoodItem... !"
+	return [list $test(best) $test(worst) $test(ok)]
+}

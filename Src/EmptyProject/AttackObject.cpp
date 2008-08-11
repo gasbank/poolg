@@ -43,19 +43,37 @@ bool BallAttackObject::frameMove( float fElapsedTime )
 		
 		if (m_target->isControllable())
 		{
-			
 			resultLog += "포인트 데미지를 받았다!";
 			getBattleState()->pushBattleLog(resultLog.c_str());
-			getBattleState()->setNextTurnType(TT_PLAYER);
-			getBattleState()->passTurn();
+			if (m_target->isDead())
+			{
+				getBattleState()->pushBattleLog("HP가 모두 소진되었습니다. 게임 오버입니다.");
+				getBattleState()->pushBattleLog("순순히 F5키를 누르고 종료하시죠.");
+				getBattleState()->setNextTurnType(TT_NATURAL);
+				getBattleState()->passTurn();
+			}
+			else
+			{
+				getBattleState()->setNextTurnType(TT_PLAYER);
+				getBattleState()->passTurn();
+			}
 		}
 		else
 		{
 			resultLog += "포인트 데미지를 입혔다!";
 			getBattleState()->pushBattleLog(resultLog.c_str());
-			getBattleState()->setNextTurnType(TT_COMPUTER);
-			getBattleState()->passTurn();
-			GetAudioState().pSoundBank->Play( GetAudioState().iSE, 0, 0, NULL );
+			if (m_target->isDead())
+			{
+				getBattleState()->pushBattleLog("대상을 섬멸하였습니다! (Enter key로 월드로 복귀)");
+				getBattleState()->setNextTurnType(TT_NATURAL);
+				GetAudioState().pSoundBank->Play( GetAudioState().iSE, 0, 0, NULL );
+			}
+			else
+			{
+				getBattleState()->setNextTurnType(TT_COMPUTER);
+				getBattleState()->passTurn();
+				GetAudioState().pSoundBank->Play( GetAudioState().iSE, 0, 0, NULL );
+			}
 		}
 		return false;
 	}

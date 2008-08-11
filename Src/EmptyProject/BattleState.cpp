@@ -312,17 +312,30 @@ HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 	m_expBarPlayer.handleMessages(hWnd, uMsg, wParam, lParam);
 	m_mpBarEnemy.handleMessages(hWnd, uMsg, wParam, lParam);
 
-	if ( getEnemy()->getCurHp() <= 0 )
-	{
-		TopStateManager& tsm = TopStateManager::getSingleton();
-		WorldState* ws = static_cast<WorldState*>( tsm.getCurState() );
-		GetWorldStateManager().setNextState(GAME_WORLD_STATE_FIELD);
-		ws->removeUnit( getEnemy() );
-		return S_OK;
-	}
+
+
 
 	if (uMsg == WM_KEYDOWN)
 	{
+		/*죽었을 시 enter 키를 입력하면 대상 파괴, 아니면 다른 키 안 받고 메시지 핸들링 종료*/
+		if ( getEnemy()->getCurHp() <= 0 )
+		{
+			if (wParam == VK_RETURN)
+			{
+				TopStateManager& tsm = TopStateManager::getSingleton();
+				WorldState* ws = static_cast<WorldState*>( tsm.getCurState() );
+				GetWorldStateManager().setNextState(GAME_WORLD_STATE_FIELD);
+				ws->removeUnit( getEnemy() );
+				return S_OK;
+			}
+			return S_OK;
+		}
+		/*자신이 죽었을 시 어떠한 키로도 반응하지 않는다.*/
+		else if (getHero()->getCurHp() <= 0)
+		{
+			return S_OK;
+		}
+
 		if ( wParam == VK_F4 )
 		{
 			GetWorldStateManager().setNextState(GAME_WORLD_STATE_FIELD);

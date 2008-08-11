@@ -255,7 +255,9 @@ HRESULT WorldState::frameMove(double fTime, float fElapsedTime)
 	{
 		if ( (*it) != m_heroUnit )
 			if ( isCollide( &m_heroUnit->getPos(), &(*it)->getPos() ) == true )
+			{
 				handleCollision( m_heroUnit, (*it) );
+			}
 	}
 	
 	return S_OK;
@@ -304,7 +306,6 @@ HRESULT WorldState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 		bTalking |= (*itDialog)->startTalk;
 	}
 	
-
 	UnitSet::iterator it = m_unitSet.begin();
 	for ( ; it != m_unitSet.end(); ++it )
 	{
@@ -452,9 +453,12 @@ void WorldState::handleCollision( Unit* heroUnit, Unit* enemyUnit )
 	m_curEnemyUnit = dynamic_cast<Character*>( enemyUnit );
 	/*데미지를 처리*/
 	m_curEnemyUnit->setAttack (20);
-	if ( GetWorldStateManager().curStateEnum() == GAME_WORLD_STATE_FIELD )
+	
+	if ( !m_curEnemyUnit->isTalkable() )
 	{
-		GetWorldStateManager().setNextState(GAME_WORLD_STATE_BATTLE);
+		if ( GetWorldStateManager().curStateEnum() == GAME_WORLD_STATE_FIELD )
+			GetWorldStateManager().setNextState( GAME_WORLD_STATE_BATTLE );
+
 		GetAudioState().bBGMFade = true;
 		GetAudioState().bMusicFade = false;
 		GetAudioState().pEngine->Stop( GetAudioState().iMusicCategory, 0 );

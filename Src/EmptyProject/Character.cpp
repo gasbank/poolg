@@ -262,6 +262,25 @@ void Character::enterTile( int tileX, int tileY )
 }
 
 
+void Character::setColor( int r, int g, int b )
+{
+	ZeroMemory(&m_material, sizeof(D3DMATERIAL9));
+
+	m_material.Ambient.r = (float)r / 255.0f;
+	m_material.Ambient.g = (float)g / 255.0f;
+	m_material.Ambient.b = (float)b / 255.0f;
+
+	m_material.Diffuse.r = (float)r / 255.0f;
+	m_material.Diffuse.g = (float)g / 255.0f;
+	m_material.Diffuse.b = (float)b / 255.0f;
+
+	m_material.Specular.r = (float)r / 255.0f;
+	m_material.Specular.g = (float)g / 255.0f;
+	m_material.Specular.b = (float)b / 255.0f;
+
+	m_material.Ambient.a = m_material.Diffuse.a = m_material.Specular.a = 1.0f;
+}
+
 Unit* EpCreateCharacter( int tileX, int tileY, int controllable )
 {
 	LPD3DXMESH d3dxMesh;
@@ -285,10 +304,24 @@ int EpCharacterSetMoveDuration( void* ptr, double val )
 	return 0;
 } SCRIPT_CALLABLE_I_PV_D( EpCharacterSetMoveDuration )
 
+int EpCharacterSetColor( void* ptr, int r, int g, int b )
+{
+	Character* instance = reinterpret_cast<Character*>( ptr );
+	instance->Character::setColor( r, g, b );
+	return 0;
+} SCRIPT_CALLABLE_I_PV_I_I_I( EpCharacterSetColor )
 
+int EpCharacterSetTalkable( void* ptr, int talkable )
+{
+	Character* instance = reinterpret_cast<Character*>( ptr );
+	instance->Character::setTalkable( talkable?true:false );
+	return 0;
+} SCRIPT_CALLABLE_I_PV_I( EpCharacterSetTalkable )
 
 START_SCRIPT_FACTORY(Character)
 	CREATE_OBJ_COMMAND( EpCreateCharacter )
 	CREATE_OBJ_COMMAND( EpCharacterSetMaxAndCurHp )
-		CREATE_OBJ_COMMAND( EpCharacterSetMoveDuration )
+	CREATE_OBJ_COMMAND( EpCharacterSetMoveDuration )
+	CREATE_OBJ_COMMAND( EpCharacterSetColor )
+	CREATE_OBJ_COMMAND( EpCharacterSetTalkable )
 END_SCRIPT_FACTORY(Character)

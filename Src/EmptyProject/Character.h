@@ -30,8 +30,11 @@ public:
 	int getTilePosY() { return m_tileY; }
 	void enterTile(int tileX, int tileY);
 
-	void setMoveDuration(float val) { m_moveDuration = val; }
+	void setMoveDuration( float val ) { m_moveDuration = val; }
+	void setColor( int r, int g, int b );
 
+	void setTalkable( bool talkable ) { m_bTalkable = talkable; }
+	bool isTalkable() { return m_bTalkable; }
 protected:
 	Character();
 
@@ -40,6 +43,7 @@ private:
 	AttackObjectList m_attackObjectList;
 
 	bool					m_bMoving;
+	bool					m_bTalkable;
 	float					m_fMovingTime;
 	int						m_maxHp;
 	int						m_curHp;

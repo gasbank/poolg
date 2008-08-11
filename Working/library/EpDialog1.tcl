@@ -1,4 +1,4 @@
-set EpDialogList [list EpDialog1 EpDialog2 EpDialogStop EpDialogHeal];
+set EpDialogList [list EpDialog1 EpDialog2 EpDialog3 EpDialogStop EpDialogHeal];
 
 namespace eval EpDialog1 {
 	
@@ -37,6 +37,21 @@ namespace eval EpDialog2 {
 		$enemy		"Okay."\
 		$player		"지금은 한글판이거든?"\
 		$enemy		"S*it! Speak English you idiot!"\
+	];	
+}
+
+namespace eval EpDialog3 {
+	
+	set region [ list 18 9 -1 -1 ]; ;# left, top, right, bottom
+	set oneTime 0;
+	
+	set player "PoolG"
+	set enemy "YangSanHyung"
+	
+	set dialog [ list\
+		$enemy		"넌 누구니?"\
+		$player		"어차피 죽을 사람에게 이름을 가르쳐줄 필요는 없겠지..."\
+		$enemy		"덤벼라!"\
 	];	
 }
 

@@ -2,7 +2,7 @@ package require Thread
 
 namespace eval EpWorldState {
 	variable pWorld
-	variable pHeroUnit pEnemyUnit1 pEnemyUnit2 pEnemyUnit3
+	variable pHeroUnit pEnemyUnit1 pEnemyUnit2 pEnemyUnit3 pNPCUnit1;
 	
 	proc init {pCurWorld} {
 		EpOutputDebugString " - WorldState init Ptr: $pCurWorld\n"
@@ -19,23 +19,27 @@ namespace eval EpWorldState {
 		variable pEnemyUnit1
 		variable pEnemyUnit2
 		variable pEnemyUnit3
+		variable pNPCUnit1
 		variable pWorld
 		
 		set pHeroUnit				[EpCreateCharacter 13 13 1];
 		set pEnemyUnit1				[EpCreateCharacter 23 23 0];
 		set pEnemyUnit2				[EpCreateCharacter  3  3 0];
 		set pEnemyUnit3				[EpCreateCharacter 18 -1 0];
+		set pNPCUnit1				[EpCreateCharacter 18  9 0];
 		set curUnitCount			[EpRegisterToWorld $pWorld $pHeroUnit];
 		set curUnitCount			[EpRegisterToWorld $pWorld $pEnemyUnit1];
 		set curUnitCount			[EpRegisterToWorld $pWorld $pEnemyUnit2];
 		set curUnitCount			[EpRegisterToWorld $pWorld $pEnemyUnit3];
-		
+		set curUnitCount			[EpRegisterToWorld $pWorld $pNPCUnit1];
 		
 		EpUnitSetRotX				$pHeroUnit [ToRadian -90]
 		EpUnitSetRotZ				$pHeroUnit [ToRadian 90]
 		EpUnitSetPosZ				$pHeroUnit -[EpUnitGetUpperRightZ $pHeroUnit]
 		EpCharacterSetMaxAndCurHp	$pHeroUnit 50 50
 		EpCharacterSetMoveDuration	$pHeroUnit 0.25
+		EpCharacterSetColor		$pNPCUnit1 255 0 0
+		EpCharacterSetTalkable		$pNPCUnit1 1
 		
 		EpOutputDebugString " -- Current Unit Count: $curUnitCount\n"
 		
@@ -62,6 +66,8 @@ namespace eval EpWorldState {
 		EpReleaseUnit $pHeroUnit
 		EpReleaseUnit $pEnemyUnit1
 		EpReleaseUnit $pEnemyUnit2
+		EpReleaseUnit $pEnemyUnit3
+		EpReleaseUnit $pNPCUnit1
 	}
 
 

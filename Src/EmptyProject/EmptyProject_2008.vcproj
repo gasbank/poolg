@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="Windows-1252"?>
+<?xml version="1.0" encoding="ks_c_5601-1987"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
@@ -762,6 +762,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\ShaderWrapper.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\ShaderWrapper.h"
+			>
+		</File>
+		<File
 			RelativePath=".\SingletonCreators.h"
 			>
 		</File>
@@ -835,6 +843,10 @@
 		</File>
 		<File
 			RelativePath=".\Utility.h"
+			>
+		</File>
+		<File
+			RelativePath="..\..\Working\Shaders\HLSL\vbomb.fx"
 			>
 		</File>
 		<File

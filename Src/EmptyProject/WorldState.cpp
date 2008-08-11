@@ -13,9 +13,6 @@ WorldState::WorldState(void)
 {
 	m_sampleTeapotMeshRot	= 0;
 	m_aTile					= 0;
-	m_pVertexShader			= 0;
-	m_pConstantTable		= 0;
-	m_pVertexDeclaration	= 0;
 	m_afd					= 0;
 	m_sg					= 0;
 	m_heroUnit				= 0;
@@ -38,7 +35,7 @@ WorldState::~WorldState(void)
 
 HRESULT WorldState::enter()
 {
-	HRESULT hr;
+	HRESULT hr = S_OK;
 
 	LPDIRECT3DDEVICE9& pd3dDevice =  GetG().m_dev;
 
@@ -69,33 +66,6 @@ HRESULT WorldState::enter()
 	tileManager.tile[9][9].talkonetime = false;
 	tileManager.tile[17][14].heal = true;
 
-	// Create vertex shader
-	WCHAR strPath[512];
-	LPD3DXBUFFER pCode;
-
-	D3DVERTEXELEMENT9 decl[] =
-	{
-		{ 0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 },
-		{ 0, 12, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0 },
-		D3DDECL_END()
-	};
-
-	V_RETURN( pd3dDevice->CreateVertexDeclaration( decl, &m_pVertexDeclaration ) );
-
-	V_RETURN(StringCchCopy( strPath, sizeof(strPath)/sizeof(TCHAR), L"HLSLwithoutEffects.vsh" ));
-
-	DWORD dwShaderFlags = D3DXSHADER_DEBUG | D3DXSHADER_DEBUG | D3DXSHADER_SKIPOPTIMIZATION;
-	V_RETURN( D3DXCompileShaderFromFile( strPath, NULL, NULL, "Ripple",
-		"vs_2_0", dwShaderFlags, &pCode,
-		NULL, &m_pConstantTable ) );
-
-	// Create the vertex shader
-	hr = pd3dDevice->CreateVertexShader( ( DWORD* )pCode->GetBufferPointer(),
-		&m_pVertexShader );
-	pCode->Release();
-	
-	if( FAILED( hr ) )
-		return DXTRACE_ERR( TEXT( "CreateVertexShader" ), hr );
 
 	// Create sample 3D model(!)
 	/*LPD3DXMESH teapot;
@@ -133,7 +103,7 @@ HRESULT WorldState::enter()
 		m_scriptedDialog.push_back( Dialog::createDialogByScript( *itDialogList ) );
 		(*m_scriptedDialog.rbegin())->init();
 	}
-	return S_OK;
+	return hr;
 }
 
 HRESULT WorldState::leave()
@@ -161,9 +131,6 @@ HRESULT WorldState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, floa
 	pd3dDevice->SetTransform(D3DTS_VIEW, camera.GetViewMatrix());
 	pd3dDevice->SetTransform(D3DTS_PROJECTION, camera.GetProjMatrix());
 
-	// Draw picture map with shader settings
-	D3DXMATRIXA16 mWorldViewProj = *m_pic.getLocalXform() * *camera.GetViewMatrix() * *camera.GetProjMatrix();
-	m_pConstantTable->SetMatrix( DXUTGetD3D9Device(), "mWorldViewProj", &mWorldViewProj );
 	
 	// Sample 3D model rendering
 	//m_heroUnit->draw();
@@ -239,11 +206,7 @@ HRESULT WorldState::frameMove(double fTime, float fElapsedTime)
 		(*it)->frameMove(fElapsedTime);
 	}
 
-	// Set up the vertex shader constants
-	D3DXMATRIXA16 mViewProj = *camera.GetViewMatrix() * *camera.GetProjMatrix();
-	m_pConstantTable->SetMatrix( DXUTGetD3D9Device(), "mViewProj", &mViewProj );
-	m_pConstantTable->SetFloat( DXUTGetD3D9Device(), "fTime", ( float )fTime );
-
+	
 	m_sampleTeapotMeshRot += fElapsedTime * D3DXToRadian(35); // 35 degrees per second
 
 	GetWorldStateManager().transit();
@@ -283,11 +246,7 @@ HRESULT WorldState::release()
 		release_arnfile(*m_afd);
 	SAFE_DELETE(m_afd);
 	SAFE_DELETE(m_sg);
-	SAFE_RELEASE( m_pVertexShader );
-	SAFE_RELEASE( m_pConstantTable );
-	SAFE_RELEASE( m_pVertexDeclaration );
 	SAFE_RELEASE(m_aTile);
-
 
 	return S_OK;
 }

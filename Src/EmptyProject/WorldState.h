@@ -56,9 +56,6 @@ private:
 	//Dialog						m_dialog;
 	DialogList						m_scriptedDialog;
 
-	LPDIRECT3DVERTEXSHADER9         m_pVertexShader;
-	LPD3DXCONSTANTTABLE             m_pConstantTable;
-	LPDIRECT3DVERTEXDECLARATION9    m_pVertexDeclaration;
 
 	float							m_sampleTeapotMeshRot;
 	LPD3DXMESH						m_aTile;

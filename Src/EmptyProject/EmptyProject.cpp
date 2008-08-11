@@ -17,19 +17,19 @@
 #include "ScriptManager.h"
 #include "VideoMan.h"
 #include "WorldStateManager.h"
+#include "ShaderWrapper.h"
 
 G								g_g;
 TopStateManager*				g_tsm					= 0;
 WorldStateManager*				g_wsm					= 0;
 ScriptManager*					g_scriptManager			= 0;		// Set to zero is 'CRUCIAL!'
-double							g_timeDelta				= 0.0f;
+BombShader*						g_bombShader			= 0;
 
 LPD3DXFONT						g_pFont					= 0;
 LPD3DXEFFECT		            g_pEffect				= 0;
 D3DXHANDLE						g_tech					= 0;
 
-//Menu							g_menubox;
-//Menu							g_select;
+LPD3DXMESH						g_testTeapot			= 0;
 
 D3DCOLOR						g_fillColor;
 
@@ -85,6 +85,13 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 	// Init Script
 	GetScriptManager().execute( "EpInitGame" );
 
+	// Shader
+	g_bombShader = new BombShader();
+	g_bombShader->initEffect( pd3dDevice, L"Shaders/HLSL/vbomb.fx" );
+	g_bombShader->initMainTechnique();
+
+	D3DXCreateTeapot( pd3dDevice, &g_testTeapot, 0 );
+
 	//////////////////////////////////////////////////////////////////////////
 
 	EpCamera& g_camera = GetG().m_camera;
@@ -133,6 +140,8 @@ HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFA
 	//g_fillColor = D3DCOLOR_ARGB( 0, 45, 50, 170 );
 	g_fillColor = D3DCOLOR_ARGB( 0, 0, 0, 0 );
 
+	g_bombShader->onResetDevice();
+
     return S_OK;
 }
 
@@ -140,10 +149,8 @@ HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFA
 //--------------------------------------------------------------------------------------
 // Handle updates to the scene.  This is called regardless of which D3D API is used
 //--------------------------------------------------------------------------------------
-void CALLBACK OnFrameMove( double fTime_, float fElapsedTime, void* pUserContext )
+void CALLBACK OnFrameMove( double fTime, float fElapsedTime, void* pUserContext )
 {
-	double fTime = fTime_ + g_timeDelta;
-
 	GetG().m_camera.FrameMove( fElapsedTime );
 
 	TopStateManager::getSingleton().transit();
@@ -152,8 +159,6 @@ void CALLBACK OnFrameMove( double fTime_, float fElapsedTime, void* pUserContext
 
 	if (GetTopStateManager().getCurState())
 		GetTopStateManager().getCurState()->frameMove(fTime, fElapsedTime);
-
-	
 }
 
 
@@ -227,14 +232,36 @@ void CALLBACK OnD3D9FrameRender( IDirect3DDevice9* pd3dDevice, double fTime, flo
     // Render the scene
     if( SUCCEEDED( pd3dDevice->BeginScene() ) )
     {
-		GetTopStateManager().getCurState()->frameRender(pd3dDevice, fTime, fElapsedTime);			
+		GetTopStateManager().getCurState()->frameRender(pd3dDevice, fTime, fElapsedTime);
 
+		D3DXVECTOR3 eye( 0, 0, -30.0f );
+		D3DXVECTOR3 lookAt( 0, 0, 0 );
+		GetG().m_camera.SetViewParams( &eye, &lookAt );
+
+		pd3dDevice->SetTransform( D3DTS_VIEW, GetG().m_camera.GetViewMatrix() );
+		pd3dDevice->SetTransform( D3DTS_PROJECTION, GetG().m_camera.GetProjMatrix() );
+
+		D3DXMATRIX mWorld;
+		D3DXMatrixIdentity( &mWorld );
+		UINT iPass, cPasses;
+		V( g_bombShader->setMainTechnique() );
+		V( g_bombShader->setWorldViewProj( fTime, fElapsedTime, &mWorld, GetG().m_camera.GetViewMatrix(), GetG().m_camera.GetProjMatrix() ) );
+
+		V( g_bombShader->begin( &cPasses, 0 ) );
+		for( iPass = 0; iPass < cPasses; iPass++ )
+		{
+			V( g_bombShader->beginPass( iPass ) );
+			// Draw mesh here...
+
+			D3DPERF_BeginEvent( 0, L"Shader applied teapot" );
+			g_testTeapot->DrawSubset( 0 );
+			D3DPERF_EndEvent();
+
+			V( g_bombShader->endPass() );
+		}
+		V( g_bombShader->end() );
 
 		//////////////////////////////////////////////////////////////////////////
-		// Orthogonal and fixed Rendering Phase
-
-		//renderFixedElements(pd3dDevice, fTime, fElapsedTime);
-
         V( pd3dDevice->EndScene() );
     }
 
@@ -264,7 +291,8 @@ LRESULT CALLBACK MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
 //--------------------------------------------------------------------------------------
 void CALLBACK OnD3D9LostDevice( void* pUserContext )
 {
-	
+	if ( g_bombShader )
+		g_bombShader->onLostDevice();	
 }
 
 
@@ -274,8 +302,11 @@ void CALLBACK OnD3D9LostDevice( void* pUserContext )
 void CALLBACK OnD3D9DestroyDevice( void* pUserContext )
 {
 	SAFE_RELEASE( g_pFont );
+	SAFE_RELEASE( g_testTeapot );
+
 	SAFE_DELETE( g_tsm );
 	SAFE_DELETE( g_wsm );
+	EP_SAFE_RELEASE( g_bombShader );
 	
 	GetG().m_videoMan.SetDev(0);
 }

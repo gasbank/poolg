@@ -58,9 +58,11 @@ bool CALLBACK IsD3D9DeviceAcceptable( D3DCAPS9* pCaps, D3DFORMAT AdapterFormat, 
 //--------------------------------------------------------------------------------------
 bool CALLBACK ModifyDeviceSettings( DXUTDeviceSettings* pDeviceSettings, void* pUserContext )
 {
+#if defined(DEBUG) & defined(FORCED_SOFTWARE_PROCESSING)
 	pDeviceSettings->d3d9.BehaviorFlags &= ~D3DCREATE_HARDWARE_VERTEXPROCESSING;
 	pDeviceSettings->d3d9.BehaviorFlags |= D3DCREATE_SOFTWARE_VERTEXPROCESSING;
-	pDeviceSettings->d3d9.BehaviorFlags |= D3DCREATE_MULTITHREADED;
+	//pDeviceSettings->d3d9.BehaviorFlags |= D3DCREATE_MULTITHREADED;
+#endif
 
 
     return true;
@@ -238,8 +240,8 @@ void CALLBACK OnD3D9FrameRender( IDirect3DDevice9* pd3dDevice, double fTime, flo
 		D3DXVECTOR3 lookAt( 0, 0, 0 );
 		GetG().m_camera.SetViewParams( &eye, &lookAt );
 
-		pd3dDevice->SetTransform( D3DTS_VIEW, GetG().m_camera.GetViewMatrix() );
-		pd3dDevice->SetTransform( D3DTS_PROJECTION, GetG().m_camera.GetProjMatrix() );
+		//pd3dDevice->SetTransform( D3DTS_VIEW, GetG().m_camera.GetViewMatrix() );
+		//pd3dDevice->SetTransform( D3DTS_PROJECTION, GetG().m_camera.GetProjMatrix() );
 
 		D3DXMATRIX mWorld;
 		D3DXMatrixIdentity( &mWorld );
@@ -253,9 +255,9 @@ void CALLBACK OnD3D9FrameRender( IDirect3DDevice9* pd3dDevice, double fTime, flo
 			V( g_bombShader->beginPass( iPass ) );
 			// Draw mesh here...
 
-			D3DPERF_BeginEvent( 0, L"Shader applied teapot" );
+			//D3DPERF_BeginEvent( 0, L"Shader applied teapot" );
 			g_testTeapot->DrawSubset( 0 );
-			D3DPERF_EndEvent();
+			//D3DPERF_EndEvent();
 
 			V( g_bombShader->endPass() );
 		}
@@ -384,8 +386,11 @@ void CreateScriptManagerIfNotExist()
 //--------------------------------------------------------------------------------------
 // Initialize everything and go into a render loop
 //--------------------------------------------------------------------------------------
-//INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
+#ifdef DEBUG
 int main()
+#else
+INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
+#endif
 {
     // Enable run-time memory check for debug builds.
 #if defined(DEBUG) | defined(_DEBUG)

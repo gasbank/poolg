@@ -4,6 +4,7 @@
 	Version="9.00"
 	Name="DXUTCore"
 	ProjectGUID="{E0CF097B-F22D-465B-A884-D89E55BD7ECD}"
+	RootNamespace="DXUTCore"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -106,7 +107,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_LIB"
-				RuntimeLibrary="0"
+				RuntimeLibrary="2"
 				UsePrecompiledHeader="1"
 				PrecompiledHeaderThrough="dxut.h"
 				WarningLevel="3"

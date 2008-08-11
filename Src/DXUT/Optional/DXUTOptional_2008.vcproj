@@ -4,6 +4,7 @@
 	Version="9.00"
 	Name="DXUTOptional"
 	ProjectGUID="{4F8BF3B3-DF36-41D9-8CAA-B68B5F4DCCE1}"
+	RootNamespace="DXUTOptional"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -108,7 +109,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="..\Core"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_LIB"
-				RuntimeLibrary="0"
+				RuntimeLibrary="2"
 				UsePrecompiledHeader="1"
 				PrecompiledHeaderThrough="dxut.h"
 				WarningLevel="3"

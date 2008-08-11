@@ -1,14 +1,20 @@
 #pragma once
 
+#if DEBUG
+static const DWORD				gs_shaderFlags = D3DXSHADER_DEBUG | D3DXSHADER_DEBUG | D3DXSHADER_SKIPOPTIMIZATION;
+#else
+static const DWORD				gs_shaderFlags = 0;
+#endif
+
 class Shader
 {
 public:
 	Shader(void);
 	virtual ~Shader(void);
-	static const DWORD				s_debugShaderFlags = D3DXSHADER_DEBUG | D3DXSHADER_DEBUG | D3DXSHADER_SKIPOPTIMIZATION;
-	HRESULT							initEffect( LPDIRECT3DDEVICE9 pd3dDevice, const WCHAR* shaderFileName, DWORD dwShaderFlags = s_debugShaderFlags );
+
+	HRESULT							initEffect( LPDIRECT3DDEVICE9 pd3dDevice, const WCHAR* shaderFileName, DWORD dwShaderFlags = gs_shaderFlags );
 	HRESULT							initShader( LPDIRECT3DDEVICE9 pd3dDevice, const WCHAR* shaderFileName );
-	HRESULT							compileShader( const char* functionName, const char* profile, DWORD dwShaderFlags = s_debugShaderFlags );
+	HRESULT							compileShader( const char* functionName, const char* profile, DWORD dwShaderFlags = gs_shaderFlags );
 
 	virtual void					release();	
 	virtual void					update( float fTime, float fElapsedTime );

@@ -2,11 +2,13 @@
 //-----------------------------------------------------------------------------
 // Struct to hold audio game state
 //-----------------------------------------------------------------------------
-struct AUDIO_STATE
+class AUDIO_STATE : public Singleton<AUDIO_STATE>
 {
+public:
 	XACTINDEX iSE;
     XACTINDEX iSong[2];
 	XACTINDEX iOpening;
+	XACTINDEX iBattle;
 
 	XACTCATEGORY iGlobalCategory;
 	XACTCATEGORY iMusicCategory;
@@ -29,6 +31,7 @@ struct AUDIO_STATE
 	float fGlobalVolume;
 	bool bMusicPaused;
 	float fMusicVolume;
+	bool bMusicFade;
 	bool bBGMPaused;
 	float fBGMVolume;
 	bool bBGMFade;
@@ -37,6 +40,8 @@ struct AUDIO_STATE
 
     int nCurSongPlaying;
 };
+
+inline AUDIO_STATE& GetAudioState() { return AUDIO_STATE::getSingleton(); }
 
 class Sound
 {

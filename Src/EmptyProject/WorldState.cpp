@@ -453,7 +453,13 @@ void WorldState::handleCollision( Unit* heroUnit, Unit* enemyUnit )
 	/*데미지를 처리*/
 	m_curEnemyUnit->setAttack (20);
 	if ( GetWorldStateManager().curStateEnum() == GAME_WORLD_STATE_FIELD )
+	{
 		GetWorldStateManager().setNextState(GAME_WORLD_STATE_BATTLE);
+		GetAudioState().bBGMFade = true;
+		GetAudioState().bMusicFade = false;
+		GetAudioState().pEngine->Stop( GetAudioState().iMusicCategory, 0 );
+		GetAudioState().pSoundBank->Play( GetAudioState().iBattle, 0, 0, NULL );
+	}
 }
 
 void WorldState::startDialog( int index )

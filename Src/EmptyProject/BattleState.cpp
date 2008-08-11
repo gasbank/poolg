@@ -145,6 +145,9 @@ HRESULT BattleState::leave()
 	m_startTime = -1.0f;
 	m_battleLog.clear();
 
+	GetAudioState().bBGMFade = false;
+	GetAudioState().bMusicFade = true;
+
 	return S_OK;
 }
 

@@ -1,6 +1,8 @@
 #include "EmptyProjectPCH.h"
 #include "Sound.h"
 
+IMPLEMENT_SINGLETON( AUDIO_STATE );
+
 void WINAPI XACTNotificationCallback( const XACT_NOTIFICATION* pNotification );
 AUDIO_STATE audioState;
 
@@ -212,6 +214,7 @@ HRESULT Sound::init()
         audioState.iSong[i] = audioState.pSoundBank->GetCueIndex( sz );
     }
 	audioState.iOpening = audioState.pSoundBank->GetCueIndex( "opening" );
+	audioState.iBattle = audioState.pSoundBank->GetCueIndex( "battle" );
 
 	audioState.iGlobalCategory = audioState.pEngine->GetCategory( "Global" );
 	audioState.iMusicCategory = audioState.pEngine->GetCategory( "Music" );
@@ -417,17 +420,28 @@ void Sound::UpdateAudio()
 
 	if( audioState.bBGMFade )
 	{
-		audioState.fBGMVolume -= 0.025f;
-		if( audioState.fBGMVolume < 0.0f )
-			audioState.fBGMVolume = 0.0f;
+		if( audioState.fBGMVolume > 0.0f )
+			audioState.fBGMVolume -= 0.025f;
 		audioState.pEngine->SetVolume( audioState.iBGMCategory, audioState.fBGMVolume );
 	}
-	else
+	if( !audioState.bBGMFade )
 	{
-		audioState.fBGMVolume += 0.025f;
-		if( audioState.fBGMVolume > 1.0f )
-			audioState.fBGMVolume = 1.0f;
+		if( audioState.fBGMVolume < 1.0f )
+			audioState.fBGMVolume += 0.025f;
 		audioState.pEngine->SetVolume( audioState.iBGMCategory, audioState.fBGMVolume );
+	}
+
+	if( audioState.bMusicFade )
+	{
+		if( audioState.fMusicVolume > 0.0f )
+			audioState.fMusicVolume -= 0.025f;
+		audioState.pEngine->SetVolume( audioState.iMusicCategory, audioState.fMusicVolume );
+	}
+	if( !audioState.bMusicFade )
+	{
+		if( audioState.fMusicVolume < 1.0f )
+			audioState.fMusicVolume += 0.025f;
+		audioState.pEngine->SetVolume( audioState.iMusicCategory, audioState.fMusicVolume );
 	}
 }
 

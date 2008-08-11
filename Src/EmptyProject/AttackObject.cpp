@@ -36,16 +36,23 @@ bool BallAttackObject::frameMove( float fElapsedTime )
 	{
 		// Hit to the target!
 		m_target->damage(m_damage);
+
+		char stringBuffer[20];
+		_itoa_s (m_damage, stringBuffer, 10);
+		std::string resultLog = stringBuffer;
 		
 		if (m_target->isControllable())
 		{
-			getBattleState()->pushBattleLog("데미지를 받았다!");
+			
+			resultLog += "포인트 데미지를 받았다!";
+			getBattleState()->pushBattleLog(resultLog.c_str());
 			getBattleState()->setNextTurnType(TT_PLAYER);
 			getBattleState()->passTurn();
 		}
 		else
 		{
-			getBattleState()->pushBattleLog("데미지를 입혔다!");
+			resultLog += "포인트 데미지를 입혔다!";
+			getBattleState()->pushBattleLog(resultLog.c_str());
 			getBattleState()->setNextTurnType(TT_COMPUTER);
 			getBattleState()->passTurn();
 			GetAudioState().pSoundBank->Play( GetAudioState().iSE, 0, 0, NULL );

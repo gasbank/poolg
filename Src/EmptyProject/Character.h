@@ -23,6 +23,8 @@ public:
 	int getAttack() const { return m_attack; }
 	void setAttack (int point) { m_attack = point; }
 
+	bool isDead() { return (m_curHp<=0); }
+
 
 	void setTilePos(int tileX, int tileY);
 	void setTileBufferPos(int tileX, int tileY) { m_tileBufferX = tileX; m_tileBufferY = tileY; }

@@ -335,6 +335,16 @@ HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 			//m_curTurnType = TT_COMPUTER;
 			getHero()->heal (30);
 		}
+		/**/
+		if ( wParam == 'T' && m_curTurnType == TT_PLAYER)
+		{
+			m_curTurnType = TT_NATURAL;
+			for (int i = 0; i < 100; i++)
+			{
+				getHero()->attack( 0, getEnemy() );
+			}
+		}
+			
 	}
 
 	return S_OK;

@@ -209,10 +209,10 @@ Dialog* Dialog::createDialogByScript( const char* dialogName )
 
 void Dialog::ctorDialogPane()
 {
-	dialog.init(L"dae-sa.png", GetG().m_dev);
+	dialog.init(L"Images/dae-sa.png", GetG().m_dev);
 	dialog.setPos (-(GetG().m_scrWidth / 2.0f), -(GetG().m_scrHeight / 2.0f), 2.8f);
 	dialog.setSize(200, 200);
-	name.init(L"name_window.png", GetG().m_dev);
+	name.init(L"Images/name_window.png", GetG().m_dev);
 	name.setPos (-(GetG().m_scrWidth / 2.0f), -(GetG().m_scrHeight / 2.0f) + 200, 2.8f);
 	name.setSize(150, 60);
 }

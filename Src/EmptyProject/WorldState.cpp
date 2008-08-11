@@ -50,15 +50,15 @@ HRESULT WorldState::enter()
 	// Load sample image (vertex and index buffer creation with texture)
 	const UINT mapSegments = 32;
 	const UINT mapSize = 32;
-	m_pic.init(L"graytile.tga", pd3dDevice, mapSegments);
+	m_pic.init(L"Images/graytile.tga", pd3dDevice, mapSegments);
 	m_pic.setSize((float)mapSize, (float)mapSize);
 	m_pic.setPos(D3DXVECTOR3(m_pic.getPos()->x - mapSize/2, m_pic.getPos()->y - mapSize/2, m_pic.getPos()->z));
 	
-	m_picRhw.initRhw(L"smiley.png", pd3dDevice);
-	m_picSmiley.init(L"smiley.png", pd3dDevice);
+	m_picRhw.initRhw(L"Images/smiley.png", pd3dDevice);
+	m_picSmiley.init(L"Images/smiley.png", pd3dDevice);
 	//g_picSmiley.setSizeToTexture();
 
-	m_avatar.init(L"smiley.png", pd3dDevice);
+	m_avatar.init(L"Images/smiley.png", pd3dDevice);
 	m_avatar.setSize(1, 1);
 
 	m_sound.init();

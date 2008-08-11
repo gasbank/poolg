@@ -76,9 +76,9 @@ HRESULT IntroState::enter()
 	m_pStrs[16] = L"beginning!";
 
 	// Load background and logo
-	m_background.init(L"the Whirlpool Galaxy (M51) and Companion Galaxy.jpg", pd3dDevice);
+	m_background.init(L"Images/the Whirlpool Galaxy (M51) and Companion Galaxy.jpg", pd3dDevice);
 	//m_background.init(L"ratatouille.jpg", pd3dDevice);
-	m_pLogo.init( L"poolc logo by ooo.png", pd3dDevice );
+	m_pLogo.init( L"Images/poolc logo by ooo.png", pd3dDevice );
 
 	// Create text meshes
 	createTextMeshes(GetG().m_dev);

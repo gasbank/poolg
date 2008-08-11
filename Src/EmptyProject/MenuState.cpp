@@ -246,67 +246,67 @@ MenuState::MenuState()
 
 	float menuBoxPositionX = (float)scrWidth/2 - menuBoxWidth - 12;
 	float menuBoxPositionY = (float)scrHeight/2 - menuBoxHeight - 20;
-	m_menu.init(L"menu_window.png", m_pDev);
+	m_menu.init(L"Images/menu_window.png", m_pDev);
 	m_menu.setPos (menuBoxPositionX, menuBoxPositionY, 3.0f);
 	m_menu.setSize( menuBoxWidth, menuBoxHeight );
 
 	//float trianglePositionX = (float)scrWidth/2 - menuBoxWidth + 7;
 	//float triangleBoxPositionY = (float)scrHeight/2 - menuBoxWidth + pos;
 
-	m_stub.init(L"status_up_button.png", m_pDev);
+	m_stub.init(L"Images/status_up_button.png", m_pDev);
 	m_stub.setPos ( (float)scrWidth/2 - menuButtonWidth - 20, (float)scrHeight/2 - menuButtonHeight - 30, 2.8f);
 	m_stub.setSize( menuButtonWidth, menuButtonHeight);
 
-	m_saub.init(L"save_up_button.png", m_pDev);
+	m_saub.init(L"Images/save_up_button.png", m_pDev);
 	m_saub.setPos ( (float)scrWidth/2 - menuButtonWidth - 20, (float)scrHeight/2 - menuButtonHeight - 80, 2.8f);
 	m_saub.setSize( menuButtonWidth, menuButtonHeight);
 
-	m_sanub.init(L"save_unusable_button.png", m_pDev);
+	m_sanub.init(L"Images/save_unusable_button.png", m_pDev);
 	m_sanub.setPos ( (float)scrWidth/2 - menuButtonWidth - 20, (float)scrHeight/2 - menuButtonHeight - 80, 2.8f);
 	m_sanub.setSize( menuButtonWidth, menuButtonHeight);
 
-	m_loub.init(L"load_up_button.png", m_pDev);
+	m_loub.init(L"Images/load_up_button.png", m_pDev);
 	m_loub.setPos ( (float)scrWidth/2 - menuButtonWidth - 20, (float)scrHeight/2 - menuButtonHeight - 130, 2.8f);
 	m_loub.setSize( menuButtonWidth, menuButtonHeight);
 
-	m_seub.init(L"setting_up_button.png", m_pDev);
+	m_seub.init(L"Images/setting_up_button.png", m_pDev);
 	m_seub.setPos ( (float)scrWidth/2 - menuButtonWidth - 20, (float)scrHeight/2 - menuButtonHeight - 180, 2.8f);
 	m_seub.setSize( menuButtonWidth, menuButtonHeight);
 
-	m_exub.init(L"exit_up_button.png", m_pDev);
+	m_exub.init(L"Images/exit_up_button.png", m_pDev);
 	m_exub.setPos ( (float)scrWidth/2 - menuButtonWidth - 20, (float)scrHeight/2 - menuButtonHeight - 230, 2.8f);
 	m_exub.setSize( menuButtonWidth, menuButtonHeight);
 
 
-	m_stdb.init(L"status_down_button.png", m_pDev);
+	m_stdb.init(L"Images/status_down_button.png", m_pDev);
 	m_stdb.setPos ( (float)scrWidth/2 - menuButtonWidth - 20, (float)scrHeight/2 - menuButtonHeight - 30, 2.7f);
 	m_stdb.setSize( menuButtonWidth, menuButtonHeight);
 
-	m_sadb.init(L"save_down_button.png", m_pDev);
+	m_sadb.init(L"Images/save_down_button.png", m_pDev);
 	m_sadb.setPos ( (float)scrWidth/2 - menuButtonWidth - 20, (float)scrHeight/2 - menuButtonHeight - 80, 2.7f);
 	m_sadb.setSize( menuButtonWidth, menuButtonHeight);
 
-	m_lodb.init(L"load_down_button.png", m_pDev);
+	m_lodb.init(L"Images/load_down_button.png", m_pDev);
 	m_lodb.setPos ( (float)scrWidth/2 - menuButtonWidth - 20, (float)scrHeight/2 - menuButtonHeight - 130, 2.7f);
 	m_lodb.setSize( menuButtonWidth, menuButtonHeight);
 
-	m_sedb.init(L"setting_down_button.png", m_pDev);
+	m_sedb.init(L"Images/setting_down_button.png", m_pDev);
 	m_sedb.setPos ( (float)scrWidth/2 - menuButtonWidth - 20, (float)scrHeight/2 - menuButtonHeight - 180, 2.7f);
 	m_sedb.setSize( menuButtonWidth, menuButtonHeight);
 
-	m_exdb.init(L"exit_down_button.png", m_pDev);
+	m_exdb.init(L"Images/exit_down_button.png", m_pDev);
 	m_exdb.setPos ( (float)scrWidth/2 - menuButtonWidth - 20, (float)scrHeight/2 - menuButtonHeight - 230, 2.7f);
 	m_exdb.setSize( menuButtonWidth, menuButtonHeight);
 
-	m_stwin.init(L"status_window.png", m_pDev);
+	m_stwin.init(L"Images/status_window.png", m_pDev);
 	m_stwin.setPos ( 0 - scrWidth / 2, 0 - scrHeight / 2, 2.6f);
 	m_stwin.setSize(scrWidth, scrHeight);
 
-	m_sawin.init(L"save_window.png", m_pDev);
+	m_sawin.init(L"Images/save_window.png", m_pDev);
 	m_sawin.setPos ( 0 - scrWidth / 2, 0 - scrHeight / 2, 2.6f);
 	m_sawin.setSize(scrWidth, scrHeight);
 
-	m_lowin.init(L"load_window.png", m_pDev);
+	m_lowin.init(L"Images/load_window.png", m_pDev);
 	m_lowin.setPos ( 0 - scrWidth / 2, 0 - scrHeight / 2, 2.6f);
 	m_lowin.setSize(scrWidth, scrHeight);
 

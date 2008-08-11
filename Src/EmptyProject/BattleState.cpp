@@ -19,13 +19,13 @@ BattleState::BattleState()
 
 	float statusBoxPlayersPositionX = -(float)scrWidth/2 + 10;
 	float statusBoxPlayersPositionY = -(float)scrHeight/2 + 10;
-	m_StatusBoxPlayer.init(L"BattleUI\\StatusBox.png", m_pDev);
+	m_StatusBoxPlayer.init(L"Images/BattleUI/StatusBox.png", m_pDev);
 	m_StatusBoxPlayer.setPos(D3DXVECTOR3(statusBoxPlayersPositionX, statusBoxPlayersPositionY, 7));
 	m_StatusBoxPlayer.setSize(statusBoxWidth, statusBoxHeight);
 
 	float statusBoxEnemysPositionX = (float)scrWidth/2 - statusBoxWidth - 10;
 	float statusBoxEnemysPositionY = (float)scrHeight/2 - statusBoxHeight - 10;
-	m_StatusBoxEnemy.init(L"BattleUI\\StatusBox.png", m_pDev);
+	m_StatusBoxEnemy.init(L"Images/BattleUI/StatusBox.png", m_pDev);
 	m_StatusBoxEnemy.setPos(D3DXVECTOR3(statusBoxEnemysPositionX, statusBoxEnemysPositionY, 6.9f));
 	m_StatusBoxEnemy.setSize(statusBoxWidth, statusBoxHeight);
 
@@ -33,72 +33,72 @@ BattleState::BattleState()
 	int skillBoxWidth = skillBoxHeight * 593 / 933;
 	int skillBoxPositionX = scrWidth/2 -skillBoxWidth - 3;
 	int skillBoxPositionY =  -scrHeight/2 + 3;
-	m_SkillBox.init(L"BattleUI\\SkillBox.png", m_pDev);
+	m_SkillBox.init(L"Images/BattleUI/SkillBox.png", m_pDev);
 	m_SkillBox.setPos (D3DXVECTOR3((float)skillBoxPositionX, (float)skillBoxPositionY, 6.9f));
 	m_SkillBox.setSize((float)skillBoxWidth, (float)skillBoxHeight);
 
 	int skillContentBoxHeight = 200;
 	int skillContentBoxWidth = skillContentBoxHeight * 390 / 269;
-	m_SkillContentBox.init(L"BattleUI\\SkillContentBox.png", m_pDev);
+	m_SkillContentBox.init(L"Images/BattleUI/SkillContentBox.png", m_pDev);
 	m_SkillContentBox.setPos(D3DXVECTOR3((float)skillBoxPositionX - skillContentBoxWidth, (float)skillBoxPositionY, 6.9f));
 	m_SkillContentBox.setSize((float)skillContentBoxWidth, (float)skillContentBoxHeight);
 
 	float dialogBoxWidth = (float)(int)(scrWidth - statusBoxWidth - 30);
 	float dialogBoxHeight = 124;
-	m_DialogBox.init(L"BattleUI\\DialogBox.png", m_pDev);
+	m_DialogBox.init(L"Images/BattleUI/DialogBox.png", m_pDev);
 	m_DialogBox.setPos(D3DXVECTOR3((float)-(scrWidth)/2 + 10, (float)(scrHeight)/2 - dialogBoxHeight - 10, 6.9f));
 	//m_DialogBox.setPos (10, 10, 6.9f);
 	m_DialogBox.setSize(dialogBoxWidth, dialogBoxHeight);
 
 	float statusBarWidth = statusBoxWidth * 0.67f;
 	float statusBarHeight = statusBarWidth * 0.1f;
-	m_hpBgPlayer.init(L"BattleUI\\HPbg.jpg", m_pDev);
+	m_hpBgPlayer.init(L"Images/BattleUI/HPbg.jpg", m_pDev);
 	m_hpBgPlayer.setPos (statusBoxPlayersPositionX + statusBoxWidth*0.23f, statusBoxPlayersPositionY + statusBoxHeight * 0.82f, 5);
 	m_hpBgPlayer.setSize(statusBarWidth, statusBarHeight);
-	m_mpBgPlayer.init(L"BattleUI\\MPbg.jpg", m_pDev);
+	m_mpBgPlayer.init(L"Images/BattleUI/MPbg.jpg", m_pDev);
 	m_mpBgPlayer.setPos (statusBoxPlayersPositionX + statusBoxWidth*0.23f, statusBoxPlayersPositionY + statusBoxHeight * 0.65f, 5);
 	m_mpBgPlayer.setSize(statusBarWidth, statusBarHeight);
-	m_expBgPlayer.init(L"BattleUI\\EXPbg.jpg", m_pDev);
+	m_expBgPlayer.init(L"Images/BattleUI/EXPbg.jpg", m_pDev);
 	m_expBgPlayer.setPos (statusBoxPlayersPositionX + statusBoxWidth*0.23f, statusBoxPlayersPositionY + statusBoxHeight * 0.48f, 5);
 	m_expBgPlayer.setSize(statusBarWidth, statusBarHeight);
 
-	m_hpBgEnemy.init(L"BattleUI\\HPbg.jpg", m_pDev);
+	m_hpBgEnemy.init(L"Images/BattleUI/HPbg.jpg", m_pDev);
 	m_hpBgEnemy.setPos (statusBoxEnemysPositionX + statusBoxWidth*0.23f, statusBoxEnemysPositionY + statusBoxHeight * 0.82f, 5);
 	m_hpBgEnemy.setSize(statusBarWidth, statusBarHeight);
-	m_mpBgEnemy.init(L"BattleUI\\MPbg.jpg", m_pDev);
+	m_mpBgEnemy.init(L"Images/BattleUI/MPbg.jpg", m_pDev);
 	m_mpBgEnemy.setPos (statusBoxEnemysPositionX + statusBoxWidth*0.23f, statusBoxEnemysPositionY + statusBoxHeight * 0.65f, 5);
 	m_mpBgEnemy.setSize(statusBarWidth, statusBarHeight);
 
-	m_hpIllusionPlayer.init(L"BattleUI\\HPillusion.jpg", m_pDev);
+	m_hpIllusionPlayer.init(L"Images/BattleUI/HPillusion.jpg", m_pDev);
 	m_hpIllusionPlayer.setSize(statusBarWidth, statusBarHeight);
 	m_hpIllusionPlayer.setPos (statusBoxPlayersPositionX + statusBoxWidth*0.23f, statusBoxPlayersPositionY + statusBoxHeight * 0.82f, 4.8f);
 
-	m_hpIllusionEnemy.init(L"BattleUI\\HPillusion.jpg", m_pDev);
+	m_hpIllusionEnemy.init(L"Images/BattleUI/HPillusion.jpg", m_pDev);
 	m_hpIllusionEnemy.setSize(statusBarWidth, statusBarHeight);
 	m_hpIllusionEnemy.setPos (statusBoxEnemysPositionX + statusBoxWidth*0.23f, statusBoxEnemysPositionY + statusBoxHeight * 0.82f, 4.8f);
 
 
-	m_hpBarPlayer.init(L"BattleUI\\HPbar.jpg", m_pDev);
+	m_hpBarPlayer.init(L"Images/BattleUI/HPbar.jpg", m_pDev);
 	m_hpBarPlayer.setSize(statusBarWidth, statusBarHeight);
 	m_hpBarPlayer.setPos (statusBoxPlayersPositionX + statusBoxWidth*0.23f, statusBoxPlayersPositionY + statusBoxHeight * 0.82f, 4.5f);
 	
 
-	m_mpBarPlayer.init(L"BattleUI\\MPbar.jpg", m_pDev);
+	m_mpBarPlayer.init(L"Images/BattleUI/MPbar.jpg", m_pDev);
 	m_mpBarPlayer.initRate();
 	m_mpBarPlayer.setPos (statusBoxPlayersPositionX + statusBoxWidth*0.23f, statusBoxPlayersPositionY + statusBoxHeight * 0.65f, 4.5f);
 	m_mpBarPlayer.setSize(statusBarWidth, statusBarHeight);
 
-	m_expBarPlayer.init(L"BattleUI\\EXPbar.jpg", m_pDev);
+	m_expBarPlayer.init(L"Images/BattleUI/EXPbar.jpg", m_pDev);
 	m_expBarPlayer.initRate();
 	m_expBarPlayer.setPos (statusBoxPlayersPositionX + statusBoxWidth*0.23f, statusBoxPlayersPositionY + statusBoxHeight * 0.48f, 4.5f);
 	m_expBarPlayer.setSize(statusBarWidth, statusBarHeight);
 	m_expBarPlayer.changeRate(-73.3f);
 
-	m_hpBarEnemy.init(L"BattleUI\\HPbar.jpg", m_pDev);
+	m_hpBarEnemy.init(L"Images/BattleUI/HPbar.jpg", m_pDev);
 	m_hpBarEnemy.setPos (statusBoxEnemysPositionX + statusBoxWidth*0.23f, statusBoxEnemysPositionY + statusBoxHeight * 0.82f, 4.5f);
 	m_hpBarEnemy.setSize(statusBarWidth, statusBarHeight);
 
-	m_mpBarEnemy.init(L"BattleUI\\MPbar.jpg", m_pDev);
+	m_mpBarEnemy.init(L"Images/BattleUI/MPbar.jpg", m_pDev);
 	m_mpBarEnemy.setSize(statusBarWidth, statusBarHeight);
 	m_mpBarEnemy.setPos (statusBoxEnemysPositionX + statusBoxWidth*0.23f, statusBoxEnemysPositionY + statusBoxHeight * 0.65f, 4.5f);
 	

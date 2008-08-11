@@ -39,6 +39,8 @@ public:
 	Unit* getHero() { return m_heroUnit; }
 	Unit* getCurEnemy() { return m_curEnemyUnit; }
 
+	void startDialog( int index );
+
 private:
 	void setupLight();
 	void handleCollision( Unit* heroUnit, Unit* enemyUnit );

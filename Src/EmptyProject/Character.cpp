@@ -2,6 +2,11 @@
 #include "Character.h"
 #include "AttackObject.h"
 #include "ScriptManager.h"
+#include "TileManager.h"
+#include "TopStateManager.h"
+#include "WorldState.h"
+
+extern TileManager tileManager;
 
 void Character::attack( int type, Character* enemy )
 {
@@ -52,35 +57,47 @@ bool Character::frameMove( float fElapsedTime )
 
 		if( IsKeyDown( m_aKeys[UNIT_MOVE_UP] ) )
 		{
-			m_bMoving = true;
-			m_vKeyboardDirection = D3DXVECTOR3( 0, 0, 0 );
-			m_vKeyboardDirection.y += 2.0f;
-			m_tileY++;
-			GetScriptManager().execute("EpUnitOnMove 0");
+			if( tileManager.tile[m_tileX][m_tileY + 1].movable )
+			{
+				m_bMoving = true;
+				m_vKeyboardDirection = D3DXVECTOR3( 0, 0, 0 );
+				m_vKeyboardDirection.y += 2.0f;
+				m_tileY++;
+				GetScriptManager().execute("EpUnitOnMove 0");
+			}
 		}
-		else if( IsKeyDown( m_aKeys[UNIT_MOVE_DOWN] ) )
+		if( IsKeyDown( m_aKeys[UNIT_MOVE_DOWN] ) )
 		{
-			m_bMoving = true;
-			m_vKeyboardDirection = D3DXVECTOR3( 0, 0, 0 );
-			m_vKeyboardDirection.y -= 2.0f;
-			m_tileY--;
-			GetScriptManager().execute("EpUnitOnMove 1");
+			if( tileManager.tile[m_tileX][m_tileY - 1].movable )
+			{
+				m_bMoving = true;
+				m_vKeyboardDirection = D3DXVECTOR3( 0, 0, 0 );
+				m_vKeyboardDirection.y -= 2.0f;
+				m_tileY--;
+				GetScriptManager().execute("EpUnitOnMove 1");
+			}
 		}
-		else if( IsKeyDown( m_aKeys[UNIT_MOVE_RIGHT] ) )
+		if( IsKeyDown( m_aKeys[UNIT_MOVE_RIGHT] ) )
 		{
-			m_bMoving = true;
-			m_vKeyboardDirection = D3DXVECTOR3( 0, 0, 0 );
-			m_vKeyboardDirection.x += 2.0f;
-			m_tileX++;
-			GetScriptManager().execute("EpUnitOnMove 2");
+			if( tileManager.tile[m_tileX + 1][m_tileY].movable )
+			{
+				m_bMoving = true;
+				m_vKeyboardDirection = D3DXVECTOR3( 0, 0, 0 );
+				m_vKeyboardDirection.x += 2.0f;
+				m_tileX++;
+				GetScriptManager().execute("EpUnitOnMove 2");
+			}
 		}
-		else if( IsKeyDown( m_aKeys[UNIT_MOVE_LEFT] ) )
+		if( IsKeyDown( m_aKeys[UNIT_MOVE_LEFT] ) )
 		{
-			m_bMoving = true;
-			m_vKeyboardDirection = D3DXVECTOR3( 0, 0, 0 );
-			m_vKeyboardDirection.x -= 2.0f;
-			m_tileX--;
-			GetScriptManager().execute("EpUnitOnMove 3");
+			if( tileManager.tile[m_tileX - 1][m_tileY].movable )
+			{
+				m_bMoving = true;
+				m_vKeyboardDirection = D3DXVECTOR3( 0, 0, 0 );
+				m_vKeyboardDirection.x -= 2.0f;
+				m_tileX--;
+				GetScriptManager().execute("EpUnitOnMove 3");
+			}
 		}
 	}
 
@@ -131,6 +148,81 @@ HRESULT Character::frameRender()
 	return S_OK;
 
 }
+
+LRESULT Character::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
+{
+	TopStateManager& tsm = TopStateManager::getSingleton();
+	WorldState* ws = static_cast<WorldState*>( tsm.getCurState() );
+
+	switch( uMsg )
+	{
+	case WM_KEYDOWN:
+		{
+			// Map this key to a D3DUtil_CameraKeys enum and update the
+			// state of m_aKeys[] by adding the KEY_WAS_DOWN_MASK|KEY_IS_DOWN_MASK mask
+			// only if the key is not down
+			UnitInput mappedKey = mapKey( ( UINT )wParam );
+			if( mappedKey != UNIT_UNKNOWN )
+			{
+				if( FALSE == IsKeyDown( m_aKeys[mappedKey] ) )
+				{
+					UINT targetTileX, targetTileY;
+					targetTileX = m_tileX;
+					targetTileY = m_tileY;
+
+					switch( mappedKey )
+					{
+					case UNIT_MOVE_UP :
+						targetTileX = m_tileX;
+						targetTileY = m_tileY + 1;
+						break;
+					case UNIT_MOVE_DOWN :
+						targetTileX = m_tileX;
+						targetTileY = m_tileY - 1;
+						break;
+					case UNIT_MOVE_RIGHT :
+						targetTileX = m_tileX + 1;
+						targetTileY = m_tileY;
+						break;
+					case UNIT_MOVE_LEFT :
+						targetTileX = m_tileX - 1;
+						targetTileY = m_tileY;
+						break;
+					}
+					if( !tileManager.tile[targetTileX][targetTileY].movable )
+					{
+						ws->startDialog( 2 );
+						m_aKeys[ mappedKey ] &= ~KEY_IS_DOWN_MASK;
+						--m_cKeysDown;
+					}
+					else
+					{
+						m_aKeys[ mappedKey ] = KEY_WAS_DOWN_MASK | KEY_IS_DOWN_MASK;
+						++m_cKeysDown;
+					}
+				}
+			}
+			break;
+		}
+
+	case WM_KEYUP:
+		{
+			// Map this key to a D3DUtil_CameraKeys enum and update the
+			// state of m_aKeys[] by removing the KEY_IS_DOWN_MASK mask.
+			UnitInput mappedKey = mapKey( ( UINT )wParam );
+			if( mappedKey != UNIT_UNKNOWN && ( DWORD )mappedKey < 8 )
+			{
+				m_aKeys[ mappedKey ] &= ~KEY_IS_DOWN_MASK;
+				--m_cKeysDown;
+			}
+			break;
+		}
+
+	}
+
+	return FALSE;
+}
+
 
 Character::Character()
 {

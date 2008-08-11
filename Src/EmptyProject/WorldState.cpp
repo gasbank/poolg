@@ -64,7 +64,7 @@ HRESULT WorldState::enter()
 	m_sound.init();
 
 
-	tileManager.tile[8][10].movable = false;
+	tileManager.tile[14][14].movable = false;
 	tileManager.tile[9][9].talkable = true;
 	tileManager.tile[9][9].talkonetime = false;
 
@@ -452,4 +452,30 @@ void WorldState::handleCollision( Unit* heroUnit, Unit* enemyUnit )
 	m_curEnemyUnit->setAttack (20);
 	if ( GetWorldStateManager().curStateEnum() == GAME_WORLD_STATE_FIELD )
 		GetWorldStateManager().setNextState(GAME_WORLD_STATE_BATTLE);
+}
+
+void WorldState::startDialog( int index )
+{
+	DialogList::iterator it = m_scriptedDialog.begin();
+	while ( index )
+	{
+		++it;
+		--index;
+	}
+
+	Dialog* dialog = (*it);
+	if ( dialog->isOneTime() && !dialog->endTalk )
+	{
+		dialog->startTalk = true;
+		if ( !dialog->dlg_ON )
+			dialog->Toggle(&dialog->dlg_ON);
+	}
+	if ( !dialog->isOneTime() && !dialog->endTalk )
+	{
+		dialog->startTalk = true;
+		if ( !dialog->dlg_ON )
+			dialog->Toggle( &dialog->dlg_ON );
+	}
+	if ( dialog->endTalk && !dialog->isOneTime() )
+		dialog->Toggle( &dialog->endTalk );
 }

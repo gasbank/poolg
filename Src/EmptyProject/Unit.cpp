@@ -64,40 +64,6 @@ HRESULT Unit::frameRender()
 
 LRESULT Unit::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
-	switch( uMsg )
-	{
-	case WM_KEYDOWN:
-		{
-			// Map this key to a D3DUtil_CameraKeys enum and update the
-			// state of m_aKeys[] by adding the KEY_WAS_DOWN_MASK|KEY_IS_DOWN_MASK mask
-			// only if the key is not down
-			UnitInput mappedKey = mapKey( ( UINT )wParam );
-			if( mappedKey != UNIT_UNKNOWN )
-			{
-				if( FALSE == IsKeyDown( m_aKeys[mappedKey] ) )
-				{
-					m_aKeys[ mappedKey ] = KEY_WAS_DOWN_MASK | KEY_IS_DOWN_MASK;
-					++m_cKeysDown;
-				}
-			}
-			break;
-		}
-
-	case WM_KEYUP:
-		{
-			// Map this key to a D3DUtil_CameraKeys enum and update the
-			// state of m_aKeys[] by removing the KEY_IS_DOWN_MASK mask.
-			UnitInput mappedKey = mapKey( ( UINT )wParam );
-			if( mappedKey != UNIT_UNKNOWN && ( DWORD )mappedKey < 8 )
-			{
-				m_aKeys[ mappedKey ] &= ~KEY_IS_DOWN_MASK;
-				--m_cKeysDown;
-			}
-			break;
-		}
-
-	}
-
 	return FALSE;
 }
 

@@ -1,4 +1,4 @@
-set EpDialogList [list EpDialog1 EpDialog2];
+set EpDialogList [list EpDialog1 EpDialog2 EpDialogStop];
 
 namespace eval EpDialog1 {
 	
@@ -37,5 +37,17 @@ namespace eval EpDialog2 {
 		$enemy		"Okay."\
 		$player		"지금은 한글판이거든?"\
 		$enemy		"S*it! Speak English you idiot!"\
+	];	
+}
+
+namespace eval EpDialogStop {
+	
+	set region [ list 14 14 -1 -1 ]; ;# left, top, right, bottom
+	set oneTime 0;
+	
+	set player "SYSTEM"
+	
+	set dialog [ list\
+		$player		"여기로 오면 안 생긴다네."\
 	];	
 }

@@ -14,6 +14,7 @@ public:
 
 	virtual HRESULT frameRender();
 	virtual bool frameMove( float fElapsedTime );
+	virtual LRESULT handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 
 	void setMaxAndCurHp( int maxHp, int curHp ) { assert( maxHp >= 0 && curHp >= 0 && maxHp >= curHp ); m_maxHp = maxHp; m_curHp = curHp; }
 	int getCurHp() const { return m_curHp; }

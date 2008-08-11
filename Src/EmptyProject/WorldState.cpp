@@ -293,11 +293,14 @@ HRESULT WorldState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 {
 	m_pic.handleMessages(hWnd, uMsg, wParam, lParam);
 	m_sound.handleMessages(hWnd, uMsg, wParam, lParam);
+
+	bool bTalking = false;
 	
 	DialogList::iterator itDialog = m_scriptedDialog.begin();
 	for ( ; itDialog != m_scriptedDialog.end(); ++itDialog )
 	{
 		(*itDialog)->handleMessages( hWnd, uMsg, wParam, lParam );
+		bTalking |= (*itDialog)->startTalk;
 	}
 	
 
@@ -306,7 +309,10 @@ HRESULT WorldState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 	{
 		if ((*it)->getControllable())
 		{
-			(*it)->handleMessages(hWnd, uMsg, wParam, lParam);
+			if ( !bTalking )
+			{
+				(*it)->handleMessages(hWnd, uMsg, wParam, lParam);
+			}
 		}
 	}
 

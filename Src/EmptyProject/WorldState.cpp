@@ -307,7 +307,7 @@ HRESULT WorldState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 	UnitSet::iterator it = m_unitSet.begin();
 	for ( ; it != m_unitSet.end(); ++it )
 	{
-		if ((*it)->getControllable())
+		if ( (*it)->getControllable() && GetWorldStateManager().curStateEnum() == GAME_WORLD_STATE_FIELD )
 		{
 			if ( !bTalking )
 			{
@@ -479,4 +479,18 @@ void WorldState::startDialog( int index )
 	}
 	if ( dialog->endTalk && !dialog->isOneTime() )
 		dialog->Toggle( &dialog->endTalk );
+}
+
+// 유닛의 포인터를 받아서, UnitSet에서 해당 유닛을 찾아 지운다.
+void WorldState::removeUnit( Unit* pUnit )
+{
+	UnitSet::iterator it = m_unitSet.begin();
+	for ( ; it != m_unitSet.end(); it++ )
+	{
+		if ( *it == pUnit )
+		{
+			m_unitSet.erase( it );
+			break;
+		}
+	}
 }

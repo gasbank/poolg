@@ -294,8 +294,13 @@ HRESULT BattleState::frameMove(double fTime, float fElapsedTime)
 		D3DXVec3Lerp( &vCurLookAt, &m_vPrevLookAt, &vDesLookAt, (float)fStateTime);
 
 		camera.SetViewParamsWithUp( &vCurEye, &vCurLookAt, vCurUp );
-	} else {
-		camera.SetViewParamsWithUp( &vDesEye, &vDesLookAt, vDesUp );
+	}
+
+	// 적의 체력이 0 이하면 FieldState로 돌아간다.
+	if ( getEnemy()->getCurHp() <= 0 )
+	{
+		GetWorldStateManager().setNextState(GAME_WORLD_STATE_FIELD);
+		ws->removeUnit( getEnemy() ); 
 	}
 
 	return S_OK;
@@ -406,7 +411,7 @@ void BattleState::passTurn()
 
 	if (m_curTurnType == TT_PLAYER)
 	{
-		m_battleLog.push_back(std::string("당신이 공격할 차례입니다."));
+		m_battleLog.push_back(std::string("당신이 공격할 차례입니다."));		
 	}
 	else if (m_curTurnType == TT_COMPUTER)
 	{

@@ -38,6 +38,7 @@ public:
 
 	Unit* getHero() { return m_heroUnit; }
 	Unit* getCurEnemy() { return m_curEnemyUnit; }
+	void removeUnit( Unit* pUnit );
 
 	void startDialog( int index );
 

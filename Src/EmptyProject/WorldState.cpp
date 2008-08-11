@@ -121,6 +121,7 @@ HRESULT WorldState::enter()
 	setupLight();
 
 	GetScriptManager().execute("EpWorldState::enter");
+
 	
 	// Load dialogs from script
 	std::list<const char*> dialogList;
@@ -146,11 +147,15 @@ HRESULT WorldState::leave()
 HRESULT WorldState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, float fElapsedTime)
 {		
 	EpCamera& camera = GetG().m_camera;
+	D3DLIGHT9& light = GetG().m_light;
 
 	//////////////////////////////////////////////////////////////////////////
 	// Perspective Rendering Phase
 
+	pd3dDevice->SetLight(0, &light);
+
 	pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
+	pd3dDevice->SetRenderState( D3DRS_LIGHTING, TRUE );
 
 	pd3dDevice->SetTransform(D3DTS_VIEW, camera.GetViewMatrix());
 	pd3dDevice->SetTransform(D3DTS_PROJECTION, camera.GetProjMatrix());
@@ -199,27 +204,21 @@ HRESULT WorldState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, floa
 
 HRESULT WorldState::frameMove(double fTime, float fElapsedTime)
 {
-	//D3DLIGHT9& light = GetG().m_light;
 	EpCamera& camera = GetG().m_camera;
+	D3DLIGHT9& light = GetG().m_light;
 
-	//double fStateTime = getStateTime(fTime);
+	double fStateTime = getStateTime(fTime);
 
-	/*if (0.0f < fTime && fTime < 5.0f)
+	fStateTime -= 1.5f;
+
+	// Fade in at starting.
+	if ( 0.0f < fStateTime && fStateTime < 2.0f )
 	{
-		D3DXVECTOR3 vecEye( 
-			0.0f, 
-			(-30.0f * (5.0f - fTime) + 0.0f * fTime) / 5.0f, 
-			(-20.0f * (5.0f - fTime) -20.0f * fTime) / 5.0f );
-		D3DXVECTOR3 vecAt ( 0.0f, 0.0f, -0.0f );
-		camera.SetViewParams( &vecEye, &vecAt );
-
-		D3DCOLORVALUE cv = { fTime / 5.0f , fTime / 5.0f, fTime / 5.0f, fTime / 5.0f };
-		const float lightLimit = 0.2f;
-		if (cv.r > lightLimit) cv.r = lightLimit;
-		if (cv.g > lightLimit) cv.g = lightLimit;
-		if (cv.b > lightLimit) cv.b = lightLimit;
+		D3DCOLORVALUE cv = { (float)fStateTime / 2.0f * 0.8f, (float)fStateTime / 2.0f * 0.8f, (float)fStateTime / 2.0f * 0.8f, 1.0f };
 		light.Ambient = cv;
-	}*/
+		light.Diffuse = cv;
+		light.Specular = cv;
+	}
 	
 	m_pic.frameMove(fElapsedTime);
 	m_avatar.frameMove(fElapsedTime);
@@ -370,17 +369,17 @@ void WorldState::setupLight()
 	LPDIRECT3DDEVICE9& pd3dDevice = GetG().m_dev;
 
 	ZeroMemory(&light, sizeof(D3DLIGHT9));
-	D3DCOLORVALUE cv = { 0.5f, 0.5f, 0.5f, 1.0f };
+	D3DCOLORVALUE cv = { 0.0f, 0.0f, 0.0f, 1.0f };
 	light.Ambient = cv;
 	light.Diffuse = cv;
 	light.Specular = cv;
 	
 	light.Attenuation0 = 0.5f;
 
-	D3DXVECTOR3 dir(10.0f, -10.0f, 10.0f);
+	D3DXVECTOR3 dir(0.0f, 1.0f, 0.0f);
 	D3DXVec3Normalize((D3DXVECTOR3*)&light.Direction, &dir);
 
-	D3DXVECTOR3 pos(-10.0f, 10.0f, -10.0f);
+	D3DXVECTOR3 pos(0.0f, -30.0f, 0.0f);
 	D3DXVec3Normalize((D3DXVECTOR3*)&light.Position, &pos);
 
 	light.Type = D3DLIGHT_DIRECTIONAL;
@@ -388,6 +387,7 @@ void WorldState::setupLight()
 
 	pd3dDevice->SetLight(0, &light);
 	pd3dDevice->LightEnable(0, TRUE);
+	pd3dDevice->SetRenderState( D3DRS_LIGHTING, TRUE );
 }
 
 UINT WorldState::addUnit( Unit* u )

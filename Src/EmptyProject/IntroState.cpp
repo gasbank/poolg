@@ -103,7 +103,7 @@ HRESULT IntroState::frameMove( double fTime, float fElapsedTime )
 {
 	double fStateTime = getStateTime(fTime);
 
-	fStateTime -= 2.0f;
+	fStateTime -= 1.5f;
 
 	if (0.0f < fStateTime  && fStateTime < 3.0f)
 	{		
@@ -222,11 +222,11 @@ HRESULT IntroState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, floa
 		if( m_pTextMeshes[0] != NULL )
 		{
 			ZeroMemory( &mtrl, sizeof( D3DMATERIAL9 ) );
-			D3DCOLORVALUE cv_diffuse = { 198.0f / 255.0f, 198.0f / 255.0f, 198.0f / 255.0f, 1.0f };
+			D3DCOLORVALUE cv_diffuse = { 198.0f / 255.0f * m_mtrlControl, 198.0f / 255.0f * m_mtrlControl, 198.0f / 255.0f * m_mtrlControl, 1.0f };
 			mtrl.Diffuse  = cv_diffuse;
 			D3DCOLORVALUE cv_ambient = { 0.0f, 0.0f, 0.0f, 1.0f };
 			mtrl.Ambient = cv_ambient;
-			D3DCOLORVALUE cv_specular = { 198.0f / 255.0f, 198.0f / 255.0f, 198.0f / 255.0f, 1.0f };
+			D3DCOLORVALUE cv_specular = { 198.0f / 255.0f * m_mtrlControl, 198.0f / 255.0f * m_mtrlControl, 198.0f / 255.0f * m_mtrlControl, 1.0f };
 			mtrl.Ambient = cv_specular;
 			pd3dDevice->SetMaterial( &mtrl );
 
@@ -251,7 +251,7 @@ HRESULT IntroState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 	{
 		if (wParam == VK_F4)
 		{
-			TopStateManager::getSingleton().setNextState(GAME_TOP_STATE_CREDIT);
+			TopStateManager::getSingleton().setNextState(GAME_TOP_STATE_WORLD);
 		}
 	}
 

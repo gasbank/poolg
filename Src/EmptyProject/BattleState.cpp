@@ -300,11 +300,7 @@ HRESULT BattleState::frameMove(double fTime, float fElapsedTime)
 	}
 
 	// 적의 체력이 0 이하면 FieldState로 돌아간다.
-	if ( getEnemy()->getCurHp() <= 0 )
-	{
-		GetWorldStateManager().setNextState(GAME_WORLD_STATE_FIELD);
-		ws->removeUnit( getEnemy() ); 
-	}
+
 
 	return S_OK;
 }
@@ -315,6 +311,15 @@ HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 	m_mpBarPlayer.handleMessages(hWnd, uMsg, wParam, lParam);
 	m_expBarPlayer.handleMessages(hWnd, uMsg, wParam, lParam);
 	m_mpBarEnemy.handleMessages(hWnd, uMsg, wParam, lParam);
+
+	if ( getEnemy()->getCurHp() <= 0 )
+	{
+		TopStateManager& tsm = TopStateManager::getSingleton();
+		WorldState* ws = static_cast<WorldState*>( tsm.getCurState() );
+		GetWorldStateManager().setNextState(GAME_WORLD_STATE_FIELD);
+		ws->removeUnit( getEnemy() );
+		return S_OK;
+	}
 
 	if (uMsg == WM_KEYDOWN)
 	{

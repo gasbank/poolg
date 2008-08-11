@@ -459,6 +459,7 @@ void WorldState::removeUnit( Unit* pUnit )
 	{
 		if ( *it == pUnit )
 		{
+			pUnit->release();
 			m_unitSet.erase( it );
 			break;
 		}

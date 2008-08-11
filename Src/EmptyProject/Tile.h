@@ -9,4 +9,5 @@ public:
 	bool movable;
 	bool talkable;
 	bool talkonetime;
+	bool heal;
 };

@@ -1,4 +1,4 @@
-set EpDialogList [list EpDialog1 EpDialog2 EpDialogStop];
+set EpDialogList [list EpDialog1 EpDialog2 EpDialogStop EpDialogHeal];
 
 namespace eval EpDialog1 {
 	
@@ -49,5 +49,17 @@ namespace eval EpDialogStop {
 	
 	set dialog [ list\
 		$player		"여기로 오면 안 생긴다네."\
+	];	
+}
+
+namespace eval EpDialogHeal {
+	
+	set region [ list 17 14 -1 -1 ]; ;# left, top, right, bottom
+	set oneTime 0;
+	
+	set player "SYSTEM"
+	
+	set dialog [ list\
+		$player		"힐링 트랩이다! 넌 이제 죽은 목숨이지."\
 	];	
 }

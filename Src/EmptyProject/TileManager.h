@@ -1,7 +1,5 @@
 #pragma once
 #include "Tile.h"
-#define X 25
-#define Y 25
 
 class TileManager
 {
@@ -9,7 +7,8 @@ public:
 	TileManager(void);
 	~TileManager(void);
 
-	int x, y;
+	static const int x = 25;
+	static const int y = 25;
 
-	Tile	tile[X][Y];
+	Tile	tile[x][y];
 };

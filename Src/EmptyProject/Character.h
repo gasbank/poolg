@@ -25,8 +25,10 @@ public:
 
 
 	void setTilePos(int tileX, int tileY);
+	void setTileBufferPos(int tileX, int tileY) { m_tileBufferX = tileX; m_tileBufferY = tileY; }
 	int getTilePosX() { return m_tileX; }
 	int getTilePosY() { return m_tileY; }
+	void enterTile(int tileX, int tileY);
 
 	void setMoveDuration(float val) { m_moveDuration = val; }
 
@@ -45,4 +47,6 @@ private:
 	int						m_tileX;
 	int						m_tileY;
 	int						m_attack;
+	int						m_tileBufferX;
+	int						m_tileBufferY;
 };

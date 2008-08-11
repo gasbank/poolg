@@ -36,6 +36,7 @@ Unit* Character::createCharacter( LPD3DXMESH mesh, int tileX, int tileY, float p
 	u->init( GetG().m_dev, mesh );
 	u->setControllable( bControllable );
 	u->setTilePos( tileX, tileY );
+	u->setTileBufferPos( tileX, tileY );
 	return u;
 }
 
@@ -57,45 +58,45 @@ bool Character::frameMove( float fElapsedTime )
 
 		if( IsKeyDown( m_aKeys[UNIT_MOVE_UP] ) )
 		{
-			if( tileManager.tile[m_tileX][m_tileY + 1].movable )
+			if( tileManager.tile[m_tileBufferX][m_tileBufferY + 1].movable && (m_tileBufferY + 1 > -1 && m_tileBufferY + 1 < TileManager::y) )
 			{
 				m_bMoving = true;
 				m_vKeyboardDirection = D3DXVECTOR3( 0, 0, 0 );
 				m_vKeyboardDirection.y += 2.0f;
-				m_tileY++;
+				m_tileBufferY++;
 				GetScriptManager().execute("EpUnitOnMove 0");
 			}
 		}
 		if( IsKeyDown( m_aKeys[UNIT_MOVE_DOWN] ) )
 		{
-			if( tileManager.tile[m_tileX][m_tileY - 1].movable )
+			if( tileManager.tile[m_tileBufferX][m_tileBufferY - 1].movable && (m_tileBufferY - 1 > -1 && m_tileBufferY - 1 < TileManager::y) )
 			{
 				m_bMoving = true;
 				m_vKeyboardDirection = D3DXVECTOR3( 0, 0, 0 );
 				m_vKeyboardDirection.y -= 2.0f;
-				m_tileY--;
+				m_tileBufferY--;
 				GetScriptManager().execute("EpUnitOnMove 1");
 			}
 		}
 		if( IsKeyDown( m_aKeys[UNIT_MOVE_RIGHT] ) )
 		{
-			if( tileManager.tile[m_tileX + 1][m_tileY].movable )
+			if( tileManager.tile[m_tileBufferX + 1][m_tileBufferY].movable && (m_tileBufferX + 1 > -1 && m_tileBufferX + 1 < TileManager::x) )
 			{
 				m_bMoving = true;
 				m_vKeyboardDirection = D3DXVECTOR3( 0, 0, 0 );
 				m_vKeyboardDirection.x += 2.0f;
-				m_tileX++;
+				m_tileBufferX++;
 				GetScriptManager().execute("EpUnitOnMove 2");
 			}
 		}
 		if( IsKeyDown( m_aKeys[UNIT_MOVE_LEFT] ) )
 		{
-			if( tileManager.tile[m_tileX - 1][m_tileY].movable )
+			if( tileManager.tile[m_tileBufferX - 1][m_tileBufferY].movable && (m_tileBufferX - 1 > -1 && m_tileBufferX - 1 < TileManager::x) )
 			{
 				m_bMoving = true;
 				m_vKeyboardDirection = D3DXVECTOR3( 0, 0, 0 );
 				m_vKeyboardDirection.x -= 2.0f;
-				m_tileX--;
+				m_tileBufferX--;
 				GetScriptManager().execute("EpUnitOnMove 3");
 			}
 		}
@@ -117,7 +118,12 @@ bool Character::frameMove( float fElapsedTime )
 		m_bMoving = false;
 
 		//타일에 맞도록 위치보정
-		setTilePos( m_tileX, m_tileY );
+		if( m_tileBufferX != m_tileX || m_tileBufferY != m_tileY )
+		{
+			printf("타일에 들어갑니다. (%d, %d)\n", m_tileBufferX, m_tileBufferY );
+			enterTile( m_tileBufferX, m_tileBufferY );
+			setTilePos( m_tileBufferX, m_tileBufferY );
+		}
 	}
 
 
@@ -189,7 +195,7 @@ LRESULT Character::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 						targetTileY = m_tileY;
 						break;
 					}
-					if( !tileManager.tile[targetTileX][targetTileY].movable )
+					if( !tileManager.tile[targetTileX][targetTileY].movable || (targetTileX < 0 || targetTileX >= TileManager::x)  || (targetTileY < 0 || targetTileY >= TileManager::y) )
 					{
 						ws->startDialog( 2 );
 						m_aKeys[ mappedKey ] &= ~KEY_IS_DOWN_MASK;
@@ -231,6 +237,8 @@ Character::Character()
 	m_bMoving			= false;
 	m_tileX				= 0;
 	m_tileY				= 0;
+	m_tileBufferX		= m_tileX;
+	m_tileBufferY		= m_tileY;
 }
 
 void Character::setTilePos( int tileX, int tileY )
@@ -241,6 +249,17 @@ void Character::setTilePos( int tileX, int tileY )
 	setPos( D3DXVECTOR3( (float)(tileX - 13) * G::s_tileSize, (float)(tileY  - 13) * G::s_tileSize, 0 ) );
 }
 
+void Character::enterTile( int tileX, int tileY )
+{
+	TopStateManager& tsm = TopStateManager::getSingleton();
+	WorldState* ws = static_cast<WorldState*>( tsm.getCurState() );
+
+	if( tileManager.tile[tileX][tileY].heal )
+	{
+		ws->startDialog( 3 );
+		heal( 9999 );
+	}
+}
 
 
 Unit* EpCreateCharacter( int tileX, int tileY, int controllable )

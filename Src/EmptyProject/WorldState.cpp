@@ -67,6 +67,7 @@ HRESULT WorldState::enter()
 	tileManager.tile[14][14].movable = false;
 	tileManager.tile[9][9].talkable = true;
 	tileManager.tile[9][9].talkonetime = false;
+	tileManager.tile[17][14].heal = true;
 
 	// Create vertex shader
 	WCHAR strPath[512];

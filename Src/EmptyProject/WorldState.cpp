@@ -214,10 +214,10 @@ HRESULT WorldState::frameMove(double fTime, float fElapsedTime)
 	// Fade in at starting.
 	if ( 0.0f < fStateTime && fStateTime < 2.0f )
 	{
-		D3DCOLORVALUE cv = { (float)fStateTime / 2.0f * 0.8f, (float)fStateTime / 2.0f * 0.8f, (float)fStateTime / 2.0f * 0.8f, 1.0f };
+		D3DCOLORVALUE cv = { (float)fStateTime / 2.0f * 0.7f, (float)fStateTime / 2.0f * 0.7f, (float)fStateTime / 2.0f * 0.7f, 1.0f };
 		light.Ambient = cv;
 		light.Diffuse = cv;
-		light.Specular = cv;
+		//light.Specular = cv;
 	}
 	
 	m_pic.frameMove(fElapsedTime);
@@ -438,8 +438,9 @@ const D3DXVECTOR3& WorldState::getHeroPos()
 bool WorldState::isCollide( const D3DXVECTOR3* vec0, const D3DXVECTOR3* vec1 )
 {
 	const float collideRange = 10.0f;
-	if ( -collideRange <= (vec0->x - vec1->x) && (vec0->x - vec1->x) <= collideRange )
-		if ( -collideRange <= (vec0->y - vec1->y) && (vec0->y - vec1->y) <= collideRange )
+	float range = sqrt( (vec0->x - vec1->x) * (vec0->x - vec1->x) + (vec0->y - vec1->y) * (vec0->y - vec1->y) );
+	if ( range <= collideRange )
+		if ( range <= collideRange )
 				return true;
 
 	return false;

@@ -13,7 +13,6 @@ enum PlayerSide { PS_NOTSET, PS_COMPUTER, PS_PLAYER };
 class BattleState : public State
 {
 public:
-	
 
 	BattleState();
 	~BattleState();
@@ -32,9 +31,7 @@ public:
 
 	void setNextTurnType( TurnType tt ) { m_nextTurnType = tt; }
 	void passTurn();
-	void pushBattleLog( const char* log ) { m_battleLog.push_back( log ); }
-
-	void rotateAboutAxis( D3DXVECTOR3* vOut, D3DXVECTOR3* axis, float rad );
+	void pushBattleLog( const char* log ) { m_battleLog.push_back( log ); }	
 	
 private:
 

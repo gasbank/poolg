@@ -3,6 +3,7 @@
 #include "WorldStateManager.h"
 #include "TopStateManager.h"
 #include "WorldState.h"
+#include "Utility.h"
 
 BattleState::BattleState()
 {
@@ -264,10 +265,10 @@ HRESULT BattleState::frameMove(double fTime, float fElapsedTime)
 
 	// z 축에 대고 vBattleAxis를 45도 돌린다.
 	D3DXVECTOR3 zAxis( 0.0f, 0.0f, 1.0f );
-	rotateAboutAxis( &vBattleAxis, &zAxis, D3DXToRadian( -45.0f ) );
+	Utility::rotateAboutAxis( &vBattleAxis, &zAxis, D3DXToRadian( -45.0f ) );
 
 	// vDesEye를 vBattleAxis에 대고 -45도 만큼 돌린다.
-	rotateAboutAxis( &vDesEye, &vBattleAxis, D3DXToRadian( -45.0f ) );
+	Utility::rotateAboutAxis( &vDesEye, &vBattleAxis, D3DXToRadian( -45.0f ) );
 
 	// vDesEye를 주인공 위로 옮긴다.
 	vDesEye.x += vHeroPos.x;
@@ -427,25 +428,4 @@ Character* BattleState::getHero()
 Character* BattleState::getEnemy()
 {
 	return static_cast<Character*>( m_ws->getCurEnemy() );
-}
-
-// 주어진 축에 대고 벡터를 각도만큼 돌린다.
-void BattleState::rotateAboutAxis( D3DXVECTOR3* pvOut, D3DXVECTOR3* pvAxis, float rad )
-{
-	D3DXMATRIX rotMat;
-	D3DXVECTOR4 vOutTmp;
-
-	// 축을 Normalize한다.
-	D3DXVec3Normalize( pvAxis, pvAxis );
-
-	// 회전 변환 행렬을 구한다.
-	D3DXMatrixRotationAxis( &rotMat, pvAxis, rad );
-	const D3DXMATRIX rotMatConst( rotMat );
-
-	// 회전 변환을 적용한다.
-	D3DXVec3Transform( &vOutTmp, pvOut, &rotMatConst );
-
-	pvOut->x = vOutTmp.x;
-	pvOut->y = vOutTmp.y;
-	pvOut->z = vOutTmp.z;
 }

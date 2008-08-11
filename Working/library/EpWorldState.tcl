@@ -24,7 +24,7 @@ namespace eval EpWorldState {
 		set pHeroUnit				[EpCreateCharacter 13 13 1];
 		set pEnemyUnit1				[EpCreateCharacter 23 23 0];
 		set pEnemyUnit2				[EpCreateCharacter  3  3 0];
-		set pEnemyUnit3				[EpCreateCharacter 23  3 0];
+		set pEnemyUnit3				[EpCreateCharacter 18 -1 0];
 		set curUnitCount			[EpRegisterToWorld $pWorld $pHeroUnit];
 		set curUnitCount			[EpRegisterToWorld $pWorld $pEnemyUnit1];
 		set curUnitCount			[EpRegisterToWorld $pWorld $pEnemyUnit2];

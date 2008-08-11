@@ -10,7 +10,19 @@ void Character::attack( int type, Character* enemy )
 
 	D3DXVec3Normalize( &fireDir, &fireDir );
 	AttackObject* ao = BallAttackObject::createBallAttackObject( enemy, getPos(), fireDir, dist );
+	BallAttackObject* bao = (BallAttackObject*)ao;
+	bao->setDamage (m_attack);
 	m_attackObjectList.push_back(ao);
+}
+
+void Character::heal (int point)
+{
+	if (m_curHp + point < m_maxHp)
+		m_curHp += point;
+	else if (m_curHp + point < 0)
+		m_curHp = 0;
+	else
+		m_curHp = m_maxHp;
 }
 
 Unit* Character::createCharacter( LPD3DXMESH mesh, int tileX, int tileY, float posZ, bool bControllable )
@@ -127,8 +139,8 @@ Character::Character()
 	m_bMoving			= false;
 	m_tileX				= 0;
 	m_tileY				= 0;
-
 }
+
 void Character::setTilePos( int tileX, int tileY )
 {
 	m_tileX = tileX;

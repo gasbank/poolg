@@ -17,6 +17,7 @@ BattleState* AttackObject::getBattleState()
 }
 //////////////////////////////////////////////////////////////////////////
 
+
 BallAttackObject::~BallAttackObject()
 {
 
@@ -36,7 +37,7 @@ bool BallAttackObject::frameMove( float fElapsedTime )
 	if ( distToInitPos > m_retainDist )
 	{
 		// Hit to the target!
-		m_target->damage(1);
+		m_target->damage(m_damage);
 		
 		if (m_target->isControllable())
 		{
@@ -75,4 +76,5 @@ BallAttackObject::BallAttackObject( Character* target, const D3DXVECTOR3& initPo
 	m_initPos = initPos;
 	m_fireDir = fireDir;
 	m_retainDist = retainDist;
+	m_damage = 1;
 }

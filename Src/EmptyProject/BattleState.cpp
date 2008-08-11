@@ -260,10 +260,18 @@ HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 		{
 			GetWorldStateManager().setNextState(GAME_WORLD_STATE_FIELD);
 		}
+		/*poolG 공격*/
 		if ( wParam == 'G' && m_curTurnType == TT_PLAYER )
 		{
 			m_curTurnType = TT_NATURAL;
 			getHero()->attack( 0, getEnemy() );
+		}
+		/*힐링*/
+		if ( wParam == 'H' && m_curTurnType == TT_PLAYER )
+		{
+			//턴 핸들링이 필요.
+			//m_curTurnType = TT_COMPUTER;
+			getHero()->heal (30);
 		}
 	}
 

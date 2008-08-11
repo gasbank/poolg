@@ -23,11 +23,14 @@ public:
 	virtual LRESULT handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 	virtual bool frameMove( float fElapsedTime );
 
+	void setDamage(int value) {m_damage = value;}
+
 private:
 	Character* m_target;
 	D3DXVECTOR3 m_initPos;
 	D3DXVECTOR3 m_fireDir;
 	float m_retainDist;
+	int m_damage;
 
 	BallAttackObject( Character* target, const D3DXVECTOR3& initPos, const D3DXVECTOR3& fireDir, float retainDist );
 };

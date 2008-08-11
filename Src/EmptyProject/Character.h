@@ -10,6 +10,7 @@ public:
 	~Character();
 
 	void attack(int type, Character* enemy);
+	void heal (int point);
 
 	virtual HRESULT frameRender();
 	virtual bool frameMove( float fElapsedTime );
@@ -18,6 +19,8 @@ public:
 	int getCurHp() const { return m_curHp; }
 	int getMaxHp() const { return m_maxHp; }
 	void damage( int point ) { m_curHp -= point; }
+	int getAttack() const { return m_attack; }
+	void setAttack (int point) { m_attack = point; }
 
 
 	void setTilePos(int tileX, int tileY);
@@ -40,4 +43,5 @@ private:
 	float					m_moveDuration; // A time needed to move one time(tile) in seconds
 	int						m_tileX;
 	int						m_tileY;
+	int						m_attack;
 };

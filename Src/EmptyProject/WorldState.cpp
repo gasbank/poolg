@@ -24,8 +24,6 @@ WorldState::WorldState(void)
 	char command[128];
 	StringCchPrintfA(command, 128, "EpWorldState::init 0x%p", this);
 	GetScriptManager().execute(command);
-
-	
 }
 
 WorldState::~WorldState(void)
@@ -398,7 +396,10 @@ UINT WorldState::addUnit( Unit* u )
 	m_unitSet.insert(u);
 	// TODO controllable means it is hero?
 	if (u->getControllable())
+	{
 		m_heroUnit = dynamic_cast<Character*>( u );
+		m_heroUnit->setAttack (4);
+	}
 
 	return m_unitSet.size();
 }
@@ -442,6 +443,8 @@ bool WorldState::isCollide( const D3DXVECTOR3* vec0, const D3DXVECTOR3* vec1 )
 void WorldState::handleCollision( Unit* heroUnit, Unit* enemyUnit )
 {
 	m_curEnemyUnit = dynamic_cast<Character*>( enemyUnit );
+	/*데미지를 처리*/
+	m_curEnemyUnit->setAttack (20);
 	if ( GetWorldStateManager().curStateEnum() == GAME_WORLD_STATE_FIELD )
 		GetWorldStateManager().setNextState(GAME_WORLD_STATE_BATTLE);
 }

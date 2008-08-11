@@ -239,6 +239,7 @@ Character::Character()
 	m_tileY				= 0;
 	m_tileBufferX		= m_tileX;
 	m_tileBufferY		= m_tileY;
+	m_bTalkable = false;
 }
 
 void Character::setTilePos( int tileX, int tileY )

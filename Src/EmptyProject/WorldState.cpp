@@ -84,11 +84,16 @@ HRESULT WorldState::enter()
 	m_player.createUnit (d3dxMesh, 20, 20, 0, true);
 	addUnit(&m_player);*/
 
-	// Setup main camera
-	const D3DXVECTOR3& heroPos = getHeroPos();
+	// Get position of hero.
+	D3DXVECTOR3 heroPos;
+	if ( m_heroUnit != 0 )
+		heroPos = m_heroUnit->getPos();
+	else
+		heroPos.x = 0.0f; heroPos.y = 0.0f; heroPos.z = -30.0f;
 
+	// Setup main camera.
 	D3DXVECTOR3 vecEye( heroPos.x, heroPos.y, heroPos.z - 30.0f );
-	D3DXVECTOR3 vecAt ( 0.0f, 0.0f, -0.0f );
+	D3DXVECTOR3 vecAt ( 0.0f, 0.0f, 0.0f );
 	GetG().m_camera.SetViewParams( &vecEye, &vecAt );
 
 	setupLight();

@@ -15,9 +15,21 @@ Sound::~Sound(void)
 
 HRESULT Sound::init()
 {
-	audioState.nCurSongPlaying = -1;
 	ZeroMemory( &audioState, sizeof( AUDIO_STATE ) );
 	InitializeCriticalSection( &audioState.cs );
+
+	audioState.nCurSongPlaying = -1;
+	
+	audioState.bGlobalPaused = false;
+	audioState.bMusicPaused = false;
+	audioState.bBGMPaused = false;
+
+	audioState.bBGMStopped = false;
+	audioState.bBGMFade = false;
+
+	audioState.fGlobalVolume = 1.0f;
+	audioState.fMusicVolume = 1.0f;
+	audioState.fBGMVolume = 1.0f;
 
 	hr = CoInitializeEx( NULL, COINIT_APARTMENTTHREADED );  // COINIT_APARTMENTTHREADED will work too
     if( SUCCEEDED( hr ) )
@@ -35,8 +47,41 @@ HRESULT Sound::init()
     if( FAILED( hr ) || audioState.pEngine == NULL )
         return E_FAIL;
 
+    // Load the global settings file and pass it into XACTInitialize
+    VOID* pGlobalSettingsData = NULL;
+    DWORD dwGlobalSettingsFileSize = 0;
+    bool bSuccess = false;
+    hFile = CreateFile( L"Sounds.xgs", GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL );
+    if( hFile )
+    {
+		dwGlobalSettingsFileSize = GetFileSize( hFile, NULL );
+		if( dwGlobalSettingsFileSize != INVALID_FILE_SIZE )
+		{
+			pGlobalSettingsData = CoTaskMemAlloc( dwGlobalSettingsFileSize );
+			if( pGlobalSettingsData )
+			{
+				if( 0 != ReadFile( hFile, pGlobalSettingsData, dwGlobalSettingsFileSize, &dwBytesRead, NULL ) )
+				{
+					bSuccess = true;
+				}
+			}
+		}
+		CloseHandle( hFile );
+	}
+   
+    if( !bSuccess )
+    {
+        if( pGlobalSettingsData )
+            CoTaskMemFree( pGlobalSettingsData );
+        pGlobalSettingsData = NULL;
+        dwGlobalSettingsFileSize = 0;
+    }
+
     // Initialize & create the XACT runtime 
     XACT_RUNTIME_PARAMETERS xrParams = {0};
+    xrParams.pGlobalSettingsBuffer = pGlobalSettingsData;
+    xrParams.globalSettingsBufferSize = dwGlobalSettingsFileSize;
+    xrParams.globalSettingsFlags = XACT_FLAG_GLOBAL_SETTINGS_MANAGEDATA; // this will tell XACT to delete[] the buffer when its unneeded
     xrParams.lookAheadTime = 250;
 	xrParams.fnNotificationCallback = XACTNotificationCallback;
     hr = audioState.pEngine->Initialize( &xrParams );
@@ -168,8 +213,9 @@ HRESULT Sound::init()
     }
 	audioState.iOpening = audioState.pSoundBank->GetCueIndex( "opening" );
 
+	audioState.iGlobalCategory = audioState.pEngine->GetCategory( "Global" );
 	audioState.iMusicCategory = audioState.pEngine->GetCategory( "Music" );
-	audioState.bMusicPaused = false;
+	audioState.iBGMCategory = audioState.pEngine->GetCategory( "BGM" );
 
     return S_OK;
 }
@@ -199,16 +245,25 @@ LRESULT Sound::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
                 audioState.pSoundBank->Play( audioState.iSE, 0, 0, NULL );
 			if( wParam == 'M' )
 			{
-				if(	audioState.bMusicPaused )
+				if(	audioState.bBGMStopped )
 				{
-					audioState.bMusicPaused = false;
+					audioState.bBGMStopped = false;
 					audioState.pSoundBank->Play( audioState.iSong[audioState.nCurSongPlaying], 0, 0, NULL );
 				}
 				else
 				{
-					audioState.bMusicPaused = true;
+					audioState.bBGMStopped = true;
 					audioState.pSoundBank->Stop( audioState.iSong[audioState.nCurSongPlaying], 0 );
 				}
+			}
+			if( wParam == 'N' )
+			{
+				audioState.bBGMPaused = !audioState.bBGMPaused;
+				audioState.pEngine->Pause( audioState.iBGMCategory, audioState.bBGMPaused );
+			}
+			if( wParam == 'B' )
+			{
+				audioState.bBGMFade = !audioState.bBGMFade;
 			}
 			break;
 	}
@@ -272,7 +327,7 @@ void WINAPI XACTNotificationCallback( const XACT_NOTIFICATION* pNotification )
     // cues by simply playing another song but its ultimately it's up the application 
     // and sound designer to decide what to do when a notification is received. 
 
-	if( audioState.bMusicPaused )
+	if( audioState.bBGMStopped )
 		return;
 
     if( pNotification->type == XACTNOTIFICATIONTYPE_CUESTOP &&
@@ -360,7 +415,20 @@ void Sound::UpdateAudio()
     if( audioState.pEngine )
         audioState.pEngine->DoWork();
 
-	Sleep( 10 ); // Yield CPU time to other apps.  Note that this is not normally needed when rendering
+	if( audioState.bBGMFade )
+	{
+		audioState.fBGMVolume -= 0.025f;
+		if( audioState.fBGMVolume < 0.0f )
+			audioState.fBGMVolume = 0.0f;
+		audioState.pEngine->SetVolume( audioState.iBGMCategory, audioState.fBGMVolume );
+	}
+	else
+	{
+		audioState.fBGMVolume += 0.025f;
+		if( audioState.fBGMVolume > 1.0f )
+			audioState.fBGMVolume = 1.0f;
+		audioState.pEngine->SetVolume( audioState.iBGMCategory, audioState.fBGMVolume );
+	}
 }
 
 void Sound::Opening()

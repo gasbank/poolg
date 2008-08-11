@@ -339,14 +339,13 @@ HRESULT WorldState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 				if ( (m_heroUnit->getTilePosX() == dialog->getRegion().left)
 					&& (m_heroUnit->getTilePosY() == dialog->getRegion().top) )
 				{
-					if ( dialog->isOneTime() )
+					if ( dialog->isOneTime() && !dialog->endTalk )
 					{
-						dialog->setOneTime( false );
 						dialog->startTalk = true;
 						if ( !dialog->dlg_ON )
 							dialog->Toggle(&dialog->dlg_ON);
 					}
-					if ( !dialog->isOneTime() && !dialog->endTalk)
+					if ( !dialog->isOneTime() && !dialog->endTalk )
 					{
 						dialog->startTalk = true;
 						if ( !dialog->dlg_ON )

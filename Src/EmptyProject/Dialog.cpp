@@ -36,14 +36,21 @@ HRESULT Dialog::init()
 {
 	HRESULT hr = S_OK;
 
-	pRc.top = GetG().m_scrHeight - 200 + 20;
-	pRc.left = 20;
-	pRc.right = 200 - 20;
-	pRc.bottom = GetG().m_scrHeight - 20;
-	qRc.top = (GetG().m_scrHeight - 200) - 61 + 20;
-	qRc.left = 20;
-	qRc.right = 53 - 20;
-	qRc.bottom = (GetG().m_scrHeight - 200) - 20;
+	const UINT dialogPaneM_H = 200;
+	const UINT dialogPaneM_W = 200;
+	const UINT dialogPaneN_H = 60;
+	const UINT dialogPaneN_W = 150;
+	const UINT dialogPaneM_S = 20;
+	const UINT dialogPaneN_S = 16;
+
+	pRc.top = GetG().m_scrHeight - dialogPaneM_H + dialogPaneM_S;
+	pRc.left = dialogPaneM_S;
+	pRc.right = dialogPaneM_W - dialogPaneM_S;
+	pRc.bottom = GetG().m_scrHeight - dialogPaneM_S;
+	qRc.top = (GetG().m_scrHeight - dialogPaneM_H) - dialogPaneN_H + dialogPaneN_S;
+	qRc.left = dialogPaneN_S;
+	qRc.right = dialogPaneN_W - dialogPaneN_S;
+	qRc.bottom = (GetG().m_scrHeight - dialogPaneM_H) - dialogPaneN_S;
 
 	
 	dlg_ON = false;
@@ -207,5 +214,5 @@ void Dialog::ctorDialogPane()
 	dialog.setSize(200, 200);
 	name.init(L"name_window.png", GetG().m_dev);
 	name.setPos (-(GetG().m_scrWidth / 2.0f), -(GetG().m_scrHeight / 2.0f) + 200, 2.8f);
-	name.setSize(21 + 40, 13 + 40);
+	name.setSize(150, 60);
 }

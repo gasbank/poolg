@@ -3,7 +3,7 @@ set EpDialogList [list EpDialog1 EpDialog2];
 namespace eval EpDialog1 {
 	
 	set region [ list 9 9 -1 -1 ]; ;# left, top, right, bottom
-	set oneTime 1;
+	set oneTime 0;
 	
 	set player "PoolG"
 	set enemy "YangSanHyung"

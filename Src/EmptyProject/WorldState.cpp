@@ -4,7 +4,7 @@
 #include "BattleState.h"
 #include "ScriptManager.h"
 #include "TileManager.h"
-
+#include "ArnMesh.h"
 
 TileManager	tileManager;
 
@@ -48,6 +48,26 @@ HRESULT WorldState::enter()
 	m_afdRat = new ArnFileData;
 	load_arnfile(_T("rat.arn"), *m_afdRat);
 	m_sgRat = new ArnSceneGraph(*m_afdRat);
+	ArnMesh* mainWallMesh = dynamic_cast<ArnMesh*>( m_sg->getSceneRoot()->getNodeByName("MainWall") );
+	
+	
+	//////////////////////////////////////////////////////////////////////////
+	// Room Model MainWall intersection test
+	D3DXVECTOR3 rayStartPos( 0, 0, -2.0f );
+	D3DXVECTOR3 rayDir( 1, 0, 0 );
+	BOOL hit;
+	DWORD hitFaceIndex;
+	float hitU, hitV;
+	float hitDist;
+	LPD3DXBUFFER allHitsBuffer = 0;
+	DWORD allHitSCount;
+	V_RETURN( D3DXIntersect( mainWallMesh->getD3DXMesh(), &rayStartPos, &rayDir,
+		&hit, &hitFaceIndex, &hitU, &hitV, &hitDist, &allHitsBuffer, &allHitSCount ) );
+	
+	D3DXINTERSECTINFO* intersectInfo = static_cast<D3DXINTERSECTINFO*>( allHitsBuffer->GetBufferPointer() );
+	UNREFERENCED_PARAMETER( intersectInfo );
+	//////////////////////////////////////////////////////////////////////////
+	
 	
 	// Load sample image (vertex and index buffer creation with texture)
 	const UINT mapSegments = 32;

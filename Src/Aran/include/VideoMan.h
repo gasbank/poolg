@@ -204,7 +204,7 @@ public:
 
 	void setWorldViewProjection( const D3DXMATRIX& matWorld, const D3DXMATRIX& matView, const D3DXMATRIX& matProj );
 
-	void renderMeshesOnly(ArnNode* node);
+	void renderMeshesOnly(ArnNode* node, const D3DXMATRIX& globalXform = DX_CONSTS::D3DXMAT_IDENTITY);
 	float getFPS() const { return m_fFPS; }
 
 private:

@@ -48,6 +48,8 @@ private:
 
 	ArnFileData*					m_afd;
 	ArnSceneGraph*					m_sg;
+	ArnFileData*					m_afdRat;
+	ArnSceneGraph*					m_sgRat;
 	PictureMap						m_pic;
 	Picture							m_picRhw;
 	Picture							m_picSmiley;

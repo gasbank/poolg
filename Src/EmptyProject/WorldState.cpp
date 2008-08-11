@@ -40,9 +40,14 @@ HRESULT WorldState::enter()
 	LPDIRECT3DDEVICE9& pd3dDevice =  GetG().m_dev;
 
 	// Aran file init
+	// Room model
 	m_afd = new ArnFileData;
 	load_arnfile(_T("gus2.arn"), *m_afd);
 	m_sg = new ArnSceneGraph(*m_afd);
+	// Rat model
+	m_afdRat = new ArnFileData;
+	load_arnfile(_T("rat.arn"), *m_afdRat);
+	m_sgRat = new ArnSceneGraph(*m_afdRat);
 	
 	// Load sample image (vertex and index buffer creation with texture)
 	const UINT mapSegments = 32;
@@ -138,23 +143,26 @@ HRESULT WorldState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, floa
 	pd3dDevice->SetTransform(D3DTS_VIEW, camera.GetViewMatrix());
 	pd3dDevice->SetTransform(D3DTS_PROJECTION, camera.GetProjMatrix());
 
-	
-	// Sample 3D model rendering
-	//m_heroUnit->draw();
 
-	//[재우] 캐릭터
+	D3DXMATRIX transform;
+	
 
 	UnitSet::iterator it = m_unitSet.begin();
 	for ( ; it != m_unitSet.end(); ++it )
 	{
 		(*it)->frameRender();
+
+		if ( (*it)->isControllable() )
+		{
+			D3DXMatrixTranslation( &transform, (*it)->getPos().x, (*it)->getPos().y, (*it)->getPos().z );
+
+			pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CW);
+			pd3dDevice->SetFVF(ArnVertex::FVF);
+			GetG().m_videoMan.renderMeshesOnly(m_sgRat->getSceneRoot(), transform);
+			m_sgRat->getSceneRoot()->update(fTime, fElapsedTime);
+		}
 	}
 
-	// Draw floor gray tile (2D)
-	//g_pic.draw();
-	
-
-	D3DXMATRIX transform;
 	D3DXMatrixIdentity(&transform);
 	pd3dDevice->SetTransform(D3DTS_WORLD, &transform);
 
@@ -253,6 +261,13 @@ HRESULT WorldState::release()
 		release_arnfile(*m_afd);
 	SAFE_DELETE(m_afd);
 	SAFE_DELETE(m_sg);
+
+	if (m_afdRat)
+		release_arnfile(*m_afdRat);
+	SAFE_DELETE(m_afdRat);
+	SAFE_DELETE(m_sgRat);
+
+
 	SAFE_RELEASE(m_aTile);
 
 	return S_OK;
@@ -400,6 +415,7 @@ const D3DXVECTOR3& WorldState::getEnemyPos()
 
 const D3DXVECTOR3& WorldState::getHeroPos()
 {
+	assert( m_heroUnit );
 	return m_heroUnit->getPos();
 }
 

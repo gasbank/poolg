@@ -69,6 +69,15 @@ BattleState::BattleState()
 	m_mpBgEnemy.setPos (statusBoxEnemysPositionX + statusBoxWidth*0.23f, statusBoxEnemysPositionY + statusBoxHeight * 0.65f, 5);
 	m_mpBgEnemy.setSize(statusBarWidth, statusBarHeight);
 
+	m_hpIllusionPlayer.init(L"BattleUI\\HPillusion.jpg", m_pDev);
+	m_hpIllusionPlayer.setSize(statusBarWidth, statusBarHeight);
+	m_hpIllusionPlayer.setPos (statusBoxPlayersPositionX + statusBoxWidth*0.23f, statusBoxPlayersPositionY + statusBoxHeight * 0.82f, 4.8f);
+
+	m_hpIllusionEnemy.init(L"BattleUI\\HPillusion.jpg", m_pDev);
+	m_hpIllusionEnemy.setSize(statusBarWidth, statusBarHeight);
+	m_hpIllusionEnemy.setPos (statusBoxEnemysPositionX + statusBoxWidth*0.23f, statusBoxEnemysPositionY + statusBoxHeight * 0.82f, 4.8f);
+
+
 	m_hpBarPlayer.init(L"BattleUI\\HPbar.jpg", m_pDev);
 	m_hpBarPlayer.setSize(statusBarWidth, statusBarHeight);
 	m_hpBarPlayer.setPos (statusBoxPlayersPositionX + statusBoxWidth*0.23f, statusBoxPlayersPositionY + statusBoxHeight * 0.82f, 4.5f);
@@ -116,7 +125,10 @@ HRESULT BattleState::enter()
 	m_vWorldLookAt = *camera.GetLookAtPt();
 
 	m_hpBarPlayer.initRate((float)getHero()->getMaxHp());
+	m_hpIllusionPlayer.initRate((float)getHero()->getMaxHp());
 	m_hpBarEnemy.initRate((float)getEnemy()->getMaxHp());
+	m_hpIllusionEnemy.initRate((float)getEnemy()->getMaxHp());
+
 
 	m_battleLog.push_back(std::string("전투 개시~~~~~~~~~!!!"));
 	m_battleWinner = PS_NOTSET;
@@ -165,6 +177,9 @@ HRESULT BattleState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, flo
 	m_hpBgEnemy.draw();
 	//m_mpBgEnemy.draw();
 
+	m_hpIllusionPlayer.draw();
+	m_hpIllusionEnemy.draw();
+
 	m_hpBarPlayer.draw();
 	//m_mpBarPlayer.draw();
 	//m_expBarPlayer.draw();
@@ -193,6 +208,9 @@ HRESULT BattleState::frameMove(double fTime, float fElapsedTime)
 	m_hpBgEnemy.frameMove(fElapsedTime);
 	m_mpBgEnemy.frameMove(fElapsedTime);
 
+	m_hpIllusionPlayer.frameMove(fElapsedTime);
+	m_hpIllusionEnemy.frameMove(fElapsedTime);
+
 	m_hpBarPlayer.frameMove(fElapsedTime);
 	m_mpBarPlayer.frameMove(fElapsedTime);
 	m_expBarPlayer.frameMove(fElapsedTime);
@@ -205,6 +223,8 @@ HRESULT BattleState::frameMove(double fTime, float fElapsedTime)
 
 	m_hpBarPlayer.setRate((float)getHero()->getCurHp());
 	m_hpBarEnemy.setRate((float)getEnemy()->getCurHp());
+	m_hpIllusionPlayer.setRate((float)getHero()->getCurHp());
+	m_hpIllusionEnemy.setRate((float)getEnemy()->getCurHp());
 	
 	TopStateManager& tsm = TopStateManager::getSingleton();
 	WorldState* ws = static_cast<WorldState*>( tsm.getCurState() );
@@ -290,6 +310,9 @@ HRESULT BattleState::release ()
 	m_expBgPlayer.release();
 	m_hpBgEnemy.release();
 	m_mpBgEnemy.release();
+
+	m_hpIllusionPlayer.release();
+	m_hpIllusionEnemy.release();
 
 	m_hpBarPlayer.release();
 	m_mpBarPlayer.release();

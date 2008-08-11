@@ -55,6 +55,9 @@ private:
 	Picture				m_hpBgEnemy;
 	Picture				m_mpBgEnemy;
 
+	IllusionBar			m_hpIllusionPlayer;
+	IllusionBar			m_hpIllusionEnemy;
+
 	ProgressBar			m_hpBarPlayer;
 	ProgressBar			m_mpBarPlayer;
 	ProgressBar			m_expBarPlayer;

@@ -10,8 +10,17 @@ public:
 	void initRate(float maxRate = 100.0f) { m_maxRate = m_currentRate = maxRate; setRate(maxRate); }
 	void changeRate (float rateV);
 	void setRate (float rateV);
+
+	void frameMove( float fElapsedTime );
+
 protected:
 	float m_maxRate;
 	float m_currentRate;
 	float m_fullWidth;
+};
+
+class IllusionBar : public ProgressBar
+{
+public:
+	void frameMove (float fElapsedTime);
 };

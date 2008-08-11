@@ -40,6 +40,8 @@ void EpCamera::SetViewParamsWithUp( D3DXVECTOR3* pvEyePt, D3DXVECTOR3* pvLookatP
 
 	m_vDefaultEye = m_vEye = *pvEyePt;
 	m_vDefaultLookAt = m_vLookAt = *pvLookatPt;
+	m_vUp = vUp;
+
 
 	// Calc the view matrix
 	D3DXMatrixLookAtLH( &m_mView, pvEyePt, pvLookatPt, &vUp );
@@ -72,4 +74,9 @@ void EpCamera::SetViewParamsWithUp( D3DXVECTOR3* pvEyePt, D3DXVECTOR3* pvLookatP
 
 	// View information changed. FrameMove should be called.
 	m_bDragSinceLastUpdate = true;
+}
+
+D3DXVECTOR3* EpCamera::GetUpPt()
+{
+	return &m_vUp;
 }

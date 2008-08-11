@@ -33,6 +33,8 @@ public:
 	void setNextTurnType( TurnType tt ) { m_nextTurnType = tt; }
 	void passTurn();
 	void pushBattleLog( const char* log ) { m_battleLog.push_back( log ); }
+
+	void rotateAboutAxis( D3DXVECTOR3* vOut, D3DXVECTOR3* axis, float rad );
 	
 private:
 
@@ -69,8 +71,10 @@ private:
 	LPD3DXFONT		m_lblREB;
 	
 	LPDIRECT3DDEVICE9	m_pDev;
-	D3DXVECTOR3		m_vWorldEye;
-	D3DXVECTOR3		m_vWorldLookAt;
+
+	D3DXVECTOR3			m_vPrevEye;
+	D3DXVECTOR3			m_vPrevLookAt;
+	D3DXVECTOR3			m_vPrevUp;
 
 	typedef std::list<std::string> StringList;
 	StringList m_battleLog;

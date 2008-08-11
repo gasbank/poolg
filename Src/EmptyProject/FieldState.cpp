@@ -16,8 +16,10 @@ HRESULT FieldState::enter()
 {
 	EpCamera& camera = G::getSingleton().m_camera;
 
+	// 카메라 워킹을 위해서 스테이트로 들어올 때의 카메라 상태를 저장해둔다.
 	m_vPrevEye = *camera.GetEyePt();
 	m_vPrevLookAt = *camera.GetLookAtPt();
+	m_vPrevUp = *camera.GetUpPt();
 
 	return S_OK;
 }
@@ -52,15 +54,13 @@ HRESULT FieldState::frameMove( double fTime, float fElapsedTime )
 
 	if (fStateTime < 1.0f && GetWorldStateManager().prevStateEnum() == GAME_WORLD_STATE_BATTLE)
 	{
-		D3DXVECTOR3 vPrevUp( 0.0f, 0.0f, -1.0f );
-
 		D3DXVECTOR3 vCurEye;
 		D3DXVECTOR3 vCurLookAt;
 		D3DXVECTOR3 vCurUp;
 
 		D3DXVec3Lerp( &vCurEye, &m_vPrevEye, &vEye, fStateTime );
 		D3DXVec3Lerp( &vCurLookAt, &m_vPrevLookAt, &vLookAt, fStateTime );
-		D3DXVec3Lerp( &vCurUp, &vPrevUp, &vUp, fStateTime );
+		D3DXVec3Lerp( &vCurUp, &m_vPrevUp, &vUp, fStateTime );
 
 		camera.SetViewParamsWithUp( &vCurEye, &vCurLookAt, vCurUp );
 	} else {

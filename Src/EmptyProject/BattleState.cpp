@@ -445,7 +445,13 @@ void BattleState::renderFixedText(int scrWidth, int scrHeight)
 	m_lblREB->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 
 
-
+	rc.top = (LONG)18;
+	rc.left = (LONG)(scrWidth - 167);
+	StringCchPrintf(textBuffer, 512, L"HP");
+	m_lblREB->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+	rc.top += (LONG)21.08;
+	StringCchPrintf(textBuffer, 512, L"CS");
+	m_lblREB->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 }
 
 void BattleState::passTurn()

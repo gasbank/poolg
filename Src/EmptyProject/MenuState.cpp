@@ -5,8 +5,8 @@
 #include "WorldState.h"
 #include "TopStateManager.h"
 
+int loc = 0;
 
-int loc = 4;
 float curHp = 0;
 float maxHp = 0;
 bool op_st = false;
@@ -108,7 +108,10 @@ HRESULT MenuState::frameMove(double fTime, float fElapsedTime)
 	m_lowin.frameMove(fElapsedTime);
 
 	m_hpbar.frameMove(fElapsedTime);
+
 	m_hpbg.frameMove(fElapsedTime);
+	m_mpbg.frameMove(fElapsedTime);
+	m_expbg.frameMove(fElapsedTime);
 	
 	//m_selc.setPos(m_selc.getPos()->x, pos, m_selc.getPos()->z);
 
@@ -169,7 +172,11 @@ HRESULT MenuState::frameRender(IDirect3DDevice9* pd3dDevice,  double fTime, floa
 	if ( op_st == true )
 	{
 		m_stwin.draw();
-		m_hpbg.draw();
+
+		m_hpbg.draw();		
+		m_mpbg.draw();
+		m_expbg.draw();
+
 		m_hpbar.draw();
 	}
 	if ( op_sa == true )
@@ -238,7 +245,10 @@ HRESULT MenuState::release()
 	m_lowin.release();
 
 	m_hpbar.release();
+
 	m_hpbg.release();
+	m_mpbg.release();
+	m_expbg.release();
 
 	SAFE_RELEASE( m_lblHYnamL );
 	SAFE_RELEASE( m_lblREB);
@@ -332,6 +342,14 @@ MenuState::MenuState()
 	m_hpbg.init(L"Images/BattleUI/HPbg.jpg", m_pDev);
 	m_hpbg.setPos ( (0 - scrWidth / 2) + 163, (0 - scrHeight / 2) + 223, 2.5f);
 	m_hpbg.setSize(220, 22);
+
+	m_mpbg.init(L"Images/BattleUI/MPbg.jpg", m_pDev);
+	m_mpbg.setPos ( (0 - scrWidth / 2) + 163, (0 - scrHeight / 2) + 171, 2.5f);
+	m_mpbg.setSize(220, 22);
+
+	m_expbg.init(L"Images/BattleUI/EXPbg.jpg", m_pDev);
+	m_expbg.setPos ( (0 - scrWidth / 2) + 163, (0 - scrHeight / 2) + 119, 2.5f);
+	m_expbg.setSize(220, 22);
 	
 
 
@@ -354,6 +372,7 @@ HRESULT MenuState::enter()
 	{
 		curHp = (float)( (Character*) ws->getHero() )->getCurHp();
 		maxHp = (float)( (Character*) ws->getHero() )->getMaxHp();
+
 		m_hpbar.setSize(220 * (curHp / maxHp), 22);
 	}
 	return S_OK;

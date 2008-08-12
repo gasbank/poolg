@@ -55,7 +55,16 @@ public:
 	
 	const D3DXMATRIX* getLocalXform() const { return &m_localXform; }
 	void setLocalXform(const D3DXMATRIX* mWorld) { m_localXform = *mWorld; }
-	void setSize(float width, float height) { m_width = width; m_height = height; }
+	void setSize(float width, float height)
+	{
+		m_width = width; m_height = height;
+		D3DXMATRIX rotMat, scaleMat, transMat;
+		D3DXMatrixIdentity(&rotMat);
+		D3DXMatrixScaling(&scaleMat, m_width, m_height, 1.0f);
+		D3DXMatrixTranslation(&transMat, m_vPos.x, m_vPos.y, 10.0f);
+		
+		m_localXform = rotMat * scaleMat * transMat;
+	}
 	void setSizeToTexture();
 	const D3DXVECTOR3* getPos() const { return &m_vPos; }
 	void setPos(const D3DXVECTOR3& val) { m_vPos = val; }

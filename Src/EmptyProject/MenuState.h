@@ -47,4 +47,6 @@ private:
 
 	Picture m_hpbar;
 	Picture m_hpbg;
+	Picture m_mpbg;
+	Picture m_expbg;
 };

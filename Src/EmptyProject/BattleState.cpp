@@ -84,7 +84,7 @@ BattleState::BattleState()
 	m_hpBarPlayer.setPos (statusBoxPlayersPositionX + statusBoxWidth*0.23f, statusBoxPlayersPositionY + statusBoxHeight * 0.82f, 4.5f);
 	
 
-	m_mpBarPlayer.init(L"Images/BattleUI/MPbar.jpg", m_pDev);
+	m_mpBarPlayer.init(L"Images/BattleUI/DKbar.jpg", m_pDev);
 	m_mpBarPlayer.initRate();
 	m_mpBarPlayer.setPos (statusBoxPlayersPositionX + statusBoxWidth*0.23f, statusBoxPlayersPositionY + statusBoxHeight * 0.65f, 4.5f);
 	m_mpBarPlayer.setSize(statusBarWidth, statusBarHeight);
@@ -316,6 +316,8 @@ HRESULT BattleState::frameMove(double fTime, float fElapsedTime)
 	// 적의 체력이 0 이하면 FieldState로 돌아간다.
 
 
+
+
 	return S_OK;
 }
 
@@ -325,6 +327,7 @@ HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 	m_mpBarPlayer.handleMessages(hWnd, uMsg, wParam, lParam);
 	m_expBarPlayer.handleMessages(hWnd, uMsg, wParam, lParam);
 	m_mpBarEnemy.handleMessages(hWnd, uMsg, wParam, lParam);
+
 
 
 
@@ -346,6 +349,11 @@ HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 		}
 		/*자신이 죽었을 시 어떠한 키로도 반응하지 않는다.*/
 		else if (getHero()->getCurHp() <= 0)
+		{
+			return S_OK;
+		}
+		/*자신의 차례가 아닐 때에도 반응하지 않는다.*/
+		else if (m_curTurnType != TT_PLAYER)
 		{
 			return S_OK;
 		}
@@ -379,6 +387,7 @@ HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 		{
 			//턴 핸들링이 필요.
 			//m_curTurnType = TT_COMPUTER;
+			m_curTurnType = TT_NATURAL;
 			getHero()->heal (30);
 		}
 		/**/
@@ -607,14 +616,26 @@ void BattleState::spellArt()
 {
 	/*attack*/
 	if (m_playerArt == PA_ART1)
-	{
-			m_curTurnType = TT_NATURAL;
-			getHero()->attack( 0, getEnemy() );
+	{	
+		m_curTurnType = TT_NATURAL;
+		m_battleLog.push_back(std::string("일반 공격을 사용하였습니다."));
+		getHero()->attack( 0, getEnemy() );
 	}
 	/*heal*/
 	else if (m_playerArt == PA_ART2)
 	{
-			getHero()->heal (30);
+		m_curTurnType = TT_NATURAL;
+		m_battleLog.push_back(std::string("힐링을 사용하였습니다."));	
+		int healPoint = getHero()->getInt();
+
+		char stringBuffer[20];
+		_itoa_s (healPoint, stringBuffer, 10);
+		std::string resultLog = stringBuffer;
+		resultLog += "포인트 HP를 회복하였습니다.";
+		m_battleLog.push_back (resultLog.c_str());
+		getHero()->heal (healPoint);
+		setNextTurnType(TT_COMPUTER);
+		passTurn();
 	}
 	/*blank*/
 	else if (m_playerArt == PA_ART3)
@@ -626,7 +647,7 @@ void BattleState::spellArt()
 	{
 
 	}
-	/*blank*/
+	/*말살기*/
 	else if (m_playerArt == PA_ART5)
 	{
 

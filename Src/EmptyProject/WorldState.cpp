@@ -402,8 +402,10 @@ UINT WorldState::addUnit( Unit* u )
 	// TODO controllable means it is hero?
 	if (u->getControllable())
 	{
+		/*주인공 유닛 설정*/
 		m_heroUnit = dynamic_cast<Character*>( u );
 		m_heroUnit->setAttack (1);
+		m_heroUnit->setInt (20);
 	}
 
 	return m_unitSet.size();

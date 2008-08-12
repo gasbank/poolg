@@ -21,8 +21,10 @@ public:
 	int getMaxHp() const { return m_maxHp; }
 	void damage( int point ) { m_curHp -= point; }
 	int getAttack() const { return m_attack; }
+	int getInt() const { return m_intelligence; }
 	bool getMoving() { return m_bMoving; }
 	void setAttack (int point) { m_attack = point; }
+	void setInt (int point) {m_intelligence = point; }
 
 	bool isDead() { return (m_curHp<=0); }
 
@@ -56,7 +58,8 @@ private:
 	float					m_moveDuration; // A time needed to move one time(tile) in seconds
 	int						m_tileX;
 	int						m_tileY;
-	int						m_attack;
+	int						m_attack;		// 일반 공격 스킬에 영향
+	int						m_intelligence; // 힐링 등의 스킬에 영향
 	int						m_tileBufferX;
 	int						m_tileBufferY;
 };

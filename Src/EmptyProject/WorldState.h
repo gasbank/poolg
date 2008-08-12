@@ -42,6 +42,8 @@ public:
 
 	void startDialog( int index );
 
+	ArnSceneGraph* getArnSceneGraphPt();
+
 private:
 	void setupLight();
 	void handleCollision( Unit* heroUnit, Unit* enemyUnit );

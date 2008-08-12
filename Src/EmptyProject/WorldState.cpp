@@ -5,6 +5,7 @@
 #include "ScriptManager.h"
 #include "TileManager.h"
 #include "ArnMesh.h"
+#include <list>
 
 TileManager	tileManager;
 
@@ -52,7 +53,7 @@ HRESULT WorldState::enter()
 	
 	
 	//////////////////////////////////////////////////////////////////////////
-	// Room Model MainWall intersection test
+	// Room Model MainWall intersection test sample code
 	D3DXVECTOR3 rayStartPos( 0, 0, -2.0f );
 	D3DXVECTOR3 rayDir( 1, 0, 0 );
 	BOOL hit;
@@ -66,7 +67,7 @@ HRESULT WorldState::enter()
 	
 	D3DXINTERSECTINFO* intersectInfo = static_cast<D3DXINTERSECTINFO*>( allHitsBuffer->GetBufferPointer() );
 	UNREFERENCED_PARAMETER( intersectInfo );
-	printf("Ray Testing test. (FaceIndex : %ui, Dist : %f)\n", intersectInfo->FaceIndex, intersectInfo->Dist );
+	SAFE_RELEASE( allHitsBuffer );
 	SAFE_RELEASE( allHitsBuffer );
 	//////////////////////////////////////////////////////////////////////////
 	
@@ -153,45 +154,53 @@ HRESULT WorldState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, floa
 	// Perspective Rendering Phase
 
 	pd3dDevice->SetLight(0, &light);
+
+	pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 	pd3dDevice->SetRenderState( D3DRS_LIGHTING, TRUE );
 
 	pd3dDevice->SetTransform(D3DTS_VIEW, camera.GetViewMatrix());
 	pd3dDevice->SetTransform(D3DTS_PROJECTION, camera.GetProjMatrix());
 
 
-	//////////////////////////////////////////////////////////////////////////
-	// Aran lib rendering routine (CW)
-	pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CW);
-	pd3dDevice->SetFVF(ArnVertex::FVF);
 	D3DXMATRIX transform;
-	D3DXMatrixTranslation( &transform, m_heroUnit->getPos().x, m_heroUnit->getPos().y, m_heroUnit->getPos().z );
-	GetG().m_videoMan.renderMeshesOnly(m_sgRat->getSceneRoot(), transform);
-	GetG().m_videoMan.renderMeshesOnly(m_sg->getSceneRoot());
 	
-
-
-	//////////////////////////////////////////////////////////////////////////
-	// EP rendering routine (CCW)
-
-	pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
-	WorldStateManager& wsm = WorldStateManager::getSingleton();
-	wsm.getCurState()->frameRender(pd3dDevice, fTime, fElapsedTime);
-	
-
-	pd3dDevice->SetTransform(D3DTS_VIEW, camera.GetViewMatrix());
-	pd3dDevice->SetTransform(D3DTS_PROJECTION, camera.GetProjMatrix());
 
 	UnitSet::iterator it = m_unitSet.begin();
 	for ( ; it != m_unitSet.end(); ++it )
 	{
 		(*it)->frameRender();
+
+		if ( (*it)->isControllable() )
+		{
+			D3DXMatrixTranslation( &transform, (*it)->getPos().x, (*it)->getPos().y, (*it)->getPos().z );
+
+			pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CW);
+			pd3dDevice->SetFVF(ArnVertex::FVF);
+			GetG().m_videoMan.renderMeshesOnly(m_sgRat->getSceneRoot(), transform);
+			m_sgRat->getSceneRoot()->update(fTime, fElapsedTime);
+		}
 	}
+
+	D3DXMatrixIdentity(&transform);
+	pd3dDevice->SetTransform(D3DTS_WORLD, &transform);
+
+	pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CW);
+	pd3dDevice->SetFVF(ArnVertex::FVF);
+	GetG().m_videoMan.renderMeshesOnly(m_sg->getSceneRoot());
+	m_sg->getSceneRoot()->update(fTime, fElapsedTime);
+
+	pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
+	WorldStateManager& wsm = WorldStateManager::getSingleton();
+	wsm.getCurState()->frameRender(pd3dDevice, fTime, fElapsedTime);
+	
 	
 	DialogList::iterator itDialog = m_scriptedDialog.begin();
 	for ( ; itDialog != m_scriptedDialog.end(); ++itDialog )
 	{
 		(*itDialog)->frameRender(pd3dDevice, fTime, fElapsedTime);
 	}
+	
+
 	return S_OK;
 }
 
@@ -203,9 +212,12 @@ HRESULT WorldState::frameMove(double fTime, float fElapsedTime)
 	// Fade in at starting.
 	static float fadeTime = 0.0f;
 
+	// If fadeTime is smaller than 2.0, add elasped time.
 	if ( fadeTime < 2.0f )
 		fadeTime += fElapsedTime;
-	else
+
+	// If fadeTime is bigger than 2.0, set as 2.0.
+	if ( fadeTime > 2.0f )
 		fadeTime = 2.0f;
 
 	D3DCOLORVALUE cv = { 0.8f * fadeTime / 2.0f, 0.8f * fadeTime / 2.0f, 0.8f * fadeTime / 2.0f, 1.0f };
@@ -246,9 +258,6 @@ HRESULT WorldState::frameMove(double fTime, float fElapsedTime)
 				handleCollision( m_heroUnit, (*it) );
 			}
 	}
-
-	m_sg->getSceneRoot()->update(fTime, fElapsedTime);
-	m_sgRat->getSceneRoot()->update(fTime, fElapsedTime);
 	
 	return S_OK;
 }
@@ -287,6 +296,8 @@ HRESULT WorldState::release()
 
 HRESULT WorldState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+	HRESULT hr = S_OK;
+
 	m_pic.handleMessages(hWnd, uMsg, wParam, lParam);
 	m_sound.handleMessages(hWnd, uMsg, wParam, lParam);
 
@@ -328,6 +339,7 @@ HRESULT WorldState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 			printf("이녀석의 y 위치 : %d\n", m_heroUnit->getTilePosY());
 		}
 	}
+
 	if (uMsg == WM_KEYUP)
 	{
 		if (wParam == VK_RETURN)
@@ -361,7 +373,7 @@ HRESULT WorldState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 	if ( GetWorldStateManager().getCurState() )
 		GetWorldStateManager().getCurState()->handleMessages(hWnd, uMsg, wParam, lParam);
 
-	return S_OK;
+	return hr;
 }
 
 void WorldState::setupLight() 
@@ -499,4 +511,9 @@ void WorldState::removeUnit( Unit* pUnit )
 			break;
 		}
 	}
+}
+
+ArnSceneGraph* WorldState::getArnSceneGraphPt()
+{
+	return m_sg;
 }

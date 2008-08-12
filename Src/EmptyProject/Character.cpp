@@ -5,6 +5,7 @@
 #include "TileManager.h"
 #include "TopStateManager.h"
 #include "WorldState.h"
+#include "ArnMesh.h"
 
 extern TileManager tileManager;
 
@@ -195,6 +196,7 @@ LRESULT Character::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 						targetTileY = m_tileY;
 						break;
 					}
+
 					if( !tileManager.tile[targetTileX][targetTileY].movable || (targetTileX < 0 || targetTileX >= TileManager::x)  || (targetTileY < 0 || targetTileY >= TileManager::y) )
 					{
 						ws->startDialog( 2 );
@@ -282,6 +284,72 @@ void Character::setColor( int r, int g, int b )
 	m_material.Specular.b = (float)b / 255.0f;
 
 	m_material.Ambient.a = m_material.Diffuse.a = m_material.Specular.a = 1.0f;
+}
+
+HRESULT Character::rayTesting( UnitInput mappedKey )
+{
+	//////////////////////////////////////////////////////////////////////////
+	// Room Model MainWall intersection test
+
+	HRESULT hr = S_OK;
+
+	TopStateManager& tsm = TopStateManager::getSingleton();
+	WorldState* ws = static_cast<WorldState*>( tsm.getCurState() );
+
+	// Ray starting position as hero position
+	D3DXVECTOR3 rayStartPos( ws->getHeroPos().x, ws->getHeroPos().y, ws->getHeroPos().z - 2.0f );
+
+	// Direction data
+	float dirArray[4][3] = { { 0.0f, 1.0f, 0.0f }, { 0.0f, -1.0f, 0.0f }, { -1.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f } };
+
+	BOOL hit;
+	DWORD hitFaceIndex;
+	float hitU, hitV;
+	float hitDist;
+	LPD3DXBUFFER allHitsBuffer = 0;
+	DWORD allHitSCount;
+
+	// Get mesh data
+	ArnMesh* mainWallMesh = dynamic_cast<ArnMesh*>( ws->getArnSceneGraphPt()->getSceneRoot()->getNodeByName("MainWall") );
+
+	// Select direction
+	D3DXVECTOR3 rayDir( dirArray[mappedKey][0], dirArray[mappedKey][1], dirArray[mappedKey][2] );
+
+	// Get intersection information
+	V_RETURN( D3DXIntersect( 
+		mainWallMesh->getD3DXMesh(), 
+		&rayStartPos, 
+		&rayDir,
+		&hit, 
+		&hitFaceIndex, 
+		&hitU, 
+		&hitV, 
+		&hitDist, 
+		&allHitsBuffer, 
+		&allHitSCount ) );
+
+	bool m_bMovable;
+
+	// allHitsBuffer가 0이면 교차가 없으므로 움직일 수 있다.
+	if ( allHitsBuffer != 0 )
+	{
+		// allHitsBuffer로부터 교차 정보를 가져온다.
+		D3DXINTERSECTINFO* intersectInfo = static_cast<D3DXINTERSECTINFO*>( allHitsBuffer->GetBufferPointer() );
+
+		printf("Ray Testing test. (FaceIndex : %u, Dist : %f)\n", intersectInfo->FaceIndex, intersectInfo->Dist );
+
+		// 3.0f 이내에서 교차하면 그 방향으로 움직이지 않는다.
+		if ( intersectInfo->Dist <= 3.0f )
+			m_bMovable = false;
+		else
+			m_bMovable = true;
+	}
+	else
+		m_bMovable = true;
+
+	SAFE_RELEASE( allHitsBuffer );
+
+	return hr;
 }
 
 Unit* EpCreateCharacter( int tileX, int tileY, int controllable )

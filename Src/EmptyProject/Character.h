@@ -41,6 +41,8 @@ protected:
 	Character();
 
 private:
+	HRESULT rayTesting( UnitInput );
+
 	typedef std::list<AttackObject*> AttackObjectList;
 	AttackObjectList m_attackObjectList;
 

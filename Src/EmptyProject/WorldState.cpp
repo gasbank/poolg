@@ -67,6 +67,7 @@ HRESULT WorldState::enter()
 	D3DXINTERSECTINFO* intersectInfo = static_cast<D3DXINTERSECTINFO*>( allHitsBuffer->GetBufferPointer() );
 	UNREFERENCED_PARAMETER( intersectInfo );
 	printf("Ray Testing test. (FaceIndex : %ui, Dist : %f)\n", intersectInfo->FaceIndex, intersectInfo->Dist );
+	SAFE_RELEASE( allHitsBuffer );
 	//////////////////////////////////////////////////////////////////////////
 	
 	

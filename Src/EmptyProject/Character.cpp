@@ -68,7 +68,7 @@ bool Character::frameMove( float fElapsedTime )
 				GetScriptManager().execute("EpUnitOnMove 0");
 			}
 		}
-		if( IsKeyDown( m_aKeys[UNIT_MOVE_DOWN] ) )
+		else if( IsKeyDown( m_aKeys[UNIT_MOVE_DOWN] ) )
 		{
 			if( tileManager.tile[m_tileBufferX][m_tileBufferY - 1].movable && (m_tileBufferY - 1 > -1 && m_tileBufferY - 1 < TileManager::y) )
 			{
@@ -79,7 +79,7 @@ bool Character::frameMove( float fElapsedTime )
 				GetScriptManager().execute("EpUnitOnMove 1");
 			}
 		}
-		if( IsKeyDown( m_aKeys[UNIT_MOVE_RIGHT] ) )
+		else if( IsKeyDown( m_aKeys[UNIT_MOVE_RIGHT] ) )
 		{
 			if( tileManager.tile[m_tileBufferX + 1][m_tileBufferY].movable && (m_tileBufferX + 1 > -1 && m_tileBufferX + 1 < TileManager::x) )
 			{
@@ -90,7 +90,7 @@ bool Character::frameMove( float fElapsedTime )
 				GetScriptManager().execute("EpUnitOnMove 2");
 			}
 		}
-		if( IsKeyDown( m_aKeys[UNIT_MOVE_LEFT] ) )
+		else if( IsKeyDown( m_aKeys[UNIT_MOVE_LEFT] ) )
 		{
 			if( tileManager.tile[m_tileBufferX - 1][m_tileBufferY].movable && (m_tileBufferX - 1 > -1 && m_tileBufferX - 1 < TileManager::x) )
 			{

@@ -72,7 +72,7 @@ bool Character::frameMove( float fElapsedTime )
 				}
 			}
 		}
-		if( IsKeyDown( m_aKeys[UNIT_MOVE_DOWN] ) )
+		else if( IsKeyDown( m_aKeys[UNIT_MOVE_DOWN] ) )
 		{
 			rayTesting( UNIT_MOVE_DOWN );
 			if( m_bMovable )
@@ -87,7 +87,7 @@ bool Character::frameMove( float fElapsedTime )
 				}
 			}
 		}
-		if( IsKeyDown( m_aKeys[UNIT_MOVE_RIGHT] ) )
+		else if( IsKeyDown( m_aKeys[UNIT_MOVE_RIGHT] ) )
 		{
 			rayTesting( UNIT_MOVE_RIGHT );
 			if( m_bMovable )
@@ -102,7 +102,7 @@ bool Character::frameMove( float fElapsedTime )
 				}
 			}
 		}
-		if( IsKeyDown( m_aKeys[UNIT_MOVE_LEFT] ) )
+		else if( IsKeyDown( m_aKeys[UNIT_MOVE_LEFT] ) )
 		{
 			rayTesting( UNIT_MOVE_LEFT );
 			if( m_bMovable )

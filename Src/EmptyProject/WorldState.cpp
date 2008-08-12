@@ -191,6 +191,7 @@ HRESULT WorldState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, floa
 	GetG().m_videoMan.renderMeshesOnly(m_sg->getSceneRoot());
 	m_sg->getSceneRoot()->update(fTime, fElapsedTime);
 
+	pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 	WorldStateManager& wsm = WorldStateManager::getSingleton();
 	wsm.getCurState()->frameRender(pd3dDevice, fTime, fElapsedTime);
 	

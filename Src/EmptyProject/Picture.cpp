@@ -74,10 +74,11 @@ void Picture::init(const TCHAR* imgFileName, LPDIRECT3DDEVICE9 d3dDev, UINT segm
 
 	if (FAILED(D3DXCreateTextureFromFile(d3dDev, imgFileName, &m_d3dTex)))
 	{
-		//throw std::runtime_error("Texture creation failed; Maybe file name error?");
+		// ! Programmatical debug breakpoint: You can continue the program by pressing F5
+		DebugBreak();
+		// ! Programmatical debug breakpoint: You can continue the program by pressing F5
 		m_d3dTex = 0;
 		OutputDebugStringA( "--- Texture creation failed; Maybe file name error?\n" );
-		DebugBreak();
 	}
 	else
 	{

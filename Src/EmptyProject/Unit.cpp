@@ -105,6 +105,12 @@ UnitInput Unit::mapKey( UINT nKey )
 	return UNIT_UNKNOWN;
 }
 
+void Unit::clearKey()
+{
+	for( int i = 0; i < UNIT_MAX_KEYS; i++ )
+		m_aKeys[i] = 0;
+}
+
 Unit* Unit::createUnit( LPD3DXMESH mesh, int tileX, int tileY, float posZ, bool bControllable )
 {
 	Unit* u = new Unit();

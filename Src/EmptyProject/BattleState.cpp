@@ -120,6 +120,7 @@ HRESULT BattleState::enter()
 {
 	m_ws = dynamic_cast<WorldState*>( GetTopStateManager().getCurState() );
 	assert( m_ws );
+	getHero()->clearKey();
 
 	EpCamera& camera = G::getSingleton().m_camera;
 

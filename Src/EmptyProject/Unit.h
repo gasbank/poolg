@@ -22,6 +22,7 @@ public:
 	LPD3DXMESH getMesh() const { return m_d3dxMesh; }
 	void release() { SAFE_RELEASE(m_d3dxMesh); }
 	bool getControllable() const { return m_bControllable; }
+	void clearKey();
 
 	virtual HRESULT frameRender();
 	virtual LRESULT handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );

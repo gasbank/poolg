@@ -158,9 +158,6 @@ HRESULT Character::frameRender()
 
 LRESULT Character::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
-	TopStateManager& tsm = TopStateManager::getSingleton();
-	WorldState* ws = static_cast<WorldState*>( tsm.getCurState() );
-
 	switch( uMsg )
 	{
 	case WM_KEYDOWN:
@@ -173,41 +170,8 @@ LRESULT Character::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 			{
 				if( FALSE == IsKeyDown( m_aKeys[mappedKey] ) )
 				{
-					UINT targetTileX, targetTileY;
-					targetTileX = m_tileX;
-					targetTileY = m_tileY;
-
-					switch( mappedKey )
-					{
-					case UNIT_MOVE_UP :
-						targetTileX = m_tileX;
-						targetTileY = m_tileY + 1;
-						break;
-					case UNIT_MOVE_DOWN :
-						targetTileX = m_tileX;
-						targetTileY = m_tileY - 1;
-						break;
-					case UNIT_MOVE_RIGHT :
-						targetTileX = m_tileX + 1;
-						targetTileY = m_tileY;
-						break;
-					case UNIT_MOVE_LEFT :
-						targetTileX = m_tileX - 1;
-						targetTileY = m_tileY;
-						break;
-					}
-
-					if( !tileManager.tile[targetTileX][targetTileY].movable || (targetTileX < 0 || targetTileX >= TileManager::x)  || (targetTileY < 0 || targetTileY >= TileManager::y) )
-					{
-						ws->startDialog( 2 );
-						m_aKeys[ mappedKey ] &= ~KEY_IS_DOWN_MASK;
-						--m_cKeysDown;
-					}
-					else
-					{
-						m_aKeys[ mappedKey ] = KEY_WAS_DOWN_MASK | KEY_IS_DOWN_MASK;
-						++m_cKeysDown;
-					}
+					m_aKeys[ mappedKey ] = KEY_WAS_DOWN_MASK | KEY_IS_DOWN_MASK;
+					++m_cKeysDown;
 				}
 			}
 			break;
@@ -261,8 +225,9 @@ void Character::enterTile( int tileX, int tileY )
 
 	if( tileManager.tile[tileX][tileY].heal )
 	{
-		ws->startDialog( 3 );
+		ws->startDialog( 4 );
 		heal( 9999 );
+		
 	}
 }
 

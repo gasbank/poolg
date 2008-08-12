@@ -41,7 +41,7 @@ public:
 	void removeUnit( Unit* pUnit );
 
 	void startDialog( int index );
-
+	
 	ArnSceneGraph* getArnSceneGraphPt() { return m_sg; }
 
 private:

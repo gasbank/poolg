@@ -11,7 +11,6 @@ TileManager::TileManager(void)
 		{
 			tile[i][j].movable = true;
 			tile[i][j].talkable = false;
-			tile[i][j].talkonetime = true;
 		}
 	}
 }

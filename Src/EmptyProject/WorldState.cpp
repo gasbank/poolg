@@ -90,7 +90,6 @@ HRESULT WorldState::enter()
 
 	tileManager.tile[14][14].movable = false;
 	tileManager.tile[9][9].talkable = true;
-	tileManager.tile[9][9].talkonetime = false;
 	tileManager.tile[17][14].heal = true;
 
 
@@ -298,7 +297,7 @@ HRESULT WorldState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 	for ( ; itDialog != m_scriptedDialog.end(); ++itDialog )
 	{
 		(*itDialog)->handleMessages( hWnd, uMsg, wParam, lParam );
-		bTalking |= (*itDialog)->startTalk;
+		bTalking |= (*itDialog)->isTalking();
 	}
 	
 	UnitSet::iterator it = m_unitSet.begin();
@@ -335,26 +334,26 @@ HRESULT WorldState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 		if (wParam == VK_RETURN)
 		{
 			DialogList::iterator it = m_scriptedDialog.begin();
-			for ( ; it != m_scriptedDialog.end(); ++it )
+			for ( ; it != m_scriptedDialog.end(); )
 			{
 				Dialog* dialog = (*it);
+				
 				if ( (m_heroUnit->getTilePosX() == dialog->getRegion().left)
 					&& (m_heroUnit->getTilePosY() == dialog->getRegion().top) )
 				{
-					if ( dialog->isOneTime() && !dialog->endTalk )
+					if ( dialog->nextDialog() == false )
 					{
-						dialog->startTalk = true;
-						if ( !dialog->dlg_ON )
-							dialog->Toggle(&dialog->dlg_ON);
+						EP_SAFE_RELEASE( *it );
+						it = m_scriptedDialog.erase( it );
 					}
-					if ( !dialog->isOneTime() && !dialog->endTalk )
+					else
 					{
-						dialog->startTalk = true;
-						if ( !dialog->dlg_ON )
-							dialog->Toggle( &dialog->dlg_ON );
+						++it;
 					}
-					if ( dialog->endTalk && !dialog->isOneTime() )
-						dialog->Toggle( &dialog->endTalk );
+				}
+				else
+				{
+					++it;
 				}
 			}
 		}
@@ -444,6 +443,23 @@ bool WorldState::isCollide( const D3DXVECTOR3* vec0, const D3DXVECTOR3* vec1 )
 	return false;
 }
 
+void WorldState::startDialog( int index )
+{
+	DialogList::iterator it = m_scriptedDialog.begin();
+	while ( index )
+	{
+		++it;
+		--index;
+	}
+
+	Dialog* dialog = (*it);
+	if ( dialog->nextDialog() == false )
+	{
+		EP_SAFE_RELEASE( *it );
+		it = m_scriptedDialog.erase( it );
+	}
+}
+
 void WorldState::handleCollision( Unit* heroUnit, Unit* enemyUnit )
 {
 	m_curEnemyUnit = dynamic_cast<Character*>( enemyUnit );
@@ -460,32 +476,6 @@ void WorldState::handleCollision( Unit* heroUnit, Unit* enemyUnit )
 		GetAudioState().pEngine->Stop( GetAudioState().iMusicCategory, 0 );
 		GetAudioState().pSoundBank->Play( GetAudioState().iBattle, 0, 0, NULL );
 	}
-}
-
-void WorldState::startDialog( int index )
-{
-	DialogList::iterator it = m_scriptedDialog.begin();
-	while ( index )
-	{
-		++it;
-		--index;
-	}
-
-	Dialog* dialog = (*it);
-	if ( dialog->isOneTime() && !dialog->endTalk )
-	{
-		dialog->startTalk = true;
-		if ( !dialog->dlg_ON )
-			dialog->Toggle(&dialog->dlg_ON);
-	}
-	if ( !dialog->isOneTime() && !dialog->endTalk )
-	{
-		dialog->startTalk = true;
-		if ( !dialog->dlg_ON )
-			dialog->Toggle( &dialog->dlg_ON );
-	}
-	if ( dialog->endTalk && !dialog->isOneTime() )
-		dialog->Toggle( &dialog->endTalk );
 }
 
 // 유닛의 포인터를 받아서, UnitSet에서 해당 유닛을 찾아 지운다.

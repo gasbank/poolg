@@ -105,9 +105,12 @@ BattleState::BattleState()
 	
 	D3DXCreateFont(m_pDev, 17, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblHYnamL);
 	D3DXCreateFont(m_pDev, 18, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Rockwell Extra Bold"), &m_lblREB);
+	D3DXCreateFont(m_pDev, 25, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblArt);
+
 
 	m_curTurnType = TT_NATURAL;
 	m_nextTurnType = TT_NATURAL;
+	m_playerArt = PA_ART1;
 }
 
 BattleState::~BattleState()
@@ -347,6 +350,20 @@ HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 			return S_OK;
 		}
 
+		/*화살표에 따라 기술 분기*/
+		if (wParam == VK_UP)
+		{
+			setArt('u');
+		}
+		if (wParam == VK_DOWN)
+		{
+			setArt('d');
+		}
+		if (wParam == VK_RETURN)
+		{
+			spellArt ();
+		}
+
 		if ( wParam == VK_F4 )
 		{
 			GetWorldStateManager().setNextState(GAME_WORLD_STATE_FIELD);
@@ -404,7 +421,8 @@ HRESULT BattleState::release ()
 	
 	
 	SAFE_RELEASE( m_lblHYnamL );
-	SAFE_RELEASE( m_lblREB);
+	SAFE_RELEASE( m_lblREB );
+	SAFE_RELEASE( m_lblArt );
 
 	return S_OK;
 }
@@ -436,6 +454,7 @@ void BattleState::renderFixedText(int scrWidth, int scrHeight)
 			break;
 	}
 
+	/*주인공 status 라벨 그리기*/
 	WCHAR textBuffer[512];
 	float statusBoxPlayersPositionX = 10;
 	float statusBoxPlayersPositionY = (float)(scrHeight - 10);
@@ -451,6 +470,7 @@ void BattleState::renderFixedText(int scrWidth, int scrHeight)
 	m_lblREB->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 
 
+	/*적 status 그리기*/
 	rc.top = (LONG)18;
 	rc.left = (LONG)(scrWidth - 167);
 	StringCchPrintf(textBuffer, 512, L"HP");
@@ -458,6 +478,52 @@ void BattleState::renderFixedText(int scrWidth, int scrHeight)
 	rc.top += (LONG)21.08;
 	StringCchPrintf(textBuffer, 512, L"CS");
 	m_lblREB->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+
+
+	int skillLineInterval = 30;
+
+	rc.top = scrHeight - 190;
+	rc.left = scrWidth - 110;
+	StringCchPrintf(textBuffer, 512, L"Attack");
+	m_lblArt->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+	rc.top += skillLineInterval;
+	StringCchPrintf(textBuffer, 512, L"Heal");
+	m_lblArt->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+	rc.top += skillLineInterval;
+	StringCchPrintf(textBuffer, 512, L"~_~");
+	m_lblArt->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+	rc.top += skillLineInterval;
+	StringCchPrintf(textBuffer, 512, L"~_~");
+	m_lblArt->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+	rc.top += skillLineInterval;
+	StringCchPrintf(textBuffer, 512, L"~_~");
+	m_lblArt->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+
+	switch (m_playerArt)
+	{
+	case PA_ART1:
+		rc.top = scrHeight - 190;
+		StringCchPrintf(textBuffer, 512, L"Attack");
+		break;
+	case PA_ART2:
+		rc.top = scrHeight - 160;
+		StringCchPrintf(textBuffer, 512, L"Heal");
+		break;
+	case PA_ART3:
+		rc.top = scrHeight - 130;
+		StringCchPrintf(textBuffer, 512, L"~_~");
+		break;
+	case PA_ART4:
+		rc.top = scrHeight - 100;
+		StringCchPrintf(textBuffer, 512, L"~_~");
+		break;
+	case PA_ART5:
+		rc.top = scrHeight - 70;
+		StringCchPrintf(textBuffer, 512, L"~_~");
+		break;
+	}
+	m_lblArt->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 0.0f, 1.0f, 1.0f ) );
+
 }
 
 void BattleState::passTurn()
@@ -489,4 +555,80 @@ Character* BattleState::getHero()
 Character* BattleState::getEnemy()
 {
 	return static_cast<Character*>( m_ws->getCurEnemy() );
+}
+
+void BattleState::setArt(char direction)
+{
+	if (direction == 'u')
+	{
+		switch (m_playerArt)
+		{
+		case PA_ART1:
+			m_playerArt = PA_ART5;
+			break;
+		case PA_ART2:
+			m_playerArt = PA_ART1;
+			break;
+		case PA_ART3:
+			m_playerArt = PA_ART2;
+			break;
+		case PA_ART4:
+			m_playerArt = PA_ART3;
+			break;
+		case PA_ART5:
+			m_playerArt = PA_ART4;
+			break;
+		}
+	}
+	else if (direction == 'd')
+	{
+		switch (m_playerArt)
+		{
+		case PA_ART1:
+			m_playerArt = PA_ART2;
+			break;
+		case PA_ART2:
+			m_playerArt = PA_ART3;
+			break;
+		case PA_ART3:
+			m_playerArt = PA_ART4;
+			break;
+		case PA_ART4:
+			m_playerArt = PA_ART5;
+			break;
+		case PA_ART5:
+			m_playerArt = PA_ART1;
+			break;
+		}
+	}
+}
+
+void BattleState::spellArt()
+{
+	/*attack*/
+	if (m_playerArt == PA_ART1)
+	{
+			m_curTurnType = TT_NATURAL;
+			getHero()->attack( 0, getEnemy() );
+	}
+	/*heal*/
+	else if (m_playerArt == PA_ART2)
+	{
+			getHero()->heal (30);
+	}
+	/*blank*/
+	else if (m_playerArt == PA_ART3)
+	{
+
+	}
+	/*blank*/
+	else if (m_playerArt == PA_ART4)
+	{
+
+	}
+	/*blank*/
+	else if (m_playerArt == PA_ART5)
+	{
+
+	}
 }

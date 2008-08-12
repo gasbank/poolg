@@ -7,7 +7,7 @@ public:
 	virtual ~ProgressBar(void) {}
 
 	void setSize(float width, float height);
-	void initRate(float maxRate = 100.0f) { m_maxRate = m_currentRate = maxRate; setRate(maxRate); }
+	void initRate(float maxRate = 100.0f) { m_maxRate = m_currentRate = maxRate; setRate(maxRate);  }
 	void changeRate (float rateV);
 	void setRate (float rateV);
 

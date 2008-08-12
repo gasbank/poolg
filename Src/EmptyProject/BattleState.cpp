@@ -93,7 +93,7 @@ BattleState::BattleState()
 	m_expBarPlayer.initRate();
 	m_expBarPlayer.setPos (statusBoxPlayersPositionX + statusBoxWidth*0.23f, statusBoxPlayersPositionY + statusBoxHeight * 0.48f, 4.5f);
 	m_expBarPlayer.setSize(statusBarWidth, statusBarHeight);
-	m_expBarPlayer.changeRate(-73.3f);
+	m_expBarPlayer.changeRate(73.3f);
 
 	m_hpBarEnemy.init(L"Images/BattleUI/HPbar.jpg", m_pDev);
 	m_hpBarEnemy.setPos (statusBoxEnemysPositionX + statusBoxWidth*0.23f, statusBoxEnemysPositionY + statusBoxHeight * 0.82f, 4.5f);
@@ -132,6 +132,12 @@ HRESULT BattleState::enter()
 	m_hpIllusionPlayer.initRate((float)getHero()->getMaxHp());
 	m_hpBarEnemy.initRate((float)getEnemy()->getMaxHp());
 	m_hpIllusionEnemy.initRate((float)getEnemy()->getMaxHp());
+
+	m_hpBarPlayer.setRate((float)getHero()->getCurHp());
+	m_hpBarEnemy.setRate((float)getEnemy()->getCurHp());
+	m_hpIllusionPlayer.setRate((float)getHero()->getCurHp());
+	m_hpIllusionEnemy.setRate((float)getEnemy()->getCurHp());
+	
 
 	m_battleLog.push_back(std::string("전투 개시~~~~~~~~~!!!"));
 	m_battleWinner = PS_NOTSET;
@@ -178,19 +184,19 @@ HRESULT BattleState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, flo
 	m_DialogBox.draw();
 	
 	m_hpBgPlayer.draw();
-	//m_mpBgPlayer.draw();
-	//m_expBgPlayer.draw();
+	m_mpBgPlayer.draw();
+	m_expBgPlayer.draw();
 	m_hpBgEnemy.draw();
-	//m_mpBgEnemy.draw();
+	m_mpBgEnemy.draw();
 
 	m_hpIllusionPlayer.draw();
 	m_hpIllusionEnemy.draw();
 
 	m_hpBarPlayer.draw();
-	//m_mpBarPlayer.draw();
-	//m_expBarPlayer.draw();
+	m_mpBarPlayer.draw();
+	m_expBarPlayer.draw();
 	m_hpBarEnemy.draw();
-	//m_mpBarEnemy.draw();
+	m_mpBarEnemy.draw();
 
 	m_pDev->SetRenderState(D3DRS_ZENABLE, TRUE);
 
@@ -224,13 +230,12 @@ HRESULT BattleState::frameMove(double fTime, float fElapsedTime)
 	m_hpBarEnemy.frameMove(fElapsedTime);
 	m_mpBarEnemy.frameMove(fElapsedTime);
 
-	//m_Player.frameMove(fElapsedTime);
-	//m_Enemy.frameMove(fElapsedTime);
 
-	m_hpBarPlayer.setRate((float)getHero()->getCurHp());
-	m_hpBarEnemy.setRate((float)getEnemy()->getCurHp());
-	m_hpIllusionPlayer.setRate((float)getHero()->getCurHp());
-	m_hpIllusionEnemy.setRate((float)getEnemy()->getCurHp());
+
+	m_hpBarPlayer.changeRate((float)getHero()->getCurHp());
+	m_hpBarEnemy.changeRate((float)getEnemy()->getCurHp());
+	m_hpIllusionPlayer.changeRate((float)getHero()->getCurHp());
+	m_hpIllusionEnemy.changeRate((float)getEnemy()->getCurHp());
 	
 
 	// WorldState에 접근하기 위한 코드.
@@ -404,7 +409,7 @@ void BattleState::renderFixedText(int scrWidth, int scrHeight)
 	const UINT maxDrawLogCount = 7;
 	const UINT lineHeight = 15;
 	RECT rc;
-	rc.top		= 100;
+	rc.top		= 110;
 	rc.left		= 25;
 	rc.right	= scrWidth;
 	rc.bottom	= scrHeight;
@@ -428,10 +433,18 @@ void BattleState::renderFixedText(int scrWidth, int scrHeight)
 	WCHAR textBuffer[512];
 	float statusBoxPlayersPositionX = 10;
 	float statusBoxPlayersPositionY = (float)(scrHeight - 10);
-	rc.top = (LONG)(statusBoxPlayersPositionY - 102);
+	rc.top = (LONG)(statusBoxPlayersPositionY - 115);
 	rc.left = (LONG)(statusBoxPlayersPositionX + 5);
 	StringCchPrintf(textBuffer, 512, L"HP");
 	m_lblREB->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+	rc.top += (LONG)21.08;
+	StringCchPrintf(textBuffer, 512, L"CS");
+	m_lblREB->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+	rc.top += (LONG)21.08;
+	StringCchPrintf(textBuffer, 512, L"EX");
+	m_lblREB->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+
+
 
 }
 

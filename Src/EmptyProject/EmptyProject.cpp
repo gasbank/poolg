@@ -221,6 +221,31 @@ void renderFixedElements(IDirect3DDevice9* pd3dDevice, double fTime, float fElap
 	renderDebugText();
 }
 
+HRESULT drawBurningTeapot( double fTime, float fElapsedTime )
+{
+	HRESULT hr = S_OK;
+	D3DXMATRIX mWorld;
+	D3DXMatrixIdentity( &mWorld );
+	UINT iPass, cPasses;
+	V( g_bombShader->setMainTechnique() );
+	V( g_bombShader->setWorldViewProj( fTime, fElapsedTime, &mWorld, GetG().m_camera.GetViewMatrix(), GetG().m_camera.GetProjMatrix() ) );
+
+	V( g_bombShader->begin( &cPasses, 0 ) );
+	for( iPass = 0; iPass < cPasses; iPass++ )
+	{
+		V( g_bombShader->beginPass( iPass ) );
+		// Draw mesh here...
+
+		//D3DPERF_BeginEvent( 0, L"Shader applied teapot" );
+		g_testTeapot->DrawSubset( 0 );
+		//D3DPERF_EndEvent();
+
+		V( g_bombShader->endPass() );
+	}
+	V( g_bombShader->end() );
+	return hr;
+}
+
 //--------------------------------------------------------------------------------------
 // Render the scene using the D3D9 device
 //--------------------------------------------------------------------------------------
@@ -234,28 +259,9 @@ void CALLBACK OnD3D9FrameRender( IDirect3DDevice9* pd3dDevice, double fTime, flo
     // Render the scene
     if( SUCCEEDED( pd3dDevice->BeginScene() ) )
     {
+		//drawBurningTeapot( fTime, fElapsedTime );
+
 		GetTopStateManager().getCurState()->frameRender(pd3dDevice, fTime, fElapsedTime);
-
-
-		D3DXMATRIX mWorld;
-		D3DXMatrixIdentity( &mWorld );
-		UINT iPass, cPasses;
-		V( g_bombShader->setMainTechnique() );
-		V( g_bombShader->setWorldViewProj( fTime, fElapsedTime, &mWorld, GetG().m_camera.GetViewMatrix(), GetG().m_camera.GetProjMatrix() ) );
-
-		V( g_bombShader->begin( &cPasses, 0 ) );
-		for( iPass = 0; iPass < cPasses; iPass++ )
-		{
-			V( g_bombShader->beginPass( iPass ) );
-			// Draw mesh here...
-
-			//D3DPERF_BeginEvent( 0, L"Shader applied teapot" );
-			g_testTeapot->DrawSubset( 0 );
-			//D3DPERF_EndEvent();
-
-			V( g_bombShader->endPass() );
-		}
-		V( g_bombShader->end() );
 
 		//////////////////////////////////////////////////////////////////////////
         V( pd3dDevice->EndScene() );

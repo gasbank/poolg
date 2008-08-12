@@ -173,10 +173,6 @@ HRESULT WorldState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, floa
 	// EP rendering routine (CCW)
 
 	pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
-	WorldStateManager& wsm = WorldStateManager::getSingleton();
-	wsm.getCurState()->frameRender(pd3dDevice, fTime, fElapsedTime);
-	
-
 	pd3dDevice->SetTransform(D3DTS_VIEW, camera.GetViewMatrix());
 	pd3dDevice->SetTransform(D3DTS_PROJECTION, camera.GetProjMatrix());
 
@@ -191,6 +187,9 @@ HRESULT WorldState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, floa
 	{
 		(*itDialog)->frameRender(pd3dDevice, fTime, fElapsedTime);
 	}
+
+	WorldStateManager& wsm = WorldStateManager::getSingleton();
+	wsm.getCurState()->frameRender(pd3dDevice, fTime, fElapsedTime);
 
 	return S_OK;
 

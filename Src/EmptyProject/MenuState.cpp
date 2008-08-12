@@ -5,6 +5,7 @@
 #include "WorldState.h"
 #include "TopStateManager.h"
 
+
 int loc = 4;
 float curHp = 0;
 float maxHp = 0;
@@ -345,10 +346,10 @@ MenuState::~MenuState()
 
 HRESULT MenuState::enter()
 {
-
 	TopStateManager& ts = GetTopStateManager();
 	WorldState* ws = static_cast<WorldState*>( ts.getCurState() );
-	
+	ws->getHero()->clearKey();
+
 	if ( ws->getHero() != 0 )
 	{
 		curHp = (float)( (Character*) ws->getHero() )->getCurHp();

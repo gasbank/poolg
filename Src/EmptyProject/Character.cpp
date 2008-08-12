@@ -79,6 +79,10 @@ bool Character::frameMove( float fElapsedTime )
 						//GetScriptManager().execute("EpUnitOnMove 0");
 					}
 				}
+
+				// 가는 방향으로 머리를 돌린다.
+				this->setHeadDir( (UnitInput)i );
+
 				break;
 			}
 		}
@@ -208,7 +212,6 @@ void Character::enterTile( int tileX, int tileY )
 	{
 		ws->startDialog( 4 );
 		heal( 9999 );
-		
 	}
 }
 

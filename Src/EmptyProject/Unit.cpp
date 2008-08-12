@@ -69,8 +69,6 @@ LRESULT Unit::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 
 bool Unit::frameMove( float fElapsedTime )
 {	
-	
-
 	updateLocalXform();
 
 	return true;
@@ -117,6 +115,26 @@ Unit* Unit::createUnit( LPD3DXMESH mesh, int tileX, int tileY, float posZ, bool 
 	u->init( GetG().m_dev, mesh );
 	u->setControllable( bControllable );
 	return u;
+}
+
+// 가고자 하는 방향으로 유닛을 회전시킨다.
+void Unit::setHeadDir( UnitInput unitInput )
+{
+	switch ( unitInput )
+	{
+	case UNIT_MOVE_UP:
+		setRotZ( D3DXToRadian( 90 + 0 ) );
+		break;
+	case UNIT_MOVE_DOWN:
+		setRotZ( D3DXToRadian( 90 + 180 ) );
+		break;
+	case UNIT_MOVE_RIGHT:
+		setRotZ( D3DXToRadian( 90 - 90 ) );
+		break;
+	case UNIT_MOVE_LEFT:
+		setRotZ( D3DXToRadian( 90 + 90 ) );
+		break;
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////

@@ -53,6 +53,8 @@ public:
 
 	bool isControllable() const { return m_bControllable; }
 
+	void setHeadDir( UnitInput );
+
 protected:
 	virtual UnitInput mapKey( UINT nKey );
 
@@ -82,6 +84,5 @@ protected:
 	D3DXVECTOR3				m_vKeyboardDirection;
 	D3DXVECTOR3				m_vVelocity;
 	bool					m_bControllable;
-	
 };
 

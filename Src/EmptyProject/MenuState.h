@@ -44,4 +44,7 @@ private:
 	Picture m_stwin;
 	Picture m_sawin;
 	Picture m_lowin;
+
+	Picture m_hpbar;
+	Picture m_hpbg;
 };

@@ -1,8 +1,13 @@
 #include "EmptyProjectPCH.h"
 #include "MenuState.h"
 #include "WorldStateManager.h"
+#include "Character.h"
+#include "WorldState.h"
+#include "TopStateManager.h"
 
 int loc = 4;
+float curHp = 0;
+float maxHp = 0;
 bool op_st = false;
 bool op_sa = false;
 bool op_lo = false;
@@ -100,6 +105,9 @@ HRESULT MenuState::frameMove(double fTime, float fElapsedTime)
 	m_stwin.frameMove(fElapsedTime);
 	m_sawin.frameMove(fElapsedTime);
 	m_lowin.frameMove(fElapsedTime);
+
+	m_hpbar.frameMove(fElapsedTime);
+	m_hpbg.frameMove(fElapsedTime);
 	
 	//m_selc.setPos(m_selc.getPos()->x, pos, m_selc.getPos()->z);
 
@@ -131,7 +139,7 @@ HRESULT MenuState::frameRender(IDirect3DDevice9* pd3dDevice,  double fTime, floa
 	
 	m_stub.draw();
 	//if ( m_nextState == m_states[1] )
-		m_sanub.draw();
+		m_saub.draw();
 	//else m_saub.draw();
 	m_loub.draw();
 	m_seub.draw();
@@ -160,6 +168,8 @@ HRESULT MenuState::frameRender(IDirect3DDevice9* pd3dDevice,  double fTime, floa
 	if ( op_st == true )
 	{
 		m_stwin.draw();
+		m_hpbg.draw();
+		m_hpbar.draw();
 	}
 	if ( op_sa == true )
 	{
@@ -194,7 +204,8 @@ HRESULT MenuState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 				select( 0 );
 				break;
 			case VK_F5:
-				GetWorldStateManager().setNextStateAsPrevState();
+				if ( !op_st && !op_sa && !op_lo )
+					GetWorldStateManager().setNextStateAsPrevState();
 				break;
 		}
 	}
@@ -225,6 +236,9 @@ HRESULT MenuState::release()
 	m_sawin.release();
 	m_lowin.release();
 
+	m_hpbar.release();
+	m_hpbg.release();
+
 	SAFE_RELEASE( m_lblHYnamL );
 	SAFE_RELEASE( m_lblREB);
 
@@ -233,6 +247,7 @@ HRESULT MenuState::release()
 
 MenuState::MenuState()
 {
+
 	HRESULT hr;
 	m_pDev = GetG().m_dev;
 	float scrWidth = (float)GetG().m_scrWidth;
@@ -310,6 +325,14 @@ MenuState::MenuState()
 	m_lowin.setPos ( 0 - scrWidth / 2, 0 - scrHeight / 2, 2.6f);
 	m_lowin.setSize(scrWidth, scrHeight);
 
+	m_hpbar.init(L"Images/BattleUI/HPbar.jpg", m_pDev);
+	m_hpbar.setPos ( (0 - scrWidth / 2) + 163, (0 - scrHeight / 2) + 223, 2.4f);
+
+	m_hpbg.init(L"Images/BattleUI/HPbg.jpg", m_pDev);
+	m_hpbg.setPos ( (0 - scrWidth / 2) + 163, (0 - scrHeight / 2) + 223, 2.5f);
+	m_hpbg.setSize(220, 22);
+	
+
 
 	V( D3DXCreateFont(m_pDev, 17, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblHYnamL) );
 	V( D3DXCreateFont(m_pDev, 18, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Rockwell Extra Bold"), &m_lblREB) );
@@ -323,6 +346,15 @@ MenuState::~MenuState()
 HRESULT MenuState::enter()
 {
 
+	TopStateManager& ts = GetTopStateManager();
+	WorldState* ws = static_cast<WorldState*>( ts.getCurState() );
+	
+	if ( ws->getHero() != 0 )
+	{
+		curHp = (float)( (Character*) ws->getHero() )->getCurHp();
+		maxHp = (float)( (Character*) ws->getHero() )->getMaxHp();
+		m_hpbar.setSize(220 * (curHp / maxHp), 22);
+	}
 	return S_OK;
 }
 
@@ -331,6 +363,7 @@ HRESULT MenuState::leave()
 
 	return S_OK;
 }
+
 /*
 void MenuState::drawFixedText(int scrWidth, int scrHeight)
 {

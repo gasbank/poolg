@@ -36,7 +36,7 @@ namespace eval EpWorldState {
 		EpUnitSetRotX				$pHeroUnit [ToRadian -90]
 		EpUnitSetRotZ				$pHeroUnit [ToRadian 90]
 		EpUnitSetPosZ				$pHeroUnit -[EpUnitGetUpperRightZ $pHeroUnit]
-		EpCharacterSetMaxAndCurHp	$pHeroUnit 50 50
+		EpCharacterSetMaxAndCurHp	$pHeroUnit 500 500
 		EpCharacterSetMoveDuration	$pHeroUnit 0.25
 		EpCharacterSetColor		$pNPCUnit1 255 0 0
 		EpCharacterSetTalkable		$pNPCUnit1 1

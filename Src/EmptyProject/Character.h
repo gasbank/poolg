@@ -21,6 +21,7 @@ public:
 	int getMaxHp() const { return m_maxHp; }
 	void damage( int point ) { m_curHp -= point; }
 	int getAttack() const { return m_attack; }
+	bool getMoving() { return m_bMoving; }
 	void setAttack (int point) { m_attack = point; }
 
 	bool isDead() { return (m_curHp<=0); }

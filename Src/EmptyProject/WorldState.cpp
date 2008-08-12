@@ -334,27 +334,30 @@ HRESULT WorldState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 	{
 		if (wParam == VK_RETURN)
 		{
-			DialogList::iterator it = m_scriptedDialog.begin();
-			for ( ; it != m_scriptedDialog.end(); )
+			if( !getHeroUnit()->getMoving() )
 			{
-				Dialog* dialog = (*it);
-				
-				if ( (m_heroUnit->getTilePosX() == dialog->getRegion().left)
-					&& (m_heroUnit->getTilePosY() == dialog->getRegion().top) )
+				DialogList::iterator it = m_scriptedDialog.begin();
+				for ( ; it != m_scriptedDialog.end(); )
 				{
-					if ( dialog->nextDialog() == false )
+					Dialog* dialog = (*it);
+					
+					if ( (m_heroUnit->getTilePosX() == dialog->getRegion().left)
+						&& (m_heroUnit->getTilePosY() == dialog->getRegion().top) )
 					{
-						EP_SAFE_RELEASE( *it );
-						it = m_scriptedDialog.erase( it );
+						if ( dialog->nextDialog() == false )
+						{
+							EP_SAFE_RELEASE( *it );
+							it = m_scriptedDialog.erase( it );
+						}
+						else
+						{
+							++it;
+						}
 					}
 					else
 					{
 						++it;
 					}
-				}
-				else
-				{
-					++it;
 				}
 			}
 		}

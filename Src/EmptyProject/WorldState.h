@@ -37,6 +37,7 @@ public:
 	bool isCollide( const D3DXVECTOR3* vec0, const D3DXVECTOR3* vec1 );
 
 	Unit* getHero() { return m_heroUnit; }
+	Character* getHeroUnit() { return m_heroUnit; }
 	Unit* getCurEnemy() { return m_curEnemyUnit; }
 	void removeUnit( Unit* pUnit );
 

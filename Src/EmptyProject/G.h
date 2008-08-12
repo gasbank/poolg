@@ -18,6 +18,5 @@ public:
 	int					m_scrHeight;
 	D3DXMATRIX			g_orthoProjMat;
 	D3DXMATRIX			g_fixedViewMat;
-	static const int	s_tileSize = 2;	
 };
 inline G& GetG() { return G::getSingleton(); }

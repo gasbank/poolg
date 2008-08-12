@@ -57,64 +57,29 @@ bool Character::frameMove( float fElapsedTime )
 	{
 		m_fMovingTime = 0;
 
-		if( IsKeyDown( m_aKeys[UNIT_MOVE_UP] ) )
+
+		UINT i;
+		for ( i = 0; i < UNIT_MAX_KEYS; i++ )
 		{
-			rayTesting( UNIT_MOVE_UP );
-			if( m_bMovable )
+			if( IsKeyDown( m_aKeys[ (UnitInput)i ] ) )
 			{
-				if( tileManager.tile[m_tileBufferX][m_tileBufferY + 1].movable && (m_tileBufferY + 1 > -1 && m_tileBufferY + 1 < TileManager::y) )
+				rayTesting( (UnitInput)i );
+				if( m_bMovable )
 				{
-					m_bMoving = true;
-					m_vKeyboardDirection = D3DXVECTOR3( 0, 0, 0 );
-					m_vKeyboardDirection.y += 2.0f;
-					m_tileBufferY++;
-					GetScriptManager().execute("EpUnitOnMove 0");
+					if( tileManager.getTile( m_tileBufferX + g_moveAmount[ i ].x, m_tileBufferY + g_moveAmount[ i ].y )->movable
+						&& (m_tileBufferX + g_moveAmount[ i ].x  > -1 && m_tileBufferX + g_moveAmount[ i ].x  < TileManager::s_xSize)
+						&& (m_tileBufferY + g_moveAmount[ i ].y  > -1 && m_tileBufferY + g_moveAmount[ i ].y  < TileManager::s_ySize) )
+ 					{
+						m_bMoving = true;
+						m_vKeyboardDirection = D3DXVECTOR3( 0, 0, 0 );
+						m_vKeyboardDirection.x += (float) g_moveAmount[ i ].x * TileManager::s_tileSize;
+						m_vKeyboardDirection.y += (float) g_moveAmount[ i ].y * TileManager::s_tileSize;
+						m_tileBufferX += g_moveAmount[ i ].x;
+						m_tileBufferY += g_moveAmount[ i ].y;
+						//GetScriptManager().execute("EpUnitOnMove 0");
+					}
 				}
-			}
-		}
-		else if( IsKeyDown( m_aKeys[UNIT_MOVE_DOWN] ) )
-		{
-			rayTesting( UNIT_MOVE_DOWN );
-			if( m_bMovable )
-			{
-				if( tileManager.tile[m_tileBufferX][m_tileBufferY - 1].movable && (m_tileBufferY - 1 > -1 && m_tileBufferY - 1 < TileManager::y) )
-				{
-					m_bMoving = true;
-					m_vKeyboardDirection = D3DXVECTOR3( 0, 0, 0 );
-					m_vKeyboardDirection.y -= 2.0f;
-					m_tileBufferY--;
-					GetScriptManager().execute("EpUnitOnMove 1");
-				}
-			}
-		}
-		else if( IsKeyDown( m_aKeys[UNIT_MOVE_RIGHT] ) )
-		{
-			rayTesting( UNIT_MOVE_RIGHT );
-			if( m_bMovable )
-			{
-				if( tileManager.tile[m_tileBufferX + 1][m_tileBufferY].movable && (m_tileBufferX + 1 > -1 && m_tileBufferX + 1 < TileManager::x) )
-				{
-					m_bMoving = true;
-					m_vKeyboardDirection = D3DXVECTOR3( 0, 0, 0 );
-					m_vKeyboardDirection.x += 2.0f;
-					m_tileBufferX++;
-					GetScriptManager().execute("EpUnitOnMove 2");
-				}
-			}
-		}
-		else if( IsKeyDown( m_aKeys[UNIT_MOVE_LEFT] ) )
-		{
-			rayTesting( UNIT_MOVE_LEFT );
-			if( m_bMovable )
-			{
-				if( tileManager.tile[m_tileBufferX - 1][m_tileBufferY].movable && (m_tileBufferX - 1 > -1 && m_tileBufferX - 1 < TileManager::x) )
-				{
-					m_bMoving = true;
-					m_vKeyboardDirection = D3DXVECTOR3( 0, 0, 0 );
-					m_vKeyboardDirection.x -= 2.0f;
-					m_tileBufferX--;
-					GetScriptManager().execute("EpUnitOnMove 3");
-				}
+				break;
 			}
 		}
 	}
@@ -231,7 +196,7 @@ void Character::setTilePos( int tileX, int tileY )
 	m_tileX = tileX;
 	m_tileY = tileY;
 
-	setPos( D3DXVECTOR3( (float)(tileX - 13) * G::s_tileSize, (float)(tileY  - 13) * G::s_tileSize, 0 ) );
+	setPos( D3DXVECTOR3( (float)(tileX - (TileManager::s_xSize / 2)) * TileManager::s_tileSize, (float)(tileY  - (TileManager::s_ySize / 2)) * TileManager::s_tileSize, 0 ) );
 }
 
 void Character::enterTile( int tileX, int tileY )
@@ -239,7 +204,7 @@ void Character::enterTile( int tileX, int tileY )
 	TopStateManager& tsm = TopStateManager::getSingleton();
 	WorldState* ws = static_cast<WorldState*>( tsm.getCurState() );
 
-	if( tileManager.tile[tileX][tileY].heal )
+	if( tileManager.getTile( tileX, tileY)->heal )
 	{
 		ws->startDialog( 4 );
 		heal( 9999 );
@@ -318,7 +283,7 @@ HRESULT Character::rayTesting( UnitInput mappedKey )
 		printf("Ray Testing test. (FaceIndex : %u, Dist : %f)\n", intersectInfo->FaceIndex, intersectInfo->Dist );
 
 		// 타일 1.5칸 이내에서 교차하면 그 방향으로 움직이지 않는다.
-		if ( intersectInfo->Dist <= (float) 1.5 * G::s_tileSize )
+		if ( intersectInfo->Dist <= (float) 1.5 * TileManager::s_tileSize )
 			m_bMovable = false;
 		else
 			m_bMovable = true;

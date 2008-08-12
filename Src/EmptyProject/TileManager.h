@@ -7,8 +7,12 @@ public:
 	TileManager(void);
 	~TileManager(void);
 
-	static const int x = 25;
-	static const int y = 25;
+	static const int s_xSize = 64;
+	static const int s_ySize = 64;
+	static const int s_tileSize = 2;	
 
-	Tile	tile[x][y];
+	Tile* getTile( int x, int y );
+
+private:
+	Tile	m_tileArray[s_xSize][s_ySize];
 };

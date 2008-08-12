@@ -88,9 +88,9 @@ HRESULT WorldState::enter()
 	m_sound.init();
 
 
-	tileManager.tile[14][14].movable = false;
-	tileManager.tile[9][9].talkable = true;
-	tileManager.tile[17][14].heal = true;
+	tileManager.getTile( 14, 14 )->movable = false;
+	tileManager.getTile( 9, 9 )->talkable = true;
+	tileManager.getTile( 17, 14 )->heal = true;
 
 
 	// Create sample 3D model(!)

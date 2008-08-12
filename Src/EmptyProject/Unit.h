@@ -2,12 +2,19 @@
 
 enum UnitInput
 {
-	UNIT_MOVE_UP = 0,
-	UNIT_MOVE_DOWN,
-	UNIT_MOVE_LEFT,
-	UNIT_MOVE_RIGHT,
+	UNIT_MOVE_UP	= 0,
+	UNIT_MOVE_DOWN	= 1,
+	UNIT_MOVE_LEFT	= 2,
+	UNIT_MOVE_RIGHT = 3,
 	UNIT_MAX_KEYS,
 	UNIT_UNKNOWN = 0xFF
+};
+
+static const POINT g_moveAmount[4] = {
+	{  0,  1 },
+	{  0, -1 },
+	{ -1,  0 },
+	{  1,  0 }
 };
 
 class Unit

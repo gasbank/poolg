@@ -402,7 +402,7 @@ UINT WorldState::addUnit( Unit* u )
 	if (u->getControllable())
 	{
 		m_heroUnit = dynamic_cast<Character*>( u );
-		m_heroUnit->setAttack (4);
+		m_heroUnit->setAttack (1);
 	}
 
 	return m_unitSet.size();
@@ -450,7 +450,7 @@ void WorldState::handleCollision( Unit* heroUnit, Unit* enemyUnit )
 {
 	m_curEnemyUnit = dynamic_cast<Character*>( enemyUnit );
 	/*데미지를 처리*/
-	m_curEnemyUnit->setAttack (20);
+	m_curEnemyUnit->setAttack (30);
 	
 	if ( !m_curEnemyUnit->isTalkable() )
 	{

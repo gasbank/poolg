@@ -12,26 +12,33 @@ public:
 	Shader(void);
 	virtual ~Shader(void);
 
-	HRESULT							initEffect( LPDIRECT3DDEVICE9 pd3dDevice, const WCHAR* shaderFileName, DWORD dwShaderFlags = gs_shaderFlags );
-	HRESULT							initShader( LPDIRECT3DDEVICE9 pd3dDevice, const WCHAR* shaderFileName );
+	virtual HRESULT					initEffect( LPDIRECT3DDEVICE9 pd3dDevice, const WCHAR* shaderFileName, DWORD dwShaderFlags = gs_shaderFlags );
+	virtual HRESULT					initShader( LPDIRECT3DDEVICE9 pd3dDevice, const WCHAR* shaderFileName );
 	HRESULT							compileShader( const char* functionName, const char* profile, DWORD dwShaderFlags = gs_shaderFlags );
-
-	virtual void					release();	
+	LPDIRECT3DVERTEXDECLARATION9	getVertexDeclaration() const { return m_pVertexDeclaration; }
+	LPD3DXCONSTANTTABLE				getConstantTable() const { return m_pConstantTable; }
+	LPDIRECT3DVERTEXSHADER9			getVertexShader() const { return m_pVertexShader; }
+	virtual void					release();
 	virtual void					update( float fTime, float fElapsedTime );
 	virtual HRESULT CALLBACK		onResetDevice();
+
+	D3DVERTEXELEMENT9* getDecl() const { return m_decl; }
 
 protected:
 	LPD3DXEFFECT					m_effect;
 	LPDIRECT3DDEVICE9				m_dev;
-private:
-	
 	LPDIRECT3DVERTEXSHADER9         m_pVertexShader;
+	
 	LPD3DXCONSTANTTABLE             m_pConstantTable;
+	
 	LPDIRECT3DVERTEXDECLARATION9    m_pVertexDeclaration;
-
+	D3DVERTEXELEMENT9*				m_decl;
+	
 	WCHAR m_shaderFileName[512];
+	
 };
 
+//////////////////////////////////////////////////////////////////////////
 
 class BombShader : public Shader
 {
@@ -51,4 +58,17 @@ public:
 private:
 	D3DXHANDLE						m_hDefaultTech;
 	LPDIRECT3DTEXTURE9				m_fireTexture;
+};
+
+//////////////////////////////////////////////////////////////////////////
+
+class AlphaShader : public Shader
+{
+public:
+	AlphaShader() {}
+	~AlphaShader() {}
+
+	virtual HRESULT					initShader( LPDIRECT3DDEVICE9 pd3dDevice, const WCHAR* shaderFileName );
+	virtual HRESULT CALLBACK		onResetDevice();
+
 };

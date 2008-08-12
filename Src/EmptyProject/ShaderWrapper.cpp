@@ -8,10 +8,12 @@ Shader::Shader(void)
 	m_pConstantTable		= 0;
 	m_pVertexDeclaration	= 0;
 	m_effect				= 0;
+	m_decl					= 0;
 }
 
 Shader::~Shader(void)
 {
+	SAFE_DELETE_ARRAY( m_decl );
 }
 
 HRESULT Shader::initShader( LPDIRECT3DDEVICE9 pd3dDevice, const WCHAR* shaderFileName )
@@ -35,7 +37,7 @@ HRESULT Shader::compileShader( const char* functionName, const char* profile, DW
 	HRESULT hr;
 	LPD3DXBUFFER pCode;
 
-	V_RETURN( D3DXCompileShaderFromFile( m_shaderFileName, NULL, NULL, functionName, "vs_2_0", dwShaderFlags, &pCode, NULL, &m_pConstantTable ) );
+	V_RETURN( D3DXCompileShaderFromFile( m_shaderFileName, NULL, NULL, functionName, profile, dwShaderFlags, &pCode, NULL, &m_pConstantTable ) );
 
 	// Create the vertex shader
 	hr = m_dev->CreateVertexShader( ( DWORD* )pCode->GetBufferPointer(), &m_pVertexShader );
@@ -85,8 +87,9 @@ HRESULT Shader::onResetDevice()
 {
 	HRESULT hr = S_OK;
 	if( m_effect )
+	{
 		V_RETURN( m_effect->OnResetDevice() );
-
+	}
 	return hr;
 }
 
@@ -139,3 +142,32 @@ HRESULT BombShader::setWorldViewProj( double fTime, float fElapsedTime, const D3
 	return hr;
 }
 
+//////////////////////////////////////////////////////////////////////////()
+
+HRESULT AlphaShader::initShader( LPDIRECT3DDEVICE9 pd3dDevice, const WCHAR* shaderFileName )
+{
+	HRESULT hr = S_OK;
+
+	D3DVERTEXELEMENT9 decl[] =
+	{
+		{ 0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 },
+		{ 0, 12, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0 },
+		{ 0, 20, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0 },
+		D3DDECL_END()
+	};
+
+	m_decl = new D3DVERTEXELEMENT9[ sizeof( decl ) / sizeof( D3DVERTEXELEMENT9 ) ];
+	memcpy( m_decl, decl, sizeof( decl ) );
+
+	m_dev = pd3dDevice;
+	V_RETURN( m_dev->CreateVertexDeclaration( decl, &m_pVertexDeclaration ) );
+	V_RETURN( StringCchCopy( m_shaderFileName, sizeof(m_shaderFileName)/sizeof(TCHAR), shaderFileName ) );
+	return hr;
+}
+
+HRESULT CALLBACK AlphaShader::onResetDevice()
+{
+	HRESULT hr = S_OK;
+
+	return hr;
+}

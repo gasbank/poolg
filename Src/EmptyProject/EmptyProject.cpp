@@ -24,12 +24,15 @@ TopStateManager*				g_tsm					= 0;
 WorldStateManager*				g_wsm					= 0;
 ScriptManager*					g_scriptManager			= 0;		// Set to zero is 'CRUCIAL!'
 BombShader*						g_bombShader			= 0;
+AlphaShader*					g_alphaShader			= 0;
 
 LPD3DXFONT						g_pFont					= 0;
 LPD3DXEFFECT		            g_pEffect				= 0;
 D3DXHANDLE						g_tech					= 0;
 
 LPD3DXMESH						g_testTeapot			= 0;
+LPD3DXMESH						g_testPolygon			= 0;
+LPD3DXMESH						g_testPolygonCloned		= 0;
 
 D3DCOLOR						g_fillColor;
 
@@ -58,14 +61,49 @@ bool CALLBACK IsD3D9DeviceAcceptable( D3DCAPS9* pCaps, D3DFORMAT AdapterFormat, 
 //--------------------------------------------------------------------------------------
 bool CALLBACK ModifyDeviceSettings( DXUTDeviceSettings* pDeviceSettings, void* pUserContext )
 {
-#if defined(DEBUG) & defined(FORCED_SOFTWARE_PROCESSING)
-	pDeviceSettings->d3d9.BehaviorFlags &= ~D3DCREATE_HARDWARE_VERTEXPROCESSING;
-	pDeviceSettings->d3d9.BehaviorFlags |= D3DCREATE_SOFTWARE_VERTEXPROCESSING;
-	//pDeviceSettings->d3d9.BehaviorFlags |= D3DCREATE_MULTITHREADED;
+	assert( DXUT_D3D9_DEVICE == pDeviceSettings->ver );
+
+	HRESULT hr;
+	IDirect3D9* pD3D = DXUTGetD3D9Object();
+	D3DCAPS9 caps;
+	V( pD3D->GetDeviceCaps( pDeviceSettings->d3d9.AdapterOrdinal,
+		pDeviceSettings->d3d9.DeviceType,
+		&caps ) );
+
+	// If device doesn't support HW T&L or doesn't support 1.1 vertex shaders in HW 
+	// then switch to SWVP.
+	if( ( caps.DevCaps & D3DDEVCAPS_HWTRANSFORMANDLIGHT ) == 0 ||
+		caps.VertexShaderVersion < D3DVS_VERSION( 2, 0 ) )
+	{
+		pDeviceSettings->d3d9.BehaviorFlags = D3DCREATE_SOFTWARE_VERTEXPROCESSING;
+	}
+
+	// Debugging vertex shaders requires either REF or software vertex processing 
+	// and debugging pixel shaders requires REF.
+#ifdef DEBUG_VS
+	if( pDeviceSettings->d3d9.DeviceType != D3DDEVTYPE_REF )
+	{
+		pDeviceSettings->d3d9.BehaviorFlags &= ~D3DCREATE_HARDWARE_VERTEXPROCESSING;
+		pDeviceSettings->d3d9.BehaviorFlags &= ~D3DCREATE_PUREDEVICE;
+		pDeviceSettings->d3d9.BehaviorFlags |= D3DCREATE_SOFTWARE_VERTEXPROCESSING;
+	}
+#endif
+#ifdef DEBUG_PS
+	pDeviceSettings->d3d9.DeviceType = D3DDEVTYPE_REF;
 #endif
 
+	// For the first device created if its a REF device, optionally display a warning dialog box
+	static bool s_bFirstTime = true;
+	if( s_bFirstTime )
+	{
+		s_bFirstTime = false;
+		if( pDeviceSettings->d3d9.DeviceType == D3DDEVTYPE_REF )
+		{
+			MessageBox( 0, L"REF mode will run very slowly", L"Caution", MB_ICONEXCLAMATION | MB_OK );
+		}
+	}
 
-    return true;
+	return true;
 }
 
 
@@ -92,7 +130,14 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 	g_bombShader->initEffect( pd3dDevice, L"Shaders/HLSL/vbomb.fx" );
 	g_bombShader->initMainTechnique();
 
+	g_alphaShader = new AlphaShader();
+	g_alphaShader->initShader( pd3dDevice, L"Shaders/Alpha.vsh" );
+	g_alphaShader->compileShader( "Alpha", "vs_2_0" );
+
 	D3DXCreateTeapot( pd3dDevice, &g_testTeapot, 0 );
+	D3DXCreatePolygon( pd3dDevice, 0.1f, 32, &g_testPolygon, 0 );
+
+	g_testPolygon->CloneMesh( 0, g_alphaShader->getDecl(), pd3dDevice, &g_testPolygonCloned );
 
 	//////////////////////////////////////////////////////////////////////////
 
@@ -153,14 +198,25 @@ HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFA
 //--------------------------------------------------------------------------------------
 void CALLBACK OnFrameMove( double fTime, float fElapsedTime, void* pUserContext )
 {
+	HRESULT hr;
+
+
+	//////////////////////////////////////////////////////////////////////////
+
 	GetG().m_camera.FrameMove( fElapsedTime );
 
 	TopStateManager::getSingleton().transit();
 
-	//g_menubox.frameMove(fElapsedTime);
-
 	if (GetTopStateManager().getCurState())
 		GetTopStateManager().getCurState()->frameMove(fTime, fElapsedTime);
+
+	// Alpha shader testing
+	D3DXMATRIXA16 mWorldViewProj;
+	D3DXMatrixIdentity( &mWorldViewProj );
+	//mWorldViewProj = *GetG().m_camera.GetViewMatrix() * *GetG().m_camera.GetProjMatrix();
+	V( g_alphaShader->getConstantTable()->SetMatrix( DXUTGetD3D9Device(), "mWorldViewProj", &mWorldViewProj ) );
+	V( g_alphaShader->getConstantTable()->SetFloat( DXUTGetD3D9Device(), "fTime", (float)fTime ) );
+
 }
 
 
@@ -221,6 +277,19 @@ void renderFixedElements(IDirect3DDevice9* pd3dDevice, double fTime, float fElap
 	renderDebugText();
 }
 
+HRESULT drawAlphaAnimatedPlane( double fTime, float fElapsedTime )
+{
+	HRESULT hr = S_OK;
+	GetG().m_dev->SetRenderState( D3DRS_LIGHTING, FALSE );
+	GetG().m_dev->SetRenderState( D3DRS_CULLMODE, D3DCULL_NONE );
+	GetG().m_dev->SetTexture( 0, 0 );
+	V_RETURN( GetG().m_dev->SetVertexShader( g_alphaShader->getVertexShader() ) );
+	D3DPERF_BeginEvent( 0, L"Draw Alpha Animated" );
+	V_RETURN( g_testPolygonCloned->DrawSubset( 0 ) );
+	D3DPERF_EndEvent();
+	V_RETURN( GetG().m_dev->SetVertexShader( 0 ) );
+	return hr;
+}
 HRESULT drawBurningTeapot( double fTime, float fElapsedTime )
 {
 	HRESULT hr = S_OK;
@@ -259,9 +328,11 @@ void CALLBACK OnD3D9FrameRender( IDirect3DDevice9* pd3dDevice, double fTime, flo
     // Render the scene
     if( SUCCEEDED( pd3dDevice->BeginScene() ) )
     {
-		//drawBurningTeapot( fTime, fElapsedTime );
+		drawBurningTeapot( fTime, fElapsedTime );
 
 		GetTopStateManager().getCurState()->frameRender(pd3dDevice, fTime, fElapsedTime);
+
+		drawAlphaAnimatedPlane( fTime, fElapsedTime );
 
 		//////////////////////////////////////////////////////////////////////////
         V( pd3dDevice->EndScene() );
@@ -305,11 +376,15 @@ void CALLBACK OnD3D9DestroyDevice( void* pUserContext )
 {
 	SAFE_RELEASE( g_pFont );
 	SAFE_RELEASE( g_testTeapot );
+	SAFE_RELEASE( g_testPolygon );
+	SAFE_RELEASE( g_testPolygonCloned );
 
 	SAFE_DELETE( g_tsm );
 	SAFE_DELETE( g_wsm );
 	EP_SAFE_RELEASE( g_bombShader );
-	
+	EP_SAFE_RELEASE( g_alphaShader );
+	EP_SAFE_RELEASE( g_alphaShader );
+
 	GetG().m_videoMan.SetDev(0);
 }
 
@@ -416,6 +491,7 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 	GetScriptManager().executeFile( "library/EpInitScript.tcl" );
 	GetScriptManager().executeFile( "library/EpWorldState.tcl" );
 	GetScriptManager().executeFile( "library/EpDialog1.tcl" );
+	//GetScriptManager().executeFile( "library/EpThreadTest.tcl" );
 
 	GetScriptManager().execute( "EpInitApp" );
 

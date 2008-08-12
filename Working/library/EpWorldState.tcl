@@ -12,7 +12,7 @@ namespace eval EpWorldState {
 	proc enter {} {
 		EpOutputDebugString " - WorldState enter\n"
 		
-		set pHeroUnit				[createChar 30 14 1];
+		set pHeroUnit				[createChar 32 32 1];
 		set pEnemyUnit1				[createChar 40 14 0];
 		set pEnemyUnit2				[createChar 45 14 0];
 		set pEnemyUnit3				[createChar 30 22 0];

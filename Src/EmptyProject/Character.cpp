@@ -252,8 +252,6 @@ HRESULT Character::rayTesting( UnitInput mappedKey )
 	DWORD hitFaceIndex;
 	float hitU, hitV;
 	float hitDist;
-	LPD3DXBUFFER allHitsBuffer = 0;
-	DWORD allHitSCount;
 
 	// Get mesh data
 	ArnMesh* mainWallMesh = dynamic_cast<ArnMesh*>( ws->getArnSceneGraphPt()->getSceneRoot()->getNodeByName("MainWall") );
@@ -271,27 +269,22 @@ HRESULT Character::rayTesting( UnitInput mappedKey )
 		&hitU, 
 		&hitV, 
 		&hitDist, 
-		&allHitsBuffer, 
-		&allHitSCount ) );
+		0, 
+		0 ) );
 
-	// allHitsBuffer가 0이면 교차가 없으므로 움직일 수 있다.
-	if ( allHitsBuffer != 0 )
+	// If there is collision between ray and face
+	if ( hit )
 	{
-		// allHitsBuffer로부터 교차 정보를 가져온다.
-		D3DXINTERSECTINFO* intersectInfo = static_cast<D3DXINTERSECTINFO*>( allHitsBuffer->GetBufferPointer() );
-
-		printf("Ray Testing test. (FaceIndex : %u, Dist : %f)\n", intersectInfo->FaceIndex, intersectInfo->Dist );
+		printf("Ray Testing test. (FaceIndex : %u, Dist : %f)\n", hitFaceIndex, hitDist );
 
 		// 타일 1.5칸 이내에서 교차하면 그 방향으로 움직이지 않는다.
-		if ( intersectInfo->Dist <= (float) 1.5 * TileManager::s_tileSize )
+		if ( hitDist <= (float) 1.5 * TileManager::s_tileSize )
 			m_bMovable = false;
 		else
 			m_bMovable = true;
 	}
 	else
 		m_bMovable = true;
-
-	SAFE_RELEASE( allHitsBuffer );
 
 	return hr;
 }

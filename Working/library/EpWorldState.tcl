@@ -22,11 +22,11 @@ namespace eval EpWorldState {
 		variable pNPCUnit1
 		variable pWorld
 		
-		set pHeroUnit				[EpCreateCharacter 13 13 1];
-		set pEnemyUnit1				[EpCreateCharacter 23 23 0];
-		set pEnemyUnit2				[EpCreateCharacter  3  3 0];
-		set pEnemyUnit3				[EpCreateCharacter 18 -1 0];
-		set pNPCUnit1				[EpCreateCharacter 18  9 0];
+		set pHeroUnit				[EpCreateCharacter 30 14 1];
+		set pEnemyUnit1				[EpCreateCharacter 40 14 0];
+		set pEnemyUnit2				[EpCreateCharacter 45 14 0];
+		set pEnemyUnit3				[EpCreateCharacter 30 22 0];
+		set pNPCUnit1				[EpCreateCharacter 34 19 0];
 		set curUnitCount			[EpRegisterToWorld $pWorld $pHeroUnit];
 		set curUnitCount			[EpRegisterToWorld $pWorld $pEnemyUnit1];
 		set curUnitCount			[EpRegisterToWorld $pWorld $pEnemyUnit2];

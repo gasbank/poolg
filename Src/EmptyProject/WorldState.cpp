@@ -152,53 +152,45 @@ HRESULT WorldState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, floa
 	// Perspective Rendering Phase
 
 	pd3dDevice->SetLight(0, &light);
-
-	pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 	pd3dDevice->SetRenderState( D3DRS_LIGHTING, TRUE );
 
 	pd3dDevice->SetTransform(D3DTS_VIEW, camera.GetViewMatrix());
 	pd3dDevice->SetTransform(D3DTS_PROJECTION, camera.GetProjMatrix());
 
 
-	D3DXMATRIX transform;
-	
-
-	UnitSet::iterator it = m_unitSet.begin();
-	for ( ; it != m_unitSet.end(); ++it )
-	{
-		(*it)->frameRender();
-
-		if ( (*it)->isControllable() )
-		{
-			D3DXMatrixTranslation( &transform, (*it)->getPos().x, (*it)->getPos().y, (*it)->getPos().z );
-
-			pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CW);
-			pd3dDevice->SetFVF(ArnVertex::FVF);
-			GetG().m_videoMan.renderMeshesOnly(m_sgRat->getSceneRoot(), transform);
-			m_sgRat->getSceneRoot()->update(fTime, fElapsedTime);
-		}
-	}
-
-	D3DXMatrixIdentity(&transform);
-	pd3dDevice->SetTransform(D3DTS_WORLD, &transform);
-
+	//////////////////////////////////////////////////////////////////////////
+	// Aran lib rendering routine (CW)
 	pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CW);
 	pd3dDevice->SetFVF(ArnVertex::FVF);
+	D3DXMATRIX transform;
+	D3DXMatrixTranslation( &transform, m_heroUnit->getPos().x, m_heroUnit->getPos().y, m_heroUnit->getPos().z );
+	GetG().m_videoMan.renderMeshesOnly(m_sgRat->getSceneRoot(), transform);
 	GetG().m_videoMan.renderMeshesOnly(m_sg->getSceneRoot());
-	m_sg->getSceneRoot()->update(fTime, fElapsedTime);
+	
+
+
+	//////////////////////////////////////////////////////////////////////////
+	// EP rendering routine (CCW)
 
 	pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 	WorldStateManager& wsm = WorldStateManager::getSingleton();
 	wsm.getCurState()->frameRender(pd3dDevice, fTime, fElapsedTime);
 	
+
+	pd3dDevice->SetTransform(D3DTS_VIEW, camera.GetViewMatrix());
+	pd3dDevice->SetTransform(D3DTS_PROJECTION, camera.GetProjMatrix());
+
+	UnitSet::iterator it = m_unitSet.begin();
+	for ( ; it != m_unitSet.end(); ++it )
+	{
+		(*it)->frameRender();
+	}
 	
 	DialogList::iterator itDialog = m_scriptedDialog.begin();
 	for ( ; itDialog != m_scriptedDialog.end(); ++itDialog )
 	{
 		(*itDialog)->frameRender(pd3dDevice, fTime, fElapsedTime);
 	}
-	
-
 	return S_OK;
 }
 
@@ -253,6 +245,9 @@ HRESULT WorldState::frameMove(double fTime, float fElapsedTime)
 				handleCollision( m_heroUnit, (*it) );
 			}
 	}
+
+	m_sg->getSceneRoot()->update(fTime, fElapsedTime);
+	m_sgRat->getSceneRoot()->update(fTime, fElapsedTime);
 	
 	return S_OK;
 }

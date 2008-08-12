@@ -236,12 +236,6 @@ void CALLBACK OnD3D9FrameRender( IDirect3DDevice9* pd3dDevice, double fTime, flo
     {
 		GetTopStateManager().getCurState()->frameRender(pd3dDevice, fTime, fElapsedTime);
 
-		D3DXVECTOR3 eye( 0, 0, -30.0f );
-		D3DXVECTOR3 lookAt( 0, 0, 0 );
-		GetG().m_camera.SetViewParams( &eye, &lookAt );
-
-		//pd3dDevice->SetTransform( D3DTS_VIEW, GetG().m_camera.GetViewMatrix() );
-		//pd3dDevice->SetTransform( D3DTS_PROJECTION, GetG().m_camera.GetProjMatrix() );
 
 		D3DXMATRIX mWorld;
 		D3DXMatrixIdentity( &mWorld );

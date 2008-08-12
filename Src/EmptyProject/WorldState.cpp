@@ -66,6 +66,7 @@ HRESULT WorldState::enter()
 	
 	D3DXINTERSECTINFO* intersectInfo = static_cast<D3DXINTERSECTINFO*>( allHitsBuffer->GetBufferPointer() );
 	UNREFERENCED_PARAMETER( intersectInfo );
+	printf("Ray Testing test. (FaceIndex : %ui, Dist : %f)\n", intersectInfo->FaceIndex, intersectInfo->Dist );
 	//////////////////////////////////////////////////////////////////////////
 	
 	
@@ -211,18 +212,17 @@ HRESULT WorldState::frameMove(double fTime, float fElapsedTime)
 	EpCamera& camera = GetG().m_camera;
 	D3DLIGHT9& light = GetG().m_light;
 
-	double fStateTime = getStateTime(fTime);
-
-	fStateTime -= 1.5f;
-
 	// Fade in at starting.
-	if ( 0.0f < fStateTime && fStateTime < 2.0f )
-	{
-		D3DCOLORVALUE cv = { (float)fStateTime / 2.0f * 0.7f, (float)fStateTime / 2.0f * 0.7f, (float)fStateTime / 2.0f * 0.7f, 1.0f };
-		light.Ambient = cv;
-		light.Diffuse = cv;
-		//light.Specular = cv;
-	}
+	static float fadeTime = 0.0f;
+
+	if ( fadeTime < 2.0f )
+		fadeTime += fElapsedTime;
+	else
+		fadeTime = 2.0f;
+
+	D3DCOLORVALUE cv = { 0.8f * fadeTime / 2.0f, 0.8f * fadeTime / 2.0f, 0.8f * fadeTime / 2.0f, 1.0f };
+	light.Ambient = cv;
+	light.Diffuse = cv;
 	
 	m_pic.frameMove(fElapsedTime);
 	m_avatar.frameMove(fElapsedTime);

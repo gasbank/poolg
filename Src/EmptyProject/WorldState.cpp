@@ -309,6 +309,8 @@ HRESULT WorldState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 			{
 				(*it)->handleMessages(hWnd, uMsg, wParam, lParam);
 			}
+			else
+				getHero()->clearKey();
 		}
 	}
 

@@ -289,6 +289,16 @@ HRESULT Character::rayTesting( UnitInput mappedKey )
 	return hr;
 }
 
+void Character::setMaxAndCurHp( int maxHp, int curHp )
+{
+	if ( maxHp < curHp || maxHp <= 0 )
+		throw std::runtime_error( "Logically incorrect value entered" );
+	if ( curHp == -1 )
+		curHp = maxHp;
+
+	m_maxHp = maxHp;
+	m_curHp = curHp;
+}
 Unit* EpCreateCharacter( int tileX, int tileY, int controllable )
 {
 	LPD3DXMESH d3dxMesh;

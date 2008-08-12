@@ -2,7 +2,7 @@
 #include "MenuState.h"
 #include "WorldStateManager.h"
 
-int loc = 0;
+int loc = 4;
 bool op_st = false;
 bool op_sa = false;
 bool op_lo = false;

@@ -42,7 +42,7 @@ public:
 
 	void startDialog( int index );
 
-	ArnSceneGraph* getArnSceneGraphPt();
+	ArnSceneGraph* getArnSceneGraphPt() { return m_sg; }
 
 private:
 	void setupLight();

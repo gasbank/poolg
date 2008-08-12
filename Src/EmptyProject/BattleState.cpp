@@ -122,6 +122,11 @@ HRESULT BattleState::enter()
 	assert( m_ws );
 	getHero()->clearKey();
 
+	GetAudioState().bBGMFade = true;
+	GetAudioState().bMusicFade = false;
+	GetAudioState().pEngine->Stop( GetAudioState().iMusicCategory, 0 );
+	GetAudioState().pSoundBank->Play( GetAudioState().iBattle, 0, 0, NULL );
+
 	EpCamera& camera = G::getSingleton().m_camera;
 
 	// 카메라 워킹을 위해 스테이트 시작 시 카메라 상태를 저장해 둔다.

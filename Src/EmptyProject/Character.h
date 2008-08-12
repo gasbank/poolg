@@ -47,6 +47,7 @@ private:
 	AttackObjectList m_attackObjectList;
 
 	bool					m_bMoving;
+	bool					m_bMovable;
 	bool					m_bTalkable;
 	float					m_fMovingTime;
 	int						m_maxHp;

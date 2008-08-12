@@ -471,11 +471,6 @@ void WorldState::handleCollision( Unit* heroUnit, Unit* enemyUnit )
 	{
 		if ( GetWorldStateManager().curStateEnum() == GAME_WORLD_STATE_FIELD )
 			GetWorldStateManager().setNextState( GAME_WORLD_STATE_BATTLE );
-
-		GetAudioState().bBGMFade = true;
-		GetAudioState().bMusicFade = false;
-		GetAudioState().pEngine->Stop( GetAudioState().iMusicCategory, 0 );
-		GetAudioState().pSoundBank->Play( GetAudioState().iBattle, 0, 0, NULL );
 	}
 }
 

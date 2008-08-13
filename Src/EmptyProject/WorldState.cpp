@@ -19,7 +19,7 @@ WorldState::WorldState(void)
 	m_heroUnit				= 0;
 	m_curEnemyUnit			= 0;
 	m_alphaShader			= 0;
-	m_redScreenAlphaAngle	= 180.0f;
+	m_screenFlashAlphaAngle	= 180.0f;
 
 	char command[128];
 	StringCchPrintfA(command, 128, "EpWorldState::init 0x%p", this);
@@ -284,26 +284,20 @@ HRESULT WorldState::frameMove(double fTime, float fElapsedTime)
 
 
 	// Change alpha for duration m_redFadeDurationSec
-	if ( m_redScreenAlphaAngle < 90.0f  )
-		m_redScreenAlphaAngle += fElapsedTime * 180.0f / m_redFadeDurationSec * 2.0f;
-	else if ( m_redScreenAlphaAngle < 180.0f  )
-		m_redScreenAlphaAngle += fElapsedTime * 180.0f / m_redFadeDurationSec / 4.0f;
+	if ( m_screenFlashAlphaAngle < 90.0f  )
+		m_screenFlashAlphaAngle += fElapsedTime * 180.0f / m_screenFlashDurationSec * 2.0f;
+	else if ( m_screenFlashAlphaAngle < 180.0f  )
+		m_screenFlashAlphaAngle += fElapsedTime * 180.0f / m_screenFlashDurationSec / 4.0f;
 	else
-		m_redScreenAlphaAngle = 180.0f;
-
-
-	//// Change alpha for duration m_redFadeDurationSec
-	//if ( m_redScreenAlphaAngle < 180.0f  )
-	//{
-	//	m_redScreenAlphaAngle += fElapsedTime * 180.0f / m_redFadeDurationSec / 4.0f;
-	//}
-	//else
-	//	m_redScreenAlphaAngle = 180.0f;
+		m_screenFlashAlphaAngle = 180.0f;
 
 	V( m_alphaShader->getConstantTable()->SetFloat( 
 		DXUTGetD3D9Device(), 
 		"alpha", 
-		abs( sin( D3DXToRadian( m_redScreenAlphaAngle ) ) / 2 ) ) );
+		abs( sin( D3DXToRadian( m_screenFlashAlphaAngle ) ) / 2 ) ) );
+	V( m_alphaShader->getConstantTable()->SetFloat( DXUTGetD3D9Device(), "diffuseR", m_screenFlashCV.r ) );
+	V( m_alphaShader->getConstantTable()->SetFloat( DXUTGetD3D9Device(), "diffuseG", m_screenFlashCV.g ) );
+	V( m_alphaShader->getConstantTable()->SetFloat( DXUTGetD3D9Device(), "diffuseB", m_screenFlashCV.b ) );
 	
 	return S_OK;
 }
@@ -374,9 +368,6 @@ HRESULT WorldState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 
 	if (uMsg == WM_KEYDOWN)
 	{
-		if ( wParam == 'R' )
-			redScreenFading( 0.5f );
-
 		if (wParam == VK_F4)
 		{
 
@@ -613,4 +604,15 @@ void WorldState::detectBattleEvent()
 			}
 		}	
 	}
+}
+
+void WorldState::screenFlashing( float durationSec, float r, float g, float b )
+{
+	m_screenFlashDurationSec = durationSec;
+	m_screenFlashCV.r = r;
+	m_screenFlashCV.g = g;
+	m_screenFlashCV.b = b;
+
+	// 이 값에 0.0도를 주면 알아서 180도까지 올라가고 멈추게 된다.
+	m_screenFlashAlphaAngle = 0.0f;
 }

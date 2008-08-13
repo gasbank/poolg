@@ -51,8 +51,7 @@ private:
 	void detectBattleEvent();
 	void handleCollision( Unit* heroUnit, Unit* opponentUnit );
 	bool isInFightArea( Character* heroPt, Character* enemyPt );
-	void redScreenFading ( float durationSec ) { 
-		m_redFadeDurationSec = durationSec; m_redScreenAlphaAngle = 0.0f; }
+	void screenFlashing( float durationSec, float r, float g, float b );
 
 	ArnFileData*					m_afd;
 	ArnSceneGraph*					m_sg;
@@ -78,6 +77,7 @@ private:
 	AlphaShader*					m_alphaShader;
 	LPD3DXMESH						m_testPolygon;
 	LPD3DXMESH						m_testPolygonCloned;
-	float							m_redScreenAlphaAngle;
-	float							m_redFadeDurationSec;
+	float							m_screenFlashAlphaAngle;
+	float							m_screenFlashDurationSec;
+	D3DXCOLOR						m_screenFlashCV;
 };

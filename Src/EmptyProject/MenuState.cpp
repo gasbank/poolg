@@ -17,6 +17,10 @@ void MenuState::select(int move)
 {
 	if ( loc == 0)
 	{
+		if ( move == 8 )
+		{
+			loc += 4;
+		}
 		if ( move == 9 )
 		{
 			loc += 1;
@@ -38,6 +42,10 @@ void MenuState::select(int move)
 		if ( move == 8 )
 		{
 			loc -= 1;
+		}
+		if ( move == 9 )
+		{
+			loc -= 4;
 		}
 	}
 	

@@ -6,7 +6,8 @@
 #include "TopStateManager.h"
 #include "WorldStateManager.h"
 
-int loc = 0;
+int loc;
+int slb;
 
 float curHp = 0;
 float maxHp = 0;
@@ -43,7 +44,7 @@ void MenuState::select(int move)
 		}
 		else if (move == 8)
 		{
-			loc -= 1;
+				loc -= 1;
 		}
 		if (move == 9)
 		{
@@ -61,7 +62,6 @@ void MenuState::select(int move)
 			loc -= 4;
 		}
 	}
-	
 
 	if ( loc == 0 )
 	{
@@ -86,7 +86,6 @@ void MenuState::select(int move)
 			else op_sa = false;
 		}
 	}
-
 	if ( loc == 2 )
 	{
 		if ( move == 0 )
@@ -100,9 +99,50 @@ void MenuState::select(int move)
 	}
 
 	if ( loc ==4 )
+	{
 		if ( move == 0 )
 			SendMessage( DXUTGetHWND(), WM_CLOSE, 0, 0 );
+	}
 }
+
+void MenuState::saveloadselect(int select)
+{
+	
+	if ( slb == 0 )
+	{
+		if ( select == 8 )
+		{
+			slb += 3;
+		}
+		else if ( select == 9 )
+		{
+			slb += 1;
+		}
+	}
+	else if ( slb == 1 || slb ==2 )
+	{
+		if ( select == 8 )
+		{
+			slb -= 1;
+		}
+		else if ( select == 9 )
+		{
+			slb += 1;
+		}
+	}
+	else if ( slb == 3 )
+	{
+		if ( select == 8 )
+		{
+			slb -= 1;
+		}
+		else if ( select == 9 )
+		{
+			slb -= 3;
+		}
+	}
+}
+
 
 
 
@@ -133,6 +173,11 @@ HRESULT MenuState::frameMove(double fTime, float fElapsedTime)
 	m_hpbg.frameMove(fElapsedTime);
 	m_mpbg.frameMove(fElapsedTime);
 	m_expbg.frameMove(fElapsedTime);
+
+	m_slb0.frameMove(fElapsedTime);
+	m_slb1.frameMove(fElapsedTime);
+	m_slb2.frameMove(fElapsedTime);
+	m_slb3.frameMove(fElapsedTime);
 	
 	//m_selc.setPos(m_selc.getPos()->x, pos, m_selc.getPos()->z);
 
@@ -202,10 +247,40 @@ HRESULT MenuState::frameRender(IDirect3DDevice9* pd3dDevice,  double fTime, floa
 	if ( op_sa == true )
 	{
 		m_sawin.draw();
+		switch ( slb )
+		{
+		case 0:
+			m_slb0.draw();
+			break;
+		case 1:
+			m_slb1.draw();
+			break;
+		case 2:
+			m_slb2.draw();
+			break;
+		case 3:
+			m_slb3.draw();
+			break;
+		}
 	}
 	if ( op_lo == true )
 	{
 		m_lowin.draw();
+		switch ( slb )
+		{
+		case 0:
+			m_slb0.draw();
+			break;
+		case 1:
+			m_slb1.draw();
+			break;
+		case 2:
+			m_slb2.draw();
+			break;
+		case 3:
+			m_slb3.draw();
+			break;
+		}
 	}
 	
 	m_pDev->SetRenderState(D3DRS_ZENABLE, TRUE);
@@ -223,10 +298,14 @@ HRESULT MenuState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 			case VK_UP:
 				if ( !op_st && !op_sa && !op_lo )
 					select( 8 );
+				else if ( op_sa || op_lo )
+					saveloadselect( 8 );
 				break;
 			case VK_DOWN:
 				if ( !op_st && !op_sa && !op_lo )
 					select( 9 );
+				else if ( op_sa || op_lo )
+					saveloadselect( 9 );
 				break;
 			case VK_RETURN:
 				select( 0 );
@@ -269,6 +348,11 @@ HRESULT MenuState::release()
 	m_hpbg.release();
 	m_mpbg.release();
 	m_expbg.release();
+
+	m_slb0.release();
+	m_slb1.release();
+	m_slb2.release();
+	m_slb3.release();
 
 	SAFE_RELEASE( m_lblHYnamL );
 	SAFE_RELEASE( m_lblREB);
@@ -370,6 +454,22 @@ MenuState::MenuState()
 	m_expbg.init(L"Images/BattleUI/EXPbg.jpg", m_pDev);
 	m_expbg.setPos ( (0 - scrWidth / 2) + 163, (0 - scrHeight / 2) + 119, 2.5f);
 	m_expbg.setSize(220, 22);
+
+	m_slb0.init(L"Images/save_load_selected.png", m_pDev);
+	m_slb0.setPos ( -342, 86, 2.5f);
+	m_slb0.setSize(684, 112);
+
+	m_slb1.init(L"Images/save_load_selected.png", m_pDev);
+	m_slb1.setPos ( -342, 86 - 122, 2.5f);
+	m_slb1.setSize(684, 112);
+
+	m_slb2.init(L"Images/save_load_selected.png", m_pDev);
+	m_slb2.setPos ( -342, 86 - 244, 2.5f);
+	m_slb2.setSize(684, 112);
+
+	m_slb3.init(L"Images/save_load_selected.png", m_pDev);
+	m_slb3.setPos ( -342, 86 - 366, 2.5f);
+	m_slb3.setSize(684, 112);
 	
 
 
@@ -395,6 +495,10 @@ HRESULT MenuState::enter()
 
 		m_hpbar.setSize(220 * (curHp / maxHp), 22);
 	}
+
+	loc = 0;
+	slb = 0;
+
 	return S_OK;
 }
 

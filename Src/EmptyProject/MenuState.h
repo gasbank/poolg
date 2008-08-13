@@ -13,6 +13,7 @@ public:
 	virtual HRESULT handleMessages (HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	virtual HRESULT release ();
 	void select(int move);
+	void saveloadselect(int select);
 
 	virtual HRESULT enter();
 	virtual HRESULT leave();
@@ -49,4 +50,9 @@ private:
 	Picture m_hpbg;
 	Picture m_mpbg;
 	Picture m_expbg;
+
+	Picture m_slb0;
+	Picture m_slb1;
+	Picture m_slb2;
+	Picture m_slb3;
 };

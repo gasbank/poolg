@@ -4,6 +4,7 @@
 #include "Character.h"
 #include "WorldState.h"
 #include "TopStateManager.h"
+#include "WorldStateManager.h"
 
 int loc = 0;
 
@@ -17,18 +18,30 @@ void MenuState::select(int move)
 {
 	if ( loc == 0)
 	{
+		if(GetWorldStateManager().prevStateEnum() == GAME_WORLD_STATE_BATTLE)
+		{
+			if ( move == 9 )
+			{
+				loc += 2;
+			}
+		}
+		else if ( move == 9 )
+		{
+			loc += 1;
+		}
 		if ( move == 8 )
 		{
 			loc += 4;
 		}
-		if ( move == 9 )
-		{
-			loc += 1;
-		}
 	}
 	else if ( loc == 1 || loc == 2 || loc == 3 )
 	{
-		if (move == 8)
+		if(GetWorldStateManager().prevStateEnum() == GAME_WORLD_STATE_BATTLE && loc == 2)
+		{
+			if( move == 8 )
+				loc -= 2;
+		}
+		else if (move == 8)
 		{
 			loc -= 1;
 		}
@@ -97,7 +110,7 @@ HRESULT MenuState::frameMove(double fTime, float fElapsedTime)
 {
 	m_menu.frameMove(fElapsedTime);
 
-	//m_sanub.frameMove(fElapsedTime);
+	m_sanub.frameMove(fElapsedTime);
 
 	m_stub.frameMove(fElapsedTime);
 	m_saub.frameMove(fElapsedTime);
@@ -150,9 +163,9 @@ HRESULT MenuState::frameRender(IDirect3DDevice9* pd3dDevice,  double fTime, floa
 	m_menu.draw();
 	
 	m_stub.draw();
-	//if ( m_nextState == m_states[1] )
-		m_saub.draw();
-	//else m_saub.draw();
+	if(GetWorldStateManager().prevStateEnum() == GAME_WORLD_STATE_BATTLE)
+		m_sanub.draw();
+	else m_saub.draw();
 	m_loub.draw();
 	m_seub.draw();
 	m_exub.draw();
@@ -163,8 +176,7 @@ HRESULT MenuState::frameRender(IDirect3DDevice9* pd3dDevice,  double fTime, floa
 		m_stdb.draw();
 		break;
 	case 1 :
-		//if ( m_nextState != m_states[1] )
-			m_sadb.draw();
+		m_sadb.draw();
 		break;
 	case 2 :
 		m_lodb.draw();
@@ -234,7 +246,7 @@ HRESULT MenuState::release()
 {
 	m_menu.release();
 
-	//m_sanub.release();
+	m_sanub.release();
 
 	m_stub.release();
 	m_saub.release();

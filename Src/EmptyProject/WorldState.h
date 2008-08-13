@@ -47,7 +47,7 @@ public:
 
 private:
 	void setupLight();
-	void handleCollision( Unit* heroUnit, Unit* enemyUnit );
+	void handleCollision( Unit* heroUnit, Unit* opponentUnit );
 
 	ArnFileData*					m_afd;
 	ArnSceneGraph*					m_sg;

@@ -466,14 +466,15 @@ void WorldState::startDialog( int index )
 	}
 }
 
-void WorldState::handleCollision( Unit* heroUnit, Unit* enemyUnit )
+void WorldState::handleCollision( Unit* heroUnit, Unit* opponentUnit )
 {
-	m_curEnemyUnit = dynamic_cast<Character*>( enemyUnit );
-	/*单固瘤甫 贸府*/
-	m_curEnemyUnit->setAttack (30);
-	
-	if ( !m_curEnemyUnit->isTalkable() )
+	if ( !dynamic_cast<Character*>(opponentUnit)->isTalkable() )
 	{
+
+		m_curEnemyUnit = dynamic_cast<Character*>( opponentUnit );
+		/*单固瘤甫 贸府*/
+		m_curEnemyUnit->setAttack (30);
+
 		if ( GetWorldStateManager().curStateEnum() == GAME_WORLD_STATE_FIELD )
 			GetWorldStateManager().setNextState( GAME_WORLD_STATE_BATTLE );
 	}

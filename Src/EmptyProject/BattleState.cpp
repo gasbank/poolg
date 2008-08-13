@@ -291,7 +291,9 @@ HRESULT BattleState::frameMove(double fTime, float fElapsedTime)
 	vDesEye.x += vHeroPos.x;
 	vDesEye.y += vHeroPos.y;
 
-	if ( 0.0f < fStateTime && fStateTime < 1.0f && GetWorldStateManager().prevStateEnum() == GAME_WORLD_STATE_FIELD)
+	float camDuration = 1.0f;
+
+	if ( 0.0f < fStateTime && fStateTime < camDuration && GetWorldStateManager().prevStateEnum() == GAME_WORLD_STATE_FIELD)
 	{
 		// 현재 카메라 상태 저장을 위한 변수.
 		D3DXVECTOR3 vCurEye;
@@ -306,11 +308,17 @@ HRESULT BattleState::frameMove(double fTime, float fElapsedTime)
 
 		// 현재 카메라 상태를 계산한다.
 		//D3DXVec3CatmullRom( &vCurEye, &vEye0, &vEye1, &vEye2, &vEye3, (FLOAT)fStateTime );
-		D3DXVec3Lerp( &vCurEye, &m_vPrevEye, &vDesEye, (float)fStateTime );
-		D3DXVec3Lerp( &vCurUp, &m_vPrevUp, &vDesUp, (float)fStateTime );
-		D3DXVec3Lerp( &vCurLookAt, &m_vPrevLookAt, &vDesLookAt, (float)fStateTime);
+		D3DXVec3Lerp( &vCurEye, &m_vPrevEye, &vDesEye, (float)fStateTime / camDuration );
+		D3DXVec3Lerp( &vCurUp, &m_vPrevUp, &vDesUp, (float)fStateTime / camDuration );
+		D3DXVec3Lerp( &vCurLookAt, &m_vPrevLookAt, &vDesLookAt, (float)fStateTime / camDuration );
+
+		D3DXVec3Normalize( &vCurUp, &vCurUp );
 
 		camera.SetViewParamsWithUp( &vCurEye, &vCurLookAt, vCurUp );
+	}
+	else
+	{
+		camera.SetViewParamsWithUp( &vDesEye, &vDesLookAt, vDesUp );
 	}
 
 	// 적의 체력이 0 이하면 FieldState로 돌아간다.

@@ -68,6 +68,7 @@ bool Character::frameMove( float fElapsedTime )
 		{
 			if( IsKeyDown( m_aKeys[ (UnitInput)i ] ) )
 			{
+				m_bMovable = true;
 				rayTesting( (UnitInput)i );
 				boundaryTesting( (UnitInput)i );
 
@@ -305,11 +306,7 @@ HRESULT Character::rayTesting( UnitInput mappedKey )
 		// 타일 1.5칸 이내에서 교차하면 그 방향으로 움직이지 않는다.
 		if ( hitDist <= (float) 1.5 * TileManager::s_tileSize )
 			m_bMovable = false;
-		else
-			m_bMovable = true;
 	}
-	else
-		m_bMovable = true;
 
 	return hr;
 }
@@ -378,26 +375,18 @@ void Character::boundaryTesting( UnitInput mappedKey )
 	case UNIT_MOVE_UP:
 		if ( m_boundaryTileRect.top == getTilePosY() )
 			m_bMovable = false;
-		else
-			m_bMovable = true;
 		break;
 	case UNIT_MOVE_DOWN:
 		if ( m_boundaryTileRect.bottom == getTilePosY() )
 			m_bMovable = false;
-		else
-			m_bMovable = true;
 		break;
 	case UNIT_MOVE_LEFT:
 		if ( m_boundaryTileRect.left == getTilePosX() )
 			m_bMovable = false;
-		else
-			m_bMovable = true;
 		break;
 	case UNIT_MOVE_RIGHT:
 		if ( m_boundaryTileRect.right == getTilePosX() )
 			m_bMovable = false;
-		else
-			m_bMovable = true;
 		break;
 	}
 }

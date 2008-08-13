@@ -10,6 +10,7 @@
 #include "VideoMan.h"
 #include "Character.h"
 #include "Dialog.h"
+#include "ShaderWrapper.h"
 
 typedef std::set<Unit*> UnitSet;
 typedef std::list<Dialog*> DialogList;
@@ -50,6 +51,8 @@ private:
 	void detectBattleEvent();
 	void handleCollision( Unit* heroUnit, Unit* opponentUnit );
 	bool isInFightArea( Character* heroPt, Character* enemyPt );
+	void redScreenFading ( float durationSec ) { 
+		m_redFadeDurationSec = durationSec; m_redScreenAlphaAngle = 0.0f; }
 
 	ArnFileData*					m_afd;
 	ArnSceneGraph*					m_sg;
@@ -71,4 +74,10 @@ private:
 	Character*						m_curEnemyUnit;
 	
 	UnitSet							m_unitSet;
+
+	AlphaShader*					m_alphaShader;
+	LPD3DXMESH						m_testPolygon;
+	LPD3DXMESH						m_testPolygonCloned;
+	float							m_redScreenAlphaAngle;
+	float							m_redFadeDurationSec;
 };

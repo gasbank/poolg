@@ -25,7 +25,7 @@ TopStateManager*				g_tsm					= 0;
 WorldStateManager*				g_wsm					= 0;
 ScriptManager*					g_scriptManager			= 0;		// Set to zero is 'CRUCIAL!'
 BombShader*						g_bombShader			= 0;
-AlphaShader*					g_alphaShader			= 0;
+//AlphaShader*					g_alphaShader			= 0;
 
 LPD3DXFONT						g_pFont					= 0;
 LPD3DXEFFECT		            g_pEffect				= 0;
@@ -33,8 +33,8 @@ D3DXHANDLE						g_tech					= 0;
 LPD3DXLINE						g_line					= 0;
 
 LPD3DXMESH						g_testTeapot			= 0;
-LPD3DXMESH						g_testPolygon			= 0;
-LPD3DXMESH						g_testPolygonCloned		= 0;
+//LPD3DXMESH						g_testPolygon			= 0;
+//LPD3DXMESH						g_testPolygonCloned		= 0;
 
 D3DCOLOR						g_fillColor;
 
@@ -135,14 +135,14 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 	g_bombShader->initEffect( pd3dDevice, L"Shaders/HLSL/vbomb.fx" );
 	g_bombShader->initMainTechnique();
 
-	g_alphaShader = new AlphaShader();
-	g_alphaShader->initShader( pd3dDevice, L"Shaders/Alpha.vsh" );
-	g_alphaShader->compileShader( "Alpha", "vs_2_0" );
+	//g_alphaShader = new AlphaShader();
+	//g_alphaShader->initShader( pd3dDevice, L"Shaders/Alpha.vsh" );
+	//g_alphaShader->compileShader( "Alpha", "vs_2_0" );
 
 	D3DXCreateTeapot( pd3dDevice, &g_testTeapot, 0 );
-	D3DXCreatePolygon( pd3dDevice, 0.1f, 32, &g_testPolygon, 0 );
+	//D3DXCreatePolygon( pd3dDevice, 0.1f, 32, &g_testPolygon, 0 );
 
-	g_testPolygon->CloneMesh( 0, g_alphaShader->getDecl(), pd3dDevice, &g_testPolygonCloned );
+	//g_testPolygon->CloneMesh( 0, g_alphaShader->getDecl(), pd3dDevice, &g_testPolygonCloned );
 
 	D3DXCreateLine( pd3dDevice, &g_line );
 	g_line->SetAntialias( TRUE );
@@ -199,7 +199,7 @@ HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFA
 	g_fillColor = D3DCOLOR_ARGB( 0, 0, 0, 0 );
 
 	g_bombShader->onResetDevice();
-	g_alphaShader->onResetDevice();
+	//g_alphaShader->onResetDevice();
 	g_line->OnResetDevice();
 
     return S_OK;
@@ -212,7 +212,8 @@ HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFA
 void CALLBACK OnFrameMove( double fTime, float fElapsedTime, void* pUserContext )
 {
 	HRESULT hr;
-
+	
+	UNREFERENCED_PARAMETER( hr );
 
 	//////////////////////////////////////////////////////////////////////////
 
@@ -227,8 +228,8 @@ void CALLBACK OnFrameMove( double fTime, float fElapsedTime, void* pUserContext 
 	D3DXMATRIXA16 mWorldViewProj;
 	D3DXMatrixIdentity( &mWorldViewProj );
 	//mWorldViewProj = *GetG().m_camera.GetViewMatrix() * *GetG().m_camera.GetProjMatrix();
-	V( g_alphaShader->getConstantTable()->SetMatrix( DXUTGetD3D9Device(), "mWorldViewProj", &mWorldViewProj ) );
-	V( g_alphaShader->getConstantTable()->SetFloat( DXUTGetD3D9Device(), "fTime", (float)fTime ) );
+	//V( g_alphaShader->getConstantTable()->SetMatrix( DXUTGetD3D9Device(), "mWorldViewProj", &mWorldViewProj ) );
+	//V( g_alphaShader->getConstantTable()->SetFloat( DXUTGetD3D9Device(), "fTime", (float)fTime ) );
 
 }
 
@@ -293,16 +294,17 @@ void renderFixedElements(IDirect3DDevice9* pd3dDevice, double fTime, float fElap
 HRESULT drawAlphaAnimatedPlane( double fTime, float fElapsedTime )
 {
 	HRESULT hr = S_OK;
-	GetG().m_dev->SetRenderState( D3DRS_LIGHTING, FALSE );
-	GetG().m_dev->SetRenderState( D3DRS_CULLMODE, D3DCULL_NONE );
-	GetG().m_dev->SetTexture( 0, 0 );
-	V_RETURN( GetG().m_dev->SetVertexShader( g_alphaShader->getVertexShader() ) );
-	D3DPERF_BeginEvent( 0, L"Draw Alpha Animated" );
-	V_RETURN( g_testPolygonCloned->DrawSubset( 0 ) );
-	D3DPERF_EndEvent();
-	V_RETURN( GetG().m_dev->SetVertexShader( 0 ) );
+	//GetG().m_dev->SetRenderState( D3DRS_LIGHTING, FALSE );
+	//GetG().m_dev->SetRenderState( D3DRS_CULLMODE, D3DCULL_NONE );
+	//GetG().m_dev->SetTexture( 0, 0 );
+	////V_RETURN( GetG().m_dev->SetVertexShader( g_alphaShader->getVertexShader() ) );
+	//D3DPERF_BeginEvent( 0, L"Draw Alpha Animated" );
+	//V_RETURN( g_testPolygonCloned->DrawSubset( 0 ) );
+	//D3DPERF_EndEvent();
+	//V_RETURN( GetG().m_dev->SetVertexShader( 0 ) );
 	return hr;
 }
+
 HRESULT drawBurningTeapot( double fTime, float fElapsedTime )
 {
 	HRESULT hr = S_OK;
@@ -399,7 +401,7 @@ void CALLBACK OnD3D9FrameRender( IDirect3DDevice9* pd3dDevice, double fTime, flo
 		drawBurningTeapot( fTime, fElapsedTime );
 		GetTopStateManager().getCurState()->frameRender(pd3dDevice, fTime, fElapsedTime);
 		drawTestLines();
-		drawAlphaAnimatedPlane( fTime, fElapsedTime );
+		//drawAlphaAnimatedPlane( fTime, fElapsedTime );
 
 		//////////////////////////////////////////////////////////////////////////
         V( pd3dDevice->EndScene() );
@@ -445,14 +447,14 @@ void CALLBACK OnD3D9DestroyDevice( void* pUserContext )
 {
 	SAFE_RELEASE( g_pFont );
 	SAFE_RELEASE( g_testTeapot );
-	SAFE_RELEASE( g_testPolygon );
-	SAFE_RELEASE( g_testPolygonCloned );
+	//SAFE_RELEASE( g_testPolygon );
+	//SAFE_RELEASE( g_testPolygonCloned );
 
 	SAFE_DELETE( g_tsm );
 	SAFE_DELETE( g_wsm );
 	EP_SAFE_RELEASE( g_bombShader );
-	EP_SAFE_RELEASE( g_alphaShader );
-	EP_SAFE_RELEASE( g_alphaShader );
+	//EP_SAFE_RELEASE( g_alphaShader );
+	//EP_SAFE_RELEASE( g_alphaShader );
 
 	SAFE_RELEASE( g_line );
 

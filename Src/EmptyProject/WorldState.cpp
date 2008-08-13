@@ -5,6 +5,7 @@
 #include "ScriptManager.h"
 #include "TileManager.h"
 #include "ArnMesh.h"
+#include "ShaderWrapper.h"
 
 TileManager	tileManager;
 
@@ -17,6 +18,8 @@ WorldState::WorldState(void)
 	m_sg					= 0;
 	m_heroUnit				= 0;
 	m_curEnemyUnit			= 0;
+	m_alphaShader			= 0;
+	m_redScreenAlphaAngle	= 180.0f;
 
 	char command[128];
 	StringCchPrintfA(command, 128, "EpWorldState::init 0x%p", this);
@@ -131,12 +134,25 @@ HRESULT WorldState::enter()
 		m_scriptedDialog.push_back( Dialog::createDialogByScript( *itDialogList ) );
 		(*m_scriptedDialog.rbegin())->init();
 	}
+
+
+	/////////////////////////////////////////////////////////////////////////////////
+	// Prepare alpha shading
+
+	m_alphaShader = new AlphaShader();
+	m_alphaShader->initShader( pd3dDevice, L"Shaders/Alpha.vsh" );
+	m_alphaShader->compileShader( "Alpha", "vs_2_0" );
+
+	D3DXCreatePolygon( pd3dDevice, 10.0f, 32, &m_testPolygon, 0 );
+	m_testPolygon->CloneMesh( 0, m_alphaShader->getDecl(), pd3dDevice, &m_testPolygonCloned );
+
 	return hr;
 }
 
 HRESULT WorldState::leave()
 {
-
+	// 여긴 적절한 장소는 아닌 것 같지만..
+	m_alphaShader->onResetDevice();
 
 	GetScriptManager().execute("EpWorldState::leave");
 
@@ -147,6 +163,8 @@ HRESULT WorldState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, floa
 {		
 	EpCamera& camera = GetG().m_camera;
 	D3DLIGHT9& light = GetG().m_light;
+	
+	HRESULT hr;
 
 	//////////////////////////////////////////////////////////////////////////
 	// Perspective Rendering Phase
@@ -188,6 +206,20 @@ HRESULT WorldState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, floa
 		(*itDialog)->frameRender(pd3dDevice, fTime, fElapsedTime);
 	}
 
+
+
+	///////////////////////////////////////////////////////////////////////////
+	// Draw alpha animated plane
+
+	GetG().m_dev->SetRenderState( D3DRS_LIGHTING, FALSE );
+	GetG().m_dev->SetRenderState( D3DRS_CULLMODE, D3DCULL_NONE );
+	GetG().m_dev->SetTexture( 0, 0 );
+	V_RETURN( GetG().m_dev->SetVertexShader( m_alphaShader->getVertexShader() ) );
+	D3DPERF_BeginEvent( 0, L"Draw Alpha Animated" );
+	V_RETURN( m_testPolygonCloned->DrawSubset( 0 ) );
+	D3DPERF_EndEvent();
+	V_RETURN( GetG().m_dev->SetVertexShader( 0 ) );
+
 	WorldStateManager& wsm = WorldStateManager::getSingleton();
 	wsm.getCurState()->frameRender(pd3dDevice, fTime, fElapsedTime);
 
@@ -199,6 +231,8 @@ HRESULT WorldState::frameMove(double fTime, float fElapsedTime)
 {
 	EpCamera& camera = GetG().m_camera;
 	D3DLIGHT9& light = GetG().m_light;
+
+	HRESULT hr;
 
 	// Fade in at starting.
 	static float fadeTime = 0.0f;
@@ -240,6 +274,36 @@ HRESULT WorldState::frameMove(double fTime, float fElapsedTime)
 
 	m_sg->getSceneRoot()->update(fTime, fElapsedTime);
 	m_sgRat->getSceneRoot()->update(fTime, fElapsedTime);
+
+	// For alpha shading animation(?)..
+	D3DXMATRIXA16 mWorldViewProj;
+	D3DXMatrixIdentity( &mWorldViewProj );
+	V( m_alphaShader->getConstantTable()->SetMatrix( DXUTGetD3D9Device(), "mWorldViewProj", &mWorldViewProj ) );
+	V( m_alphaShader->getConstantTable()->SetFloat( DXUTGetD3D9Device(), "fTime", (float)fTime ) );
+
+
+
+	// Change alpha for duration m_redFadeDurationSec
+	if ( m_redScreenAlphaAngle < 90.0f  )
+		m_redScreenAlphaAngle += fElapsedTime * 180.0f / m_redFadeDurationSec * 2.0f;
+	else if ( m_redScreenAlphaAngle < 180.0f  )
+		m_redScreenAlphaAngle += fElapsedTime * 180.0f / m_redFadeDurationSec / 4.0f;
+	else
+		m_redScreenAlphaAngle = 180.0f;
+
+
+	//// Change alpha for duration m_redFadeDurationSec
+	//if ( m_redScreenAlphaAngle < 180.0f  )
+	//{
+	//	m_redScreenAlphaAngle += fElapsedTime * 180.0f / m_redFadeDurationSec / 4.0f;
+	//}
+	//else
+	//	m_redScreenAlphaAngle = 180.0f;
+
+	V( m_alphaShader->getConstantTable()->SetFloat( 
+		DXUTGetD3D9Device(), 
+		"alpha", 
+		abs( sin( D3DXToRadian( m_redScreenAlphaAngle ) ) / 2 ) ) );
 	
 	return S_OK;
 }
@@ -272,6 +336,10 @@ HRESULT WorldState::release()
 
 
 	SAFE_RELEASE(m_aTile);
+
+	SAFE_RELEASE( m_testPolygon );
+	SAFE_RELEASE( m_testPolygonCloned );
+	EP_SAFE_RELEASE( m_alphaShader );
 
 	return S_OK;
 }
@@ -306,6 +374,8 @@ HRESULT WorldState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 
 	if (uMsg == WM_KEYDOWN)
 	{
+		if ( wParam == 'R' )
+			redScreenFading( 0.5f );
 
 		if (wParam == VK_F4)
 		{

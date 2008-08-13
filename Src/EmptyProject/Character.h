@@ -40,11 +40,14 @@ public:
 
 	void setTalkable( bool talkable ) { m_bTalkable = talkable; }
 	bool isTalkable() { return m_bTalkable; }
+
+	void setRandomWalkable( bool randomWalkable ) { m_bRandomWalkable = randomWalkable; }
 protected:
 	Character();
 
 private:
 	HRESULT rayTesting( UnitInput );
+	void walkRandomly();
 
 	typedef std::list<AttackObject*> AttackObjectList;
 	AttackObjectList m_attackObjectList;
@@ -52,6 +55,7 @@ private:
 	bool					m_bMoving;
 	bool					m_bMovable;
 	bool					m_bTalkable;
+	bool					m_bRandomWalkable;
 	float					m_fMovingTime;
 	int						m_maxHp;
 	int						m_curHp;

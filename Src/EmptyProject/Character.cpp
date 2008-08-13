@@ -4,8 +4,13 @@
 #include "ScriptManager.h"
 #include "TileManager.h"
 #include "TopStateManager.h"
+#include "WorldStateManager.h"
 #include "WorldState.h"
 #include "ArnMesh.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
 
 extern TileManager tileManager;
 
@@ -64,6 +69,7 @@ bool Character::frameMove( float fElapsedTime )
 			if( IsKeyDown( m_aKeys[ (UnitInput)i ] ) )
 			{
 				rayTesting( (UnitInput)i );
+
 				if( m_bMovable )
 				{
 					if( tileManager.getTile( m_tileBufferX + g_moveAmount[ i ].x, m_tileBufferY + g_moveAmount[ i ].y )->movable
@@ -125,6 +131,13 @@ bool Character::frameMove( float fElapsedTime )
 		else
 			++it;
 	}
+
+	// 일단 조종 불가능한 적은 랜덤하게 움직인다.
+	WorldStateManager& wsm = GetWorldStateManager();
+
+
+	if ( !isControllable() && wsm.curStateEnum() == GAME_WORLD_STATE_FIELD )
+		walkRandomly();
 
 	return Unit::frameMove( fElapsedTime );
 }
@@ -193,6 +206,8 @@ Character::Character()
 	m_bTalkable			= false;
 	m_fMovingTime		= 0;
 	m_moveDuration		= 1.0f;
+	m_bRandomWalkable	= true;
+	srand ( (unsigned)time(NULL) );
 }
 
 void Character::setTilePos( int tileX, int tileY )
@@ -246,7 +261,7 @@ HRESULT Character::rayTesting( UnitInput mappedKey )
 	WorldState* ws = static_cast<WorldState*>( tsm.getCurState() );
 
 	// Ray starting position as hero position
-	D3DXVECTOR3 rayStartPos( ws->getHeroPos().x, ws->getHeroPos().y, ws->getHeroPos().z - 2.0f );
+	D3DXVECTOR3 rayStartPos( getPos().x, getPos().y, getPos().z - 2.0f );
 
 	// Direction data
 	float dirArray[4][3] = { { 0.0f, 1.0f, 0.0f }, { 0.0f, -1.0f, 0.0f }, { -1.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f } };
@@ -278,7 +293,7 @@ HRESULT Character::rayTesting( UnitInput mappedKey )
 	// If there is collision between ray and face
 	if ( hit )
 	{
-		printf("Ray Testing test. (FaceIndex : %u, Dist : %f)\n", hitFaceIndex, hitDist );
+		//printf("Ray Testing test. (FaceIndex : %u, Dist : %f)\n", hitFaceIndex, hitDist );
 
 		// 타일 1.5칸 이내에서 교차하면 그 방향으로 움직이지 않는다.
 		if ( hitDist <= (float) 1.5 * TileManager::s_tileSize )
@@ -302,6 +317,51 @@ void Character::setMaxAndCurHp( int maxHp, int curHp )
 	m_maxHp = maxHp;
 	m_curHp = curHp;
 }
+
+void Character::walkRandomly()
+{
+	// Move per minute
+	float movePerMin = 0.5;
+
+	int randomNumber = rand() % ((int)(60 / movePerMin) * 4);
+
+	// If random number is 0~3, move.
+	if ( 0 <= randomNumber && randomNumber <= 3 )
+	{
+		// Map key virtually by random number
+		UnitInput mappedKey = (UnitInput)randomNumber ;
+		if( mappedKey != UNIT_UNKNOWN )
+		{
+			if( FALSE == IsKeyDown( m_aKeys[mappedKey] ) )
+			{
+				m_aKeys[ mappedKey ] = KEY_WAS_DOWN_MASK | KEY_IS_DOWN_MASK;
+				++m_cKeysDown;
+			}
+		}
+	}
+	else
+	{
+		UINT i;
+		// Pull pushed key at 33% probablity
+		if ( (rand() % 3) )
+		{
+			for ( i = 0; i < UNIT_MAX_KEYS; i++ )
+			{
+				if( IsKeyDown( m_aKeys[ (UnitInput)i ] ) )
+				{
+					
+					UnitInput mappedKey = (UnitInput)i;
+					if( mappedKey != UNIT_UNKNOWN && ( DWORD )mappedKey < 8 )
+					{
+						m_aKeys[ mappedKey ] &= ~KEY_IS_DOWN_MASK;
+						--m_cKeysDown;
+					}
+				}
+			}
+		}
+	}
+}
+
 Unit* EpCreateCharacter( int tileX, int tileY, int controllable )
 {
 	LPD3DXMESH d3dxMesh;

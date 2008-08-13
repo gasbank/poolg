@@ -403,7 +403,7 @@ Unit* EpCreateCharacter( int tileX, int tileY, int controllable )
 {
 	LPD3DXMESH d3dxMesh;
 	D3DXCreateTeapot( GetG().m_dev, &d3dxMesh, 0 );
-	return Character::createCharacter( d3dxMesh, tileX, tileY, 0, controllable?true:false );
+	return Character::createCharacter( d3dxMesh, tileX + (TileManager::s_xSize / 2), tileY + (TileManager::s_ySize / 2), 0, controllable?true:false );
 
 } SCRIPT_CALLABLE_PV_I_I_I( EpCreateCharacter )
 

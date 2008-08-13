@@ -12,11 +12,11 @@ namespace eval EpWorldState {
 	proc enter {} {
 		EpOutputDebugString " - WorldState enter\n"
 		
-		set pHeroUnit				[createChar 32 32 1];
-		set pEnemyUnit1				[createChar 40 14 0];
-		set pEnemyUnit2				[createChar 45 14 0];
-		set pEnemyUnit3				[createChar 30 22 0];
-		set pNPCUnit1				[createChar 34 19 0];
+		set pHeroUnit				[createChar 0 0 1];
+		set pEnemyUnit1				[createChar 16 -36 0];
+		set pEnemyUnit2				[createChar 26 -36 0];
+		set pEnemyUnit3				[createChar 4 -20 0];
+		set pNPCUnit1				[createChar 4 -26 0];
 		
 		EpUnitSetRotX				$pHeroUnit [ToRadian -90]
 		EpUnitSetRotZ				$pHeroUnit [ToRadian 90]

@@ -148,6 +148,8 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 	g_line->SetAntialias( TRUE );
 	g_line->SetWidth( 0.5f );
 
+	pd3dDevice->SetRenderState( D3DRS_STENCILENABLE, TRUE );
+
 	//////////////////////////////////////////////////////////////////////////
 
 	EpCamera& g_camera = GetG().m_camera;

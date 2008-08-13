@@ -7,9 +7,9 @@ public:
 	TileManager(void);
 	~TileManager(void);
 
-	static const int s_xSize = 64;
-	static const int s_ySize = 64;
-	static const int s_tileSize = 2;	
+	static const int s_xSize = 90;
+	static const int s_ySize = 158;
+	static const int s_tileSize = 1;	
 
 	Tile* getTile( int x, int y );
 

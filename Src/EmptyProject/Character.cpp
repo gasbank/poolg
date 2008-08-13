@@ -399,6 +399,16 @@ void Character::setBoundaryRect( LONG left, LONG top, LONG right, LONG bottom )
 	m_boundaryTileRect.right = right;
 }
 
+void Character::damage( int point )
+{
+	TopStateManager& tsm = TopStateManager::getSingleton();
+	WorldState* ws = static_cast<WorldState*>( tsm.getCurState() );
+
+	ws->screenFlashing( 0.3f, 0.0f, 0.0f, 1.0f );
+
+	m_curHp -= point;
+}
+
 Unit* EpCreateCharacter( int tileX, int tileY, int controllable )
 {
 	LPD3DXMESH d3dxMesh;

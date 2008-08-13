@@ -19,7 +19,7 @@ public:
 	void setMaxAndCurHp( int maxHp, int curHp );
 	int getCurHp() const { return m_curHp; }
 	int getMaxHp() const { return m_maxHp; }
-	void damage( int point ) { m_curHp -= point; }
+	void damage( int point );
 	int getAttack() const { return m_attack; }
 	int getInt() const { return m_intelligence; }
 	bool getMoving() { return m_bMoving; }

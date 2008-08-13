@@ -45,13 +45,13 @@ public:
 	void startDialog( int index );
 	
 	ArnSceneGraph* getArnSceneGraphPt() { return m_sg; }
+	void screenFlashing( float durationSec, float r, float g, float b );
 
 private:
 	void setupLight();
 	void detectBattleEvent();
 	void handleCollision( Unit* heroUnit, Unit* opponentUnit );
 	bool isInFightArea( Character* heroPt, Character* enemyPt );
-	void screenFlashing( float durationSec, float r, float g, float b );
 
 	ArnFileData*					m_afd;
 	ArnSceneGraph*					m_sg;

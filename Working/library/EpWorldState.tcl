@@ -36,6 +36,9 @@ namespace eval EpWorldState {
 		
 		EpCharacterSetColor			$pNPCUnit1 0 255 0
 		EpCharacterSetTalkable		$pNPCUnit1 1
+
+		EpCharacterSetRandomWalkable	$pNPCUnit1 1
+		EpCharacterSetBoundary		$pNPCUnit1 33 20 35 18  # left, top, right, bottom
 	}
 	
 	proc leave {} {

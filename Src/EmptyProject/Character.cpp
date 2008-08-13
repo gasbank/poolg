@@ -69,6 +69,7 @@ bool Character::frameMove( float fElapsedTime )
 			if( IsKeyDown( m_aKeys[ (UnitInput)i ] ) )
 			{
 				rayTesting( (UnitInput)i );
+				boundaryTesting( (UnitInput)i );
 
 				if( m_bMovable )
 				{
@@ -136,7 +137,7 @@ bool Character::frameMove( float fElapsedTime )
 	WorldStateManager& wsm = GetWorldStateManager();
 
 
-	if ( !isControllable() && wsm.curStateEnum() == GAME_WORLD_STATE_FIELD )
+	if ( m_bRandomWalkable && wsm.curStateEnum() == GAME_WORLD_STATE_FIELD )
 		walkRandomly();
 
 	return Unit::frameMove( fElapsedTime );
@@ -206,7 +207,13 @@ Character::Character()
 	m_bTalkable			= false;
 	m_fMovingTime		= 0;
 	m_moveDuration		= 1.0f;
-	m_bRandomWalkable	= true;
+	m_bRandomWalkable	= false;
+	m_boundaryTileRect.top   = 999999;
+	m_boundaryTileRect.left  = -999999;
+	m_boundaryTileRect.bottom= -999999;
+	m_boundaryTileRect.right = 999999;
+
+	// Initialize random number
 	srand ( (unsigned)time(NULL) );
 }
 
@@ -326,6 +333,7 @@ void Character::walkRandomly()
 	int randomNumber = rand() % ((int)(60 / movePerMin) * 4);
 
 	// If random number is 0~3, move.
+
 	if ( 0 <= randomNumber && randomNumber <= 3 )
 	{
 		// Map key virtually by random number
@@ -342,7 +350,7 @@ void Character::walkRandomly()
 	else
 	{
 		UINT i;
-		// Pull pushed key at 33% probablity
+		// Pull virtually pushed key at 33% probability
 		if ( (rand() % 3) )
 		{
 			for ( i = 0; i < UNIT_MAX_KEYS; i++ )
@@ -360,6 +368,46 @@ void Character::walkRandomly()
 			}
 		}
 	}
+}
+
+// 지정된 사각형 경계 위에 캐릭터가 있을 때 경계 바깥으로 나가려고 하면 움직일 수 없게 한다.
+void Character::boundaryTesting( UnitInput mappedKey )
+{
+	switch ( mappedKey )
+	{
+	case UNIT_MOVE_UP:
+		if ( m_boundaryTileRect.top == getTilePosY() )
+			m_bMovable = false;
+		else
+			m_bMovable = true;
+		break;
+	case UNIT_MOVE_DOWN:
+		if ( m_boundaryTileRect.bottom == getTilePosY() )
+			m_bMovable = false;
+		else
+			m_bMovable = true;
+		break;
+	case UNIT_MOVE_LEFT:
+		if ( m_boundaryTileRect.left == getTilePosX() )
+			m_bMovable = false;
+		else
+			m_bMovable = true;
+		break;
+	case UNIT_MOVE_RIGHT:
+		if ( m_boundaryTileRect.right == getTilePosX() )
+			m_bMovable = false;
+		else
+			m_bMovable = true;
+		break;
+	}
+}
+
+void Character::setBoundaryRect( LONG left, LONG top, LONG right, LONG bottom )
+{
+	m_boundaryTileRect.top = top; 
+	m_boundaryTileRect.left = left; 
+	m_boundaryTileRect.bottom = bottom; 
+	m_boundaryTileRect.right = right;
 }
 
 Unit* EpCreateCharacter( int tileX, int tileY, int controllable )
@@ -399,10 +447,26 @@ int EpCharacterSetTalkable( void* ptr, int talkable )
 	return 0;
 } SCRIPT_CALLABLE_I_PV_I( EpCharacterSetTalkable )
 
+int EpCharacterSetRandomWalkable( void* ptr, int randomWalkable )
+{
+	Character* instance = reinterpret_cast<Character*>( ptr );
+	instance->Character::setRandomWalkable( randomWalkable?true:false );
+	return 0;
+} SCRIPT_CALLABLE_I_PV_I( EpCharacterSetRandomWalkable )
+
+int EpCharacterSetBoundary( void* ptr, int left, int top, int right, int bottom )
+{
+	Character* instance = reinterpret_cast<Character*>( ptr );
+	instance->Character::setBoundaryRect( left, top, right, bottom );
+	return 0;
+} SCRIPT_CALLABLE_I_PV_I_I_I_I( EpCharacterSetBoundary )
+
 START_SCRIPT_FACTORY(Character)
 	CREATE_OBJ_COMMAND( EpCreateCharacter )
 	CREATE_OBJ_COMMAND( EpCharacterSetMaxAndCurHp )
 	CREATE_OBJ_COMMAND( EpCharacterSetMoveDuration )
 	CREATE_OBJ_COMMAND( EpCharacterSetColor )
 	CREATE_OBJ_COMMAND( EpCharacterSetTalkable )
+	CREATE_OBJ_COMMAND( EpCharacterSetBoundary )
+	CREATE_OBJ_COMMAND( EpCharacterSetRandomWalkable )
 END_SCRIPT_FACTORY(Character)

@@ -42,11 +42,13 @@ public:
 	bool isTalkable() { return m_bTalkable; }
 
 	void setRandomWalkable( bool randomWalkable ) { m_bRandomWalkable = randomWalkable; }
+	void setBoundaryRect( LONG left, LONG top, LONG right, LONG bottom );
 protected:
 	Character();
 
 private:
 	HRESULT rayTesting( UnitInput );
+	void boundaryTesting( UnitInput );
 	void walkRandomly();
 
 	typedef std::list<AttackObject*> AttackObjectList;
@@ -66,4 +68,5 @@ private:
 	int						m_intelligence; // 힐링 등의 스킬에 영향
 	int						m_tileBufferX;
 	int						m_tileBufferY;
+	RECT					m_boundaryTileRect;
 };

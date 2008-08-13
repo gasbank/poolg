@@ -236,16 +236,7 @@ HRESULT WorldState::frameMove(double fTime, float fElapsedTime)
 	GetWorldStateManager().transit();
 	GetWorldStateManager().getCurState()->frameMove(fTime, fElapsedTime);
 
-	// Detect collision always.
-	it = m_unitSet.begin();
-	for ( ; it != m_unitSet.end(); ++it )
-	{
-		if ( (*it) != m_heroUnit )
-			if ( isCollide( &m_heroUnit->getPos(), &(*it)->getPos() ) == true )
-			{
-				handleCollision( m_heroUnit, (*it) );
-			}
-	}
+	detectBattleEvent();
 
 	m_sg->getSceneRoot()->update(fTime, fElapsedTime);
 	m_sgRat->getSceneRoot()->update(fTime, fElapsedTime);
@@ -438,12 +429,36 @@ const D3DXVECTOR3& WorldState::getHeroPos()
 	return m_heroUnit->getPos();
 }
 
+bool WorldState::isInFightArea( Character* heroPt, Character* enemyPt )
+{
+	// 적의 타일 좌표가 0, 0일 때 플레이어가 들어오면 전투가 시작되는 타일 좌표 범위.
+	
+	int fightTileArea[13][2] = { 
+		{-2, 0}, 
+		{-1, 1}, {-1, 0}, {-1, -1}, 
+		{ 0, 2}, { 0, 1}, { 0,  0}, {0, -1}, {0, -2},
+		{ 1, 1}, { 1, 0}, { 1, -1},
+		{ 2, 0}
+	};
+
+
+	// 적의 전투 범위 타일 안에 주인공이 있는지 판단한다.
+	for ( int i = 0; i < 13; i++ )
+	{
+		if ( (enemyPt->getTilePosX() + fightTileArea[i][0]) == heroPt->getTilePosX()
+			&& (enemyPt->getTilePosY() + fightTileArea[i][1]) == heroPt->getTilePosY() )
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 bool WorldState::isCollide( const D3DXVECTOR3* vec0, const D3DXVECTOR3* vec1 )
 {
 	const float collideRange = 10.0f;
 	float range = sqrt( (vec0->x - vec1->x) * (vec0->x - vec1->x) + (vec0->y - vec1->y) * (vec0->y - vec1->y) );
 	if ( range <= collideRange )
-		if ( range <= collideRange )
 				return true;
 
 	return false;
@@ -468,16 +483,23 @@ void WorldState::startDialog( int index )
 
 void WorldState::handleCollision( Unit* heroUnit, Unit* opponentUnit )
 {
+	// 상대방이 대화 불가능하면 적으로 간주한다.
 	if ( !dynamic_cast<Character*>(opponentUnit)->isTalkable() )
 	{
-
-		m_curEnemyUnit = dynamic_cast<Character*>( opponentUnit );
-		/*데미지를 처리*/
-		m_curEnemyUnit->setAttack (30);
-
-		if ( GetWorldStateManager().curStateEnum() == GAME_WORLD_STATE_FIELD )
-			GetWorldStateManager().setNextState( GAME_WORLD_STATE_BATTLE );
+		m_curEnemyUnit = dynamic_cast<Character*>(opponentUnit);
 	}
+
+	// 전투는 타일 진입시 일어나는 것으로 한다.
+	// 상대방이 이야기 가능한 상대가 아니면 적으로 간주한다.
+	//if ( !dynamic_cast<Character*>(opponentUnit)->isTalkable() )
+	//{
+
+	//	m_curEnemyUnit = dynamic_cast<Character*>( opponentUnit );
+	//	m_curEnemyUnit->setAttack (30);
+
+	//	if ( GetWorldStateManager().curStateEnum() == GAME_WORLD_STATE_FIELD )
+	//		GetWorldStateManager().setNextState( GAME_WORLD_STATE_BATTLE );
+	//}
 }
 
 // 유닛의 포인터를 받아서, UnitSet에서 해당 유닛을 찾아 지운다.
@@ -492,5 +514,33 @@ void WorldState::removeUnit( Unit* pUnit )
 			m_unitSet.erase( it );
 			break;
 		}
+	}
+}
+
+void WorldState::detectBattleEvent()
+{
+	// Detect battle event.
+	// If current selected unit isn't hero unit, and isn't talkable,
+	// regard as enemy. And if hero is in the fight area of enemy, start battle.
+	UnitSet::iterator it = m_unitSet.begin();
+	for ( ; it != m_unitSet.end(); ++it )
+	{
+		if ( (*it) != m_heroUnit )
+		{
+			Character* oppCharacter = dynamic_cast<Character*>( *it );
+			if ( oppCharacter->isTalkable() == false )
+			{
+				if ( isInFightArea( m_heroUnit, oppCharacter ) == true )
+				{
+					// Set current enemy unit and enter into BattleState
+					m_curEnemyUnit = oppCharacter;
+
+					m_curEnemyUnit->setAttack (30);
+
+					if ( GetWorldStateManager().curStateEnum() == GAME_WORLD_STATE_FIELD )
+						GetWorldStateManager().setNextState( GAME_WORLD_STATE_BATTLE );
+				}
+			}
+		}	
 	}
 }

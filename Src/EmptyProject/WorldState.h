@@ -47,7 +47,9 @@ public:
 
 private:
 	void setupLight();
+	void detectBattleEvent();
 	void handleCollision( Unit* heroUnit, Unit* opponentUnit );
+	bool isInFightArea( Character* heroPt, Character* enemyPt );
 
 	ArnFileData*					m_afd;
 	ArnSceneGraph*					m_sg;

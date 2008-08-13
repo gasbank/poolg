@@ -291,6 +291,7 @@ HRESULT BattleState::frameMove(double fTime, float fElapsedTime)
 	vDesEye.x += vHeroPos.x;
 	vDesEye.y += vHeroPos.y;
 
+	// 카메라 움직이는 시간
 	float camDuration = 1.0f;
 
 	if ( 0.0f < fStateTime && fStateTime < camDuration && GetWorldStateManager().prevStateEnum() == GAME_WORLD_STATE_FIELD)
@@ -317,14 +318,7 @@ HRESULT BattleState::frameMove(double fTime, float fElapsedTime)
 		camera.SetViewParamsWithUp( &vCurEye, &vCurLookAt, vCurUp );
 	}
 	else
-	{
 		camera.SetViewParamsWithUp( &vDesEye, &vDesLookAt, vDesUp );
-	}
-
-	// 적의 체력이 0 이하면 FieldState로 돌아간다.
-
-
-
 
 	return S_OK;
 }

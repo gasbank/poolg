@@ -160,7 +160,7 @@ int EpRegisterToWorld( void* pv1, void* pv2 )
 {
 	WorldState* w = reinterpret_cast<WorldState*>(pv1);
 	Unit* u = reinterpret_cast<Unit*>(pv2);
-	return w->addUnit(u);;
+	return w->addUnit(u);
 } SCRIPT_CALLABLE_I_PV_PV( EpRegisterToWorld )
 
 

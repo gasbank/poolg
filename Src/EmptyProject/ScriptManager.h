@@ -151,7 +151,7 @@ static const DWORD _trait_D_PV			= AT_D | (AT_PV << 4);
 	{																			\
 		args[0].i = funcName(args[1].pv, args[2].i, args[3].i);					\
 	}																			\
-	SCRIPT_CALLABLE_END(funcName, PV_I_I_I)
+	SCRIPT_CALLABLE_END(funcName, I_PV_I_I)
 
 #define SCRIPT_CALLABLE_I_PV_I_I_I(funcName)									\
 	void _wrap_##funcName(ScriptArgumentList& args)								\

@@ -18,6 +18,7 @@
 #include "VideoMan.h"
 #include "WorldStateManager.h"
 #include "ShaderWrapper.h"
+#include "TileManager.h"
 
 G								g_g;
 TopStateManager*				g_tsm					= 0;
@@ -29,6 +30,7 @@ AlphaShader*					g_alphaShader			= 0;
 LPD3DXFONT						g_pFont					= 0;
 LPD3DXEFFECT		            g_pEffect				= 0;
 D3DXHANDLE						g_tech					= 0;
+LPD3DXLINE						g_line					= 0;
 
 LPD3DXMESH						g_testTeapot			= 0;
 LPD3DXMESH						g_testPolygon			= 0;
@@ -103,6 +105,9 @@ bool CALLBACK ModifyDeviceSettings( DXUTDeviceSettings* pDeviceSettings, void* p
 		}
 	}
 
+	pDeviceSettings->d3d9.pp.EnableAutoDepthStencil= TRUE;
+	pDeviceSettings->d3d9.pp.AutoDepthStencilFormat = D3DFMT_D16;
+
 	return true;
 }
 
@@ -139,6 +144,10 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 
 	g_testPolygon->CloneMesh( 0, g_alphaShader->getDecl(), pd3dDevice, &g_testPolygonCloned );
 
+	D3DXCreateLine( pd3dDevice, &g_line );
+	g_line->SetAntialias( TRUE );
+	g_line->SetWidth( 0.5f );
+
 	//////////////////////////////////////////////////////////////////////////
 
 	EpCamera& g_camera = GetG().m_camera;
@@ -161,7 +170,7 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 	D3DXMatrixLookAtLH(&GetG().g_fixedViewMat,	&eye, &at, &up);
 
 	float fAspectRatio = pBackBufferSurfaceDesc->Width / ( FLOAT )pBackBufferSurfaceDesc->Height;
-	g_camera.SetProjParams( D3DX_PI / 4, fAspectRatio, 1.0f, 1000.0f );
+	g_camera.SetProjParams( D3DX_PI / 4, fAspectRatio, 1.0f, 100000.0f );
 
 	
 	return S_OK;
@@ -188,6 +197,8 @@ HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFA
 	g_fillColor = D3DCOLOR_ARGB( 0, 0, 0, 0 );
 
 	g_bombShader->onResetDevice();
+	g_alphaShader->onResetDevice();
+	g_line->OnResetDevice();
 
     return S_OK;
 }
@@ -315,6 +326,61 @@ HRESULT drawBurningTeapot( double fTime, float fElapsedTime )
 	return hr;
 }
 
+HRESULT drawTestLines()
+{
+	//////////////////////////////////////////////////////////////////////////
+	const float lineStripHeight = -2.0f;
+	const D3DXVECTOR3 lineStrip1[] = {
+		D3DXVECTOR3( -0.5f * TileManager::s_tileSize * TileManager::s_xSize,	0,	0 ),
+		D3DXVECTOR3( +0.5f * TileManager::s_tileSize * TileManager::s_xSize,	0,	0 ),
+	};
+	const D3DXVECTOR3 lineStrip2[] = {
+		D3DXVECTOR3( 0, -0.5f * TileManager::s_tileSize * TileManager::s_ySize,	0 ),
+		D3DXVECTOR3( 0, +0.5f * TileManager::s_tileSize * TileManager::s_ySize,	0 ),
+	};
+	const D3DCOLOR lineColor = D3DCOLOR_ARGB( 255, 0, 255, 255 );
+
+	g_line->Begin();
+	D3DPERF_BeginEvent( 0, L"Line Drawing" );
+	D3DXMATRIX mWvp, mWorld, mView, mProj;
+	D3DXMATRIX mScale, mTrans;
+	mView = *GetG().m_camera.GetViewMatrix();
+	mProj = *GetG().m_camera.GetProjMatrix();
+
+	//GetG().m_dev->SetTransform( D3DTS_VIEW, &mView );
+	//GetG().m_dev->SetTransform( D3DTS_PROJECTION, &mProj );
+	GetG().m_dev->SetRenderState( D3DRS_CULLMODE, D3DCULL_NONE );
+	D3DXMatrixScaling( &mScale, 1.0f, 1.0f, 1.0f );
+
+	int i;
+	for ( i = -TileManager::s_xSize / 2; i < TileManager::s_xSize / 2; ++i )
+	{
+		D3DXMatrixTranslation( &mTrans,
+			0,
+			(float)(TileManager::s_tileSize * i),
+			lineStripHeight );
+
+		mWorld = mScale * mTrans;
+		mWvp = mWorld * mView * mProj;
+		g_line->DrawTransform( lineStrip1, 2, &mWvp, lineColor );
+
+	}
+	for ( i = -TileManager::s_ySize / 2; i < TileManager::s_ySize / 2; ++i )
+	{
+		D3DXMatrixTranslation( &mTrans,
+			(float)(TileManager::s_tileSize * i),
+			0,
+			lineStripHeight );
+		mWorld = mScale * mTrans;
+		mWvp = mWorld * mView * mProj;
+		g_line->DrawTransform( lineStrip2, 2, &mWvp, lineColor );
+	}
+	D3DPERF_EndEvent();
+	g_line->End();
+
+	return S_OK;
+}
+
 //--------------------------------------------------------------------------------------
 // Render the scene using the D3D9 device
 //--------------------------------------------------------------------------------------
@@ -329,9 +395,8 @@ void CALLBACK OnD3D9FrameRender( IDirect3DDevice9* pd3dDevice, double fTime, flo
     if( SUCCEEDED( pd3dDevice->BeginScene() ) )
     {
 		drawBurningTeapot( fTime, fElapsedTime );
-
 		GetTopStateManager().getCurState()->frameRender(pd3dDevice, fTime, fElapsedTime);
-
+		drawTestLines();
 		drawAlphaAnimatedPlane( fTime, fElapsedTime );
 
 		//////////////////////////////////////////////////////////////////////////
@@ -365,7 +430,9 @@ LRESULT CALLBACK MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
 void CALLBACK OnD3D9LostDevice( void* pUserContext )
 {
 	if ( g_bombShader )
-		g_bombShader->onLostDevice();	
+		g_bombShader->onLostDevice();
+	if ( g_line )
+		g_line->OnLostDevice();
 }
 
 
@@ -384,6 +451,8 @@ void CALLBACK OnD3D9DestroyDevice( void* pUserContext )
 	EP_SAFE_RELEASE( g_bombShader );
 	EP_SAFE_RELEASE( g_alphaShader );
 	EP_SAFE_RELEASE( g_alphaShader );
+
+	SAFE_RELEASE( g_line );
 
 	GetG().m_videoMan.SetDev(0);
 }
@@ -494,6 +563,10 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 	//GetScriptManager().executeFile( "library/EpThreadTest.tcl" );
 
 	GetScriptManager().execute( "EpInitApp" );
+
+	GetG().m_camera.SetAttachCameraToModel( true );
+	GetG().m_camera.SetEnablePositionMovement( true );
+
 
     // Initialize DXUT and create the desired Win32 window and Direct3D device for the application
     DXUTInit( true, true ); // Parse the command line and show msgboxes

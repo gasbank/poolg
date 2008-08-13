@@ -1,7 +1,7 @@
 #pragma warning(disable:4201)
 #pragma warning(disable:4100)
 #pragma warning(disable:4505) // disable 'unreferenced local function has been removed' warning
-
+#pragma warning(disable:4189) // disable 'local variable is initialized but not referenced' warning
 #include "AranPCH.h"
 #include <tchar.h>
 #include <set>

@@ -11,7 +11,7 @@
 #include <malloc.h>
 #include <memory.h>
 #include <tchar.h>
-#include <assert.h>
+#include <assert.h> 
 #include <map>
 #include <fstream>
 #include <list>

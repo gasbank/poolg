@@ -6,6 +6,7 @@
 
 FieldState::FieldState(void)
 {
+	m_bCamManualMovement = false;
 }
 
 FieldState::~FieldState(void)
@@ -52,20 +53,24 @@ HRESULT FieldState::frameMove( double fTime, float fElapsedTime )
 	D3DXVECTOR3 vLookAt( vHeroPos );
 	const D3DXVECTOR3 vUp( 0.0f, 1.0f, 0.0f );
 
-	if (fStateTime < 1.0f && GetWorldStateManager().prevStateEnum() == GAME_WORLD_STATE_BATTLE)
+	if ( m_bCamManualMovement == false )
 	{
-		D3DXVECTOR3 vCurEye;
-		D3DXVECTOR3 vCurLookAt;
-		D3DXVECTOR3 vCurUp;
+		if (fStateTime < 1.0f && GetWorldStateManager().prevStateEnum() == GAME_WORLD_STATE_BATTLE)
+		{
+			D3DXVECTOR3 vCurEye;
+			D3DXVECTOR3 vCurLookAt;
+			D3DXVECTOR3 vCurUp;
 
-		D3DXVec3Lerp( &vCurEye, &m_vPrevEye, &vEye, fStateTime );
-		D3DXVec3Lerp( &vCurLookAt, &m_vPrevLookAt, &vLookAt, fStateTime );
-		D3DXVec3Lerp( &vCurUp, &m_vPrevUp, &vUp, fStateTime );
+			D3DXVec3Lerp( &vCurEye, &m_vPrevEye, &vEye, fStateTime );
+			D3DXVec3Lerp( &vCurLookAt, &m_vPrevLookAt, &vLookAt, fStateTime );
+			D3DXVec3Lerp( &vCurUp, &m_vPrevUp, &vUp, fStateTime );
 
-		camera.SetViewParamsWithUp( &vCurEye, &vCurLookAt, vCurUp );
-	} else {
-		camera.SetViewParamsWithUp( &vEye, &vLookAt, vUp );
+			camera.SetViewParamsWithUp( &vCurEye, &vCurLookAt, vCurUp );
+		} else {
+			camera.SetViewParamsWithUp( &vEye, &vLookAt, vUp );
+		}
 	}
+	
 
 	return S_OK;
 }
@@ -77,6 +82,10 @@ HRESULT FieldState::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 		if (wParam == VK_F4)
 		{
 			GetWorldStateManager().setNextState(GAME_WORLD_STATE_BATTLE);
+		}
+		if ( wParam == VK_F6 )
+		{
+			m_bCamManualMovement = !m_bCamManualMovement;
 		}
 	}
 

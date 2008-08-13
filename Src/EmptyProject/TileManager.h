@@ -9,7 +9,7 @@ public:
 
 	static const int s_xSize = 90;
 	static const int s_ySize = 158;
-	static const int s_tileSize = 1;	
+	static const int s_tileSize = 2;	
 
 	Tile* getTile( int x, int y );
 

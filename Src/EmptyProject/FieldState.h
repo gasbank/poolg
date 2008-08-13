@@ -22,4 +22,6 @@ private:
 	D3DXVECTOR3 m_vPrevEye;
 	D3DXVECTOR3 m_vPrevLookAt;
 	D3DXVECTOR3 m_vPrevUp;
+
+	bool			m_bCamManualMovement;
 };

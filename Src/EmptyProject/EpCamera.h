@@ -55,4 +55,5 @@ protected:
 
 	bool			m_bViewParamsDirty;
 	bool			m_bCamManualMovement;
+	bool			m_bUpdateContinue;
 };

@@ -71,6 +71,6 @@ void FieldState::setupCamera()
 	const D3DXVECTOR3& vHeroPos = ws->getHeroPos();
 
 	camera.setAttachPos( &vHeroPos );
-	camera.setSmoothCameraDuration( 1.0f );
+	camera.setSmoothCameraDuration( 3.0f );
 	camera.begin( CAMERA_SMOOTH_ATTACH );
 }

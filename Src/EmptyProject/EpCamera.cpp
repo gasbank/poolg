@@ -164,8 +164,6 @@ void EpCamera::setDesViewParams( D3DXVECTOR3* pvEyePt, D3DXVECTOR3* pvLookAtPt, 
 
 void EpCamera::updateSmoothCamera( float fElapsedTime )
 {
-	static bool updateContinue = true;
-
 	// 지정된 시간 동안 이전 위치로부터 목적 위치까지 linear interpolation 하여 현재 카메라 위치를
 	// 구한다.
 	if ( m_fSmoothCameraTimer < m_fSmoothCameraDuration )
@@ -178,19 +176,19 @@ void EpCamera::updateSmoothCamera( float fElapsedTime )
 		D3DXVec3Lerp( &m_vUp, &m_vPrevUp, &m_vDesUp, s );
 
 		m_fSmoothCameraTimer += fElapsedTime;
+
+		m_bViewParamsDirty = true;
 	} 
-	else
+	else if ( m_bUpdateContinue )
 	{
 		// 마지막으로 최종 위치에 정확히 카메라를 놓는다.
 		m_vEye = m_vDesEye;
 		m_vLookAt = m_vDesLookAt;
 		m_vUp	= m_vDesUp;
 
-		updateContinue = false;
-	}
-
-	if ( updateContinue )
+		m_bUpdateContinue = false;
 		m_bViewParamsDirty = true;
+	}
 }
 
 void EpCamera::begin( RunningCamera rc )
@@ -209,6 +207,8 @@ void EpCamera::begin( RunningCamera rc )
 		m_fSmoothCameraTimer = 0.0f;
 		break;
 	}
+
+	m_bUpdateContinue = true;
 }
 
 // 쓸모 없는 함수가 된듯 하나 아까워서 남겨둠.
@@ -236,17 +236,36 @@ void EpCamera::updateSmoothAttachCamera( float fElapsedTime )
 {
 	// 기존의 Smooth moving camera를 활용한다.
 	// At first, attach destination of camera to object's position.
-	m_vDesEye.x = m_vPos->x;
-	m_vDesEye.y = m_vPos->y;
-	m_vDesEye.z = m_vPos->z - 30.0f;
+	// So camera gradually attached.
+	// If attaching is finished, just float over the object and follow object.
+	if ( m_bUpdateContinue )
+	{
+		m_vDesEye.x = m_vPos->x;
+		m_vDesEye.y = m_vPos->y;
+		m_vDesEye.z = m_vPos->z - 30.0f;
 
-	m_vDesLookAt.x = m_vPos->x;
-	m_vDesLookAt.y = m_vPos->y;
-	m_vDesLookAt.z = m_vPos->z;
+		m_vDesLookAt.x = m_vPos->x;
+		m_vDesLookAt.y = m_vPos->y;
+		m_vDesLookAt.z = m_vPos->z;
 
-	m_vDesUp.x = 0.0f;
-	m_vDesUp.y = 1.0f;
-	m_vDesUp.z = 0.0f;
+		m_vDesUp.x = 0.0f;
+		m_vDesUp.y = 1.0f;
+		m_vDesUp.z = 0.0f;
+	}
+	else
+	{
+		m_vEye.x = m_vPos->x;
+		m_vEye.y = m_vPos->y;
+		m_vEye.z = m_vPos->z - 30.0f;
+
+		m_vLookAt.x = m_vPos->x;
+		m_vLookAt.y = m_vPos->y;
+		m_vLookAt.z = m_vPos->z;
+
+		m_vUp.x = 0.0f;
+		m_vUp.y = 1.0f;
+		m_vUp.z = 0.0f;
+	}
 
 	// And move to the destination gradually
 	updateSmoothCamera( fElapsedTime );

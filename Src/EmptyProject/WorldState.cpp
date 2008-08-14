@@ -1,6 +1,7 @@
 #include "EmptyProjectPCH.h"
 #include "WorldState.h"
 #include "WorldStateManager.h"
+#include "TopStateManager.h"
 #include "BattleState.h"
 #include "ScriptManager.h"
 #include "TileManager.h"
@@ -420,6 +421,40 @@ HRESULT WorldState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 				}
 			}
 		}
+	}
+
+
+	switch ( uMsg )
+	{
+	case WM_KEYDOWN:
+		switch ( wParam )
+		{
+		case 'C':
+			// external ca¸Þ¶ó Testing code
+			EpCamera& rCamera = GetG().m_camera;
+			TopStateManager& tsm = TopStateManager::getSingleton();
+			WorldState* ws = static_cast<WorldState*>( tsm.getCurState() );
+			const D3DXVECTOR3& vHeroPos = ws->getHeroPos();
+			static bool bExtCam = true;
+			if ( bExtCam )
+			{
+				rCamera.setExternalCamera( 
+					static_cast<ArnCamera*>(m_sg->getSceneRoot()->getNodeByName( "Camera" )) );
+				rCamera.begin( CAMERA_EXTERNAL );
+			}
+			else
+			{
+				rCamera.setAttachPos( &vHeroPos );
+				rCamera.setSmoothCameraDuration( 3.0f );
+				rCamera.begin( CAMERA_SMOOTH_ATTACH );
+
+			}
+			bExtCam = !bExtCam;
+			break;
+		}
+		break;
+	case WM_KEYUP:
+		break;
 	}
 
 	if ( GetWorldStateManager().getCurState() )

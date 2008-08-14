@@ -6,8 +6,10 @@ enum RunningCamera { CAMERA_NORMAL, CAMERA_SMOOTH, CAMERA_EXTERNAL, CAMERA_SMOOT
 
 // CAMERA_NORMAL : SetViewParamsWithUp()에 의해 지정된 위치로 카메라를 옮긴다.
 // CAMERA_SMOOTH : 이전 위치로부터 SetDesViewParams()에 의해 지정된 위치로 카메라를 서서히 옮긴다.
-//					움직이는데 걸리는 시간도 지정할 수 있다.
+//				움직이는데 걸리는 시간도 지정할 수 있다.
 // CAMERA_EXTERNAL : 외부에서 들어온 ArnCamera에 의해 카메라 위치가 정해진다.
+// CAMERA_SMOOTH_ATTACH : 이전 위치로부터 setAttachPos에 의해 지정된 포인터가 가리키는 벡터를 z축으로
+//				-30만큼 떨어진 곳에서 바라보도록 서서이 붙어서 따라다닌다.
 
 class EpCamera : public CModelViewerCamera
 {

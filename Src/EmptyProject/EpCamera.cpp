@@ -5,10 +5,15 @@
 EpCamera::EpCamera(void)
 {
 	m_fSmoothCameraTimer = 99999.0f;
+	m_fSmoothCameraDuration = 1.0f;
+	m_bViewParamsDirty = false;
+	m_bCamManualMovement = false;
 }
 
 void EpCamera::frameMove( FLOAT fElapsedTime )
 {
+	CModelViewerCamera::FrameMove( fElapsedTime );
+
 	switch ( m_runningCamera )
 	{
 	case CAMERA_NORMAL:
@@ -20,9 +25,16 @@ void EpCamera::frameMove( FLOAT fElapsedTime )
 	case CAMERA_EXTERNAL:
 		updateExternalCamera( m_pArnCam );
 		break;
+	case CAMERA_SMOOTH_ATTACH:
+		updateSmoothAttachCamera( fElapsedTime );
+		break;
 	}
 
-	CModelViewerCamera::FrameMove( fElapsedTime );
+	if ( m_bViewParamsDirty && !m_bCamManualMovement )
+	{
+		setViewParamsWithUp( &m_vEye, &m_vLookAt, &m_vUp );
+		m_bViewParamsDirty = false;
+	}
 }
 
 D3DUtil_CameraKeys EpCamera::MapKey( UINT nKey )
@@ -96,6 +108,11 @@ void EpCamera::setViewParamsWithUp( D3DXVECTOR3* pvEyePt, D3DXVECTOR3* pvLookatP
 	m_bDragSinceLastUpdate = true;
 }
 
+void EpCamera::setViewParamsWithUp( D3DXVECTOR3* pvEyePt, D3DXVECTOR3* pvLookatPt, D3DXVECTOR3* pvUp )
+{
+	setViewParamsWithUp( pvEyePt, pvLookatPt, *pvUp );
+
+}
 D3DXVECTOR3* EpCamera::GetUpPt()
 {
 	return &m_vUp;
@@ -135,38 +152,45 @@ void EpCamera::updateExternalCamera( ArnCamera* arnCam )
 	vEye.y = arnCamLocalXfrom._42;
 	vEye.z = arnCamLocalXfrom._43;
 
-	setViewParamsWithUp( &vEye, &vLookAt, vUp );
+	m_bViewParamsDirty = true;
 }
 
-void EpCamera::setDesViewParams( D3DXVECTOR3* pvEyePt, D3DXVECTOR3* pvLookAtPt, const D3DXVECTOR3& vUp )
+void EpCamera::setDesViewParams( D3DXVECTOR3* pvEyePt, D3DXVECTOR3* pvLookAtPt, D3DXVECTOR3* vUp )
 {
 	m_vDesEye = *pvEyePt;
 	m_vDesLookAt = *pvLookAtPt;
-	m_vDesUp = vUp;
+	m_vDesUp = *vUp;
 }
 
 void EpCamera::updateSmoothCamera( float fElapsedTime )
 {
+	static bool updateContinue = true;
+
 	// 지정된 시간 동안 이전 위치로부터 목적 위치까지 linear interpolation 하여 현재 카메라 위치를
 	// 구한다.
-	if ( m_fSmoothCameraTimer <= m_fSmoothCameraDuration )
+	if ( m_fSmoothCameraTimer < m_fSmoothCameraDuration )
 	{
 		float s = m_fSmoothCameraTimer / m_fSmoothCameraDuration;
 
 		D3DXVec3Lerp( &m_vEye, &m_vPrevEye, &m_vDesEye, s );
+
 		D3DXVec3Lerp( &m_vLookAt, &m_vPrevLookAt, &m_vDesLookAt, s );
 		D3DXVec3Lerp( &m_vUp, &m_vPrevUp, &m_vDesUp, s );
 
 		m_fSmoothCameraTimer += fElapsedTime;
 	} 
-	else 
+	else
 	{
+		// 마지막으로 최종 위치에 정확히 카메라를 놓는다.
 		m_vEye = m_vDesEye;
 		m_vLookAt = m_vDesLookAt;
 		m_vUp	= m_vDesUp;
+
+		updateContinue = false;
 	}
 
-
+	if ( updateContinue )
+		m_bViewParamsDirty = true;
 }
 
 void EpCamera::begin( RunningCamera rc )
@@ -178,8 +202,9 @@ void EpCamera::begin( RunningCamera rc )
 	switch ( rc )
 	{
 	case CAMERA_SMOOTH:
+	case CAMERA_SMOOTH_ATTACH:
 		m_vPrevEye = m_vEye;
-		m_vPrevLookAt = m_vPrevLookAt;
+		m_vPrevLookAt = m_vLookAt;
 		m_vPrevUp = m_vUp;
 		m_fSmoothCameraTimer = 0.0f;
 		break;
@@ -196,4 +221,36 @@ void EpCamera::lerpViewParams(
 	D3DXVec3Lerp( pvEyeOut, pvEye1, pvEye2, s );
 	D3DXVec3Lerp( pvLookAtOut, pvLookAt1, pvLookAt2, s );
 	D3DXVec3Lerp( pvUpOut, pvUp1, pvUp2, s );
+}
+
+LRESULT EpCamera::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
+{
+	if ( uMsg == WM_KEYDOWN )
+		if ( wParam == VK_F6 )
+			m_bCamManualMovement = !m_bCamManualMovement;
+
+	return CModelViewerCamera::HandleMessages( hWnd, uMsg, wParam, lParam );
+}
+
+void EpCamera::updateSmoothAttachCamera( float fElapsedTime )
+{
+	// 기존의 Smooth moving camera를 활용한다.
+	// At first, attach destination of camera to object's position.
+	m_vDesEye.x = m_vPos->x;
+	m_vDesEye.y = m_vPos->y;
+	m_vDesEye.z = m_vPos->z - 30.0f;
+
+	m_vDesLookAt.x = m_vPos->x;
+	m_vDesLookAt.y = m_vPos->y;
+	m_vDesLookAt.z = m_vPos->z;
+
+	m_vDesUp.x = 0.0f;
+	m_vDesUp.y = 1.0f;
+	m_vDesUp.z = 0.0f;
+
+	// And move to the destination gradually
+	updateSmoothCamera( fElapsedTime );
+
+	// After moving to destination, always follow object.
+	m_bViewParamsDirty = true;
 }

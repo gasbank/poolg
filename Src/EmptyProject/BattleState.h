@@ -44,6 +44,7 @@ private:
 	void doComputerAction();
 	Character* getHero();
 	Character* getEnemy();
+	void setupCamera();
 
 	/*이곳부터가 컴포넌트*/
 	Picture				m_StatusBoxPlayer;
@@ -76,15 +77,10 @@ private:
 	
 	LPDIRECT3DDEVICE9	m_pDev;
 
-	D3DXVECTOR3			m_vPrevEye;
-	D3DXVECTOR3			m_vPrevLookAt;
-	D3DXVECTOR3			m_vPrevUp;
-
 	typedef std::list<std::string> StringList;
 	StringList m_battleLog;
 
 	WorldState*		m_ws;
-
 	
 	TurnType		m_curTurnType;
 	TurnType		m_nextTurnType;

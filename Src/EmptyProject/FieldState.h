@@ -19,9 +19,7 @@ public:
 	virtual HRESULT release();
 
 private:
-	D3DXVECTOR3 m_vPrevEye;
-	D3DXVECTOR3 m_vPrevLookAt;
-	D3DXVECTOR3 m_vPrevUp;
+	void setupCamera();
 
-	bool			m_bCamManualMovement;
+	bool		m_bCamManualMovement;
 };

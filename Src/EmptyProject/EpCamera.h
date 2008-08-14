@@ -2,7 +2,7 @@
 
 #include "ArnCamera.h"
 
-enum RunningCamera { CAMERA_NORMAL, CAMERA_SMOOTH, CAMERA_EXTERNAL };
+enum RunningCamera { CAMERA_NORMAL, CAMERA_SMOOTH, CAMERA_EXTERNAL, CAMERA_SMOOTH_ATTACH };
 
 // CAMERA_NORMAL : SetViewParamsWithUp()에 의해 지정된 위치로 카메라를 옮긴다.
 // CAMERA_SMOOTH : 이전 위치로부터 SetDesViewParams()에 의해 지정된 위치로 카메라를 서서히 옮긴다.
@@ -14,9 +14,12 @@ class EpCamera : public CModelViewerCamera
 public:
 	EpCamera();
 
+	virtual LRESULT handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 	virtual void frameMove( FLOAT fElapsedTime );
 	void setViewParamsWithUp( D3DXVECTOR3* pvEyePt, D3DXVECTOR3* pvLookatPt, const D3DXVECTOR3& vUp );
-	void setDesViewParams( D3DXVECTOR3* pvEyePt, D3DXVECTOR3* pvLookatPt, const D3DXVECTOR3& vUp );
+	void setViewParamsWithUp( D3DXVECTOR3* pvEyePt, D3DXVECTOR3* pvLookatPt, D3DXVECTOR3* pvUp );
+	void setDesViewParams( D3DXVECTOR3* pvEyePt, D3DXVECTOR3* pvLookatPtg, D3DXVECTOR3* vUp );
+	void setAttachPos( const D3DXVECTOR3* pos ) { m_vPos = pos; }
 	void setSmoothCameraDuration( float f ) { m_fSmoothCameraDuration = f; }
 	void setExternalCamera( ArnCamera* arnCam ) { m_pArnCam = arnCam; }
 	void begin( RunningCamera rc );
@@ -26,6 +29,7 @@ protected:
 	virtual D3DUtil_CameraKeys MapKey( UINT nKey );
 	void updateSmoothCamera( float fElapsedTime );
 	void updateExternalCamera( ArnCamera* arnCam );
+	void updateSmoothAttachCamera( float fElapsedTime );
 	void lerpViewParams( 
 		D3DXVECTOR3* pvEyeOut, D3DXVECTOR3* pvLookAtOut, D3DXVECTOR3* pvUpOut, 
 		D3DXVECTOR3* pvEye1, D3DXVECTOR3* pvLookAt1, D3DXVECTOR3* pvUp1,
@@ -44,6 +48,11 @@ protected:
 	D3DXVECTOR3		m_vDesLookAt;
 	D3DXVECTOR3		m_vDesUp;
 
+	const D3DXVECTOR3*	m_vPos;
+
 	float			m_fSmoothCameraTimer;
 	float			m_fSmoothCameraDuration;
+
+	bool			m_bViewParamsDirty;
+	bool			m_bCamManualMovement;
 };

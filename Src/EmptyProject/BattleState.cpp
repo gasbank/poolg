@@ -134,13 +134,6 @@ HRESULT BattleState::enter()
 
 	m_action->soundAction( "Start Battle" );
 
-	EpCamera& camera = G::getSingleton().m_camera;
-
-	// 카메라 워킹을 위해 스테이트 시작 시 카메라 상태를 저장해 둔다.
-	m_vPrevEye		= *camera.GetEyePt();
-	m_vPrevLookAt	= *camera.GetLookAtPt();
-	m_vPrevUp		= *camera.GetUpPt();
-
 	m_hpBarPlayer.initRate((float)getHero()->getMaxHp());
 	m_hpIllusionPlayer.initRate((float)getHero()->getMaxHp());
 	m_hpBarEnemy.initRate((float)getEnemy()->getMaxHp());
@@ -150,6 +143,8 @@ HRESULT BattleState::enter()
 	m_hpBarEnemy.setRate((float)getEnemy()->getCurHp());
 	m_hpIllusionPlayer.setRate((float)getHero()->getCurHp());
 	m_hpIllusionEnemy.setRate((float)getEnemy()->getCurHp());
+
+	setupCamera();
 	
 
 	m_battleLog.push_back(std::string("전투 개시~~~~~~~~~!!!"));
@@ -250,90 +245,26 @@ HRESULT BattleState::frameMove(double fTime, float fElapsedTime)
 	m_innerFire.frameMove(fElapsedTime);
 	m_innerFire.setPos( getHero()->getPos().x, getHero()->getPos().y, -3);
 
-
 	m_hpBarEnemy.frameMove(fElapsedTime);
 	m_mpBarEnemy.frameMove(fElapsedTime);
-
-
 
 	m_hpBarPlayer.changeRate((float)getHero()->getCurHp());
 	m_hpBarEnemy.changeRate((float)getEnemy()->getCurHp());
 	m_hpIllusionPlayer.changeRate((float)getHero()->getCurHp());
 	m_hpIllusionEnemy.changeRate((float)getEnemy()->getCurHp());
 	
-
-	// WorldState에 접근하기 위한 코드.
-	TopStateManager& tsm = TopStateManager::getSingleton();
-	WorldState* ws = static_cast<WorldState*>( tsm.getCurState() );
-	const D3DXVECTOR3& vEnemyPos = ws->getEnemyPos();
-	const D3DXVECTOR3& vHeroPos = ws->getHeroPos();
+	//// WorldState에 접근하기 위한 코드.
+	//TopStateManager& tsm = TopStateManager::getSingleton();
+	//WorldState* ws = static_cast<WorldState*>( tsm.getCurState() );
+	//const D3DXVECTOR3& vEnemyPos = ws->getEnemyPos();
+	//const D3DXVECTOR3& vHeroPos = ws->getHeroPos();
 
 	// 주인공이 적과 멀어지거나(충돌 상태가 아니거나), 승자가 결정되면 FieldState로 돌아간다.
-	if ( ws->isCollide( &vEnemyPos, &vHeroPos ) == false || m_battleWinner != PS_NOTSET )
+	//if ( ws->isCollide( &vEnemyPos, &vHeroPos ) == false || m_battleWinner != PS_NOTSET )
+
+	// 승자가 결정되면 FieldState로 돌아간다.
+	if ( m_battleWinner != PS_NOTSET )
 		GetWorldStateManager().setNextState(GAME_WORLD_STATE_FIELD);
-
-	//
-	// 처음 시작시 주인공이 왼쪽 아래, 적이 오른쪽 위에 보이도록 카메라를 움직인다.
-	//
-
-	EpCamera& camera = G::getSingleton().m_camera;
-
-	// 전투가 일어나는 위치를 구한다. 적의 위치와 주인공 위치의 중간임.
-	D3DXVECTOR3 vBattlePos;
-	vBattlePos.x = (vEnemyPos.x + vHeroPos.x) / 2.0f;
-	vBattlePos.y = (vEnemyPos.y + vHeroPos.y) / 2.0f;
-	vBattlePos.z = (vEnemyPos.z + vHeroPos.z) / 2.0f;
-
-	// 최종 카메라 상태.
-	D3DXVECTOR3 vDesEye( 0.0f, 0.0f, -10.0f );
-	D3DXVECTOR3 vDesLookAt( vBattlePos );
-	D3DXVECTOR3 vDesUp( 0.0f, 0.0f, -1.0f );
-
-	// 주인공으로부터 적으로 이어지는 축을 구한다.
-	D3DXVECTOR3 vBattleAxis;
-	vBattleAxis.x = (vEnemyPos.x - vHeroPos.x);
-	vBattleAxis.y = (vEnemyPos.y - vHeroPos.y);
-	vBattleAxis.z = (vEnemyPos.z - vHeroPos.z);
-
-	// z 축에 대고 vBattleAxis를 45도 돌린다.
-	D3DXVECTOR3 zAxis( 0.0f, 0.0f, 1.0f );
-	Utility::rotateAboutAxis( &vBattleAxis, &zAxis, D3DXToRadian( -45.0f ) );
-
-	// vDesEye를 vBattleAxis에 대고 -45도 만큼 돌린다.
-	Utility::rotateAboutAxis( &vDesEye, &vBattleAxis, D3DXToRadian( -45.0f ) );
-
-	// vDesEye를 주인공 위로 옮긴다.
-	vDesEye.x += vHeroPos.x;
-	vDesEye.y += vHeroPos.y;
-
-	// 카메라 움직이는 시간
-	float camDuration = 1.0f;
-
-	if ( 0.0f < fStateTime && fStateTime < camDuration && GetWorldStateManager().prevStateEnum() == GAME_WORLD_STATE_FIELD)
-	{
-		// 현재 카메라 상태 저장을 위한 변수.
-		D3DXVECTOR3 vCurEye;
-		D3DXVECTOR3 vCurLookAt;
-		D3DXVECTOR3 vCurUp;
-		
-		// 카메라 경로 설정.
-		D3DXVECTOR3 vEye0( m_vPrevEye );
-		D3DXVECTOR3 vEye1( m_vPrevEye );		
-		D3DXVECTOR3 vEye2( vDesEye );
-		D3DXVECTOR3 vEye3( vHeroPos );
-
-		// 현재 카메라 상태를 계산한다.
-		//D3DXVec3CatmullRom( &vCurEye, &vEye0, &vEye1, &vEye2, &vEye3, (FLOAT)fStateTime );
-		D3DXVec3Lerp( &vCurEye, &m_vPrevEye, &vDesEye, (float)fStateTime / camDuration );
-		D3DXVec3Lerp( &vCurUp, &m_vPrevUp, &vDesUp, (float)fStateTime / camDuration );
-		D3DXVec3Lerp( &vCurLookAt, &m_vPrevLookAt, &vDesLookAt, (float)fStateTime / camDuration );
-
-		D3DXVec3Normalize( &vCurUp, &vCurUp );
-
-		camera.setViewParamsWithUp( &vCurEye, &vCurLookAt, vCurUp );
-	}
-	else
-		camera.setViewParamsWithUp( &vDesEye, &vDesLookAt, vDesUp );
 
 	return S_OK;
 }
@@ -649,4 +580,52 @@ void BattleState::spellArt()
 	{
 
 	}
+}
+
+void BattleState::setupCamera()
+{
+	//
+	// 처음 시작시 주인공이 왼쪽 아래, 적이 오른쪽 위에 보이도록 카메라를 움직인다.
+	//
+
+	// WorldState에 접근하기 위한 코드.
+	TopStateManager& tsm = TopStateManager::getSingleton();
+	WorldState* ws = static_cast<WorldState*>( tsm.getCurState() );
+	const D3DXVECTOR3& vEnemyPos = ws->getEnemyPos();
+	const D3DXVECTOR3& vHeroPos = ws->getHeroPos();
+
+	EpCamera& camera = G::getSingleton().m_camera;
+
+	// 전투가 일어나는 위치를 구한다. 적의 위치와 주인공 위치의 중간임.
+	D3DXVECTOR3 vBattlePos;
+	vBattlePos.x = (vEnemyPos.x + vHeroPos.x) / 2.0f;
+	vBattlePos.y = (vEnemyPos.y + vHeroPos.y) / 2.0f;
+	vBattlePos.z = (vEnemyPos.z + vHeroPos.z) / 2.0f;
+
+	// 최종 카메라 상태.
+	D3DXVECTOR3 vDesEye( 0.0f, 0.0f, -10.0f );
+	D3DXVECTOR3 vDesLookAt( vBattlePos );
+	D3DXVECTOR3 vDesUp( 0.0f, 0.0f, -1.0f );
+
+	// 주인공으로부터 적으로 이어지는 축을 구한다.
+	D3DXVECTOR3 vBattleAxis;
+	vBattleAxis.x = (vEnemyPos.x - vHeroPos.x);
+	vBattleAxis.y = (vEnemyPos.y - vHeroPos.y);
+	vBattleAxis.z = (vEnemyPos.z - vHeroPos.z);
+
+	// z 축에 대고 vBattleAxis를 45도 돌린다.
+	D3DXVECTOR3 zAxis( 0.0f, 0.0f, 1.0f );
+	Utility::rotateAboutAxis( &vBattleAxis, &zAxis, D3DXToRadian( -45.0f ) );
+
+	// vDesEye를 vBattleAxis에 대고 -45도 만큼 돌린다.
+	Utility::rotateAboutAxis( &vDesEye, &vBattleAxis, D3DXToRadian( -45.0f ) );
+
+	// vDesEye를 주인공 위로 옮긴다.
+	vDesEye.x += vHeroPos.x;
+	vDesEye.y += vHeroPos.y;
+
+	// 자, 이제 카메라의 목적 위치를 구하였다. 이동시켜보자.
+	camera.setDesViewParams( &vDesEye, &vDesLookAt, &vDesUp );
+	camera.setSmoothCameraDuration( 3.0f );
+	camera.begin( CAMERA_SMOOTH );
 }

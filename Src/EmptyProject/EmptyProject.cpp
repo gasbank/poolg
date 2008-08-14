@@ -421,7 +421,7 @@ LRESULT CALLBACK MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
 	EpCamera& g_camera = GetG().m_camera;
 
 	//g_avatar.handleMessages(hWnd, uMsg, wParam, lParam);
-	g_camera.HandleMessages(hWnd, uMsg, wParam, lParam);
+	g_camera.handleMessages(hWnd, uMsg, wParam, lParam);
 
 	if (g_tsm && GetTopStateManager().getCurState())
 		GetTopStateManager().getCurState()->handleMessages(hWnd, uMsg, wParam, lParam);

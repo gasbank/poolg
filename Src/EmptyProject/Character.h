@@ -37,9 +37,6 @@ public:
 	void setMoveDuration( float val ) { m_moveDuration = val; }
 	void setColor( int r, int g, int b );
 
-	void setTalkable( bool talkable ) { m_bTalkable = talkable; }
-	bool isTalkable() { return m_bTalkable; }
-
 	void setBoundaryRect( LONG left, LONG top, LONG right, LONG bottom );
 protected:
 	Character();
@@ -53,7 +50,6 @@ private:
 
 	bool					m_bMoving;
 	bool					m_bMovable;
-	bool					m_bTalkable;
 	float					m_fMovingTime;
 	int						m_maxHp;
 	int						m_curHp;

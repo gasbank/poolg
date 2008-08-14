@@ -12,14 +12,14 @@ namespace eval EpWorldState {
 	proc enter {} {
 		EpOutputDebugString " - WorldState enter\n"
 		
-		set pHeroUnit				[createChar -18 -4 1];
-		set pEnemyUnit1				[createChar -19 11 0];
-		set pEnemyUnit2				[createChar -9 8 0];
-		set pEnemyUnit3				[createChar -10 -11 0];
-		set pEnemyUnit4				[createChar 3 -6 0];
-		set pEnemyUnit5				[createChar 18 4 0];
-		set pEnemyUnit6				[createChar 13 -25 0];
-		set pNPCUnit1				[createChar 4 -26 0];
+		set pHeroUnit				[createHero -18 -4];
+		set pEnemyUnit1				[createEnem -19 11];
+		set pEnemyUnit2				[createEnem -9 8];
+		set pEnemyUnit3				[createEnem -10 -11];
+		set pEnemyUnit4				[createEnem 3 -6];
+		set pEnemyUnit5				[createEnem 18 4];
+		set pEnemyUnit6				[createEnem 13 -25];
+		set pNPCUnit1				[createEnem 4 -26];
 		set pTestEnemyUnit			[createEnem 4 -23];
 		
 		EpUnitSetRotX				$pHeroUnit [ToRadian -90]
@@ -39,13 +39,13 @@ namespace eval EpWorldState {
 		EpCharacterSetMaxAndCurHp		$pEnemyUnit3 6 -1
 
 		EpCharacterSetColor			$pEnemyUnit4 0 128 128
-		EpCharacterSetMaxAndCurHp	$pEnemyUnit4 8 -1
+		EpCharacterSetMaxAndCurHp		$pEnemyUnit4 8 -1
 
 		EpCharacterSetColor			$pEnemyUnit5 128 0 128
-		EpCharacterSetMaxAndCurHp	$pEnemyUnit5 10 -1
+		EpCharacterSetMaxAndCurHp		$pEnemyUnit5 10 -1
 
 		EpCharacterSetColor			$pEnemyUnit6 0 0 0
-		EpCharacterSetMaxAndCurHp	$pEnemyUnit6 12 -1
+		EpCharacterSetMaxAndCurHp		$pEnemyUnit6 12 -1
 		
 		EpCharacterSetColor			$pNPCUnit1 0 255 0
 		
@@ -56,7 +56,8 @@ namespace eval EpWorldState {
 		# Setting Test Enemy Unit
 		EpCharacterSetColor			$pTestEnemyUnit 255 255 255
 		EpEnemySetRandomWalkable		$pTestEnemyUnit	1
-		EpCharacterSetBoundary			$pNPCUnit1 3 -22 5 -25  # left, top, right, bottom
+		EpCharacterSetBoundary			$pTestEnemyUnit 3 -22 5 -25  # left, top, right, bottom
+		EpEnemySetTalkable			$pTestEnemyUnit	1
 	}
 	
 	proc leave {} {
@@ -67,9 +68,17 @@ namespace eval EpWorldState {
 		EpWriteDialog "ÇÑ±ÛÁ«¶óarlsdgklgtulsdu;asjd;tjhklsaerlushldfhlzxcvhxhjzvbkjzxcfjha;srhqwieutpuiwetp;oiweoptyiisauhljkdflkhzx"
 	}
 
+	# Not used procedure
 	proc createChar { tileX tileY ctrl } {
 		variable pWorld
 		set unit [ EpCreateCharacter $tileX $tileY $ctrl ];
+		EpRegisterToWorld $pWorld $unit
+		return $unit
+	}
+
+	proc createHero { tileX tileY } {
+		variable pWorld
+		set unit [ EpCreateHero $tileX $tileY ];
 		EpRegisterToWorld $pWorld $unit
 		return $unit
 	}

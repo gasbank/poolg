@@ -198,7 +198,6 @@ Character::Character()
 	m_tileY				= 0;
 	m_tileBufferX		= m_tileX;
 	m_tileBufferY		= m_tileY;
-	m_bTalkable			= false;
 	m_fMovingTime		= 0;
 	m_moveDuration		= 1.0f;
 	m_boundaryTileRect.top   = 999999;
@@ -386,13 +385,6 @@ int EpCharacterSetColor( void* ptr, int r, int g, int b )
 	return 0;
 } SCRIPT_CALLABLE_I_PV_I_I_I( EpCharacterSetColor )
 
-int EpCharacterSetTalkable( void* ptr, int talkable )
-{
-	Character* instance = reinterpret_cast<Character*>( ptr );
-	instance->Character::setTalkable( talkable?true:false );
-	return 0;
-} SCRIPT_CALLABLE_I_PV_I( EpCharacterSetTalkable )
-
 int EpCharacterSetBoundary( void* ptr, int left, int top, int right, int bottom )
 {
 	Character* instance = reinterpret_cast<Character*>( ptr );
@@ -405,6 +397,5 @@ START_SCRIPT_FACTORY(Character)
 	CREATE_OBJ_COMMAND( EpCharacterSetMaxAndCurHp )
 	CREATE_OBJ_COMMAND( EpCharacterSetMoveDuration )
 	CREATE_OBJ_COMMAND( EpCharacterSetColor )
-	CREATE_OBJ_COMMAND( EpCharacterSetTalkable )
 	CREATE_OBJ_COMMAND( EpCharacterSetBoundary )
 END_SCRIPT_FACTORY(Character)

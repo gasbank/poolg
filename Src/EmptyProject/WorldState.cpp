@@ -6,6 +6,7 @@
 #include "TileManager.h"
 #include "ArnMesh.h"
 #include "ShaderWrapper.h"
+#include "Enemy.h"
 
 TileManager	tileManager;
 
@@ -545,7 +546,7 @@ void WorldState::startDialog( int index )
 void WorldState::handleCollision( Unit* heroUnit, Unit* opponentUnit )
 {
 	// 상대방이 대화 불가능하면 적으로 간주한다.
-	if ( !dynamic_cast<Character*>(opponentUnit)->isTalkable() )
+	if ( !dynamic_cast<Enemy*>(opponentUnit)->isTalkable() )
 	{
 		m_curEnemyUnit = dynamic_cast<Character*>(opponentUnit);
 	}
@@ -588,7 +589,7 @@ void WorldState::detectBattleEvent()
 	{
 		if ( (*it) != m_heroUnit )
 		{
-			Character* oppCharacter = dynamic_cast<Character*>( *it );
+			Enemy* oppCharacter = dynamic_cast<Enemy*>( *it );
 			if ( oppCharacter->isTalkable() == false )
 			{
 				if ( isInFightArea( m_heroUnit, oppCharacter ) == true )

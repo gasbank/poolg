@@ -17,6 +17,8 @@ static const POINT g_moveAmount[4] = {
 	{  1,  0 }
 };
 
+class WorldState;
+
 class Unit
 {
 public:
@@ -55,7 +57,15 @@ public:
 
 	void setHeadDir( UnitInput );
 
+
+	void setTilePos(int tileX, int tileY);
+	void setTileBufferPos(int tileX, int tileY) { m_tileBufferX = tileX; m_tileBufferY = tileY; }
+	UINT getTilePosX() { return m_tileX; }
+	UINT getTilePosY() { return m_tileY; }
+	virtual void enterTile( UINT tileX, UINT tileY) {}
 protected:
+	WorldState* getWorldState() const;
+
 	virtual UnitInput mapKey( UINT nKey );
 
 //[재우]상속받은 객체가 접근하기 위해 protected로.
@@ -84,5 +94,12 @@ protected:
 	D3DXVECTOR3				m_vKeyboardDirection;
 	D3DXVECTOR3				m_vVelocity;
 	bool					m_bControllable;
+
+	
+	UINT					m_tileX;
+	UINT					m_tileY;
+	UINT					m_tileBufferX;
+	UINT					m_tileBufferY;
+	
 };
 

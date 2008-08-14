@@ -106,8 +106,8 @@ bool CALLBACK ModifyDeviceSettings( DXUTDeviceSettings* pDeviceSettings, void* p
 		}
 	}
 
-	pDeviceSettings->d3d9.pp.EnableAutoDepthStencil= TRUE;
-	pDeviceSettings->d3d9.pp.AutoDepthStencilFormat = D3DFMT_D16;
+	//pDeviceSettings->d3d9.pp.EnableAutoDepthStencil= TRUE;
+	//pDeviceSettings->d3d9.pp.AutoDepthStencilFormat = D3DFMT_D16;
 
 	return true;
 }
@@ -122,7 +122,7 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 {
 	HRESULT hr;
 	GetG().m_dev = pd3dDevice;
-	pd3dDevice->SetRenderState( D3DRS_STENCILENABLE, TRUE );
+	//pd3dDevice->SetRenderState( D3DRS_STENCILENABLE, TRUE );
 	//////////////////////////////////////////////////////////////////////////
 
 	// State Manager Initialization
@@ -133,9 +133,11 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 	GetScriptManager().execute( "EpInitGame" );
 
 	// Shader
+	/*
 	g_bombShader = new BombShader();
 	g_bombShader->initEffect( pd3dDevice, L"Shaders/HLSL/vbomb.fx" );
 	g_bombShader->initMainTechnique();
+	*/
 
 	//g_alphaShader = new AlphaShader();
 	//g_alphaShader->initShader( pd3dDevice, L"Shaders/Alpha.vsh" );
@@ -208,7 +210,8 @@ HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFA
 	//g_fillColor = D3DCOLOR_ARGB( 0, 45, 50, 170 );
 	g_fillColor = D3DCOLOR_ARGB( 0, 0, 0, 0 );
 
-	g_bombShader->onResetDevice();
+	if ( g_bombShader )
+		g_bombShader->onResetDevice();
 	//g_alphaShader->onResetDevice();
 
     return S_OK;
@@ -352,7 +355,7 @@ void CALLBACK OnD3D9FrameRender( IDirect3DDevice9* pd3dDevice, double fTime, flo
     // Render the scene
     if( SUCCEEDED( pd3dDevice->BeginScene() ) )
     {
-		drawBurningTeapot( fTime, fElapsedTime );
+		//drawBurningTeapot( fTime, fElapsedTime );
 
 		GetG().m_dev->SetVertexShader( 0 );
 		GetG().m_dev->SetRenderState( D3DRS_LIGHTING, FALSE );
@@ -365,7 +368,7 @@ void CALLBACK OnD3D9FrameRender( IDirect3DDevice9* pd3dDevice, double fTime, flo
 		V( GetG().m_dev->SetStreamSource( 0, g_lineElement, 0, 16 ) );
 		int i;
 		D3DXMATRIX mWorld, mTrans, mRot, mScaling;
-		D3DXMatrixScaling( &mScaling, (float)s_xSize * s_tileSize, 1.0f, 1.0f );
+		D3DXMatrixScaling( &mScaling, (float)(s_xSize) * s_tileSize, 1.0f, 1.0f );
 		for ( i = -s_ySize / 2; i < s_ySize / 2; ++i )
 		{
 			D3DXMatrixTranslation( &mTrans,
@@ -377,7 +380,7 @@ void CALLBACK OnD3D9FrameRender( IDirect3DDevice9* pd3dDevice, double fTime, flo
 			V( GetG().m_dev->DrawPrimitive( D3DPT_LINELIST, 0, 1 ) );
 		}
 
-		D3DXMatrixScaling( &mScaling, (float)s_ySize * s_tileSize, 1.0f, 1.0f );
+		D3DXMatrixScaling( &mScaling, (float)(s_ySize) * s_tileSize, 1.0f, 1.0f );
 		D3DXMatrixRotationZ( &mRot, D3DXToRadian( 90 ) );
 		for ( i = -s_xSize / 2; i < s_xSize / 2; ++i )
 		{

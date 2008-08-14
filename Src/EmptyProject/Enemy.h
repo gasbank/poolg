@@ -6,7 +6,7 @@ class Enemy :
 {
 public:
 	Enemy(void);
-	~Enemy(void);
+	virtual ~Enemy(void);
 
 	static Unit* createEnemy( LPD3DXMESH mesh, int tileX, int tileY, float posZ );
 

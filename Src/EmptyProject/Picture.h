@@ -1,8 +1,5 @@
 #pragma once
 
-#define KEY_WAS_DOWN_MASK 0x80
-#define KEY_IS_DOWN_MASK  0x01
-
 struct Vertex
 {
 	float x, y, z;

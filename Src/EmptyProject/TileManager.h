@@ -1,9 +1,9 @@
 #pragma once
 #include "Tile.h"
 
-static const int s_xSize = 90;
-static const int s_ySize = 158;
-static const int s_tileSize = 2;
+#define s_xSize		(90)
+#define s_ySize		(158)
+#define s_tileSize	(2)
 
 class TileManager : public Singleton<TileManager>
 {

@@ -74,11 +74,14 @@ bool Character::frameMove( float fElapsedTime )
 				rayTesting( (UnitInput)i );
 				boundaryTesting( (UnitInput)i );
 
+				// if there is no obstacles
 				if( m_bMovable )
 				{
-					if( tileManager.getTile( m_tileBufferX + g_moveAmount[ i ].x, m_tileBufferY + g_moveAmount[ i ].y )->b_movable
-						&& (m_tileBufferX + g_moveAmount[ i ].x  > -1 && m_tileBufferX + g_moveAmount[ i ].x  < s_xSize)
-						&& (m_tileBufferY + g_moveAmount[ i ].y  > -1 && m_tileBufferY + g_moveAmount[ i ].y  < s_ySize) )
+					int nextTileX = m_tileBufferX + g_moveAmount[ i ].x;
+					int nextTileY = m_tileBufferY + g_moveAmount[ i ].y;
+					Tile* nextTile = tileManager.getTile( nextTileX, nextTileY );
+					assert( nextTile );
+					if( nextTile->b_movable && (nextTileX  > -1 && nextTileX  < s_xSize) && (nextTileY  > -1 && nextTileY  < s_ySize) )
  					{
 						m_bMoving = true;
 						m_vKeyboardDirection = D3DXVECTOR3( 0, 0, 0 );
@@ -86,12 +89,12 @@ bool Character::frameMove( float fElapsedTime )
 						m_vKeyboardDirection.y += (float) g_moveAmount[ i ].y * s_tileSize;
 						m_tileBufferX += g_moveAmount[ i ].x;
 						m_tileBufferY += g_moveAmount[ i ].y;
-						//GetScriptManager().execute("EpUnitOnMove 0");
 					}
 				}
-
 				// 가는 방향으로 머리를 돌린다.
 				this->setHeadDir( (UnitInput)i );
+
+				pushUnitInFront( (UnitInput)i );
 
 				break;
 			}
@@ -195,10 +198,6 @@ Character::Character()
 	m_maxHp				= 5;
 	m_curHp				= m_maxHp;
 	m_bMoving			= false;
-	m_tileX				= 0;
-	m_tileY				= 0;
-	m_tileBufferX		= m_tileX;
-	m_tileBufferY		= m_tileY;
 	m_fMovingTime		= 0;
 	m_moveDuration		= 1.0f;
 	m_boundaryTileRect.top   = 999999;
@@ -211,24 +210,6 @@ Character::Character()
 	srand ( (unsigned)time(NULL) );
 }
 
-void Character::setTilePos( int tileX, int tileY )
-{
-	m_tileX = tileX;
-	m_tileY = tileY;
-
-	setPos( D3DXVECTOR3( (float)(tileX - (s_xSize / 2)) * s_tileSize, (float)(tileY  - (s_ySize / 2)) * s_tileSize, 0 ) );
-}
-
-void Character::enterTile( int tileX, int tileY )
-{
-	TopStateManager& tsm = TopStateManager::getSingleton();
-	WorldState* ws = static_cast<WorldState*>( tsm.getCurState() );
-
-	printf( "현재의 위치 : [%d, %d]\n", tileX, tileY );
-	//printf( "또다른 현재의 위치 : [%d, %d]\n", GetTileManager().pos2TileX( &ws->getHeroPos() ), GetTileManager().pos2TileY( &ws->getHeroPos() ) );
-
-	m_trigger->positionTrigger();
-}
 void Character::setColor( int r, int g, int b )
 {
 	ZeroMemory(&m_material, sizeof(D3DMATERIAL9));
@@ -318,19 +299,19 @@ void Character::boundaryTesting( UnitInput mappedKey )
 	switch ( mappedKey )
 	{
 	case UNIT_MOVE_UP:
-		if ( m_boundaryTileRect.top == getTilePosY() )
+		if ( (UINT)m_boundaryTileRect.top == getTilePosY() )
 			m_bMovable = false;
 		break;
 	case UNIT_MOVE_DOWN:
-		if ( m_boundaryTileRect.bottom == getTilePosY() )
+		if ( (UINT)m_boundaryTileRect.bottom == getTilePosY() )
 			m_bMovable = false;
 		break;
 	case UNIT_MOVE_LEFT:
-		if ( m_boundaryTileRect.left == getTilePosX() )
+		if ( (UINT)m_boundaryTileRect.left == getTilePosX() )
 			m_bMovable = false;
 		break;
 	case UNIT_MOVE_RIGHT:
-		if ( m_boundaryTileRect.right == getTilePosX() )
+		if ( (UINT)m_boundaryTileRect.right == getTilePosX() )
 			m_bMovable = false;
 		break;
 	}
@@ -354,6 +335,16 @@ void Character::damage( int point )
 	m_curHp -= point;
 }
 
+void Character::enterTile( UINT tileX, UINT tileY )
+{
+
+	printf( "현재의 위치 : [%d, %d]\n", tileX, tileY );
+	printf( "또다른 현재의 위치 : [%d, %d]\n",
+		GetTileManager().pos2TileX( &getWorldState()->getHeroPos() ),
+		GetTileManager().pos2TileY( &getWorldState()->getHeroPos() ) );
+
+	m_trigger->positionTrigger();
+}
 Unit* EpCreateCharacter( int tileX, int tileY, int controllable )
 {
 	LPD3DXMESH d3dxMesh;

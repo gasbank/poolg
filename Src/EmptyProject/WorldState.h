@@ -52,6 +52,7 @@ public:
 	ArnSceneGraph* getArnSceneGraphPt() { return m_sg; }
 	void screenFlashing( float durationSec, float r, float g, float b );
 
+	Unit* findUnitAtTile( UINT x, UINT y );
 private:
 	void setupLight();
 	void handleCollision( Unit* heroUnit, Unit* opponentUnit );

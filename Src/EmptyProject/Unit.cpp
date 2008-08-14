@@ -2,9 +2,10 @@
 #include "Unit.h"
 #include "ScriptManager.h"
 #include "WorldState.h"
-#define KEY_WAS_DOWN_MASK 0x80
-#define KEY_IS_DOWN_MASK  0x01
+#include "TopStateManager.h"
+#include "TileManager.h"
 
+extern TileManager tileManager;
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -13,6 +14,11 @@ Unit::Unit()
 	m_d3dxMesh			= 0;
 	m_pd3dDevice		= 0;
 	m_d3dTex			= 0;
+
+	m_tileX				= 0;
+	m_tileY				= 0;
+	m_tileBufferX		= m_tileX;
+	m_tileBufferY		= m_tileY;
 
 	m_vRot				= D3DXVECTOR3(0, 0, 0);
 	m_vPos				= D3DXVECTOR3(0, 0, 0);
@@ -49,6 +55,16 @@ HRESULT Unit::init( LPDIRECT3DDEVICE9 pd3dDevice, LPD3DXMESH mesh )
 	m_d3dxMesh->UnlockVertexBuffer();
 
 	return hr;
+}
+
+void Unit::setTilePos( int tileX, int tileY )
+{
+	m_tileX = tileX;
+	m_tileY = tileY;
+
+	setPos( D3DXVECTOR3( (float)(tileX - (s_xSize / 2)) * s_tileSize, (float)(tileY  - (s_ySize / 2)) * s_tileSize, 0 ) );
+
+	//printf( "%s: setTilePos called (%d, %d)\n", typeid(this).name(), tileX, tileY );
 }
 
 HRESULT Unit::frameRender()
@@ -136,6 +152,12 @@ void Unit::setHeadDir( UnitInput unitInput )
 		break;
 	}
 }
+
+WorldState* Unit::getWorldState() const
+{
+	return static_cast<WorldState*>( TopStateManager::getSingleton().getCurState() );
+}
+
 
 //////////////////////////////////////////////////////////////////////////
 

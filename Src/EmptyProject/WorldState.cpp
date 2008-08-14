@@ -8,7 +8,7 @@
 #include "ArnCamera.h"
 #include "ShaderWrapper.h"
 #include "Enemy.h"
-
+#include "ArnCamera.h"
 IMPLEMENT_SINGLETON( TileManager );
 TileManager	tileManager;
 
@@ -37,6 +37,8 @@ WorldState::~WorldState(void)
 	{
 		EP_SAFE_RELEASE( *it );
 	}
+
+	delete m_trigger;
 }
 
 HRESULT WorldState::enter()
@@ -152,7 +154,7 @@ HRESULT WorldState::enter()
 	m_alphaShader->compileShader( "Alpha", "vs_2_0" );
 
 	D3DXCreatePolygon( pd3dDevice, 10.0f, 32, &m_testPolygon, 0 );
-	m_testPolygon->CloneMesh( 0, m_alphaShader->getDecl(), pd3dDevice, &m_testPolygonCloned );
+	m_testPolygon->CloneMesh( D3DXMESH_WRITEONLY, m_alphaShader->getDecl(), pd3dDevice, &m_testPolygonCloned );
 
 	return hr;
 }
@@ -195,8 +197,6 @@ HRESULT WorldState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, floa
 	GetG().m_videoMan.renderMeshesOnly(m_sgRat->getSceneRoot(), transform);
 	GetG().m_videoMan.renderMeshesOnly(m_sg->getSceneRoot());
 	
-
-
 	//////////////////////////////////////////////////////////////////////////
 	// EP rendering routine (CCW)
 
@@ -399,8 +399,8 @@ HRESULT WorldState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 				{
 					Dialog* dialog = (*it);
 					
-					if ( (m_heroUnit->getTilePosX() == dialog->getRegion().left)
-						&& (m_heroUnit->getTilePosY() == dialog->getRegion().top) )
+					if ( (m_heroUnit->getTilePosX() == (UINT)dialog->getRegion().left)
+						&& (m_heroUnit->getTilePosY() == (UINT)dialog->getRegion().top) )
 					{
 						if ( dialog->nextDialog() == false )
 						{
@@ -621,4 +621,19 @@ void WorldState::screenFlashing( float durationSec, float r, float g, float b )
 
 	// 이 값에 0.0도를 주면 알아서 180도까지 올라가고 멈추게 된다.
 	m_screenFlashAlphaAngle = 0.0f;
+}
+
+Unit* WorldState::findUnitAtTile( UINT x, UINT y )
+{
+	Unit* ret = 0;
+	UnitSet::iterator it = m_unitSet.begin();
+	for ( ; it != m_unitSet.end(); ++it )
+	{
+		if ( (*it)->getTilePosX() == x && (*it)->getTilePosY() == y )
+		{
+			ret = *it;
+			break;
+		}
+	}
+	return ret;
 }

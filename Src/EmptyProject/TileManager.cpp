@@ -4,6 +4,16 @@
 TileManager::TileManager(void)
 {
 	int i, j;
+	int xSize = s_xSize;
+	int ySize = s_ySize;
+	int tileSize = s_tileSize;
+
+	if ( xSize % 2 != 0 || ySize % 2 != 0 || xSize <= 0 || ySize <= 0 || tileSize <= 0)
+	{
+		printf( " - Tile SIze Error! Should be positive and even number\n" );
+		system( "pause" );
+		exit( -10 );
+	}
 
 	for(i = 0; i < s_xSize; i++)
 	{

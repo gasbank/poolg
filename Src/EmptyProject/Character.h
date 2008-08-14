@@ -29,16 +29,15 @@ public:
 
 	bool isDead() { return (m_curHp<=0); }
 
-	void setTilePos(int tileX, int tileY);
-	void setTileBufferPos(int tileX, int tileY) { m_tileBufferX = tileX; m_tileBufferY = tileY; }
-	int getTilePosX() { return m_tileX; }
-	int getTilePosY() { return m_tileY; }
-	void enterTile(int tileX, int tileY);
-
+	
 	void setMoveDuration( float val ) { m_moveDuration = val; }
 	void setColor( int r, int g, int b );
 
 	void setBoundaryRect( LONG left, LONG top, LONG right, LONG bottom );
+
+	virtual void pushUnitInFront( UnitInput dir ) {}
+
+	virtual void enterTile( UINT tileX, UINT tileY);
 protected:
 	Character();
 
@@ -55,12 +54,10 @@ private:
 	int						m_maxHp;
 	int						m_curHp;
 	float					m_moveDuration; // A time needed to move one time(tile) in seconds
-	int						m_tileX;
-	int						m_tileY;
+	
 	int						m_attack;		// 일반 공격 스킬에 영향
 	int						m_intelligence; // 힐링 등의 스킬에 영향
-	int						m_tileBufferX;
-	int						m_tileBufferY;
+	
 	RECT					m_boundaryTileRect;
 	Trigger*				m_trigger;
 };

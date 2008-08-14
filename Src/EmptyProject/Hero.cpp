@@ -2,6 +2,7 @@
 #include "Hero.h"
 #include "ScriptManager.h"
 #include "TileManager.h"
+#include "WorldState.h"
 
 Hero::Hero(void)
 {
@@ -37,6 +38,19 @@ LRESULT Hero::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 	return Character::handleMessages( hWnd, uMsg, wParam, lParam );
 }
 
+void Hero::pushUnitInFront( UnitInput dir )
+{
+	/*Unit* u = getWorldState()->findUnitAtTile(
+		m_tileBufferX + g_moveAmount[ (int)dir ].x,
+		m_tileBufferY + g_moveAmount[ (int)dir ].y );
+
+	if ( u )
+	{
+		UINT targetTileX = u->getTilePosX() + g_moveAmount[dir].x;
+		UINT targetTileY = u->getTilePosY() + g_moveAmount[dir].y;
+		u->setTilePos( targetTileX, targetTileY );
+	}*/
+}
 Unit* EpCreateHero( int tileX, int tileY )
 {
 	LPD3DXMESH d3dxMesh;

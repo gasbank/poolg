@@ -26,3 +26,5 @@ private:
 };
 
 Unit* EpCreateEnemy( int tileX, int tileY );
+
+SCRIPT_FACTORY( Enemy )

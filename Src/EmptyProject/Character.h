@@ -65,3 +65,5 @@ private:
 };
 
 Unit* EpCreateCharacter( int tileX, int tileY, int controllable );
+
+SCRIPT_FACTORY( Character )

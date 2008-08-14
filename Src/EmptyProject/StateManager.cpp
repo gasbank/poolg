@@ -33,3 +33,8 @@ void StateManager::transit()
 		m_curStates->enter();
 	}
 }
+
+State* StateManager::getState( GameState gs )
+{
+	return m_states[2];
+}

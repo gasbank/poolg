@@ -21,6 +21,7 @@ class StateManager
 
 	void setNextStateAsPrevState();
 	State* getCurState() const;
+	State* getState(GameState gs);
 	void transit();
 
 protected:

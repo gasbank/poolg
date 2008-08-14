@@ -2,6 +2,11 @@
 #include "ScriptManager.h"
 #include "TopStateManager.h"
 
+#include "Unit.h"
+#include "Character.h"
+#include "Hero.h"
+#include "Enemy.h"
+
 int Tcl_AppInit(Tcl_Interp *interp);
 
 //////////////////////////////////////////////////////////////////////////
@@ -112,6 +117,17 @@ bool ScriptManager::readCharPtrList( const char* variableName, std::list<const c
 	}
 	return true;
 }
+
+
+
+void ScriptManager::initBoundings()
+{
+	_script_factory_Unit::init();
+	_script_factory_Character::init();
+	_script_factory_Hero::init();
+	_script_factory_Enemy::init();
+	_script_factory_TopStateManager::init();
+}
 //////////////////////////////////////////////////////////////////////////
 
 int EpSetNextState(int stateID)
@@ -121,12 +137,7 @@ int EpSetNextState(int stateID)
 
 } SCRIPT_CALLABLE_I_I( EpSetNextState )
 
-int EpOutputDebugString( const char* msg )
-{
-	OutputDebugStringA( msg );
-	return 0;
 
-} SCRIPT_CALLABLE_I_PC( EpOutputDebugString )
 
 int EpSetWindowSize(int w, int h)
 {
@@ -145,9 +156,8 @@ int Tcl_AppInit(Tcl_Interp *interp)
 	if (Tcl_Init(interp) == TCL_ERROR)
 		return TCL_ERROR;
 	/* Now initialize our functions */
-	CREATE_OBJ_COMMAND( EpSetNextState );
-	CREATE_OBJ_COMMAND( EpOutputDebugString );
-	CREATE_OBJ_COMMAND( EpSetWindowSize );
+	CREATE_OBJ_COMMAND_ENGINE( EpSetNextState );
+	CREATE_OBJ_COMMAND_ENGINE( EpSetWindowSize );
 	return TCL_OK;
 }
 

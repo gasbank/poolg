@@ -41,7 +41,7 @@ D3DCOLOR						g_fillColor;
 
 LOGMANAGER logMan;
 
-
+Tcl_Interp*						g_consoleInterp			= 0;
 //--------------------------------------------------------------------------------------
 // Rejects any D3D9 devices that aren't acceptable to the app by returning false
 //--------------------------------------------------------------------------------------
@@ -108,6 +108,8 @@ bool CALLBACK ModifyDeviceSettings( DXUTDeviceSettings* pDeviceSettings, void* p
 
 	//pDeviceSettings->d3d9.pp.EnableAutoDepthStencil= TRUE;
 	//pDeviceSettings->d3d9.pp.AutoDepthStencilFormat = D3DFMT_D16;
+
+	pDeviceSettings->d3d9.BehaviorFlags |= D3DCREATE_MULTITHREADED;
 
 	return true;
 }
@@ -521,15 +523,45 @@ void SetCurrentWorkingDirectory()
 	}
 }
 
+
+int EpOutputDebugString( const char* msg )
+{
+	OutputDebugStringA( msg );
+	return 0;
+
+} SCRIPT_CALLABLE_I_PC( EpOutputDebugString )
+
+unsigned int __stdcall newThread( ClientData cd )
+{
+	//printf( "xx ^________^ xx" );
+	g_consoleInterp = Tcl_CreateInterp();
+	if (Tcl_Init(g_consoleInterp) == TCL_ERROR)
+		return TCL_ERROR;
+
+	GetScriptManager().initBoundings();
+
+	CREATE_OBJ_COMMAND( EpOutputDebugString );
+
+
+	Tcl_EvalFile( g_consoleInterp, "library/EpThreadTest.tcl" );
+
+	return 0;
+}
+
+
 void CreateScriptManagerIfNotExist()
 {
 	SetCurrentWorkingDirectory();
 	if ( !g_scriptManager )
 	{
 		g_scriptManager = new ScriptManager();
+
+		
 		GetScriptManager().init();
 	}
 }
+
+
 
 //--------------------------------------------------------------------------------------
 // Initialize everything and go into a render loop
@@ -564,13 +596,17 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 	GetScriptManager().executeFile( "library/EpInitScript.tcl" );
 	GetScriptManager().executeFile( "library/EpWorldState.tcl" );
 	GetScriptManager().executeFile( "library/EpDialog1.tcl" );
-	//GetScriptManager().executeFile( "library/EpThreadTest.tcl" );
+	//GetScriptManager().executeFile( "library/EpThreadModuleTest.tcl" );
 
 	GetScriptManager().execute( "EpInitApp" );
 
 	GetG().m_camera.SetAttachCameraToModel( true );
 	GetG().m_camera.SetEnablePositionMovement( true );
 
+	
+	Tcl_ThreadId ttid;
+	Tcl_CreateThread( &ttid, newThread, 0, 1024, 0 );
+	
 
     // Initialize DXUT and create the desired Win32 window and Direct3D device for the application
     DXUTInit( true, true ); // Parse the command line and show msgboxes

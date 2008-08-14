@@ -3,6 +3,7 @@
 #include "IntroState.h"
 #include "WorldState.h"
 #include "CreditState.h"
+#include "ScriptManager.h"
 
 IMPLEMENT_SINGLETON(TopStateManager);
 
@@ -79,3 +80,16 @@ GameState TopStateManager::prevStateEnum()
 		return GAME_TOP_STATE_CREDIT;
 	return NULL_STATE;
 }
+
+//////////////////////////////////////////////////////////////////////////
+
+
+
+void* EpGetWorldState()
+{
+	return GetTopStateManager().getState(GAME_TOP_STATE_WORLD);
+} SCRIPT_CALLABLE_PV( EpGetWorldState )
+
+START_SCRIPT_FACTORY( TopStateManager )
+	CREATE_OBJ_COMMAND( EpGetWorldState )
+END_SCRIPT_FACTORY( TopStateManager )

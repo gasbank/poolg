@@ -15,6 +15,7 @@
 
 extern TileManager tileManager;
 
+
 void Character::attack( int type, Character* enemy )
 {
 	D3DXVECTOR3 fireDir = enemy->getPos() - getPos();
@@ -338,10 +339,10 @@ void Character::damage( int point )
 void Character::enterTile( UINT tileX, UINT tileY )
 {
 
-	printf( "현재의 위치 : [%d, %d]\n", tileX, tileY );
+	/*printf( "현재의 위치 : [%d, %d]\n", tileX, tileY );
 	printf( "또다른 현재의 위치 : [%d, %d]\n",
 		GetTileManager().pos2TileX( &getWorldState()->getHeroPos() ),
-		GetTileManager().pos2TileY( &getWorldState()->getHeroPos() ) );
+		GetTileManager().pos2TileY( &getWorldState()->getHeroPos() ) );*/
 
 	m_trigger->positionTrigger();
 }

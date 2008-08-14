@@ -103,3 +103,4 @@ protected:
 	
 };
 
+SCRIPT_FACTORY( Unit )

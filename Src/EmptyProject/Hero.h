@@ -16,3 +16,5 @@ public:
 
 	virtual void pushUnitInFront( UnitInput dir );
 };
+
+SCRIPT_FACTORY( Hero )

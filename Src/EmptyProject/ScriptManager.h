@@ -1,6 +1,8 @@
 #pragma once
 #include "SingletonCreators.h"
 
+extern Tcl_Interp* g_consoleInterp;
+
 class ScriptManager : public Singleton<ScriptManager>
 {
 public:
@@ -19,12 +21,14 @@ public:
 	Tcl_Obj* getObject( const char* variableName );
 	bool readCharPtrList( const char* variableName, std::list<const char*>& strList );
 
+	void initBoundings();
 private:
 	void throwScriptErrorWithMessage();
 
 	Tcl_Interp* m_interp;
 };
 inline ScriptManager& GetScriptManager() { return ScriptManager::getSingleton(); }
+
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -36,18 +40,7 @@ enum ArgumentType
 	AT_D = 3,
 	AT_PV = 4,
 };
-class SuperVoidPointer
-{
-public:
-	SuperVoidPointer(void* realPtr = 0) { m_realPtr = realPtr; }
-	template<class newType>
-	operator newType()
-	{
-		return reinterpret_cast<newType>(m_realPtr);
-	}
-private:
-	void* m_realPtr;
-};
+
 union ScriptArgument
 {
 	int i;
@@ -55,6 +48,7 @@ union ScriptArgument
 	double d;
 	void* pv;
 };
+
 typedef std::vector<ScriptArgument> ScriptArgumentList;
 
 void ParseTclArgumentByTrait( DWORD trait, Tcl_Interp* interp, Tcl_Obj *CONST objv[], ScriptArgumentList& argList );
@@ -190,18 +184,25 @@ static const DWORD _trait_D_PV			= AT_D | (AT_PV << 4);
 	SCRIPT_CALLABLE_END(funcName, D_PV)
 
 
-#define CREATE_OBJ_COMMAND(funcName)	Tcl_CreateObjCommand(GetScriptManager().getInterp(), #funcName, _tcl_wrap_##funcName, (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL);
+#define SCRIPT_CALLABLE_PV(funcName)											\
+	void _wrap_##funcName(ScriptArgumentList& args)								\
+	{																			\
+	args[0].pv = funcName();													\
+	}																			\
+	SCRIPT_CALLABLE_END(funcName, PV)
+
+
+
+#define CREATE_OBJ_COMMAND_ENGINE(funcName)											\
+	Tcl_CreateObjCommand(GetScriptManager().getInterp(), #funcName, _tcl_wrap_##funcName, (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL);
+
+#define CREATE_OBJ_COMMAND(funcName)											\
+	Tcl_CreateObjCommand(GetScriptManager().getInterp(), #funcName, _tcl_wrap_##funcName, (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL);	\
+	Tcl_CreateObjCommand(g_consoleInterp, #funcName, _tcl_wrap_##funcName, (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL);
 
 #define START_SCRIPT_FACTORY(className)											\
-	class _script_factory_##className											\
-	{																			\
-	public:																		\
-		_script_factory_##className()											\
-		{																		\
-			CreateScriptManagerIfNotExist();
+	void _script_factory_##className::init()									\
+	{
 
 #define END_SCRIPT_FACTORY(className)											\
-		}																		\
-	};																			\
-	static _script_factory_##className _script_factory_##className_instance_;
-
+	}

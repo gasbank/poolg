@@ -83,7 +83,7 @@ BattleState::BattleState()
 	m_hpBarPlayer.setSize(statusBarWidth, statusBarHeight);
 	m_hpBarPlayer.setPos (statusBoxPlayersPositionX + statusBoxWidth*0.23f, statusBoxPlayersPositionY + statusBoxHeight * 0.82f, 4.5f);
 	
-	m_innerFire.init (L"Images/BattleUI/ChaosAura.png", m_pDev, 0.8f, 3, 20);
+	m_innerFire.init (L"Images/BattleUI/ChaosAura.png", m_pDev, 0.8f, 3, 9);
 	m_innerFire.setPos (0, 0, 0);
 
 

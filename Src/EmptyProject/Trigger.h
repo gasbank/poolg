@@ -16,6 +16,7 @@ public:
 
 	void detectBattleAction();
 	void detectTalkAction();
+	void detecCreateAction();
 	void detectHealAction();
 private:
 	WorldState* m_ws;

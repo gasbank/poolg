@@ -3,6 +3,7 @@
 #include "TopStateManager.h"
 #include "WorldState.h"
 #include "WorldStateManager.h"
+#include "Enemy.h"
 
 Action::Action(void)
 {
@@ -44,4 +45,12 @@ void Action::soundAction( std::string sz )
 		GetAudioState().bBGMFade = false;
 		GetAudioState().bMusicFade = true;
 	}
+}
+
+void Action::createUnitAction( int x, int y, bool random )
+{
+	static int i = 0;
+	if ( i == 0 )
+		m_ws->addUnit (EpCreateEnemy( x, y ) );
+	i++;
 }

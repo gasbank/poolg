@@ -22,6 +22,7 @@ void Trigger::positionTrigger()
 	detectBattleAction();
 	detectHealAction();
 	detectTalkAction();
+	detecCreateAction();
 }
 
 void Trigger::detectBattleAction()
@@ -58,4 +59,10 @@ void Trigger::detectHealAction()
 	{
 		m_ws->getHeroUnit()->heal( 9999 );
 	}
+}
+
+void Trigger::detecCreateAction()
+{
+	if ( GetTileManager().getTile( GetTileManager().pos2TileX( &m_ws->getHeroPos() ) , GetTileManager().pos2TileY( &m_ws->getHeroPos() ) )->b_createEnemy )
+		m_action.createUnitAction( 33, 57, 0 );
 }

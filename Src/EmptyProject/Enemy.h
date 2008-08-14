@@ -22,5 +22,7 @@ private:
 	void walkRandomly();
 
 	bool m_bRandomWalkable;
-	bool					m_bTalkable;
+	bool m_bTalkable;
 };
+
+Unit* EpCreateEnemy( int tileX, int tileY );

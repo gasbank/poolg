@@ -13,6 +13,7 @@ public:
 	void battleAction( Enemy* oppCharacter );
 	void screenAction();
 	void soundAction( std::string sz );
+	void createUnitAction( int x, int y, bool random );
 private:
 	WorldState* m_ws;
 };

@@ -4,6 +4,8 @@
 class AttackObject;
 class Trigger;
 
+
+
 class Character : public Unit
 {
 public:
@@ -61,3 +63,5 @@ private:
 	RECT					m_boundaryTileRect;
 	Trigger*				m_trigger;
 };
+
+Unit* EpCreateCharacter( int tileX, int tileY, int controllable );

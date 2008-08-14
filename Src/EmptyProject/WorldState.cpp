@@ -100,6 +100,7 @@ HRESULT WorldState::enter()
 	tileManager.getTile( 14, 14 )->b_movable = false;
 	tileManager.getTile( 17, 14 )->b_heal = true;
 	tileManager.getTile( 26, 74 )->b_eventTalk = true;
+	tileManager.getTile( 33, 57 )->b_createEnemy = true;
 
 
 	// Create sample 3D model(!)

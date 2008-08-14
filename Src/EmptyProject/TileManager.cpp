@@ -21,6 +21,7 @@ TileManager::TileManager(void)
 		{
 			m_tileArray[i][j].b_movable = true;
 			m_tileArray[i][j].b_eventTalk = false;
+			m_tileArray[i][j].b_createEnemy = false;
 		}
 	}
 }

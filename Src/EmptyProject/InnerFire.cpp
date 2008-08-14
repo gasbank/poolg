@@ -66,7 +66,7 @@ void InnerFire::init(const TCHAR* imgFileName, LPDIRECT3DDEVICE9 d3dDev, float r
 	{
 		ind[6 * i + 0] = (WORD)(i);
 		ind[6 * i + 1] = (WORD)(i + 1);
-		ind[6 * i + 2] = (WORD)(i + angleNumber);
+		ind[6 * i + 2] = (WORD)(i + angleNumber + 1);
 
 		ind[6 * i + 3] = (WORD)(i + 1);
 		ind[6 * i + 4] = (WORD)(i + 2 + angleNumber);
@@ -139,7 +139,7 @@ HRESULT InnerFire::draw(bool textured)
 void InnerFire::frameMove( float fElapsedTime )
 {
 	D3DXMATRIX mScaling, mTranslation;
-	D3DXMatrixScaling(&mScaling, m_radius*2, m_radius*2, m_height);
+	D3DXMatrixScaling(&mScaling, 1, 1, 1);
 	D3DXMatrixTranslation(&mTranslation, m_vPos.x, m_vPos.y, m_vPos.z);
 
 	m_localXform = mScaling * mTranslation;

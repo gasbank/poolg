@@ -83,8 +83,8 @@ BattleState::BattleState()
 	m_hpBarPlayer.setSize(statusBarWidth, statusBarHeight);
 	m_hpBarPlayer.setPos (statusBoxPlayersPositionX + statusBoxWidth*0.23f, statusBoxPlayersPositionY + statusBoxHeight * 0.82f, 4.5f);
 	
-	m_innerFire.init (L"Images/BattleUI/BGchecker.jpg", m_pDev, 2, 2, 5);
-	m_innerFire.setPos (0, 0, -5.0f);
+	m_innerFire.init (L"Images/BattleUI/ChaosAura.png", m_pDev, 0.8f, 3, 20);
+	m_innerFire.setPos (0, 0, 0);
 
 
 	m_mpBarPlayer.init(L"Images/BattleUI/DKbar.jpg", m_pDev);
@@ -217,7 +217,10 @@ HRESULT BattleState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, flo
 	pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
 	pd3dDevice->SetTransform(D3DTS_VIEW, GetG().m_camera.GetViewMatrix());
 	pd3dDevice->SetTransform(D3DTS_PROJECTION, GetG().m_camera.GetProjMatrix());
-	m_innerFire.draw();
+
+	if (this->m_curTurnType == TT_PLAYER)
+		m_innerFire.draw();
+
 	renderFixedText(GetG().m_scrWidth, GetG().m_scrHeight);
 	
 	return S_OK;

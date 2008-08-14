@@ -226,7 +226,7 @@ void CALLBACK OnFrameMove( double fTime, float fElapsedTime, void* pUserContext 
 
 	//////////////////////////////////////////////////////////////////////////
 
-	GetG().m_camera.FrameMove( fElapsedTime );
+	GetG().m_camera.frameMove( fElapsedTime );
 
 	TopStateManager::getSingleton().transit();
 

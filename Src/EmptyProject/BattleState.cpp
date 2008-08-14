@@ -331,10 +331,10 @@ HRESULT BattleState::frameMove(double fTime, float fElapsedTime)
 
 		D3DXVec3Normalize( &vCurUp, &vCurUp );
 
-		camera.SetViewParamsWithUp( &vCurEye, &vCurLookAt, vCurUp );
+		camera.setViewParamsWithUp( &vCurEye, &vCurLookAt, vCurUp );
 	}
 	else
-		camera.SetViewParamsWithUp( &vDesEye, &vDesLookAt, vDesUp );
+		camera.setViewParamsWithUp( &vDesEye, &vDesLookAt, vDesUp );
 
 	return S_OK;
 }

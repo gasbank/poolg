@@ -258,7 +258,7 @@ HRESULT WorldState::frameMove(double fTime, float fElapsedTime)
 	
 	m_pic.frameMove(fElapsedTime);
 	m_avatar.frameMove(fElapsedTime);
-	camera.FrameMove(fElapsedTime);
+	camera.frameMove(fElapsedTime);
 	m_sound.UpdateAudio();
 	
 	DialogList::iterator itDialog = m_scriptedDialog.begin();

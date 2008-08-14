@@ -4,10 +4,24 @@
 
 EpCamera::EpCamera(void)
 {
+	m_fSmoothCameraTimer = 99999.0f;
 }
 
-void EpCamera::FrameMove( FLOAT fElapsedTime )
+void EpCamera::frameMove( FLOAT fElapsedTime )
 {
+	switch ( m_runningCamera )
+	{
+	case CAMERA_NORMAL:
+		// 위치가 일정하므로 Update해줄 것이 없다.
+		break;
+	case CAMERA_SMOOTH:
+		updateSmoothCamera( fElapsedTime );
+		break;
+	case CAMERA_EXTERNAL:
+		updateExternalCamera( m_pArnCam );
+		break;
+	}
+
 	CModelViewerCamera::FrameMove( fElapsedTime );
 }
 
@@ -39,7 +53,7 @@ D3DUtil_CameraKeys EpCamera::MapKey( UINT nKey )
 	return CAM_UNKNOWN;
 }
 
-void EpCamera::SetViewParamsWithUp( D3DXVECTOR3* pvEyePt, D3DXVECTOR3* pvLookatPt, const D3DXVECTOR3& vUp )
+void EpCamera::setViewParamsWithUp( D3DXVECTOR3* pvEyePt, D3DXVECTOR3* pvLookatPt, const D3DXVECTOR3& vUp )
 {
 	if( NULL == pvEyePt || NULL == pvLookatPt )
 		return;
@@ -87,12 +101,6 @@ D3DXVECTOR3* EpCamera::GetUpPt()
 	return &m_vUp;
 }
 
-void EpCamera::beginExternalCamera( ArnCamera* arnCam )
-{
-	m_pArnCam = arnCam;
-	m_runningCamera = CAMERA_EXTERNAL;
-}
-
 // arnCam로부터 정보를 얻어서 카메라의 view parameter를 지정한다.
 // arnCam이 변할 수 있으므로 프레임마다 호출해아 한다.
 void EpCamera::updateExternalCamera( ArnCamera* arnCam )
@@ -127,5 +135,65 @@ void EpCamera::updateExternalCamera( ArnCamera* arnCam )
 	vEye.y = arnCamLocalXfrom._42;
 	vEye.z = arnCamLocalXfrom._43;
 
-	SetViewParamsWithUp( &vEye, &vLookAt, vUp );
+	setViewParamsWithUp( &vEye, &vLookAt, vUp );
+}
+
+void EpCamera::setDesViewParams( D3DXVECTOR3* pvEyePt, D3DXVECTOR3* pvLookAtPt, const D3DXVECTOR3& vUp )
+{
+	m_vDesEye = *pvEyePt;
+	m_vDesLookAt = *pvLookAtPt;
+	m_vDesUp = vUp;
+}
+
+void EpCamera::updateSmoothCamera( float fElapsedTime )
+{
+	// 지정된 시간 동안 이전 위치로부터 목적 위치까지 linear interpolation 하여 현재 카메라 위치를
+	// 구한다.
+	if ( m_fSmoothCameraTimer <= m_fSmoothCameraDuration )
+	{
+		float s = m_fSmoothCameraTimer / m_fSmoothCameraDuration;
+
+		D3DXVec3Lerp( &m_vEye, &m_vPrevEye, &m_vDesEye, s );
+		D3DXVec3Lerp( &m_vLookAt, &m_vPrevLookAt, &m_vDesLookAt, s );
+		D3DXVec3Lerp( &m_vUp, &m_vPrevUp, &m_vDesUp, s );
+
+		m_fSmoothCameraTimer += fElapsedTime;
+	} 
+	else 
+	{
+		m_vEye = m_vDesEye;
+		m_vLookAt = m_vDesLookAt;
+		m_vUp	= m_vDesUp;
+	}
+
+
+}
+
+void EpCamera::begin( RunningCamera rc )
+{
+	m_runningCamera = rc;
+
+	// CAMERA_SMOOTH는 카메라가 이전 위치에서 목적 위치까지 서서히 움직이는 카메라이다.
+	// 따라서 이전 위치를 미리 저장해 두고, timer도 초기화한다.
+	switch ( rc )
+	{
+	case CAMERA_SMOOTH:
+		m_vPrevEye = m_vEye;
+		m_vPrevLookAt = m_vPrevLookAt;
+		m_vPrevUp = m_vUp;
+		m_fSmoothCameraTimer = 0.0f;
+		break;
+	}
+}
+
+// 쓸모 없는 함수가 된듯 하나 아까워서 남겨둠.
+void EpCamera::lerpViewParams(
+	D3DXVECTOR3* pvEyeOut, D3DXVECTOR3* pvLookAtOut, D3DXVECTOR3* pvUpOut, 
+	D3DXVECTOR3* pvEye1, D3DXVECTOR3* pvLookAt1, D3DXVECTOR3* pvUp1, 
+	D3DXVECTOR3* pvEye2, D3DXVECTOR3* pvLookAt2, D3DXVECTOR3* pvUp2, 
+	float s )
+{
+	D3DXVec3Lerp( pvEyeOut, pvEye1, pvEye2, s );
+	D3DXVec3Lerp( pvLookAtOut, pvLookAt1, pvLookAt2, s );
+	D3DXVec3Lerp( pvUpOut, pvUp1, pvUp2, s );
 }

@@ -65,9 +65,9 @@ HRESULT FieldState::frameMove( double fTime, float fElapsedTime )
 			D3DXVec3Lerp( &vCurLookAt, &m_vPrevLookAt, &vLookAt, fStateTime );
 			D3DXVec3Lerp( &vCurUp, &m_vPrevUp, &vUp, fStateTime );
 
-			camera.SetViewParamsWithUp( &vCurEye, &vCurLookAt, vCurUp );
+			camera.setViewParamsWithUp( &vCurEye, &vCurLookAt, vCurUp );
 		} else {
-			camera.SetViewParamsWithUp( &vEye, &vLookAt, vUp );
+			camera.setViewParamsWithUp( &vEye, &vLookAt, vUp );
 		}
 	}
 	

@@ -21,6 +21,7 @@ Unit* Enemy::createEnemy( LPD3DXMESH mesh, int tileX, int tileY, float posZ )
 	u->setControllable( false );
 	u->setTilePos( tileX, tileY );
 	u->setTileBufferPos( tileX, tileY );
+
 	return u;
 }
 

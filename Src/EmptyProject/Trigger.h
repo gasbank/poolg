@@ -1,5 +1,7 @@
 #pragma once
 #include "Character.h"
+#include "Action.h"
+
 class WorldState;
 
 class Trigger
@@ -17,4 +19,5 @@ public:
 	void detectHealAction();
 private:
 	WorldState* m_ws;
+	Action		m_action;
 };

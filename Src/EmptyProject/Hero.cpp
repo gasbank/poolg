@@ -18,6 +18,7 @@ Unit* Hero::createHero( LPD3DXMESH mesh, int tileX, int tileY, float posZ )
 	u->setControllable( true );
 	u->setTilePos( tileX, tileY );
 	u->setTileBufferPos( tileX, tileY );
+
 	return u;
 }
 

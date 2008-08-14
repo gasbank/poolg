@@ -7,6 +7,7 @@
 #include "InnerFire.h"
 
 class WorldState;
+class Action;
 
 enum TurnType { TT_NATURAL, TT_COMPUTER, TT_PLAYER };
 enum PlayerSide { PS_NOTSET, PS_COMPUTER, PS_PLAYER };
@@ -91,4 +92,6 @@ private:
 	PlayerArt		m_playerArt;
 
 	InnerFire		m_innerFire;
+
+	Action*			m_action;
 };

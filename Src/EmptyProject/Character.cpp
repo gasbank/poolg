@@ -55,6 +55,7 @@ Character::~Character()
 		EP_SAFE_RELEASE(*it);
 	}
 	m_attackObjectList.clear();
+	delete m_trigger;
 }
 
 bool Character::frameMove( float fElapsedTime )
@@ -224,7 +225,7 @@ void Character::enterTile( int tileX, int tileY )
 	WorldState* ws = static_cast<WorldState*>( tsm.getCurState() );
 
 	printf( "현재의 위치 : [%d, %d]\n", tileX, tileY );
-	printf( "또다른 현재의 위치 : [%d, %d]\n", GetTileManager().pos2TileX( &ws->getHeroPos() ), GetTileManager().pos2TileY( &ws->getHeroPos() ) );
+	//printf( "또다른 현재의 위치 : [%d, %d]\n", GetTileManager().pos2TileX( &ws->getHeroPos() ), GetTileManager().pos2TileY( &ws->getHeroPos() ) );
 
 	m_trigger->positionTrigger();
 }

@@ -5,6 +5,7 @@
 #include "Enemy.h"
 #include "WorldStateManager.h"
 #include "TileManager.h"
+#include "Action.h"
 
 Trigger::Trigger(void)
 {
@@ -38,13 +39,7 @@ void Trigger::detectBattleAction()
 			{
 				if ( m_ws->isInFightArea( m_ws->getHeroUnit() , oppCharacter ) == true )
 				{
-					// Set current enemy unit and enter into BattleState
-					m_ws->setCurEnemy( oppCharacter );
-
-					m_ws->getCurEnemyUnit()->setAttack(30);
-
-					if ( GetWorldStateManager().curStateEnum() == GAME_WORLD_STATE_FIELD )
-						GetWorldStateManager().setNextState( GAME_WORLD_STATE_BATTLE );
+					m_action.battleAction( oppCharacter );
 				}
 			}
 		}	
@@ -54,14 +49,13 @@ void Trigger::detectBattleAction()
 void Trigger::detectTalkAction()
 {
 	if ( GetTileManager().getTile( GetTileManager().pos2TileX( &m_ws->getHeroPos() ) , GetTileManager().pos2TileY( &m_ws->getHeroPos() ) )->b_eventTalk )
-		m_ws->startDialog( 0 );
+		m_action.dialogAction( 0 );
 }
 
 void Trigger::detectHealAction()
 {
 	if ( GetTileManager().getTile( GetTileManager().pos2TileX( &m_ws->getHeroPos() ) , GetTileManager().pos2TileY( &m_ws->getHeroPos() ) )->b_heal )
 	{
-		m_ws->startDialog( 5 );
 		m_ws->getHeroUnit()->heal( 9999 );
 	}
 }

@@ -637,34 +637,178 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ShaderWrapper.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ShaderWrapper.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\Working\Shaders\HLSL\vbomb.fx"
 				>
 			</File>
 		</Filter>
-		<File
-			RelativePath=".\Action.cpp"
+		<Filter
+			Name="Event"
 			>
-		</File>
-		<File
-			RelativePath=".\Action.h"
+			<File
+				RelativePath=".\Action.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Action.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Trigger.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Trigger.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Unit"
 			>
-		</File>
-		<File
-			RelativePath=".\AttackObject.cpp"
+			<File
+				RelativePath=".\AttackObject.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\AttackObject.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Character.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Character.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Enemy.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Enemy.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Hero.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Hero.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Unit.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Unit.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Tile"
 			>
-		</File>
-		<File
-			RelativePath=".\AttackObject.h"
+			<File
+				RelativePath=".\Tile.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Tile.h"
+				>
+			</File>
+			<File
+				RelativePath=".\TileManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\TileManager.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="State"
 			>
-		</File>
-		<File
-			RelativePath=".\Character.cpp"
+			<File
+				RelativePath=".\State.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\State.h"
+				>
+			</File>
+			<File
+				RelativePath=".\StateManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\StateManager.h"
+				>
+			</File>
+			<File
+				RelativePath=".\TopStateManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\TopStateManager.h"
+				>
+			</File>
+			<File
+				RelativePath=".\WorldStateManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\WorldStateManager.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="UI"
 			>
-		</File>
-		<File
-			RelativePath=".\Character.h"
+			<File
+				RelativePath=".\ProgressBar.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ProgressBar.h"
+				>
+			</File>
+			<File
+				RelativePath=".\StatusBar.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\StatusBar.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Sprite"
 			>
-		</File>
+			<File
+				RelativePath=".\Picture.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Picture.h"
+				>
+			</File>
+			<File
+				RelativePath=".\PictureMap.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\PictureMap.h"
+				>
+			</File>
+		</Filter>
 		<File
 			RelativePath=".\Dialog.cpp"
 			>
@@ -706,14 +850,6 @@
 			>
 		</File>
 		<File
-			RelativePath=".\Enemy.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\Enemy.h"
-			>
-		</File>
-		<File
 			RelativePath=".\EpCamera.cpp"
 			>
 		</File>
@@ -730,14 +866,6 @@
 			>
 		</File>
 		<File
-			RelativePath=".\Hero.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\Hero.h"
-			>
-		</File>
-		<File
 			RelativePath=".\InnerFire.cpp"
 			>
 		</File>
@@ -746,43 +874,11 @@
 			>
 		</File>
 		<File
-			RelativePath=".\Picture.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\Picture.h"
-			>
-		</File>
-		<File
-			RelativePath=".\PictureMap.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\PictureMap.h"
-			>
-		</File>
-		<File
-			RelativePath=".\ProgressBar.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\ProgressBar.h"
-			>
-		</File>
-		<File
 			RelativePath=".\ScriptManager.cpp"
 			>
 		</File>
 		<File
 			RelativePath=".\ScriptManager.h"
-			>
-		</File>
-		<File
-			RelativePath=".\ShaderWrapper.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\ShaderWrapper.h"
 			>
 		</File>
 		<File
@@ -798,83 +894,11 @@
 			>
 		</File>
 		<File
-			RelativePath=".\State.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\State.h"
-			>
-		</File>
-		<File
-			RelativePath=".\StateManager.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\StateManager.h"
-			>
-		</File>
-		<File
-			RelativePath=".\StatusBar.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\StatusBar.h"
-			>
-		</File>
-		<File
-			RelativePath=".\Tile.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\Tile.h"
-			>
-		</File>
-		<File
-			RelativePath=".\TileManager.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\TileManager.h"
-			>
-		</File>
-		<File
-			RelativePath=".\TopStateManager.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\TopStateManager.h"
-			>
-		</File>
-		<File
-			RelativePath=".\Trigger.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\Trigger.h"
-			>
-		</File>
-		<File
-			RelativePath=".\Unit.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\Unit.h"
-			>
-		</File>
-		<File
 			RelativePath=".\Utility.cpp"
 			>
 		</File>
 		<File
 			RelativePath=".\Utility.h"
-			>
-		</File>
-		<File
-			RelativePath=".\WorldStateManager.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\WorldStateManager.h"
 			>
 		</File>
 	</Files>

@@ -675,3 +675,16 @@ Unit* WorldState::findUnitAtTile( UINT x, UINT y )
 }
 
 //////////////////////////////////////////////////////////////////////////
+
+Unit* EpGetHero()
+{
+	WorldState* ws = dynamic_cast<WorldState*>( GetTopStateManager().getState( GAME_TOP_STATE_WORLD ) );
+	assert( ws );
+	return ws->getHero();
+} SCRIPT_CALLABLE_PV( EpGetHero )
+
+
+START_SCRIPT_FACTORY( WorldState )
+	CREATE_OBJ_COMMAND( EpGetHero )
+
+END_SCRIPT_FACTORY( WorldState )

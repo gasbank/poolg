@@ -6,6 +6,7 @@
 #include "Character.h"
 #include "Hero.h"
 #include "Enemy.h"
+#include "WorldState.h"
 
 int Tcl_AppInit(Tcl_Interp *interp);
 
@@ -127,6 +128,7 @@ void ScriptManager::initBoundings()
 	_script_factory_Hero::init();
 	_script_factory_Enemy::init();
 	_script_factory_TopStateManager::init();
+	_script_factory_WorldState::init();
 }
 //////////////////////////////////////////////////////////////////////////
 

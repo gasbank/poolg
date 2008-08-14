@@ -86,3 +86,5 @@ private:
 	float							m_screenFlashDurationSec;
 	D3DXCOLOR						m_screenFlashCV;
 };
+
+SCRIPT_FACTORY( WorldState )

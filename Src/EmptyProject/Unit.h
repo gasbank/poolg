@@ -60,8 +60,9 @@ public:
 
 	void setTilePos(int tileX, int tileY);
 	void setTileBufferPos(int tileX, int tileY) { m_tileBufferX = tileX; m_tileBufferY = tileY; }
-	UINT getTilePosX() { return m_tileX; }
-	UINT getTilePosY() { return m_tileY; }
+	UINT getTilePosX() const { return m_tileX; }
+	UINT getTilePosY() const { return m_tileY; }
+	void getTilePos( UINT& x, UINT& y ) const { x = m_tileX; y = m_tileY; }
 	virtual void enterTile( UINT tileX, UINT tileY) {}
 protected:
 	WorldState* getWorldState() const;

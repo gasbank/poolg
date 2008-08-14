@@ -1,4 +1,3 @@
-package require Thread
 
 proc EpInitApp {} {
 	# 16:9 widescreen resolution
@@ -14,7 +13,6 @@ proc EpInitGame {} {
 	EpSetNextState 4
 	
 	EpOutputDebugString "<Script> EpInitGame called\n"
-	EpOutputDebugString "<Script> Thread id is [thread::id]\n"
 }
 
 proc EpUnitOnMove {direction} {

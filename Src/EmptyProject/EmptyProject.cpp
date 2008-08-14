@@ -46,16 +46,16 @@ Tcl_Interp*						g_consoleInterp			= 0;
 // Rejects any D3D9 devices that aren't acceptable to the app by returning false
 //--------------------------------------------------------------------------------------
 bool CALLBACK IsD3D9DeviceAcceptable( D3DCAPS9* pCaps, D3DFORMAT AdapterFormat, D3DFORMAT BackBufferFormat,
-                                      bool bWindowed, void* pUserContext )
+									 bool bWindowed, void* pUserContext )
 {
-    // Typically want to skip back buffer formats that don't support alpha blending
-    IDirect3D9* pD3D = DXUTGetD3D9Object();
-    if( FAILED( pD3D->CheckDeviceFormat( pCaps->AdapterOrdinal, pCaps->DeviceType,
-                                         AdapterFormat, D3DUSAGE_QUERY_POSTPIXELSHADER_BLENDING,
-                                         D3DRTYPE_TEXTURE, BackBufferFormat ) ) )
-        return false;
+	// Typically want to skip back buffer formats that don't support alpha blending
+	IDirect3D9* pD3D = DXUTGetD3D9Object();
+	if( FAILED( pD3D->CheckDeviceFormat( pCaps->AdapterOrdinal, pCaps->DeviceType,
+		AdapterFormat, D3DUSAGE_QUERY_POSTPIXELSHADER_BLENDING,
+		D3DRTYPE_TEXTURE, BackBufferFormat ) ) )
+		return false;
 
-    return true;
+	return true;
 }
 
 
@@ -120,7 +120,7 @@ bool CALLBACK ModifyDeviceSettings( DXUTDeviceSettings* pDeviceSettings, void* p
 // and aren't tied to the back buffer size
 //--------------------------------------------------------------------------------------
 HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
-                                     void* pUserContext )
+									void* pUserContext )
 {
 	HRESULT hr;
 	GetG().m_dev = pd3dDevice;
@@ -150,7 +150,7 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 
 	//g_testPolygon->CloneMesh( 0, g_alphaShader->getDecl(), pd3dDevice, &g_testPolygonCloned );
 
-	
+
 	V_RETURN( pd3dDevice->CreateVertexBuffer( sizeof( MY_COLOR_VERTEX ) * 2, D3DUSAGE_WRITEONLY, D3DFVF_XYZ | D3DFVF_DIFFUSE, D3DPOOL_MANAGED, &g_lineElement, 0 ) );
 
 	const D3DCOLOR gridColor = D3DCOLOR_ARGB( 255, 32, 128, 128 );
@@ -177,7 +177,7 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 
 	//[윤욱]
 	//g_menubox.init(pd3dDevice, GetG().m_scrWidth, GetG().m_scrHeight);
-	
+
 	V( D3DXCreateFont( pd3dDevice, 12, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Gulim"), &g_pFont) );
 
 	// Orthogonal and fixed view xforms for GUI or fixed element rendering
@@ -188,7 +188,7 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 	float fAspectRatio = pBackBufferSurfaceDesc->Width / ( FLOAT )pBackBufferSurfaceDesc->Height;
 	g_camera.SetProjParams( D3DX_PI / 4, fAspectRatio, 1.0f, 100000.0f );
 
-	
+
 	return S_OK;
 }
 
@@ -197,11 +197,11 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 // or that are tied to the back buffer size 
 //--------------------------------------------------------------------------------------
 HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
-                                    void* pUserContext )
+								   void* pUserContext )
 {
-    pd3dDevice->SetRenderState( D3DRS_DITHERENABLE, TRUE );
-    pd3dDevice->SetRenderState( D3DRS_SPECULARENABLE, TRUE );
-	
+	pd3dDevice->SetRenderState( D3DRS_DITHERENABLE, TRUE );
+	pd3dDevice->SetRenderState( D3DRS_SPECULARENABLE, TRUE );
+
 	pd3dDevice->SetRenderState(D3DRS_LIGHTING, TRUE);
 	pd3dDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
 	pd3dDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
@@ -216,7 +216,7 @@ HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFA
 		g_bombShader->onResetDevice();
 	//g_alphaShader->onResetDevice();
 
-    return S_OK;
+	return S_OK;
 }
 
 
@@ -226,7 +226,7 @@ HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFA
 void CALLBACK OnFrameMove( double fTime, float fElapsedTime, void* pUserContext )
 {
 	HRESULT hr;
-	
+
 	UNREFERENCED_PARAMETER( hr );
 
 	//////////////////////////////////////////////////////////////////////////
@@ -258,7 +258,7 @@ void renderDebugText()
 	rc.left = 0;
 	rc.right = GetG().m_scrWidth;
 	rc.bottom = GetG().m_scrHeight;
-	
+
 	StringCchPrintf(debugBuffer, 512, L"カメラの位置: (%.2f, %.2f, %.2f)", g_camera.GetEyePt()->x, g_camera.GetEyePt()->y, g_camera.GetEyePt()->z);
 	g_pFont->DrawTextW(0, debugBuffer, -1, &rc, DT_NOCLIP | DT_RIGHT, D3DXCOLOR( 0.0f, 1.0f, 0.0f, 1.0f ) );
 	rc.top += 12;
@@ -292,13 +292,13 @@ void renderFixedElements(IDirect3DDevice9* pd3dDevice, double fTime, float fElap
 
 	/*D3DPERF_BeginEvent(0xff00ffff, L"Draw Center Smiley~");
 	{
-		D3DXMATRIX mRot, mScale, mTrans, mWorld;
-		D3DXMatrixRotationZ(&mRot, D3DXToRadian(45));
-		D3DXMatrixScaling(&mScale, 128.0f, 128.0f, 1.0f);
-		D3DXMatrixTranslation(&mTrans, 0, 0, -10.0f);
-		mWorld = mRot * mScale * mTrans;
-		g_picSmiley.setLocalXform(&mWorld);
-		g_picSmiley.draw();
+	D3DXMATRIX mRot, mScale, mTrans, mWorld;
+	D3DXMatrixRotationZ(&mRot, D3DXToRadian(45));
+	D3DXMatrixScaling(&mScale, 128.0f, 128.0f, 1.0f);
+	D3DXMatrixTranslation(&mTrans, 0, 0, -10.0f);
+	mWorld = mRot * mScale * mTrans;
+	g_picSmiley.setLocalXform(&mWorld);
+	g_picSmiley.draw();
 	}
 	D3DPERF_EndEvent();*/
 
@@ -351,12 +351,12 @@ void CALLBACK OnD3D9FrameRender( IDirect3DDevice9* pd3dDevice, double fTime, flo
 {
 	HRESULT hr;
 
-    // Clear the render target and the zbuffer 
-    V( pd3dDevice->Clear( 0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, g_fillColor, 1.0f, 0 ) );
+	// Clear the render target and the zbuffer 
+	V( pd3dDevice->Clear( 0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, g_fillColor, 1.0f, 0 ) );
 
-    // Render the scene
-    if( SUCCEEDED( pd3dDevice->BeginScene() ) )
-    {
+	// Render the scene
+	if( SUCCEEDED( pd3dDevice->BeginScene() ) )
+	{
 		//drawBurningTeapot( fTime, fElapsedTime );
 
 		GetG().m_dev->SetVertexShader( 0 );
@@ -399,17 +399,17 @@ void CALLBACK OnD3D9FrameRender( IDirect3DDevice9* pd3dDevice, double fTime, flo
 
 		GetTopStateManager().getCurState()->frameRender(pd3dDevice, fTime, fElapsedTime);
 
-		
-		
+
+
 
 
 		//drawAlphaAnimatedPlane( fTime, fElapsedTime );
 
-		
+
 
 		//////////////////////////////////////////////////////////////////////////
-        V( pd3dDevice->EndScene() );
-    }
+		V( pd3dDevice->EndScene() );
+	}
 
 }
 
@@ -418,7 +418,7 @@ void CALLBACK OnD3D9FrameRender( IDirect3DDevice9* pd3dDevice, double fTime, flo
 // Handle messages to the application 
 //--------------------------------------------------------------------------------------
 LRESULT CALLBACK MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
-                          bool* pbNoFurtherProcessing, void* pUserContext )
+						 bool* pbNoFurtherProcessing, void* pUserContext )
 {
 	EpCamera& g_camera = GetG().m_camera;
 
@@ -428,7 +428,7 @@ LRESULT CALLBACK MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
 	if (g_tsm && GetTopStateManager().getCurState())
 		GetTopStateManager().getCurState()->handleMessages(hWnd, uMsg, wParam, lParam);
 
-    return 0;
+	return 0;
 }
 
 
@@ -556,7 +556,7 @@ void CreateScriptManagerIfNotExist()
 	{
 		g_scriptManager = new ScriptManager();
 
-		
+
 		GetScriptManager().init();
 	}
 }
@@ -568,27 +568,29 @@ void CreateScriptManagerIfNotExist()
 //--------------------------------------------------------------------------------------
 #ifdef DEBUG
 int main()
+{
+	system( "title EmptyProject Console" );
 #else
 INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
-#endif
 {
-    // Enable run-time memory check for debug builds.
-#if defined(DEBUG) | defined(_DEBUG)
-    _CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 #endif
-    // Set the callback functions
-    DXUTSetCallbackD3D9DeviceAcceptable( IsD3D9DeviceAcceptable );
+	// Enable run-time memory check for debug builds.
+#if defined(DEBUG) | defined(_DEBUG)
+	//_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
+#endif
+	// Set the callback functions
+	DXUTSetCallbackD3D9DeviceAcceptable( IsD3D9DeviceAcceptable );
 	DXUTSetCallbackD3D9DeviceCreated( OnD3D9CreateDevice );
-    DXUTSetCallbackD3D9DeviceReset( OnD3D9ResetDevice );
-    DXUTSetCallbackD3D9FrameRender( OnD3D9FrameRender );
-    DXUTSetCallbackD3D9DeviceLost( OnD3D9LostDevice );
-    DXUTSetCallbackD3D9DeviceDestroyed( OnD3D9DestroyDevice );
-    DXUTSetCallbackDeviceChanging( ModifyDeviceSettings );
-    DXUTSetCallbackMsgProc( MsgProc );
-    DXUTSetCallbackFrameMove( OnFrameMove );
+	DXUTSetCallbackD3D9DeviceReset( OnD3D9ResetDevice );
+	DXUTSetCallbackD3D9FrameRender( OnD3D9FrameRender );
+	DXUTSetCallbackD3D9DeviceLost( OnD3D9LostDevice );
+	DXUTSetCallbackD3D9DeviceDestroyed( OnD3D9DestroyDevice );
+	DXUTSetCallbackDeviceChanging( ModifyDeviceSettings );
+	DXUTSetCallbackMsgProc( MsgProc );
+	DXUTSetCallbackFrameMove( OnFrameMove );
 	DXUTSetCallbackKeyboard( KeyboardProc );
-	
-    // TODO: Perform any application-level initialization here
+
+	// TODO: Perform any application-level initialization here
 	SetCurrentWorkingDirectory();
 
 	// Script Manager Initialization
@@ -603,24 +605,27 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 	GetG().m_camera.SetAttachCameraToModel( true );
 	GetG().m_camera.SetEnablePositionMovement( true );
 
-	
-	Tcl_ThreadId ttid;
-	Tcl_CreateThread( &ttid, newThread, 0, 1024, 0 );
-	
 
-    // Initialize DXUT and create the desired Win32 window and Direct3D device for the application
-    DXUTInit( true, true ); // Parse the command line and show msgboxes
-    DXUTSetHotkeyHandling( true, false, true );  // handle the default hotkeys
-    DXUTSetCursorSettings( true, true ); // Show the cursor and clip it when in full screen
-    DXUTCreateWindow( L"EmptyProject" );
+	Tcl_ThreadId ttid;
+	if ( Tcl_CreateThread( &ttid, newThread, 0, 1024, 0 ) != TCL_OK )
+		throw std::runtime_error( "Check your Tcl library to support thread" );
+
+
+	// Initialize DXUT and create the desired Win32 window and Direct3D device for the application
+	DXUTInit( true, true ); // Parse the command line and show msgboxes
+	DXUTSetHotkeyHandling( true, false, true );  // handle the default hotkeys
+	DXUTSetCursorSettings( true, true ); // Show the cursor and clip it when in full screen
+	DXUTCreateWindow( L"EmptyProject" );
 	DXUTCreateDevice( true, GetG().m_scrWidth, GetG().m_scrHeight );
 
-    // Start the render loop
-    DXUTMainLoop();
+	// Start the render loop
+	DXUTMainLoop();
 
-    // TODO: Perform any application-level cleanup here
+	// TODO: Perform any application-level cleanup here
+	//Tcl_DeleteInterp( g_consoleInterp );
 	EP_SAFE_RELEASE( g_scriptManager );
-	
-    return DXUTGetExitCode();
+
+
+	return DXUTGetExitCode();
 }
 

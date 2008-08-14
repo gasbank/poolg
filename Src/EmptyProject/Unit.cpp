@@ -224,10 +224,18 @@ double EpUnitGetUpperRightZ( void* ptr )
 	return instance->Unit::getUpperRight().z;
 } SCRIPT_CALLABLE_D_PV( EpUnitGetUpperRightZ )
 
+int EpUnitPrintTilePos( void* ptr )
+{
+	Unit* instance = reinterpret_cast<Unit*>( ptr );
+	assert( instance );
+	printf( "(%d, %d)\n", instance->getTilePosX(), instance->getTilePosY() );
+	return 0;
+} SCRIPT_CALLABLE_I_PV( EpUnitPrintTilePos )
 
 
 
-START_SCRIPT_FACTORY(Unit)
+
+START_SCRIPT_FACTORY( Unit )
 	CREATE_OBJ_COMMAND( EpCreateUnit )
 	CREATE_OBJ_COMMAND( EpReleaseUnit )
 	CREATE_OBJ_COMMAND( EpRegisterToWorld )
@@ -236,4 +244,5 @@ START_SCRIPT_FACTORY(Unit)
 	CREATE_OBJ_COMMAND( EpUnitSetRotZ )
 	CREATE_OBJ_COMMAND( EpUnitSetPosZ )
 	CREATE_OBJ_COMMAND( EpUnitGetUpperRightZ )
-END_SCRIPT_FACTORY(Unit)
+	CREATE_OBJ_COMMAND( EpUnitPrintTilePos )
+END_SCRIPT_FACTORY( Unit )

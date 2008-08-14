@@ -1,11 +1,14 @@
-package require Thread
 
 namespace eval EpThreadTest {
 
 	proc createUnit {} {
 		set ws [ EpGetWorldState ]
-		set en [ EpCreateEnemy 28 76]
+		set en [ EpCreateEnemy 28 76 ]
 		EpRegisterToWorld $ws $en
+	}
+	proc printHeroPos {} {
+		set hero [ EpGetHero ]
+		EpUnitPrintTilePos $hero
 	}
 
 	proc localHandler {} {
@@ -28,9 +31,6 @@ namespace eval EpThreadTest {
 				exit { exit }
 				ls {
 					puts "So classical"
-				}
-				info {
-					puts "This thread id: [thread::id]"
 				}
 				default {
 					if [string length $data] {

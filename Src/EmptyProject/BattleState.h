@@ -4,6 +4,7 @@
 #include "ProgressBar.h"
 #include "StatusBar.h"
 #include "State.h"
+#include "InnerFire.h"
 
 class WorldState;
 
@@ -88,4 +89,6 @@ private:
 	TurnType		m_nextTurnType;
 	PlayerSide		m_battleWinner;
 	PlayerArt		m_playerArt;
+
+	InnerFire		m_innerFire;
 };

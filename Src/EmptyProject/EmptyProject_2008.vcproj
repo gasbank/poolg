@@ -730,6 +730,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\InnerFire.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\InnerFire.h"
+			>
+		</File>
+		<File
 			RelativePath=".\Picture.cpp"
 			>
 		</File>

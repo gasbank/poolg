@@ -83,6 +83,9 @@ BattleState::BattleState()
 	m_hpBarPlayer.setSize(statusBarWidth, statusBarHeight);
 	m_hpBarPlayer.setPos (statusBoxPlayersPositionX + statusBoxWidth*0.23f, statusBoxPlayersPositionY + statusBoxHeight * 0.82f, 4.5f);
 	
+	m_innerFire.init (L"Images/BattleUI/BGchecker.jpg", m_pDev, 2, 2, 5);
+	m_innerFire.setPos (0, 0, -5.0f);
+
 
 	m_mpBarPlayer.init(L"Images/BattleUI/DKbar.jpg", m_pDev);
 	m_mpBarPlayer.initRate();
@@ -106,6 +109,7 @@ BattleState::BattleState()
 	D3DXCreateFont(m_pDev, 17, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblHYnamL);
 	D3DXCreateFont(m_pDev, 18, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Rockwell Extra Bold"), &m_lblREB);
 	D3DXCreateFont(m_pDev, 25, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblArt);
+
 
 
 	m_curTurnType = TT_NATURAL;
@@ -207,8 +211,13 @@ HRESULT BattleState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, flo
 	m_hpBarEnemy.draw();
 	m_mpBarEnemy.draw();
 
-	m_pDev->SetRenderState(D3DRS_ZENABLE, TRUE);
+	
 
+	m_pDev->SetRenderState(D3DRS_ZENABLE, TRUE);
+	pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+	pd3dDevice->SetTransform(D3DTS_VIEW, GetG().m_camera.GetViewMatrix());
+	pd3dDevice->SetTransform(D3DTS_PROJECTION, GetG().m_camera.GetProjMatrix());
+	m_innerFire.draw();
 	renderFixedText(GetG().m_scrWidth, GetG().m_scrHeight);
 	
 	return S_OK;
@@ -235,6 +244,10 @@ HRESULT BattleState::frameMove(double fTime, float fElapsedTime)
 	m_hpBarPlayer.frameMove(fElapsedTime);
 	m_mpBarPlayer.frameMove(fElapsedTime);
 	m_expBarPlayer.frameMove(fElapsedTime);
+
+	m_innerFire.frameMove(fElapsedTime);
+	m_innerFire.setPos( getHero()->getPos().x, getHero()->getPos().y, -3);
+
 
 	m_hpBarEnemy.frameMove(fElapsedTime);
 	m_mpBarEnemy.frameMove(fElapsedTime);
@@ -378,29 +391,7 @@ HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 		{
 			GetWorldStateManager().setNextState(GAME_WORLD_STATE_FIELD);
 		}
-		/*poolG 공격*/
-		if ( wParam == 'G' && m_curTurnType == TT_PLAYER )
-		{
-			m_curTurnType = TT_NATURAL;
-			getHero()->attack( 0, getEnemy() );
-		}
-		/*힐링*/
-		if ( wParam == 'H' && m_curTurnType == TT_PLAYER )
-		{
-			//턴 핸들링이 필요.
-			//m_curTurnType = TT_COMPUTER;
-			m_curTurnType = TT_NATURAL;
-			getHero()->heal (30);
-		}
-		/**/
-		if ( wParam == 'T' && m_curTurnType == TT_PLAYER)
-		{
-			m_curTurnType = TT_NATURAL;
-			for (int i = 0; i < 100; i++)
-			{
-				getHero()->attack( 0, getEnemy() );
-			}
-		}
+
 			
 	}
 
@@ -429,6 +420,8 @@ HRESULT BattleState::release ()
 
 	m_hpBarEnemy.release();
 	m_mpBarEnemy.release();
+
+	m_innerFire.release();
 	
 	
 	SAFE_RELEASE( m_lblHYnamL );

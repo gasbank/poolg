@@ -350,7 +350,7 @@ void Character::damage( int point )
 	TopStateManager& tsm = TopStateManager::getSingleton();
 	WorldState* ws = static_cast<WorldState*>( tsm.getCurState() );
 
-	ws->screenFlashing( 0.3f, 0.0f, 0.0f, 1.0f );
+	ws->screenFlashing( 0.2f, 1.0f, 0.0f, 0.0f );
 
 	m_curHp -= point;
 }

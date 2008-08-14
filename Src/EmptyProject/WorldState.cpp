@@ -167,6 +167,8 @@ HRESULT WorldState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, floa
 	
 	HRESULT hr;
 
+	UNREFERENCED_PARAMETER( hr );
+
 	//////////////////////////////////////////////////////////////////////////
 	// Perspective Rendering Phase
 
@@ -212,14 +214,14 @@ HRESULT WorldState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, floa
 	///////////////////////////////////////////////////////////////////////////
 	// Draw alpha animated plane
 
-	GetG().m_dev->SetRenderState( D3DRS_LIGHTING, FALSE );
+	/*GetG().m_dev->SetRenderState( D3DRS_LIGHTING, FALSE );
 	GetG().m_dev->SetRenderState( D3DRS_CULLMODE, D3DCULL_NONE );
 	GetG().m_dev->SetTexture( 0, 0 );
 	V_RETURN( GetG().m_dev->SetVertexShader( m_alphaShader->getVertexShader() ) );
 	D3DPERF_BeginEvent( 0, L"Draw Alpha Animated" );
 	V_RETURN( m_testPolygonCloned->DrawSubset( 0 ) );
 	D3DPERF_EndEvent();
-	V_RETURN( GetG().m_dev->SetVertexShader( 0 ) );
+	V_RETURN( GetG().m_dev->SetVertexShader( 0 ) );*/
 
 	WorldStateManager& wsm = WorldStateManager::getSingleton();
 	wsm.getCurState()->frameRender(pd3dDevice, fTime, fElapsedTime);

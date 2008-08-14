@@ -20,22 +20,23 @@ namespace eval EpWorldState {
 		set pEnemyUnit5				[createChar 18 4 0];
 		set pEnemyUnit6				[createChar 13 -25 0];
 		set pNPCUnit1				[createChar 4 -26 0];
+		set pTestEnemyUnit			[createEnem 4 -23];
 		
 		EpUnitSetRotX				$pHeroUnit [ToRadian -90]
 		EpUnitSetRotZ				$pHeroUnit [ToRadian 90]
 		EpUnitSetPosZ				$pHeroUnit -[EpUnitGetUpperRightZ $pHeroUnit]
-		EpCharacterSetMaxAndCurHp	$pHeroUnit 500 -1
-		EpCharacterSetMoveDuration	$pHeroUnit [expr 0.1]
+		EpCharacterSetMaxAndCurHp		$pHeroUnit 500 -1
+		EpCharacterSetMoveDuration		$pHeroUnit [expr 0.1]
 		EpCharacterSetColor			$pHeroUnit 255 0 255
 		
 		EpCharacterSetColor			$pEnemyUnit1 128 128 0
-		EpCharacterSetMaxAndCurHp	$pEnemyUnit1 2 -1
+		EpCharacterSetMaxAndCurHp		$pEnemyUnit1 2 -1
 		
 		EpCharacterSetColor			$pEnemyUnit2 0 255 255
-		EpCharacterSetMaxAndCurHp	$pEnemyUnit2 4 -1
+		EpCharacterSetMaxAndCurHp		$pEnemyUnit2 4 -1
 		
 		EpCharacterSetColor			$pEnemyUnit3 255 255 0
-		EpCharacterSetMaxAndCurHp	$pEnemyUnit3 6 -1
+		EpCharacterSetMaxAndCurHp		$pEnemyUnit3 6 -1
 
 		EpCharacterSetColor			$pEnemyUnit4 0 128 128
 		EpCharacterSetMaxAndCurHp	$pEnemyUnit4 8 -1
@@ -47,25 +48,36 @@ namespace eval EpWorldState {
 		EpCharacterSetMaxAndCurHp	$pEnemyUnit6 12 -1
 		
 		EpCharacterSetColor			$pNPCUnit1 0 255 0
-		EpCharacterSetTalkable		$pNPCUnit1 1
+		
+		# EpCharacterSetTalkable		$pNPCUnit1 1
+		# EpCharacterSetRandomWalkable		$pNPCUnit1 1
+		# EpCharacterSetBoundary		$pNPCUnit1 33 20 35 18  # left, top, right, bottom
 
-		EpCharacterSetRandomWalkable	$pNPCUnit1 1
-		EpCharacterSetBoundary		$pNPCUnit1 33 20 35 18  # left, top, right, bottom
+		# Setting Test Enemy Unit
+		EpCharacterSetColor			$pTestEnemyUnit 255 255 255
+		EpEnemySetRandomWalkable		$pTestEnemyUnit	1
+		EpCharacterSetBoundary			$pNPCUnit1 3 -22 5 -25  # left, top, right, bottom
 	}
 	
 	proc leave {} {
 		EpOutputDebugString " - WorldState leave\n"
 	}
 
-
 	proc printDialogText {} {
 		EpWriteDialog "ÇÑ±ÛÁ«¶óarlsdgklgtulsdu;asjd;tjhklsaerlushldfhlzxcvhxhjzvbkjzxcfjha;srhqwieutpuiwetp;oiweoptyiisauhljkdflkhzx"
 	}
+
 	proc createChar { tileX tileY ctrl } {
 		variable pWorld
 		set unit [ EpCreateCharacter $tileX $tileY $ctrl ];
 		EpRegisterToWorld $pWorld $unit
 		return $unit
 	}
-	
+
+	proc createEnem { tileX tileY } {
+		variable pWorld
+		set unit [ EpCreateEnemy $tileX $tileY ];
+		EpRegisterToWorld $pWorld $unit
+		return $unit
+	}	
 }

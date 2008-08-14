@@ -28,7 +28,6 @@ public:
 
 	bool isDead() { return (m_curHp<=0); }
 
-
 	void setTilePos(int tileX, int tileY);
 	void setTileBufferPos(int tileX, int tileY) { m_tileBufferX = tileX; m_tileBufferY = tileY; }
 	int getTilePosX() { return m_tileX; }
@@ -41,7 +40,6 @@ public:
 	void setTalkable( bool talkable ) { m_bTalkable = talkable; }
 	bool isTalkable() { return m_bTalkable; }
 
-	void setRandomWalkable( bool randomWalkable ) { m_bRandomWalkable = randomWalkable; }
 	void setBoundaryRect( LONG left, LONG top, LONG right, LONG bottom );
 protected:
 	Character();
@@ -49,7 +47,6 @@ protected:
 private:
 	HRESULT rayTesting( UnitInput );
 	void boundaryTesting( UnitInput );
-	void walkRandomly();
 
 	typedef std::list<AttackObject*> AttackObjectList;
 	AttackObjectList m_attackObjectList;
@@ -57,7 +54,6 @@ private:
 	bool					m_bMoving;
 	bool					m_bMovable;
 	bool					m_bTalkable;
-	bool					m_bRandomWalkable;
 	float					m_fMovingTime;
 	int						m_maxHp;
 	int						m_curHp;

@@ -698,6 +698,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\Enemy.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\Enemy.h"
+			>
+		</File>
+		<File
 			RelativePath=".\EpCamera.cpp"
 			>
 		</File>
@@ -711,6 +719,14 @@
 		</File>
 		<File
 			RelativePath=".\G.h"
+			>
+		</File>
+		<File
+			RelativePath=".\Hero.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\Hero.h"
 			>
 		</File>
 		<File

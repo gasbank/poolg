@@ -134,13 +134,6 @@ bool Character::frameMove( float fElapsedTime )
 			++it;
 	}
 
-	// 일단 조종 불가능한 적은 랜덤하게 움직인다.
-	WorldStateManager& wsm = GetWorldStateManager();
-
-
-	if ( m_bRandomWalkable && wsm.curStateEnum() == GAME_WORLD_STATE_FIELD )
-		walkRandomly();
-
 	return Unit::frameMove( fElapsedTime );
 }
 
@@ -208,7 +201,6 @@ Character::Character()
 	m_bTalkable			= false;
 	m_fMovingTime		= 0;
 	m_moveDuration		= 1.0f;
-	m_bRandomWalkable	= false;
 	m_boundaryTileRect.top   = 999999;
 	m_boundaryTileRect.left  = -999999;
 	m_boundaryTileRect.bottom= -999999;
@@ -322,51 +314,6 @@ void Character::setMaxAndCurHp( int maxHp, int curHp )
 	m_curHp = curHp;
 }
 
-void Character::walkRandomly()
-{
-	// Move per minute
-	float movePerMin = 0.5;
-
-	int randomNumber = rand() % ((int)(60 / movePerMin) * 4);
-
-	// If random number is 0~3, move.
-
-	if ( 0 <= randomNumber && randomNumber <= 3 )
-	{
-		// Map key virtually by random number
-		UnitInput mappedKey = (UnitInput)randomNumber ;
-		if( mappedKey != UNIT_UNKNOWN )
-		{
-			if( FALSE == IsKeyDown( m_aKeys[mappedKey] ) )
-			{
-				m_aKeys[ mappedKey ] = KEY_WAS_DOWN_MASK | KEY_IS_DOWN_MASK;
-				++m_cKeysDown;
-			}
-		}
-	}
-	else
-	{
-		UINT i;
-		// Pull virtually pushed key at 33% probability
-		if ( (rand() % 3) )
-		{
-			for ( i = 0; i < UNIT_MAX_KEYS; i++ )
-			{
-				if( IsKeyDown( m_aKeys[ (UnitInput)i ] ) )
-				{
-					
-					UnitInput mappedKey = (UnitInput)i;
-					if( mappedKey != UNIT_UNKNOWN && ( DWORD )mappedKey < 8 )
-					{
-						m_aKeys[ mappedKey ] &= ~KEY_IS_DOWN_MASK;
-						--m_cKeysDown;
-					}
-				}
-			}
-		}
-	}
-}
-
 // 지정된 사각형 경계 위에 캐릭터가 있을 때 경계 바깥으로 나가려고 하면 움직일 수 없게 한다.
 void Character::boundaryTesting( UnitInput mappedKey )
 {
@@ -446,13 +393,6 @@ int EpCharacterSetTalkable( void* ptr, int talkable )
 	return 0;
 } SCRIPT_CALLABLE_I_PV_I( EpCharacterSetTalkable )
 
-int EpCharacterSetRandomWalkable( void* ptr, int randomWalkable )
-{
-	Character* instance = reinterpret_cast<Character*>( ptr );
-	instance->Character::setRandomWalkable( randomWalkable?true:false );
-	return 0;
-} SCRIPT_CALLABLE_I_PV_I( EpCharacterSetRandomWalkable )
-
 int EpCharacterSetBoundary( void* ptr, int left, int top, int right, int bottom )
 {
 	Character* instance = reinterpret_cast<Character*>( ptr );
@@ -467,5 +407,4 @@ START_SCRIPT_FACTORY(Character)
 	CREATE_OBJ_COMMAND( EpCharacterSetColor )
 	CREATE_OBJ_COMMAND( EpCharacterSetTalkable )
 	CREATE_OBJ_COMMAND( EpCharacterSetBoundary )
-	CREATE_OBJ_COMMAND( EpCharacterSetRandomWalkable )
 END_SCRIPT_FACTORY(Character)

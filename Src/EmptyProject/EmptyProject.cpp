@@ -365,24 +365,24 @@ void CALLBACK OnD3D9FrameRender( IDirect3DDevice9* pd3dDevice, double fTime, flo
 		V( GetG().m_dev->SetStreamSource( 0, g_lineElement, 0, 16 ) );
 		int i;
 		D3DXMATRIX mWorld, mTrans, mRot, mScaling;
-		D3DXMatrixScaling( &mScaling, (float)TileManager::s_xSize * TileManager::s_tileSize, 1.0f, 1.0f );
-		for ( i = -TileManager::s_ySize / 2; i < TileManager::s_ySize / 2; ++i )
+		D3DXMatrixScaling( &mScaling, (float)s_xSize * s_tileSize, 1.0f, 1.0f );
+		for ( i = -s_ySize / 2; i < s_ySize / 2; ++i )
 		{
 			D3DXMatrixTranslation( &mTrans,
 				0,
-				(float)i * TileManager::s_tileSize,
+				(float)i * s_tileSize,
 				0 );
 			mWorld = mScaling * mTrans;
 			V( GetG().m_dev->SetTransform( D3DTS_WORLD, &mWorld ) );
 			V( GetG().m_dev->DrawPrimitive( D3DPT_LINELIST, 0, 1 ) );
 		}
 
-		D3DXMatrixScaling( &mScaling, (float)TileManager::s_ySize * TileManager::s_tileSize, 1.0f, 1.0f );
+		D3DXMatrixScaling( &mScaling, (float)s_ySize * s_tileSize, 1.0f, 1.0f );
 		D3DXMatrixRotationZ( &mRot, D3DXToRadian( 90 ) );
-		for ( i = -TileManager::s_xSize / 2; i < TileManager::s_xSize / 2; ++i )
+		for ( i = -s_xSize / 2; i < s_xSize / 2; ++i )
 		{
 			D3DXMatrixTranslation( &mTrans,
-				(float)i * TileManager::s_tileSize,
+				(float)i * s_tileSize,
 				0,
 				0 );
 			mWorld = mScaling * mRot * mTrans;

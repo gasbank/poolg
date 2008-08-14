@@ -642,6 +642,14 @@
 			</File>
 		</Filter>
 		<File
+			RelativePath=".\Action.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\Action.h"
+			>
+		</File>
+		<File
 			RelativePath=".\AttackObject.cpp"
 			>
 		</File>
@@ -835,6 +843,14 @@
 		</File>
 		<File
 			RelativePath=".\TopStateManager.h"
+			>
+		</File>
+		<File
+			RelativePath=".\Trigger.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\Trigger.h"
 			>
 		</File>
 		<File

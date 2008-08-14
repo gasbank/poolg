@@ -40,7 +40,7 @@ Unit* EpCreateHero( int tileX, int tileY )
 {
 	LPD3DXMESH d3dxMesh;
 	D3DXCreateTeapot( GetG().m_dev, &d3dxMesh, 0 );
-	return Hero::createHero( d3dxMesh, tileX + (TileManager::s_xSize / 2), tileY + (TileManager::s_ySize / 2), 0 );
+	return Hero::createHero( d3dxMesh, tileX, tileY, 0 );
 
 } SCRIPT_CALLABLE_PV_I_I( EpCreateHero )
 

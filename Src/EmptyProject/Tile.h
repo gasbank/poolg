@@ -6,7 +6,7 @@ public:
 	Tile(void);
 	~Tile(void);
 
-	bool movable;
-	bool talkable;
-	bool heal;
+	bool b_movable;
+	bool b_eventTalk;
+	bool b_heal;
 };

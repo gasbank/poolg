@@ -11,6 +11,7 @@
 #include "Character.h"
 #include "Dialog.h"
 #include "ShaderWrapper.h"
+#include "Trigger.h"
 
 typedef std::set<Unit*> UnitSet;
 typedef std::list<Dialog*> DialogList;
@@ -40,7 +41,11 @@ public:
 	Unit* getHero() { return m_heroUnit; }
 	Character* getHeroUnit() { return m_heroUnit; }
 	Unit* getCurEnemy() { return m_curEnemyUnit; }
+	Character* getCurEnemyUnit() { return m_curEnemyUnit; }
+	void setCurEnemy( Character* enemy ) { m_curEnemyUnit = enemy; }
+	UnitSet* getUnitSet() { return &m_unitSet; }
 	void removeUnit( Unit* pUnit );
+	bool isInFightArea( Character* heroPt, Character* enemyPt );
 
 	void startDialog( int index );
 	
@@ -49,9 +54,7 @@ public:
 
 private:
 	void setupLight();
-	void detectBattleEvent();
 	void handleCollision( Unit* heroUnit, Unit* opponentUnit );
-	bool isInFightArea( Character* heroPt, Character* enemyPt );
 
 	ArnFileData*					m_afd;
 	ArnSceneGraph*					m_sg;
@@ -64,6 +67,7 @@ private:
 	Sound							m_sound;
 	//Dialog						m_dialog;
 	DialogList						m_scriptedDialog;
+	Trigger*						m_trigger;
 
 
 	float							m_sampleTeapotMeshRot;

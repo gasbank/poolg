@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include "Trigger.h"
 
 
 extern TileManager tileManager;
@@ -74,14 +75,14 @@ bool Character::frameMove( float fElapsedTime )
 
 				if( m_bMovable )
 				{
-					if( tileManager.getTile( m_tileBufferX + g_moveAmount[ i ].x, m_tileBufferY + g_moveAmount[ i ].y )->movable
-						&& (m_tileBufferX + g_moveAmount[ i ].x  > -1 && m_tileBufferX + g_moveAmount[ i ].x  < TileManager::s_xSize)
-						&& (m_tileBufferY + g_moveAmount[ i ].y  > -1 && m_tileBufferY + g_moveAmount[ i ].y  < TileManager::s_ySize) )
+					if( tileManager.getTile( m_tileBufferX + g_moveAmount[ i ].x, m_tileBufferY + g_moveAmount[ i ].y )->b_movable
+						&& (m_tileBufferX + g_moveAmount[ i ].x  > -1 && m_tileBufferX + g_moveAmount[ i ].x  < s_xSize)
+						&& (m_tileBufferY + g_moveAmount[ i ].y  > -1 && m_tileBufferY + g_moveAmount[ i ].y  < s_ySize) )
  					{
 						m_bMoving = true;
 						m_vKeyboardDirection = D3DXVECTOR3( 0, 0, 0 );
-						m_vKeyboardDirection.x += (float) g_moveAmount[ i ].x * TileManager::s_tileSize;
-						m_vKeyboardDirection.y += (float) g_moveAmount[ i ].y * TileManager::s_tileSize;
+						m_vKeyboardDirection.x += (float) g_moveAmount[ i ].x * s_tileSize;
+						m_vKeyboardDirection.y += (float) g_moveAmount[ i ].y * s_tileSize;
 						m_tileBufferX += g_moveAmount[ i ].x;
 						m_tileBufferY += g_moveAmount[ i ].y;
 						//GetScriptManager().execute("EpUnitOnMove 0");
@@ -114,7 +115,6 @@ bool Character::frameMove( float fElapsedTime )
 		//타일에 맞도록 위치보정
 		if( m_tileBufferX != m_tileX || m_tileBufferY != m_tileY )
 		{
-			printf("타일에 들어갑니다. (%d, %d)\n", m_tileBufferX, m_tileBufferY );
 			enterTile( m_tileBufferX, m_tileBufferY );
 			setTilePos( m_tileBufferX, m_tileBufferY );
 		}
@@ -204,6 +204,7 @@ Character::Character()
 	m_boundaryTileRect.left  = -999999;
 	m_boundaryTileRect.bottom= -999999;
 	m_boundaryTileRect.right = 999999;
+	m_trigger			= new Trigger;
 
 	// Initialize random number
 	srand ( (unsigned)time(NULL) );
@@ -214,7 +215,7 @@ void Character::setTilePos( int tileX, int tileY )
 	m_tileX = tileX;
 	m_tileY = tileY;
 
-	setPos( D3DXVECTOR3( (float)(tileX - (TileManager::s_xSize / 2)) * TileManager::s_tileSize, (float)(tileY  - (TileManager::s_ySize / 2)) * TileManager::s_tileSize, 0 ) );
+	setPos( D3DXVECTOR3( (float)(tileX - (s_xSize / 2)) * s_tileSize, (float)(tileY  - (s_ySize / 2)) * s_tileSize, 0 ) );
 }
 
 void Character::enterTile( int tileX, int tileY )
@@ -222,14 +223,11 @@ void Character::enterTile( int tileX, int tileY )
 	TopStateManager& tsm = TopStateManager::getSingleton();
 	WorldState* ws = static_cast<WorldState*>( tsm.getCurState() );
 
-	if( tileManager.getTile( tileX, tileY)->heal )
-	{
-		ws->startDialog( 4 );
-		heal( 9999 );
-	}
+	printf( "현재의 위치 : [%d, %d]\n", tileX, tileY );
+	printf( "또다른 현재의 위치 : [%d, %d]\n", GetTileManager().pos2TileX( &ws->getHeroPos() ), GetTileManager().pos2TileY( &ws->getHeroPos() ) );
+
+	m_trigger->positionTrigger();
 }
-
-
 void Character::setColor( int r, int g, int b )
 {
 	ZeroMemory(&m_material, sizeof(D3DMATERIAL9));
@@ -295,7 +293,7 @@ HRESULT Character::rayTesting( UnitInput mappedKey )
 		//printf("Ray Testing test. (FaceIndex : %u, Dist : %f)\n", hitFaceIndex, hitDist );
 
 		// 타일 1.5칸 이내에서 교차하면 그 방향으로 움직이지 않는다.
-		if ( hitDist <= (float) 1.5 * TileManager::s_tileSize )
+		if ( hitDist <= (float) 1.5 * s_tileSize )
 			m_bMovable = false;
 	}
 
@@ -359,7 +357,7 @@ Unit* EpCreateCharacter( int tileX, int tileY, int controllable )
 {
 	LPD3DXMESH d3dxMesh;
 	D3DXCreateTeapot( GetG().m_dev, &d3dxMesh, 0 );
-	return Character::createCharacter( d3dxMesh, tileX + (TileManager::s_xSize / 2), tileY + (TileManager::s_ySize / 2), 0, controllable?true:false );
+	return Character::createCharacter( d3dxMesh, tileX, tileY, 0, controllable?true:false );
 
 } SCRIPT_CALLABLE_PV_I_I_I( EpCreateCharacter )
 
@@ -369,7 +367,6 @@ int EpCharacterSetMaxAndCurHp( void* ptr, int maxHp, int curHp )
 	instance->Character::setMaxAndCurHp( maxHp, curHp );
 	return 0;
 } SCRIPT_CALLABLE_I_PV_I_I( EpCharacterSetMaxAndCurHp )
-
 
 int EpCharacterSetMoveDuration( void* ptr, double val )
 {

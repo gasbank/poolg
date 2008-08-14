@@ -2,6 +2,7 @@
 #include "Unit.h"
 
 class AttackObject;
+class Trigger;
 
 class Character : public Unit
 {
@@ -61,4 +62,5 @@ private:
 	int						m_tileBufferX;
 	int						m_tileBufferY;
 	RECT					m_boundaryTileRect;
+	Trigger*				m_trigger;
 };

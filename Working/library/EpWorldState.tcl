@@ -12,15 +12,17 @@ namespace eval EpWorldState {
 	proc enter {} {
 		EpOutputDebugString " - WorldState enter\n"
 		
-		set pHeroUnit				[createHero -18 -4];
-		set pEnemyUnit1				[createEnem -19 11];
-		set pEnemyUnit2				[createEnem -9 8];
-		set pEnemyUnit3				[createEnem -10 -11];
-		set pEnemyUnit4				[createEnem 3 -6];
-		set pEnemyUnit5				[createEnem 18 4];
-		set pEnemyUnit6				[createEnem 13 -25];
-		set pNPCUnit1				[createEnem 4 -26];
-		set pTestEnemyUnit			[createEnem 4 -23];
+		set pHeroUnit				[createHero 26 74];
+		set pEnemyUnit1				[createEnem 25 90];
+		set pEnemyUnit2				[createEnem 37 88];
+		set pEnemyUnit3				[createEnem 35 67];
+		set pEnemyUnit4				[createEnem 47 73];
+		set pEnemyUnit5				[createEnem 62 83];
+		set pEnemyUnit6				[createEnem 59 58];
+		set pEnemyUnit7				[createEnem 36 53];
+		set pEnemyUnit8				[createEnem 42 44];
+		set pNPCUnit1				[createEnem 47 65];
+		set pTestEnemyUnit			[createEnem 55 40];
 		
 		EpUnitSetRotX				$pHeroUnit [ToRadian -90]
 		EpUnitSetRotZ				$pHeroUnit [ToRadian 90]
@@ -44,8 +46,14 @@ namespace eval EpWorldState {
 		EpCharacterSetColor			$pEnemyUnit5 128 0 128
 		EpCharacterSetMaxAndCurHp		$pEnemyUnit5 10 -1
 
-		EpCharacterSetColor			$pEnemyUnit6 0 0 0
+		EpCharacterSetColor			$pEnemyUnit6 64 64 0
 		EpCharacterSetMaxAndCurHp		$pEnemyUnit6 12 -1
+
+		EpCharacterSetColor			$pEnemyUnit7 0 64 64
+		EpCharacterSetMaxAndCurHp		$pEnemyUnit7 14 -1
+
+		EpCharacterSetColor			$pEnemyUnit8 0 0 0
+		EpCharacterSetMaxAndCurHp		$pEnemyUnit8 16 -1
 		
 		EpCharacterSetColor			$pNPCUnit1 0 255 0
 		

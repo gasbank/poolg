@@ -95,8 +95,8 @@ Unit* EpCreateEnemy( int tileX, int tileY )
 	D3DXCreateTeapot( GetG().m_dev, &d3dxMesh, 0 );
 	return Enemy::createEnemy( 
 		d3dxMesh, 
-		tileX + (TileManager::s_xSize / 2), 
-		tileY + (TileManager::s_ySize / 2), 
+		tileX, 
+		tileY, 
 		0 );
 
 } SCRIPT_CALLABLE_PV_I_I( EpCreateEnemy )

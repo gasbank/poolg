@@ -9,6 +9,7 @@
 #include "ShaderWrapper.h"
 #include "Enemy.h"
 
+IMPLEMENT_SINGLETON( TileManager );
 TileManager	tileManager;
 
 
@@ -43,6 +44,7 @@ HRESULT WorldState::enter()
 	HRESULT hr = S_OK;
 
 	LPDIRECT3DDEVICE9& pd3dDevice =  GetG().m_dev;
+	m_trigger = new Trigger;
 
 	// Aran file init
 	// Room model
@@ -93,9 +95,9 @@ HRESULT WorldState::enter()
 	m_sound.init();
 
 
-	tileManager.getTile( 14, 14 )->movable = false;
-	tileManager.getTile( 9, 9 )->talkable = true;
-	tileManager.getTile( 17, 14 )->heal = true;
+	tileManager.getTile( 14, 14 )->b_movable = false;
+	tileManager.getTile( 17, 14 )->b_heal = true;
+	tileManager.getTile( 26, 74 )->b_eventTalk = true;
 
 
 	// Create sample 3D model(!)
@@ -278,8 +280,6 @@ HRESULT WorldState::frameMove(double fTime, float fElapsedTime)
 	GetWorldStateManager().transit();
 	GetWorldStateManager().getCurState()->frameMove(fTime, fElapsedTime);
 
-	detectBattleEvent();
-
 	m_sg->getSceneRoot()->update(fTime, fElapsedTime);
 	m_sgRat->getSceneRoot()->update(fTime, fElapsedTime);
 
@@ -288,8 +288,6 @@ HRESULT WorldState::frameMove(double fTime, float fElapsedTime)
 	D3DXMatrixIdentity( &mWorldViewProj );
 	V( m_alphaShader->getConstantTable()->SetMatrix( DXUTGetD3D9Device(), "mWorldViewProj", &mWorldViewProj ) );
 	V( m_alphaShader->getConstantTable()->SetFloat( DXUTGetD3D9Device(), "fTime", (float)fTime ) );
-
-
 
 	// Change alpha for duration m_redFadeDurationSec
 	if ( m_screenFlashAlphaAngle < 90.0f  )
@@ -586,7 +584,7 @@ void WorldState::removeUnit( Unit* pUnit )
 	}
 }
 
-void WorldState::detectBattleEvent()
+/*void WorldState::detectBattleEvent()
 {
 	// Detect battle event.
 	// If current selected unit isn't hero unit, and isn't talkable,
@@ -612,7 +610,7 @@ void WorldState::detectBattleEvent()
 			}
 		}	
 	}
-}
+} */
 
 void WorldState::screenFlashing( float durationSec, float r, float g, float b )
 {

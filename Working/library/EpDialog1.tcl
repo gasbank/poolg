@@ -2,7 +2,7 @@ set EpDialogList [list EpDialog1 EpDialog2 EpDialog3 EpDialog4 EpDialogStop EpDi
 
 namespace eval EpDialog1 {
 	
-	set region [ list 9 9 -1 -1 ]; ;# left, top, right, bottom
+	set region [ list 26 74 -1 -1 ]; ;# left, top, right, bottom
 	set oneTime 1;
 	
 	set player "PoolG"
@@ -19,7 +19,6 @@ namespace eval EpDialog1 {
 	];
 }
 
-
 namespace eval EpDialog2 {
 	
 	set region [ list 10 10 -1 -1 ]; ;# left, top, right, bottom
@@ -32,7 +31,7 @@ namespace eval EpDialog2 {
 		$player		"너는 누구냐!"\
 		$npc		"나는 두부를 지극히 사랑하는 이 동아리의 부원이라네"\
 		$player		"이 동아리에 소속된 사람이라면 대청소를 한 주범이 누군지 알고 있을텐데?"\
-				"순순히 말하지 않으면 널 Overflow 시켜버리겠어!"\
+		$player		"순순히 말하지 않으면 널 Overflow 시켜버리겠어!"\
 		$npc		"대청소를 한 미화부장이라면, A213이라는 신비의 장소에서 코딩을 즐겨 한다고 하더군"\
 		$player		"말이 통해서 다행이군"\
 	];	
@@ -47,8 +46,8 @@ namespace eval EpDialog3 {
 		
 	set dialog [ list\
 		$player		"도대체 이 끔찍한 시설의 컴퓨터 실은 뭐냔 말이다....."\
-				"정말 이런 곳에서 코딩을 할 수 있단 말인가! 제길, 아까 그녀석이 잘못 가르쳐 준거 아냐?"\
-				"만약 미화부장이 없다면 그녀석을 혼내러 가야겠어"\
+		$player		"정말 이런 곳에서 코딩을 할 수 있단 말인가! 제길, 아까 그녀석이 잘못 가르쳐 준거 아냐?"\
+		$player		"만약 미화부장이 없다면 그녀석을 혼내러 가야겠어"\
 	];	
 }
 

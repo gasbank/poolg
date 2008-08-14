@@ -7,7 +7,7 @@ class Character : public Unit
 {
 public:
 	static Unit* createCharacter( LPD3DXMESH mesh, int tileX, int tileY, float posZ, bool bControllable );
-	~Character();
+	virtual ~Character();
 
 	void attack(int type, Character* enemy);
 	void heal (int point);

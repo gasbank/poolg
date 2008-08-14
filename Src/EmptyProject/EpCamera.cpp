@@ -1,8 +1,14 @@
 #include "EmptyProjectPCH.h"
 #include "EpCamera.h"
 
+
 EpCamera::EpCamera(void)
 {
+}
+
+void EpCamera::FrameMove( FLOAT fElapsedTime )
+{
+	CModelViewerCamera::FrameMove( fElapsedTime );
 }
 
 D3DUtil_CameraKeys EpCamera::MapKey( UINT nKey )
@@ -79,4 +85,47 @@ void EpCamera::SetViewParamsWithUp( D3DXVECTOR3* pvEyePt, D3DXVECTOR3* pvLookatP
 D3DXVECTOR3* EpCamera::GetUpPt()
 {
 	return &m_vUp;
+}
+
+void EpCamera::beginExternalCamera( ArnCamera* arnCam )
+{
+	m_pArnCam = arnCam;
+	m_runningCamera = CAMERA_EXTERNAL;
+}
+
+// arnCam로부터 정보를 얻어서 카메라의 view parameter를 지정한다.
+// arnCam이 변할 수 있으므로 프레임마다 호출해아 한다.
+void EpCamera::updateExternalCamera( ArnCamera* arnCam )
+{
+	//
+	// Content of local transform ( 4 * 4)
+	// [  Right ]
+	// [   Up   ]
+	// [  Look  ]
+	// [Position]
+	//
+	// Transpose of this is view transform matrix
+	//
+
+	const ARN_NDD_CAMERA_CHUNK& arnCamData = arnCam->getCameraData();
+
+	// Extract information from localXfrom
+	const D3DXMATRIX& arnCamLocalXfrom = m_pArnCam->getFinalLocalXform();
+	D3DXVECTOR3 vUp;
+	D3DXVECTOR3 vEye;
+	D3DXVECTOR3 vLookAt;
+
+	vUp.x = arnCamLocalXfrom._21;
+	vUp.y = arnCamLocalXfrom._22;
+	vUp.z = arnCamLocalXfrom._23;
+
+	vLookAt.x = arnCamLocalXfrom._31;
+	vLookAt.y = arnCamLocalXfrom._32;
+	vLookAt.z = arnCamLocalXfrom._33;
+
+	vEye.x = arnCamLocalXfrom._41;
+	vEye.y = arnCamLocalXfrom._42;
+	vEye.z = arnCamLocalXfrom._43;
+
+	SetViewParamsWithUp( &vEye, &vLookAt, vUp );
 }

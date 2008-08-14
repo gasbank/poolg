@@ -5,6 +5,7 @@
 #include "ScriptManager.h"
 #include "TileManager.h"
 #include "ArnMesh.h"
+#include "ArnCamera.h"
 #include "ShaderWrapper.h"
 #include "Enemy.h"
 
@@ -54,7 +55,7 @@ HRESULT WorldState::enter()
 	m_sgRat = new ArnSceneGraph(*m_afdRat);
 	ArnMesh* mainWallMesh = dynamic_cast<ArnMesh*>( m_sg->getSceneRoot()->getNodeByName("MainWall") );
 	
-	
+
 	//////////////////////////////////////////////////////////////////////////
 	// Room Model MainWall intersection test
 	D3DXVECTOR3 rayStartPos( 0, 0, -2.0f );
@@ -107,7 +108,8 @@ HRESULT WorldState::enter()
 	
 	D3DXCreateBox(pd3dDevice, 1.0f, 1.0f, 1.0f, &m_aTile, 0);
 
-
+ 	//////////////////////////////////////////////////////////////////////////
+	// Setup main camera
 
 	// Get position of hero.
 	D3DXVECTOR3 heroPos;
@@ -121,7 +123,10 @@ HRESULT WorldState::enter()
 	D3DXVECTOR3 vecAt ( 0.0f, 0.0f, 0.0f );
 	GetG().m_camera.SetViewParams( &vecEye, &vecAt );
 
+	//////////////////////////////////////////////////////////////////////////
+	
 	setupLight();
+
 
 	GetScriptManager().execute("EpWorldState::enter");
 

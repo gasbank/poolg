@@ -136,19 +136,22 @@ void EpCamera::updateExternalCamera( ArnCamera* arnCam )
 	const ARN_NDD_CAMERA_CHUNK& arnCamData = arnCam->getCameraData();
 
 	// Extract information from localXfrom
-	const D3DXMATRIX& arnCamLocalXfrom = m_pArnCam->getFinalLocalXform();
+	D3DXMATRIX arnCamLocalXfrom = m_pArnCam->getFinalLocalXform();
 
-	m_vUp.x = arnCamLocalXfrom._21;
-	m_vUp.y = arnCamLocalXfrom._22;
-	m_vUp.z = arnCamLocalXfrom._23;
+	// Calculate up and lookAt vectors based on local xform mat
+	D3DXVECTOR3 pos = *(D3DXVECTOR3*)&arnCamLocalXfrom._41;		// Camera position stored in 4th row of mat
+	D3DXVECTOR3 up = DX_CONSTS::D3DXVEC3_Y;						// Up vector basis (+Y axis)
+	D3DXVECTOR3 look = DX_CONSTS::D3DXVEC3_Z;					// LookAt vector basis (+Z axis)
+	D3DXVec3TransformCoord( &look, &look, &arnCamLocalXfrom );	// Transform LookAt vector
+	
+	// Clear translation part of camera xform mat since Up vector is relative to
+	// camera position, not absolute.
+	arnCamLocalXfrom._41 = arnCamLocalXfrom._42 = arnCamLocalXfrom._43 = 0;
+	D3DXVec3TransformCoord( &up, &up, &arnCamLocalXfrom );		// Transform Up vector
 
-	m_vLookAt.x = arnCamLocalXfrom._31;
-	m_vLookAt.y = arnCamLocalXfrom._32;
-	m_vLookAt.z = arnCamLocalXfrom._33;
-
-	m_vEye.x = arnCamLocalXfrom._41;
-	m_vEye.y = arnCamLocalXfrom._42;
-	m_vEye.z = arnCamLocalXfrom._43;
+	m_vUp = up;
+	m_vLookAt = look;
+	m_vEye = pos;
 
 	m_bViewParamsDirty = true;
 }

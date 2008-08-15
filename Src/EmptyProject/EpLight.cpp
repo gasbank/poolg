@@ -3,9 +3,10 @@
 
 EpLight::EpLight(void)
 {
-	m_fFadeDuration	= 3.0f;
+	m_fFadeDuration	= 2.0f;
 	m_fFadeTimer = 0.0f;
 	m_fFadeTimerSign = 1.0f;
+	m_fFlickerDuration = 0.0f;
 }
 
 EpLight::~EpLight(void)
@@ -23,18 +24,22 @@ void EpLight::setupLight()
 	D3DCOLORVALUE cvSpc = { 0.1f, 0.1f, 0.1f, 1.0f };
 	m_light.Specular = cvSpc;
 
-	D3DXVECTOR3 dir(10.0f, -10.0f, 10.0f);
+	D3DXVECTOR3 dir(0.0f, 0.0f, 10.0f);
 	D3DXVec3Normalize((D3DXVECTOR3*)&m_light.Direction, &dir);
 
-	D3DXVECTOR3 pos(-10.0f, 10.0f, -10.0f);
+	D3DXVECTOR3 pos(-38.0f, -10.0f, -5.0f);
 	D3DXVec3Normalize((D3DXVECTOR3*)&m_light.Position, &pos);
 
-	m_light.Falloff = 0.5f; 
+	m_light.Falloff = 1.0f; 
 	m_light.Phi = D3DXToRadian(80);
 	m_light.Theta = D3DXToRadian(10);
 
 	m_light.Type = D3DLIGHT_DIRECTIONAL;
 	m_light.Range = 1000.0f;
+
+	m_light.Attenuation0 = 1.0f;
+	m_light.Attenuation1 = 0.0f;
+	m_light.Attenuation2 = 0.0f;
 
 	GetG().m_dev->SetLight(1, &m_light);
 	GetG().m_dev->LightEnable( 1, FALSE );
@@ -57,6 +62,11 @@ LRESULT EpLight::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 		case 'O':
 			fadeOutLight();
 			break;
+		case 'F':
+			setColor( 1.0f, 0.0f, 0.0f );
+			setFadeDuration( 0.5f );
+			flicker( 10.0f );
+			break;
 		}
 		break;
 	}
@@ -66,10 +76,11 @@ LRESULT EpLight::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 
 void EpLight::frameMove( FLOAT fElapsedTime )
 {
-	updateFadeColor( fElapsedTime );
-
 	if ( m_bLightValueDirty )
 		GetG().m_dev->SetLight( 1, &m_light );
+
+	updateFadeColor( fElapsedTime );
+	updateFlicker( fElapsedTime );
 }
 
 void EpLight::fadeInLight()
@@ -111,6 +122,40 @@ void EpLight::updateFadeColor( float fElapsedTime )
 	m_light.Ambient = m_cAmbient * fBrightness;
 	m_light.Diffuse = m_cDiffuse * fBrightness;
 	m_light.Specular = m_cSpecular * fBrightness;
+
+	m_bLightValueDirty = true;
+}
+
+void EpLight::updateFlicker( float fElapsedTime )
+{
+	if ( m_fFlickerDuration > 0.0f )
+	{
+		m_fFlickerDuration -= fElapsedTime;
+
+		if ( m_fFadeTimer == 0.0f )
+			fadeInLight();
+		else if ( m_fFadeTimer == m_fFadeDuration )
+			fadeOutLight();
+	}
+}
+
+void EpLight::setColor( float r, float g, float b )
+{
+	m_cAmbient.r = r * 0.3f;
+	m_cAmbient.g = g * 0.3f;
+	m_cAmbient.b = b * 0.3f;
+
+	m_cDiffuse.r = r * 0.6f;
+	m_cDiffuse.g = g * 0.6f;
+	m_cDiffuse.b = b * 0.6f;
+
+	m_cSpecular.r = r * 0.1f;
+	m_cSpecular.g = g * 0.1f;
+	m_cSpecular.b = b * 0.1f;
+
+	m_light.Ambient = m_cAmbient;
+	m_light.Diffuse = m_cDiffuse;
+	m_light.Specular = m_cSpecular;
 
 	m_bLightValueDirty = true;
 }

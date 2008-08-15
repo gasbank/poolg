@@ -219,6 +219,8 @@ HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFA
 		g_bombShader->onResetDevice();
 	//g_alphaShader->onResetDevice();
 
+	GetG().m_EpLight.setupLight();
+
 	return S_OK;
 }
 
@@ -235,6 +237,7 @@ void CALLBACK OnFrameMove( double fTime, float fElapsedTime, void* pUserContext 
 	//////////////////////////////////////////////////////////////////////////
 
 	GetG().m_camera.frameMove( fElapsedTime );
+	GetG().m_EpLight.frameMove( fElapsedTime );
 
 	TopStateManager::getSingleton().transit();
 
@@ -408,6 +411,7 @@ LRESULT CALLBACK MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
 
 	//g_avatar.handleMessages(hWnd, uMsg, wParam, lParam);
 	g_camera.handleMessages(hWnd, uMsg, wParam, lParam);
+	GetG().m_EpLight.handleMessages(hWnd, uMsg, wParam, lParam);
 
 	if (g_tsm && GetTopStateManager().getCurState())
 		GetTopStateManager().getCurState()->handleMessages(hWnd, uMsg, wParam, lParam);

@@ -30,7 +30,7 @@ namespace eval EpWorldState {
 		EpCharacterSetStat			$pHeroUnit 30 20 20 10 # Health Will Coding Defence
 		EpCharacterSetCurHp			$pHeroUnit -1
 		EpCharacterSetCurCs			$pHeroUnit -1
-		EpCharacterSetMoveDuration		$pHeroUnit [expr 0.1]
+		EpCharacterSetMoveDuration		$pHeroUnit [expr 0.5]
 		EpCharacterSetColor			$pHeroUnit 255 0 255
 		
 		

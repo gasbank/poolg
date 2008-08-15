@@ -142,8 +142,9 @@ HRESULT WorldState::enter()
 	m_testPolygon->CloneMesh( D3DXMESH_WRITEONLY, m_alphaShader->getDecl(), pd3dDevice, &m_testPolygonCloned );
 	//////////////////////////////////////////////////////////////////////////
 
-
 	m_curDialog = 0;
+
+	GetG().m_EpLight.fadeInLight();
 
 	return hr;
 }
@@ -170,12 +171,11 @@ HRESULT WorldState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, floa
 	//////////////////////////////////////////////////////////////////////////
 	// Perspective Rendering Phase
 
-	pd3dDevice->SetLight(0, &light);
 	pd3dDevice->SetRenderState( D3DRS_LIGHTING, TRUE );
 
 	pd3dDevice->SetTransform(D3DTS_VIEW, camera.GetViewMatrix());
 	pd3dDevice->SetTransform(D3DTS_PROJECTION, camera.GetProjMatrix());
-
+	
 
 	//////////////////////////////////////////////////////////////////////////
 	// Aran lib rendering routine (CW)
@@ -229,22 +229,8 @@ HRESULT WorldState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, floa
 HRESULT WorldState::frameMove(double fTime, float fElapsedTime)
 {
 	EpCamera& camera = GetG().m_camera;
-	D3DLIGHT9& light = GetG().m_light;
 
 	HRESULT hr;
-
-	// Fade in at starting.f
-
-	static float fadeTime = 0.0f;
-
-	if ( fadeTime < 2.0f )
-		fadeTime += fElapsedTime;
-	else
-		fadeTime = 2.0f;
-
-	D3DCOLORVALUE cv = { 0.8f * fadeTime / 2.0f, 0.8f * fadeTime / 2.0f, 0.8f * fadeTime / 2.0f, 1.0f };
-	light.Ambient = cv;
-	light.Diffuse = cv;
 	
 	m_pic.frameMove(fElapsedTime);
 	m_avatar.frameMove(fElapsedTime);
@@ -257,7 +243,6 @@ HRESULT WorldState::frameMove(double fTime, float fElapsedTime)
 		(*itDialog)->frameMove( fTime, fElapsedTime );
 	}
 	
-
 	UnitSet::iterator it = m_unitSet.begin();
 	for ( ; it != m_unitSet.end(); ++it )
 	{

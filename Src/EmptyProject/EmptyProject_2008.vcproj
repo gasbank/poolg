@@ -866,6 +866,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\EpLight.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\EpLight.h"
+			>
+		</File>
+		<File
 			RelativePath=".\G.cpp"
 			>
 		</File>

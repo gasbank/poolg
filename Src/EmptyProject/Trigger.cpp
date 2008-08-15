@@ -36,7 +36,7 @@ void Trigger::detectBattleAction()
 		if ( (*it) != m_ws->getHeroUnit() )
 		{
 			Enemy* oppCharacter = dynamic_cast<Enemy*>( *it );
-			if ( oppCharacter->isTalkable() == false )
+			if ( oppCharacter->isTalkable() == false && oppCharacter != NULL )
 			{
 				if ( m_ws->isInFightArea( m_ws->getHeroUnit() , oppCharacter ) == true )
 				{
@@ -64,5 +64,5 @@ void Trigger::detectHealAction()
 void Trigger::detecCreateAction()
 {
 	if ( GetTileManager().getTile( GetTileManager().pos2TileX( &m_ws->getHeroPos() ) , GetTileManager().pos2TileY( &m_ws->getHeroPos() ) )->b_createEnemy )
-		m_action.createUnitAction( 33, 57, 0 );
+		m_action.createUnitAction( 34, 57, 0 );
 }

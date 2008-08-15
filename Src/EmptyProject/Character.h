@@ -43,8 +43,6 @@ public:
 
 	virtual void pushUnitInFront( UnitInput dir ) {}
 
-	virtual void enterTile( UINT tileX, UINT tileY);
-
 	void setStat( int statHealth, int statWill, int statCoding, int statDef );
 protected:
 	Character();
@@ -67,7 +65,6 @@ private:
 	int						m_intelligence; // 힐링 등의 스킬에 영향
 	
 	RECT					m_boundaryTileRect;
-	Trigger*				m_trigger;
 
 	struct Stat
 	{

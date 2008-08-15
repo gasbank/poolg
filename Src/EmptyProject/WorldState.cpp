@@ -113,23 +113,6 @@ HRESULT WorldState::enter()
 	m_heroUnit->setRotZ( D3DXToRadian(  90 ) );*/
 	
 	D3DXCreateBox(pd3dDevice, 1.0f, 1.0f, 1.0f, &m_aTile, 0);
-
- 	//////////////////////////////////////////////////////////////////////////
-	// Setup main camera
-
-	// Get position of hero.
-	D3DXVECTOR3 heroPos;
-	if ( m_heroUnit != 0 )
-		heroPos = m_heroUnit->getPos();
-	else
-		heroPos.x = 0.0f; heroPos.y = 0.0f; heroPos.z = -30.0f;
-
-	// Setup main camera.
-	D3DXVECTOR3 vecEye( heroPos.x, heroPos.y, heroPos.z - 30.0f );
-	D3DXVECTOR3 vecAt ( 0.0f, 0.0f, 0.0f );
-	GetG().m_camera.SetViewParams( &vecEye, &vecAt );
-
-	//////////////////////////////////////////////////////////////////////////
 	
 	setupLight();
 
@@ -148,15 +131,15 @@ HRESULT WorldState::enter()
 	}
 
 
-	/////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
 	// Prepare alpha shading
-
 	m_alphaShader = new AlphaShader();
 	m_alphaShader->initShader( pd3dDevice, L"Shaders/Alpha.vsh" );
 	m_alphaShader->compileShader( "Alpha", "vs_2_0" );
 
 	D3DXCreatePolygon( pd3dDevice, 10.0f, 32, &m_testPolygon, 0 );
 	m_testPolygon->CloneMesh( D3DXMESH_WRITEONLY, m_alphaShader->getDecl(), pd3dDevice, &m_testPolygonCloned );
+	//////////////////////////////////////////////////////////////////////////
 
 
 	m_curDialog = 0;
@@ -223,9 +206,8 @@ HRESULT WorldState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, floa
 
 
 
-	///////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
 	// Draw alpha animated plane
-
 	/*GetG().m_dev->SetRenderState( D3DRS_LIGHTING, FALSE );
 	GetG().m_dev->SetRenderState( D3DRS_CULLMODE, D3DCULL_NONE );
 	GetG().m_dev->SetTexture( 0, 0 );
@@ -234,6 +216,7 @@ HRESULT WorldState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, floa
 	V_RETURN( m_testPolygonCloned->DrawSubset( 0 ) );
 	D3DPERF_EndEvent();
 	V_RETURN( GetG().m_dev->SetVertexShader( 0 ) );*/
+	//////////////////////////////////////////////////////////////////////////
 
 	WorldStateManager& wsm = WorldStateManager::getSingleton();
 	wsm.getCurState()->frameRender(pd3dDevice, fTime, fElapsedTime);
@@ -249,7 +232,8 @@ HRESULT WorldState::frameMove(double fTime, float fElapsedTime)
 
 	HRESULT hr;
 
-	// Fade in at starting.
+	// Fade in at starting.f
+
 	static float fadeTime = 0.0f;
 
 	if ( fadeTime < 2.0f )
@@ -288,12 +272,15 @@ HRESULT WorldState::frameMove(double fTime, float fElapsedTime)
 	m_sg->getSceneRoot()->update(fTime, fElapsedTime);
 	m_sgRat->getSceneRoot()->update(fTime, fElapsedTime);
 
-	// For alpha shading animation(?)..
+
+	//////////////////////////////////////////////////////////////////////////
+	// Alpha shading logic
+
 	D3DXMATRIXA16 mWorldViewProj;
 	D3DXMatrixIdentity( &mWorldViewProj );
 	V( m_alphaShader->getConstantTable()->SetMatrix( DXUTGetD3D9Device(), "mWorldViewProj", &mWorldViewProj ) );
 	V( m_alphaShader->getConstantTable()->SetFloat( DXUTGetD3D9Device(), "fTime", (float)fTime ) );
-
+	
 	// Change alpha for duration m_redFadeDurationSec
 	if ( m_screenFlashAlphaAngle < 90.0f  )
 		m_screenFlashAlphaAngle += fElapsedTime * 180.0f / m_screenFlashDurationSec * 2.0f;
@@ -309,6 +296,8 @@ HRESULT WorldState::frameMove(double fTime, float fElapsedTime)
 	V( m_alphaShader->getConstantTable()->SetFloat( DXUTGetD3D9Device(), "diffuseR", m_screenFlashCV.r ) );
 	V( m_alphaShader->getConstantTable()->SetFloat( DXUTGetD3D9Device(), "diffuseG", m_screenFlashCV.g ) );
 	V( m_alphaShader->getConstantTable()->SetFloat( DXUTGetD3D9Device(), "diffuseB", m_screenFlashCV.b ) );
+
+	//////////////////////////////////////////////////////////////////////////
 	
 	return S_OK;
 }
@@ -412,7 +401,8 @@ HRESULT WorldState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 		switch ( wParam )
 		{
 		case 'C':
-			// external ca메라 Testing code
+			//////////////////////////////////////////////////////////////////////////
+			// External camera test
 			EpCamera& rCamera = GetG().m_camera;
 			TopStateManager& tsm = TopStateManager::getSingleton();
 			WorldState* ws = static_cast<WorldState*>( tsm.getCurState() );
@@ -432,6 +422,7 @@ HRESULT WorldState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 
 			}
 			bExtCam = !bExtCam;
+			//////////////////////////////////////////////////////////////////////////
 			break;
 		}
 		break;
@@ -482,7 +473,11 @@ UINT WorldState::addUnit( Unit* u )
 		m_heroUnit = dynamic_cast<Character*>( u );
 		m_heroUnit->setAttack (1);
 		m_heroUnit->setInt (20);
+
 	}
+
+	// 이벤트 트리거링을 위해서 월드에 등록될 때 타일에 한번 들어간다.
+	u->enterTile();
 
 	return m_unitSet.size();
 }

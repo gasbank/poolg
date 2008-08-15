@@ -62,7 +62,6 @@ Character::~Character()
 		EP_SAFE_RELEASE(*it);
 	}
 	m_attackObjectList.clear();
-	delete m_trigger;
 }
 
 bool Character::frameMove( float fElapsedTime )
@@ -211,7 +210,6 @@ Character::Character()
 	m_boundaryTileRect.left  = -999999;
 	m_boundaryTileRect.bottom= -999999;
 	m_boundaryTileRect.right = 999999;
-	m_trigger			= new Trigger;
 
 	ZeroMemory( &m_stat, sizeof(Stat) );
 
@@ -344,16 +342,6 @@ void Character::damage( int point )
 	m_curHp -= point;
 }
 
-void Character::enterTile( UINT tileX, UINT tileY )
-{
-
-	/*printf( "현재의 위치 : [%d, %d]\n", tileX, tileY );
-	printf( "또다른 현재의 위치 : [%d, %d]\n",
-		GetTileManager().pos2TileX( &getWorldState()->getHeroPos() ),
-		GetTileManager().pos2TileY( &getWorldState()->getHeroPos() ) );*/
-
-	m_trigger->positionTrigger();
-}
 
 void Character::setStat( int statHealth, int statWill, int statCoding, int statDef )
 {

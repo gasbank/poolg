@@ -1,5 +1,7 @@
 #pragma once
 
+class Trigger;
+
 enum UnitInput
 {
 	UNIT_MOVE_UP	= 0,
@@ -63,7 +65,8 @@ public:
 	UINT getTilePosX() const { return m_tileX; }
 	UINT getTilePosY() const { return m_tileY; }
 	void getTilePos( UINT& x, UINT& y ) const { x = m_tileX; y = m_tileY; }
-	virtual void enterTile( UINT tileX, UINT tileY) {}
+	virtual void enterTile( UINT tileX, UINT tileY);
+	virtual void enterTile();
 protected:
 	WorldState* getWorldState() const;
 
@@ -95,7 +98,7 @@ protected:
 	D3DXVECTOR3				m_vKeyboardDirection;
 	D3DXVECTOR3				m_vVelocity;
 	bool					m_bControllable;
-
+	Trigger*				m_trigger;
 	
 	UINT					m_tileX;
 	UINT					m_tileY;

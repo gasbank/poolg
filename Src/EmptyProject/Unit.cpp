@@ -4,6 +4,7 @@
 #include "WorldState.h"
 #include "TopStateManager.h"
 #include "TileManager.h"
+#include "Trigger.h"
 
 extern TileManager tileManager;
 
@@ -25,6 +26,8 @@ Unit::Unit()
 	m_vScale			= D3DXVECTOR3(1.0f, 1.0f, 1.0f);
 	m_bLocalXformDirty	= true;
 
+	m_trigger			= new Trigger;
+
 	D3DXMatrixIdentity(&m_localXform);
 
 	ZeroMemory(&m_material, sizeof(D3DMATERIAL9));
@@ -38,6 +41,7 @@ Unit::Unit()
 Unit::~Unit()
 {
 	SAFE_RELEASE(m_d3dxMesh);
+	delete m_trigger;
 }
 
 HRESULT Unit::init( LPDIRECT3DDEVICE9 pd3dDevice, LPD3DXMESH mesh )
@@ -158,7 +162,20 @@ WorldState* Unit::getWorldState() const
 	return static_cast<WorldState*>( TopStateManager::getSingleton().getCurState() );
 }
 
+void Unit::enterTile( UINT tileX, UINT tileY )
+{
+	printf( "현재의 위치 : [%d, %d]\n", tileX, tileY );
+	/*printf( "또다른 현재의 위치 : [%d, %d]\n",
+	GetTileManager().pos2TileX( &getWorldState()->getHeroPos() ),
+	GetTileManager().pos2TileY( &getWorldState()->getHeroPos() ) );*/
 
+	m_trigger->positionTrigger();
+}
+
+void Unit::enterTile()
+{
+	enterTile( getTilePosX(), getTilePosY() );
+}
 //////////////////////////////////////////////////////////////////////////
 
 Unit* EpCreateUnit( int tileX, int tileY, int controllable )

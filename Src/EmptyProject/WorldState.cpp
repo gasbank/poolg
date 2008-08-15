@@ -485,7 +485,7 @@ UINT WorldState::addUnit( Unit* u )
 		/*주인공 유닛 설정*/
 		m_heroUnit = dynamic_cast<Character*>( u );
 		m_heroUnit->setAttack (10);
-		m_heroUnit->setInt (20);
+		m_heroUnit->setInt (150);
 
 	}
 

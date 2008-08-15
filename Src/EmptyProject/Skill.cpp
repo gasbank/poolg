@@ -139,6 +139,18 @@ AttackObject기반으로 인한 수치변경 or 자기자신 효과(buff). (공격 or 자가)
 
 void NormalAttack::useSkill(BattleState *bs)
 {
+	int curCs = m_hero->getCurCs();
+
+	if (curCs < m_csEssentials)
+	{
+		bs->pushBattleLog("스피릿이 부족합니다.");
+		bs->pushBattleLog("기술은 취소되며 코딩스피릿 번이 일어납니다.");
+		m_hero->csBurn();
+		return;
+	}
+
+	m_hero->setCurCs (curCs - m_csEssentials);
+
 	bs->pushBattleLog("일반 공격을 사용하였습니다.");
 	m_hero->attack(0, m_enemy);
 
@@ -146,7 +158,24 @@ void NormalAttack::useSkill(BattleState *bs)
 
 void Heal::useSkill(BattleState *bs)
 {
+	int curCs = m_hero->getCurCs();
+	if (curCs < m_csEssentials)
+	{
+		bs->pushBattleLog("스피릿이 부족합니다.");
+		bs->pushBattleLog("기술은 취소되며 코딩스피릿 번이 일어납니다.");
+		m_hero->csBurn();
+		return;
+	}
+
+	m_hero->setCurCs (curCs - m_csEssentials);
+
+
 	bs->pushBattleLog("힐링을 사용하였습니다.");
 	m_hero->throwHealBall();
 }
 
+void Meditation::useSkill(BattleState *bs)
+{
+	bs->pushBattleLog("메디테이션을 사용하였습니다.");
+	m_hero->meditation();
+}

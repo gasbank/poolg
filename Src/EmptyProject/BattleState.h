@@ -60,6 +60,7 @@ private:
 
 	IllusionBar			m_hpIllusionPlayer;
 	IllusionBar			m_hpIllusionEnemy;
+	IllusionBar			m_mpIllusionPlayer;
 
 	ProgressBar			m_hpBarPlayer;
 	ProgressBar			m_mpBarPlayer;

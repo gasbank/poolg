@@ -17,6 +17,7 @@ public:
 	std::wstring			m_description;
 	Character*			m_hero;
 	Character*			m_enemy;
+	int					m_csEssentials;
 };
 
 
@@ -54,8 +55,7 @@ public:
 		m_description =
 			L"[Normal Attack]\n"
 			L"일반적인 방법으로 적을 공격합니다.\n";
-	
-	
+		m_csEssentials = 10;
 	}
 	virtual void useSkill( BattleState* battleState );
 };
@@ -69,6 +69,22 @@ public:
 		m_description =
 			L"[Heal]\n"
 			L"디버그를 통하여 HP를 회복합니다.\n";
+		m_csEssentials = 20;
+	}
+	virtual void useSkill( BattleState* battleState );
+};
+
+class Meditation : public Skill
+{
+public:
+	Meditation()
+	{
+		m_skillName = L"Meditation";
+		m_description =
+			L"[Meditation]\n"
+			L"공A관의 음침한 기운을 흡수하여 풀쥐의\n"
+			L"타락한 스피릿을 끌어올립니다.\n";
+		m_csEssentials = 0;
 	}
 	virtual void useSkill( BattleState* battleState );
 };

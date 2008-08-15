@@ -15,8 +15,10 @@ public:
 	/*스킬 함수*/
 	void attack(int type, Character* enemy);
 	void throwHealBall();
+	void csBurn();
+	void meditation();
 
-
+	void recoverCs();
 	void heal (int point);
 
 	virtual HRESULT frameRender();

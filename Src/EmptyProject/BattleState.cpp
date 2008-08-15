@@ -83,6 +83,9 @@ BattleState::BattleState()
 	m_hpIllusionEnemy.setSize(statusBarWidth, statusBarHeight);
 	m_hpIllusionEnemy.setPos (statusBoxEnemysPositionX + statusBoxWidth*0.23f, statusBoxEnemysPositionY + statusBoxHeight * 0.82f, 4.8f);
 
+	m_mpIllusionPlayer.init(L"Images/BattleUI/DKillusion.jpg", m_pDev);
+	m_mpIllusionPlayer.setSize(statusBarWidth, statusBarHeight);
+	m_mpIllusionPlayer.setPos (statusBoxPlayersPositionX + statusBoxWidth*0.23f, statusBoxPlayersPositionY + statusBoxHeight * 0.65f, 4.8f);
 
 	m_hpBarPlayer.init(L"Images/BattleUI/HPbar.jpg", m_pDev);
 	m_hpBarPlayer.setSize(statusBarWidth, statusBarHeight);
@@ -113,7 +116,7 @@ BattleState::BattleState()
 	
 	D3DXCreateFont(m_pDev, 17, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblHYnamL);
 	D3DXCreateFont(m_pDev, 18, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Rockwell Extra Bold"), &m_lblREB);
-	D3DXCreateFont(m_pDev, 25, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblSkill);
+	D3DXCreateFont(m_pDev, 20, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblSkill);
 	D3DXCreateFont(m_pDev, 15, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblSkillDescription);
 
 
@@ -124,6 +127,7 @@ BattleState::BattleState()
 
 	m_skillSet->setSkill (SL_FIRST, (Skill*) new NormalAttack());
 	m_skillSet->setSkill (SL_SECOND, (Skill*) new Heal());
+	m_skillSet->setSkill (SL_FIFTH, (Skill*) new Meditation());
 
 	m_noneSkillSelectedCount = 0;
 
@@ -150,11 +154,15 @@ HRESULT BattleState::enter()
 	m_hpIllusionPlayer.initRate((float)getHero()->getMaxHp());
 	m_hpBarEnemy.initRate((float)getEnemy()->getMaxHp());
 	m_hpIllusionEnemy.initRate((float)getEnemy()->getMaxHp());
+	m_mpBarPlayer.initRate((float)getHero()->getMaxCs());
+	m_mpIllusionPlayer.initRate((float)getHero()->getMaxCs());
 
 	m_hpBarPlayer.setRate((float)getHero()->getCurHp());
 	m_hpBarEnemy.setRate((float)getEnemy()->getCurHp());
+	m_mpBarPlayer.setRate((float)getHero()->getCurCs());
 	m_hpIllusionPlayer.setRate((float)getHero()->getCurHp());
 	m_hpIllusionEnemy.setRate((float)getEnemy()->getCurHp());
+	m_mpIllusionPlayer.setRate((float)getHero()->getCurCs());
 
 	/*스킬 대상 설정*/
 	m_skillSet->setCharacter (getHero(), getEnemy());
@@ -215,6 +223,8 @@ HRESULT BattleState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, flo
 
 	m_hpIllusionPlayer.draw();
 	m_hpIllusionEnemy.draw();
+	m_mpIllusionPlayer.draw();
+
 
 	m_hpBarPlayer.draw();
 	m_mpBarPlayer.draw();
@@ -254,6 +264,7 @@ HRESULT BattleState::frameMove(double fTime, float fElapsedTime)
 
 	m_hpIllusionPlayer.frameMove(fElapsedTime);
 	m_hpIllusionEnemy.frameMove(fElapsedTime);
+	m_mpIllusionPlayer.frameMove(fElapsedTime);
 
 	m_hpBarPlayer.frameMove(fElapsedTime);
 	m_mpBarPlayer.frameMove(fElapsedTime);
@@ -269,6 +280,10 @@ HRESULT BattleState::frameMove(double fTime, float fElapsedTime)
 	m_hpBarEnemy.changeRate((float)getEnemy()->getCurHp());
 	m_hpIllusionPlayer.changeRate((float)getHero()->getCurHp());
 	m_hpIllusionEnemy.changeRate((float)getEnemy()->getCurHp());
+	m_mpBarPlayer.changeRate((float)getHero()->getCurCs());
+	m_mpIllusionPlayer.changeRate((float)getHero()->getCurCs());
+
+
 	
 	//// WorldState에 접근하기 위한 코드.
 	//TopStateManager& tsm = TopStateManager::getSingleton();
@@ -391,7 +406,7 @@ HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 					m_battleLog.push_back(std::string("보스는 사실 거미를 무서워하는 듯 하다."));
 					break;
 				case 14:
-					m_battleLog.push_back(std::string("흐흥, 딱히 스크립트를 모르기 때문에 이런 switch문 노가다를 하는 건 아니야!"));
+					m_battleLog.push_back(std::string("흐흥, 딱히 스크립트를 모르기 땜시 이런 switch문 노가다를 한건 아니야!"));
 					break;
 				case 15:
 					m_battleLog.push_back(std::string("goto문은 지양합시다."));
@@ -404,6 +419,9 @@ HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 					break;
 				case 18:
 					m_battleLog.push_back(std::string("코드에 주석은 필수."));
+					break;
+				case 19:
+					m_battleLog.push_back(std::string("제작 동안 OOO군의 프로젝트 말살 음모가 있었습니다."));
 					break;
 				default:
 					m_battleLog.push_back(std::string("훗, 더 이상의 자세한 팁은 생략한다."));;
@@ -440,6 +458,7 @@ HRESULT BattleState::release ()
 
 	m_hpIllusionPlayer.release();
 	m_hpIllusionEnemy.release();
+	m_mpIllusionPlayer.release();
 
 	m_hpBarPlayer.release();
 	m_mpBarPlayer.release();
@@ -513,7 +532,7 @@ void BattleState::renderFixedText(int scrWidth, int scrHeight)
 	m_lblREB->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 
 
-	int skillLineInterval = 30;
+	int skillLineInterval = 39;
 
 	rc.top = scrHeight - 190;
 	rc.left = scrWidth - 110;
@@ -541,19 +560,19 @@ void BattleState::renderFixedText(int scrWidth, int scrHeight)
 		StringCchPrintf(textBuffer, 512, (STRSAFE_LPCWSTR)m_skillSet->getSkillName(SL_FIRST).c_str());
 		break;
 	case SL_SECOND:
-		rc.top = scrHeight - 160;
+		rc.top = scrHeight - 190 + skillLineInterval;
 		StringCchPrintf(textBuffer, 512, (STRSAFE_LPCWSTR)m_skillSet->getSkillName(SL_SECOND).c_str());
 		break;
 	case SL_THIRD:
-		rc.top = scrHeight - 130;
+		rc.top = scrHeight - 190 + skillLineInterval*2;
 		StringCchPrintf(textBuffer, 512, (STRSAFE_LPCWSTR)m_skillSet->getSkillName(SL_THIRD).c_str());
 		break;
 	case SL_FOURTH:
-		rc.top = scrHeight - 100;
+		rc.top = scrHeight - 190 + skillLineInterval*3;
 		StringCchPrintf(textBuffer, 512, (STRSAFE_LPCWSTR)m_skillSet->getSkillName(SL_FOURTH).c_str());
 		break;
 	case SL_FIFTH:
-		rc.top = scrHeight - 70;
+		rc.top = scrHeight - 190 + skillLineInterval*4;
 		StringCchPrintf(textBuffer, 512, (STRSAFE_LPCWSTR)m_skillSet->getSkillName(SL_FIFTH).c_str());
 		break;
 	}
@@ -595,6 +614,7 @@ void BattleState::passTurn()
 	if (m_curTurnType == TT_PLAYER)
 	{
 		m_battleLog.push_back(std::string("당신이 공격할 차례입니다."));
+		getHero()->recoverCs();
 	}
 	else if (m_curTurnType == TT_COMPUTER)
 	{

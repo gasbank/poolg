@@ -34,6 +34,28 @@ void Character::throwHealBall ()
 	m_attackObjectList.push_back(ao);
 }
 
+void Character::csBurn ()
+{
+	AttackObject* ao = CsBurnObject::createCsBurnObject(this);
+	m_attackObjectList.push_back(ao);
+}
+
+void Character::meditation ()
+{
+	AttackObject* ao = MeditationObject::createMeditationObject(this);
+	m_attackObjectList.push_back(ao);
+}
+
+
+void Character::recoverCs()
+{
+	int recoverCsPoint = (int)(m_maxCs * 0.1f);
+	if (m_curCs + recoverCsPoint > m_maxHp)
+		m_curCs = m_maxCs;
+	else
+		m_curCs += recoverCsPoint;
+}
+
 void Character::heal (int point)
 {
 	if (m_curHp + point < m_maxHp)
@@ -293,12 +315,24 @@ void Character::setCurHp( int curHp )
 {
 	if ( curHp == -1 )
 		m_curHp = m_maxHp;
+	else if ( curHp > m_maxHp )
+		m_curHp = m_maxHp;
+	else if ( curHp < 0)
+		m_curHp = 0;
+	else
+		m_curHp = curHp;
 }
 
 void Character::setCurCs( int curCs )
 {
 	if ( curCs == -1 )
 		m_curCs = m_maxCs;
+	else if ( curCs > m_maxCs )
+		m_curCs = m_maxCs;
+	else if ( curCs < 0)
+		m_curCs = 0;
+	else
+		m_curCs = curCs;
 }
 /*void Character::setMaxAndCurHp( int maxHp, int curHp )
 {

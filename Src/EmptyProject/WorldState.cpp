@@ -653,7 +653,7 @@ void WorldState::startTileDefinedDialogIfExist()
 	if( !getHeroUnit()->getMoving() && m_curDialog == 0 )
 	{
 		DialogList::iterator it = m_scriptedDialog.begin();
-		for ( ; it != m_scriptedDialog.end(); )
+		for ( ; it != m_scriptedDialog.end(); ++it )
 		{
 			Dialog* dialog = (*it);
 

@@ -26,6 +26,9 @@ public:
 	void setMaxAndCurHp( int maxHp, int curHp );
 	int getCurHp() const { return m_curHp; }
 	int getMaxHp() const { return m_maxHp; }
+	void setMaxAndCurCs( int maxCs, int curCs );
+	int getCurCs() const { return m_curCs; }
+	int getMaxCs() const { return m_maxCs; }
 	void damage( int point );
 	int getAttack() const { return m_attack; }
 	int getInt() const { return m_intelligence; }
@@ -59,6 +62,8 @@ private:
 	float					m_fMovingTime;
 	int						m_maxHp;
 	int						m_curHp;
+	int						m_maxCs;
+	int						m_curCs;
 	float					m_moveDuration; // A time needed to move one time(tile) in seconds
 	
 	int						m_attack;		// 일반 공격 스킬에 영향

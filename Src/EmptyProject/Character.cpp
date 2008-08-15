@@ -293,11 +293,24 @@ void Character::setMaxAndCurHp( int maxHp, int curHp )
 {
 	if ( maxHp < curHp || maxHp <= 0 )
 		throw std::runtime_error( "Logically incorrect value entered" );
+	maxHp = m_stat.health * m_stat.health / 4 + 50;
 	if ( curHp == -1 )
 		curHp = maxHp;
 
 	m_maxHp = maxHp;
 	m_curHp = curHp;
+}
+
+void Character::setMaxAndCurCs( int maxCs, int curCs )
+{
+	if ( maxCs < curCs || maxCs <= 0 )
+		throw std::runtime_error( "Logically incorrect value entered" );
+	maxCs = m_stat.will * m_stat.will / 10 + 20;
+	if ( curCs == -1 )
+		curCs = maxCs;
+
+	m_maxCs = maxCs;
+	m_curCs = curCs;
 }
 
 // 지정된 사각형 경계 위에 캐릭터가 있을 때 경계 바깥으로 나가려고 하면 움직일 수 없게 한다.
@@ -372,6 +385,13 @@ int EpCharacterSetMaxAndCurHp( void* ptr, int maxHp, int curHp )
 	return 0;
 } SCRIPT_CALLABLE_I_PV_I_I( EpCharacterSetMaxAndCurHp )
 
+int EpCharacterSetMaxAndCurCs( void* ptr, int maxCs, int curCs )
+{
+	Character* instance = reinterpret_cast<Character*>( ptr );
+	instance->Character::setMaxAndCurCs( maxCs, curCs );
+	return 0;
+} SCRIPT_CALLABLE_I_PV_I_I( EpCharacterSetMaxAndCurCs )
+
 int EpCharacterSetMoveDuration( void* ptr, double val )
 {
 	Character* instance = reinterpret_cast<Character*>( ptr );
@@ -405,6 +425,7 @@ int EpCharacterSetStat( void* ptr, int statHealth, int statWill, int statCoding,
 START_SCRIPT_FACTORY(Character)
 	CREATE_OBJ_COMMAND( EpCreateCharacter )
 	CREATE_OBJ_COMMAND( EpCharacterSetMaxAndCurHp )
+	CREATE_OBJ_COMMAND( EpCharacterSetMaxAndCurCs )
 	CREATE_OBJ_COMMAND( EpCharacterSetMoveDuration )
 	CREATE_OBJ_COMMAND( EpCharacterSetColor )
 	CREATE_OBJ_COMMAND( EpCharacterSetBoundary )

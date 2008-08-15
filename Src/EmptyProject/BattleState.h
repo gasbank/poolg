@@ -12,7 +12,6 @@ class Action;
 
 enum TurnType { TT_NATURAL, TT_COMPUTER, TT_PLAYER };
 enum PlayerSide { PS_NOTSET, PS_COMPUTER, PS_PLAYER };
-enum PlayerArt { PA_ART1, PA_ART2, PA_ART3, PA_ART4, PA_ART5};
 
 class BattleState : public State
 {
@@ -36,10 +35,6 @@ public:
 	void setNextTurnType( TurnType tt ) { m_nextTurnType = tt; }
 	void passTurn();
 	void pushBattleLog( const char* log ) { m_battleLog.push_back( log ); }	
-
-	void setArt (char direction);
-	void spellArt ();
-	
 private:
 
 	void doComputerAction();
@@ -86,10 +81,12 @@ private:
 	TurnType		m_curTurnType;
 	TurnType		m_nextTurnType;
 	PlayerSide		m_battleWinner;
-	PlayerArt		m_playerArt;
+
 
 	InnerFire		m_innerFire;
 
 	Action*			m_action;
 	SkillSet*		m_skillSet;
+	
+	int				m_noneSkillSelectedCount;
 };

@@ -1,7 +1,7 @@
 #include "EmptyProjectPCH.h"
 #include "Skill.h"
 
-using std::string;
+using std::wstring;
 
 SkillSet::SkillSet()
 {
@@ -20,9 +20,9 @@ SkillSet::~SkillSet()
 	}
 }
 
-void Skill::useSkill (BattleState* battleState)
+void Skill::useSkill (BattleState* bs)
 {
-
+	bs->pushBattleLog("그냥..");
 }
 
 void SkillSet::setSkill (SkillLocation skillLocation, Skill* skill)
@@ -36,22 +36,25 @@ void SkillSet::deleteSkill (SkillLocation skillLocation)
 {
 	if (m_skillSet[(int)skillLocation] != (NULL))
 		delete m_skillSet[(int)skillLocation];
+	m_skillSet[(int)skillLocation] = NULL;
 }
 
-string SkillSet::getSkillName (SkillLocation skillLocation)
+wstring SkillSet::getSkillName (SkillLocation skillLocation)
 {
 	/*비었을 경우 NULL 반환*/
 	if (m_skillSet[(int)skillLocation] == NULL)
-		return NULL;
+		return L"-";
 	return m_skillSet[(int)skillLocation]->m_skillName;
 }
 
-void SkillSet::useSkill (SkillLocation skillLocation)
+bool SkillSet::useSkill ()
 {
-	if (m_skillSet[(int)skillLocation] == NULL)
-		return;
+	if (m_skillSet[(int)this->m_skillLocation] == NULL)
+		return false;
 
-	m_skillSet[(int)skillLocation]->useSkill( m_battleState );
+	m_skillSet[(int)this->m_skillLocation]->useSkill( m_battleState );
+	
+	return true;
 }
 
 void SkillSet::moveSkillLocation (char mode)
@@ -61,7 +64,7 @@ void SkillSet::moveSkillLocation (char mode)
 	/*initialize*/
 	case 'i':
 		m_skillLocation = SL_FIRST;
-
+		break;
 	/*up*/
 	case 'u':
 		switch (m_skillLocation)
@@ -82,6 +85,7 @@ void SkillSet::moveSkillLocation (char mode)
 			m_skillLocation = SL_FOURTH;
 			break;
 		}
+		break;
 	/*down*/
 	case 'd':
 		switch (m_skillLocation)
@@ -102,8 +106,29 @@ void SkillSet::moveSkillLocation (char mode)
 			m_skillLocation = SL_FIRST;
 			break;
 		}
+		break;
 	}
 }
+
+void SkillSet::setCharacter (Character* hero, Character* enemy)
+{
+	for (int i = 0; i < 5; i++)
+	{
+		if (m_skillSet[i] != NULL)
+			m_skillSet[i]->setUser (hero, enemy);
+	}
+
+}
+
+
+wstring SkillSet::getDescription (SkillLocation skillLocation)
+{
+	if (m_skillSet[(int)skillLocation] == NULL)
+		return L"스킬이 없습니다.";
+	return m_skillSet[(int)skillLocation]->getDescription();
+}
+
+
 /*
 Skill 행하는 순서
 턴 제어 to TT_NATURAL
@@ -114,21 +139,14 @@ AttackObject기반으로 인한 수치변경 or 자기자신 효과(buff). (공격 or 자가)
 
 void NormalAttack::useSkill(BattleState *bs)
 {
-/*
-	m_battleLog.push_back(std::string("일반 공격을 사용하였습니다."));
-	getHero()->attack( 0, getEnemy() );
-	/*
+	bs->pushBattleLog("일반 공격을 사용하였습니다.");
+	m_hero->attack(0, m_enemy);
 
-	bs->pushBattleLog("힐링을 사용하였습니다.");
-	int healPoint = m_hero->getInt();
-	
-	char stringBuffer[20];
-	_itoa_s (healPoint, stringBuffer, 10);
-	std::string resultLog = stringBuffer;
-	resultLog += "포인트 HP를 회복하였습니다.";
-	bs->pushBattleLog(resultLog.c_str());
-	m_hero->heal (healPoint);
-	//bs->setNextTurnType(TT_COMPUTER);
-	//bs->passTurn();
-	*/
 }
+
+void Heal::useSkill(BattleState *bs)
+{
+	bs->pushBattleLog("힐링을 사용하였습니다.");
+	m_hero->throwHealBall();
+}
+

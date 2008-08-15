@@ -9,10 +9,12 @@ enum SkillLocation { SL_FIRST, SL_SECOND, SL_THIRD, SL_FOURTH, SL_FIFTH };
 class Skill
 {
 public:
-	void useSkill( BattleState* battleState );
-	void setUser (Character* hero, Character* enemy) { m_hero = hero; m_enemy = enemy; }
-	std::string getSkillName () { return m_skillName; }
-	std::string			m_skillName;
+	virtual void useSkill( BattleState* battleState );
+	std::wstring getDescription() { return m_description; }
+	void setUser(Character* hero, Character* enemy) { m_hero = hero; m_enemy = enemy; }
+	std::wstring getSkillName() { return m_skillName; }
+	std::wstring			m_skillName;
+	std::wstring			m_description;
 	Character*			m_hero;
 	Character*			m_enemy;
 };
@@ -25,10 +27,13 @@ public:
 	~SkillSet();
 	void setSkill( SkillLocation skillLocation, Skill* skill );
 	void deleteSkill( SkillLocation skillLocation );
-	void useSkill( SkillLocation skillLocation );
-	std::string getSkillName( SkillLocation skillLocation );
+	bool useSkill();
+	std::wstring getSkillName( SkillLocation skillLocation );
 	SkillLocation getSkillLocation() { return m_skillLocation; }
 	void moveSkillLocation(char mode);
+	void setCharacter (Character* hero, Character* enemy);
+
+	std::wstring getDescription (SkillLocation skillLocation);
 
 	/*사용 전엔 반드시 battleState를 설정해 주어야 한다.*/
 	void setBattleState( BattleState* battleState ) { m_battleState = battleState; }
@@ -43,13 +48,23 @@ private:
 class NormalAttack : public Skill
 {
 public:
-	NormalAttack() { m_skillName = "NormalAttack"; }
-	void useSkill( BattleState* battleState );
+	NormalAttack()
+	{
+		m_skillName = L"N A"; 
+		m_description = L"일반적인 방법으로 적을 공격합니다.";
+	
+	
+	}
+	virtual void useSkill( BattleState* battleState );
 };
 
 class Heal : public Skill
 {
 public:
-	Heal() { m_skillName = "Heal"; }
-	void useSkill( BattleState* battleState );
+	Heal()
+	{
+		m_skillName = L"Heal";
+		m_description = L"디버그를 통하여 HP를 회복합니다.";
+	}
+	virtual void useSkill( BattleState* battleState );
 };

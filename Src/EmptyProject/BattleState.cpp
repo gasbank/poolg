@@ -121,10 +121,11 @@ BattleState::BattleState()
 	m_skillSet->setSkill (SL_FIRST, (Skill*) new NormalAttack());
 	m_skillSet->setSkill (SL_SECOND, (Skill*) new Heal());
 
+	m_noneSkillSelectedCount = 0;
+
 
 	m_curTurnType = TT_NATURAL;
 	m_nextTurnType = TT_NATURAL;
-	m_playerArt = PA_ART1;
 }
 
 BattleState::~BattleState()
@@ -151,6 +152,10 @@ HRESULT BattleState::enter()
 	m_hpBarEnemy.setRate((float)getEnemy()->getCurHp());
 	m_hpIllusionPlayer.setRate((float)getHero()->getCurHp());
 	m_hpIllusionEnemy.setRate((float)getEnemy()->getCurHp());
+
+	/*스킬 대상 설정*/
+	m_skillSet->setCharacter (getHero(), getEnemy());
+	m_noneSkillSelectedCount = 0;
 
 	setupCamera();
 	
@@ -317,15 +322,84 @@ HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 		/*화살표에 따라 기술 분기*/
 		if (wParam == VK_UP)
 		{
-			setArt('u');
+			this->m_skillSet->moveSkillLocation('u');
 		}
 		if (wParam == VK_DOWN)
 		{
-			setArt('d');
+			this->m_skillSet->moveSkillLocation('d');
 		}
 		if (wParam == VK_RETURN)
 		{
-			spellArt ();
+			m_curTurnType = TT_NATURAL;
+			if (!(this->m_skillSet->useSkill()))
+			{
+				/*이부분에 스킬이 없습니다 라는 다이얼로그를 추가할수도.*/
+				switch (m_noneSkillSelectedCount)
+				{
+				case 0:
+					m_battleLog.push_back(std::string("스킬이 없습니다."));
+					break;
+				case 1:
+					m_battleLog.push_back(std::string("스킬이 없는데요?"));
+					break;
+				case 2:
+					m_battleLog.push_back(std::string("스킬이 없다니까요!!?"));
+					break;
+				case 3:
+					m_battleLog.push_back(std::string("없는 스킬 자꾸 누르는 저의가 무엇이냐!"));
+					break;
+				case 4:
+					m_battleLog.push_back(std::string("뭥미???"));
+					break;
+				case 5:
+					m_battleLog.push_back(std::string("..."));
+					break;
+				case 6:
+					m_battleLog.push_back(std::string("..."));
+					break;
+				case 7:
+					m_battleLog.push_back(std::string("어쩔 수 없군. 몇 가지 팁을 제공하죠."));
+					break;
+				case 8:
+					m_battleLog.push_back(std::string("맵의 곳곳에 숨겨진 박카스가 존재하는 듯 하다."));
+					break;
+				case 9:
+					m_battleLog.push_back(std::string("박카스를 쟁취하려면 맵에 존재하는 갖가지 퍼즐을 풀어야 한다."));
+					break;
+				case 10:
+					m_battleLog.push_back(std::string("최종 보스와의 대전을 위해 물약을 최대한 많이 쟁겨놓으십시오."));
+					break;
+				case 11:
+					m_battleLog.push_back(std::string("신도 세미나실은 신성합니다. 존중해주시죠."));
+					break;
+				case 12:
+					m_battleLog.push_back(std::string("일부 스킬들은 연속기로 쓸 수 있습니다."));
+					break;
+				case 13:
+					m_battleLog.push_back(std::string("보스는 사실 거미를 무서워하는 듯 하다."));
+					break;
+				case 14:
+					m_battleLog.push_back(std::string("흐흥, 딱히 스크립트를 모르기 때문에 이런 switch문 노가다를 하는 건 아니야!"));
+					break;
+				case 15:
+					m_battleLog.push_back(std::string("goto문은 지양합시다."));
+					break;
+				case 16:
+					m_battleLog.push_back(std::string("1일 1코딩."));
+					break;
+				case 17:
+					m_battleLog.push_back(std::string("게임은 조금만 합시다."));
+					break;
+				case 18:
+					m_battleLog.push_back(std::string("코드에 주석은 필수."));
+					break;
+				default:
+					m_battleLog.push_back(std::string("훗, 더 이상의 자세한 팁은 생략한다."));;
+					break;
+				}
+				m_noneSkillSelectedCount++;
+				m_curTurnType = TT_PLAYER;
+			}
 		}
 
 		if ( wParam == VK_F4 )
@@ -363,7 +437,8 @@ HRESULT BattleState::release ()
 	m_mpBarEnemy.release();
 
 	m_innerFire.release();
-	
+
+	//delete m_skillSet;
 	
 	SAFE_RELEASE( m_lblHYnamL );
 	SAFE_RELEASE( m_lblREB );
@@ -429,42 +504,43 @@ void BattleState::renderFixedText(int scrWidth, int scrHeight)
 
 	rc.top = scrHeight - 190;
 	rc.left = scrWidth - 110;
-	StringCchPrintf(textBuffer, 512, L"Attack");
+
+	StringCchPrintf(textBuffer, 512, (STRSAFE_LPCWSTR)m_skillSet->getSkillName(SL_FIRST).c_str());
 	m_lblArt->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 	rc.top += skillLineInterval;
-	StringCchPrintf(textBuffer, 512, L"Heal");
+	StringCchPrintf(textBuffer, 512, (STRSAFE_LPCWSTR)m_skillSet->getSkillName(SL_SECOND).c_str());
 	m_lblArt->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 	rc.top += skillLineInterval;
-	StringCchPrintf(textBuffer, 512, L"~_~");
+	StringCchPrintf(textBuffer, 512, (STRSAFE_LPCWSTR)m_skillSet->getSkillName(SL_THIRD).c_str());
 	m_lblArt->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 	rc.top += skillLineInterval;
-	StringCchPrintf(textBuffer, 512, L"~_~");
+	StringCchPrintf(textBuffer, 512, (STRSAFE_LPCWSTR)m_skillSet->getSkillName(SL_FOURTH).c_str());
 	m_lblArt->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 	rc.top += skillLineInterval;
-	StringCchPrintf(textBuffer, 512, L"~_~");
+	StringCchPrintf(textBuffer, 512, (STRSAFE_LPCWSTR)m_skillSet->getSkillName(SL_FIFTH).c_str());
 	m_lblArt->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 
-	switch (m_playerArt)
+	switch (m_skillSet->getSkillLocation())
 	{
-	case PA_ART1:
+	case SL_FIRST:
 		rc.top = scrHeight - 190;
-		StringCchPrintf(textBuffer, 512, L"Attack");
+		StringCchPrintf(textBuffer, 512, (STRSAFE_LPCWSTR)m_skillSet->getSkillName(SL_FIRST).c_str());
 		break;
-	case PA_ART2:
+	case SL_SECOND:
 		rc.top = scrHeight - 160;
-		StringCchPrintf(textBuffer, 512, L"Heal");
+		StringCchPrintf(textBuffer, 512, (STRSAFE_LPCWSTR)m_skillSet->getSkillName(SL_SECOND).c_str());
 		break;
-	case PA_ART3:
+	case SL_THIRD:
 		rc.top = scrHeight - 130;
-		StringCchPrintf(textBuffer, 512, L"~_~");
+		StringCchPrintf(textBuffer, 512, (STRSAFE_LPCWSTR)m_skillSet->getSkillName(SL_THIRD).c_str());
 		break;
-	case PA_ART4:
+	case SL_FOURTH:
 		rc.top = scrHeight - 100;
-		StringCchPrintf(textBuffer, 512, L"~_~");
+		StringCchPrintf(textBuffer, 512, (STRSAFE_LPCWSTR)m_skillSet->getSkillName(SL_FOURTH).c_str());
 		break;
-	case PA_ART5:
+	case SL_FIFTH:
 		rc.top = scrHeight - 70;
-		StringCchPrintf(textBuffer, 512, L"~_~");
+		StringCchPrintf(textBuffer, 512, (STRSAFE_LPCWSTR)m_skillSet->getSkillName(SL_FIFTH).c_str());
 		break;
 	}
 	m_lblArt->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 0.0f, 1.0f, 1.0f ) );
@@ -478,7 +554,7 @@ void BattleState::passTurn()
 
 	if (m_curTurnType == TT_PLAYER)
 	{
-		m_battleLog.push_back(std::string("당신이 공격할 차례입니다."));		
+		m_battleLog.push_back(std::string("당신이 공격할 차례입니다."));
 	}
 	else if (m_curTurnType == TT_COMPUTER)
 	{
@@ -500,85 +576,6 @@ Character* BattleState::getHero()
 Character* BattleState::getEnemy()
 {
 	return static_cast<Character*>( m_ws->getCurEnemy() );
-}
-
-void BattleState::setArt(char direction)
-{
-	if (direction == 'u')
-	{
-		switch (m_playerArt)
-		{
-		case PA_ART1:
-			m_playerArt = PA_ART5;
-			break;
-		case PA_ART2:
-			m_playerArt = PA_ART1;
-			break;
-		case PA_ART3:
-			m_playerArt = PA_ART2;
-			break;
-		case PA_ART4:
-			m_playerArt = PA_ART3;
-			break;
-		case PA_ART5:
-			m_playerArt = PA_ART4;
-			break;
-		}
-	}
-	else if (direction == 'd')
-	{
-		switch (m_playerArt)
-		{
-		case PA_ART1:
-			m_playerArt = PA_ART2;
-			break;
-		case PA_ART2:
-			m_playerArt = PA_ART3;
-			break;
-		case PA_ART3:
-			m_playerArt = PA_ART4;
-			break;
-		case PA_ART4:
-			m_playerArt = PA_ART5;
-			break;
-		case PA_ART5:
-			m_playerArt = PA_ART1;
-			break;
-		}
-	}
-}
-
-void BattleState::spellArt()
-{
-	/*attack*/
-	if (m_playerArt == PA_ART1)
-	{	
-		m_curTurnType = TT_NATURAL;
-		m_battleLog.push_back(std::string("일반 공격을 사용하였습니다."));
-		getHero()->attack( 0, getEnemy() );
-	}
-	/*heal*/
-	else if (m_playerArt == PA_ART2)
-	{
-		m_curTurnType = TT_NATURAL;
-		m_battleLog.push_back(std::string("힐링을 사용하였습니다."));	
-		getHero()->throwHealBall();
-	}
-	/*blank*/
-	else if (m_playerArt == PA_ART3)
-	{
-
-	}
-	/*blank*/
-	else if (m_playerArt == PA_ART4)
-	{
-
-	}
-	/*말살기*/
-	else if (m_playerArt == PA_ART5)
-	{
-
-	}
 }
 
 void BattleState::setupCamera()

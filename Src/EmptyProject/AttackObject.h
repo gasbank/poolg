@@ -32,6 +32,7 @@ private:
 	D3DXVECTOR3 m_fireDir;
 	float m_retainDist;
 	int m_damage;
+	//int m_manaConsumption;
 
 	BallAttackObject( Character* target, const D3DXVECTOR3& initPos, const D3DXVECTOR3& fireDir, float retainDist );
 };
@@ -56,3 +57,21 @@ private:
 	float m_angularVelocity;
 
 };
+
+/*
+class MeditationObject : public AttackObject
+{
+public:
+	static AttackObject* createHealObject( Character* target );
+	HealObject( Character* target );
+	~HealObject();
+
+	virtual LRESULT handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
+	virtual bool frameMove( float fElapsedTime );
+
+private:
+	Character* m_target;
+	D3DXVECTOR3 m_fireDir;
+	int m_meditationPoint;
+}
+*/

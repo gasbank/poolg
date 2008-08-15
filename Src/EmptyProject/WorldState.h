@@ -36,6 +36,7 @@ public:
 	virtual HRESULT release();
 
 	UINT addUnit(Unit* u);
+	UINT addIncident( Incident* inc );
 	void detachAllUnits();
 	const D3DXVECTOR3& getEnemyPos();
 	const D3DXVECTOR3& getHeroPos();

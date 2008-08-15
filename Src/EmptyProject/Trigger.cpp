@@ -6,6 +6,7 @@
 #include "WorldStateManager.h"
 #include "TileManager.h"
 #include "Action.h"
+#include "ScriptManager.h"
 
 Trigger::Trigger(void)
 {
@@ -105,3 +106,14 @@ bool CharHpTrigger::check()
 
 	return false;
 }
+
+Trigger* EpCreateCharHpTrigger( void* ptr, int min, int max, int bInclude )
+{
+	Character* c = reinterpret_cast<Character*>( ptr );
+	return new CharHpTrigger( c, min, max, bInclude?true:false );
+} SCRIPT_CALLABLE_PV_PV_I_I_I( EpCreateCharHpTrigger )
+
+
+START_SCRIPT_FACTORY( Trigger )
+	CREATE_OBJ_COMMAND( EpCreateCharHpTrigger )
+END_SCRIPT_FACTORY( Trigger )

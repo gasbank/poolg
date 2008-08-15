@@ -131,10 +131,10 @@ HRESULT WorldState::enter()
 
 	// Incidents construction
 	
-	Trigger* trigger = new UnitPositionTrigger( m_heroUnit, TileRegion( 26, 80, 27, 82 ) );
+	/*Trigger* trigger = new UnitPositionTrigger( m_heroUnit, TileRegion( 26, 80, 27, 82 ) );
 	Action* action = new DialogAction( "EpDialog4" );
 	Incident* inc = new Incident( trigger, action );
-	m_incidents.push_back( inc );
+	m_incidents.push_back( inc );*/
 
 	/*trigger = new CharHpTrigger( m_heroUnit, 1, 100, true );
 	Incident* inc2 = new Incident( trigger, action );
@@ -742,6 +742,12 @@ Dialog* WorldState::getDialogByName( const char* dialogName )
 	}
 	return 0;
 }
+
+UINT WorldState::addIncident( Incident* inc )
+{
+	m_incidents.push_back( inc );
+	return m_incidents.size();
+}
 //////////////////////////////////////////////////////////////////////////
 
 Unit* EpGetHero()
@@ -751,8 +757,15 @@ Unit* EpGetHero()
 	return ws->getHero();
 } SCRIPT_CALLABLE_PV( EpGetHero )
 
+int EpRegisterIncident( void* ptr )
+{
+	WorldState* ws = dynamic_cast<WorldState*>( GetTopStateManager().getState( GAME_TOP_STATE_WORLD ) );
+	Incident* inc = reinterpret_cast<Incident*>( ptr );
+	assert( ws );
+	return ws->addIncident( inc );
+} SCRIPT_CALLABLE_I_PV( EpRegisterIncident )
 
 START_SCRIPT_FACTORY( WorldState )
 	CREATE_OBJ_COMMAND( EpGetHero )
-
+	CREATE_OBJ_COMMAND( EpRegisterIncident )
 END_SCRIPT_FACTORY( WorldState )

@@ -1,12 +1,14 @@
 #include "EmptyProjectPCH.h"
 #include "ScriptManager.h"
 #include "TopStateManager.h"
-
 #include "Unit.h"
 #include "Character.h"
 #include "Hero.h"
 #include "Enemy.h"
 #include "WorldState.h"
+#include "Incident.h"
+#include "Trigger.h"
+#include "Action.h"
 
 int Tcl_AppInit(Tcl_Interp *interp);
 
@@ -129,6 +131,10 @@ void ScriptManager::initBoundings()
 	_script_factory_Enemy::init();
 	_script_factory_TopStateManager::init();
 	_script_factory_WorldState::init();
+	_script_factory_Incident::init();
+	_script_factory_Action::init();
+	_script_factory_Trigger::init();
+
 }
 //////////////////////////////////////////////////////////////////////////
 

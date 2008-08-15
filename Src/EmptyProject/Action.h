@@ -27,6 +27,7 @@ private:
 	WorldState* m_ws;
 };
 
+SCRIPT_FACTORY( Action )
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -58,3 +59,4 @@ public:
 private:
 	std::string m_dialogName;
 };
+

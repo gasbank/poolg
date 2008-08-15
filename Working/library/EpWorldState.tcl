@@ -1,18 +1,34 @@
 namespace eval EpWorldState {
-	variable pWorld
+	variable pWorld testEnemy
 	
 	proc init {pCurWorld} {
-		EpOutputDebugString " - WorldState init Ptr: $pCurWorld\n"
 		variable pWorld
+		
+		EpOutputDebugString " - WorldState init Ptr: $pCurWorld\n"
 		
 		set pWorld				$pCurWorld;
 	}
 
+	proc registerIncident1 {} {
+		variable testEnemy
+		
+		set trigger		[ EpCreateCharHpTrigger $testEnemy -100 0 1 ]
+		set action		[ EpCreateDialogAction "EpDialog2" ]
+		set incident	[ EpCreateIncident $trigger $action ]
+		
+		set incCount	[ EpRegisterIncident $incident ]
+		EpOutputDebugString " - Incident count: $incCount\n"
+	}
 	
 	proc enter {} {
+		variable testEnemy
+		
 		EpOutputDebugString " - WorldState enter\n"
 		
+		set testEnemy				[createEnem 27 78];
+		
 		set pHeroUnit				[createHero 26 74];
+		
 		set pEnemyUnit1				[createEnem 25 90];
 		set pEnemyUnit2				[createEnem 37 88];
 		set pEnemyUnit3				[createEnem 35 67];
@@ -78,6 +94,9 @@ namespace eval EpWorldState {
 		EpEnemySetRandomWalkable		$pTestEnemyUnit	1
 		EpCharacterSetBoundary			$pTestEnemyUnit 3 -22 5 -25  # left, top, right, bottom
 		EpEnemySetTalkable			$pTestEnemyUnit	1
+		
+		
+		registerIncident1
 	}
 	
 	proc leave {} {

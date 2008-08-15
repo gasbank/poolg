@@ -5,6 +5,7 @@
 #include "WorldStateManager.h"
 #include "Enemy.h"
 #include "Unit.h"
+#include "ScriptManager.h"
 
 
 Action::Action(void)
@@ -101,3 +102,12 @@ void DialogAction::update()
 {
 
 }
+Action* EpCreateDialogAction( const char* dialogName )
+{
+	return new DialogAction( dialogName );
+} SCRIPT_CALLABLE_PV_PC( EpCreateDialogAction )
+
+
+START_SCRIPT_FACTORY( Action )
+	CREATE_OBJ_COMMAND( EpCreateDialogAction )
+END_SCRIPT_FACTORY( Action )

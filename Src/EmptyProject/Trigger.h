@@ -26,6 +26,7 @@ public:
 private:
 	WorldState* m_ws;
 };
+SCRIPT_FACTORY( Trigger )
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -58,3 +59,4 @@ private:
 	int m_max;
 	bool m_bInclude;
 };
+

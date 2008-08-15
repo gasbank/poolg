@@ -18,3 +18,5 @@ private:
 	Action* m_action;
 
 };
+
+SCRIPT_FACTORY( Incident )

@@ -509,6 +509,8 @@ int EpOutputDebugString( const char* msg )
 
 } SCRIPT_CALLABLE_I_PC( EpOutputDebugString )
 
+HANDLE g_handle;
+
 unsigned int __stdcall newThread( ClientData cd )
 {
 	//printf( "xx ^________^ xx" );
@@ -520,6 +522,7 @@ unsigned int __stdcall newThread( ClientData cd )
 
 	CREATE_OBJ_COMMAND( EpOutputDebugString );
 
+	SetEvent( g_handle );
 
 	Tcl_EvalFile( g_consoleInterp, "library/EpThreadTest.tcl" );
 
@@ -585,9 +588,12 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 
 
 	Tcl_ThreadId ttid;
-	if ( Tcl_CreateThread( &ttid, newThread, 0, 1024, 0 ) != TCL_OK )
+	if ( Tcl_CreateThread( &ttid, newThread, 0, TCL_THREAD_STACK_DEFAULT, 0 ) != TCL_OK )
 		throw std::runtime_error( "Check your Tcl library to support thread" );
 
+	g_handle = CreateEvent( NULL , TRUE , FALSE , NULL );  
+	ResetEvent( g_handle ); 
+	WaitForSingleObject( g_handle, INFINITE );
 
 	// Initialize DXUT and create the desired Win32 window and Direct3D device for the application
 	DXUTInit( true, true ); // Parse the command line and show msgboxes

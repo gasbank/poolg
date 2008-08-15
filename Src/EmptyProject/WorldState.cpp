@@ -136,6 +136,9 @@ HRESULT WorldState::enter()
 	Incident* inc = new Incident( trigger, action );
 	m_incidents.push_back( inc );
 
+	/*trigger = new CharHpTrigger( m_heroUnit, 1, 100, true );
+	Incident* inc2 = new Incident( trigger, action );
+	m_incidents.push_back( inc2 );*/
 
 	//////////////////////////////////////////////////////////////////////////
 	// Prepare alpha shading

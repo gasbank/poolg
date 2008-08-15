@@ -83,3 +83,25 @@ bool UnitPositionTrigger::check()
 	return m_region.isExist( m_unit->getTilePos() );
 }
 
+//////////////////////////////////////////////////////////////////////////
+
+CharHpTrigger::CharHpTrigger( Character* c, int min, int max, bool bInclude /*= true */ )
+: m_char( c ), m_min( min ), m_max( max ), m_bInclude( bInclude )
+{
+}
+
+bool CharHpTrigger::check()
+{
+	if ( m_bInclude && m_char->getCurHp() >= m_min && m_char->getCurHp() <= m_max )
+	{
+		// HP is within the range
+		return true;
+	}
+	else if ( !m_bInclude && m_char->getCurHp() < m_min && m_char->getCurHp() > m_max )
+	{
+		// HP is not within the range
+		return true;
+	}
+
+	return false;
+}

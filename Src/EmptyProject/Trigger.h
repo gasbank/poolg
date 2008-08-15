@@ -27,6 +27,7 @@ private:
 	WorldState* m_ws;
 };
 
+//////////////////////////////////////////////////////////////////////////
 
 class UnitPositionTrigger : public Trigger
 {
@@ -39,4 +40,21 @@ public:
 private:
 	Unit* m_unit;
 	TileRegion m_region;
+};
+
+//////////////////////////////////////////////////////////////////////////
+
+class CharHpTrigger : public Trigger
+{
+public:
+	CharHpTrigger( Character* unit, int min, int max, bool bInclude = true );
+	virtual ~CharHpTrigger() {}
+
+	virtual bool check();
+
+private:
+	Character* m_char;
+	int m_min;
+	int m_max;
+	bool m_bInclude;
 };

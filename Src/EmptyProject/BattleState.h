@@ -5,6 +5,7 @@
 #include "StatusBar.h"
 #include "State.h"
 #include "InnerFire.h"
+#include "SkillDescBox.h"
 
 class SkillSet;
 class WorldState;
@@ -47,7 +48,7 @@ private:
 	Picture				m_StatusBoxEnemy;
 
 	Picture				m_SkillBox;
-	Picture				m_SkillContentBox;
+	SkillDescBox		m_SkillContentBox;
 	Picture				m_DialogBox;
 
 	Picture				m_hpBgPlayer;
@@ -69,7 +70,9 @@ private:
 
 	LPD3DXFONT			m_lblHYnamL;
 	LPD3DXFONT			m_lblREB;
-	LPD3DXFONT			m_lblArt;
+	LPD3DXFONT			m_lblSkill;
+	LPD3DXFONT			m_lblSkillDescription;
+
 	
 	LPDIRECT3DDEVICE9	m_pDev;
 

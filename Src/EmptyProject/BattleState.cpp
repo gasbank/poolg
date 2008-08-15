@@ -44,7 +44,9 @@ BattleState::BattleState()
 	int skillContentBoxHeight = 200;
 	int skillContentBoxWidth = skillContentBoxHeight * 390 / 269;
 	m_SkillContentBox.init(L"Images/BattleUI/SkillContentBox.png", m_pDev);
-	m_SkillContentBox.setPos(D3DXVECTOR3((float)skillBoxPositionX - skillContentBoxWidth, (float)skillBoxPositionY, 6.9f));
+	m_SkillContentBox.setDistance(500);
+	m_SkillContentBox.setOff();
+	m_SkillContentBox.setOnPos((float)skillBoxPositionX - skillContentBoxWidth, (float)skillBoxPositionY, 7);
 	m_SkillContentBox.setSize((float)skillContentBoxWidth, (float)skillContentBoxHeight);
 
 	float dialogBoxWidth = (float)(int)(scrWidth - statusBoxWidth - 30);
@@ -111,7 +113,9 @@ BattleState::BattleState()
 	
 	D3DXCreateFont(m_pDev, 17, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblHYnamL);
 	D3DXCreateFont(m_pDev, 18, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Rockwell Extra Bold"), &m_lblREB);
-	D3DXCreateFont(m_pDev, 25, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblArt);
+	D3DXCreateFont(m_pDev, 25, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblSkill);
+	D3DXCreateFont(m_pDev, 15, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblSkillDescription);
+
 
 	/*스킬 초기화 부분*/
 	
@@ -122,7 +126,6 @@ BattleState::BattleState()
 	m_skillSet->setSkill (SL_SECOND, (Skill*) new Heal());
 
 	m_noneSkillSelectedCount = 0;
-
 
 	m_curTurnType = TT_NATURAL;
 	m_nextTurnType = TT_NATURAL;
@@ -156,6 +159,7 @@ HRESULT BattleState::enter()
 	/*스킬 대상 설정*/
 	m_skillSet->setCharacter (getHero(), getEnemy());
 	m_noneSkillSelectedCount = 0;
+	m_SkillContentBox.setOff();
 
 	setupCamera();
 	
@@ -229,7 +233,7 @@ HRESULT BattleState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, flo
 		m_innerFire.draw();
 
 	renderFixedText(GetG().m_scrWidth, GetG().m_scrHeight);
-	
+
 	return S_OK;
 }
 
@@ -322,11 +326,19 @@ HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 		/*화살표에 따라 기술 분기*/
 		if (wParam == VK_UP)
 		{
-			this->m_skillSet->moveSkillLocation('u');
+			m_skillSet->moveSkillLocation('u');
 		}
 		if (wParam == VK_DOWN)
 		{
-			this->m_skillSet->moveSkillLocation('d');
+			m_skillSet->moveSkillLocation('d');
+		}
+		if (wParam == VK_LEFT)
+		{
+			m_SkillContentBox.onBox();
+		}
+		if (wParam == VK_RIGHT)
+		{
+			m_SkillContentBox.offBox();
 		}
 		if (wParam == VK_RETURN)
 		{
@@ -442,7 +454,8 @@ HRESULT BattleState::release ()
 	
 	SAFE_RELEASE( m_lblHYnamL );
 	SAFE_RELEASE( m_lblREB );
-	SAFE_RELEASE( m_lblArt );
+	SAFE_RELEASE( m_lblSkill );
+	SAFE_RELEASE( m_lblSkillDescription );
 
 	return S_OK;
 }
@@ -490,7 +503,7 @@ void BattleState::renderFixedText(int scrWidth, int scrHeight)
 	m_lblREB->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 
 
-	/*적 status 그리기*/
+	/*적 status 라벨 그리기*/
 	rc.top = (LONG)18;
 	rc.left = (LONG)(scrWidth - 167);
 	StringCchPrintf(textBuffer, 512, L"HP");
@@ -506,20 +519,21 @@ void BattleState::renderFixedText(int scrWidth, int scrHeight)
 	rc.left = scrWidth - 110;
 
 	StringCchPrintf(textBuffer, 512, (STRSAFE_LPCWSTR)m_skillSet->getSkillName(SL_FIRST).c_str());
-	m_lblArt->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+	m_lblSkill->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 	rc.top += skillLineInterval;
 	StringCchPrintf(textBuffer, 512, (STRSAFE_LPCWSTR)m_skillSet->getSkillName(SL_SECOND).c_str());
-	m_lblArt->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+	m_lblSkill->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 	rc.top += skillLineInterval;
 	StringCchPrintf(textBuffer, 512, (STRSAFE_LPCWSTR)m_skillSet->getSkillName(SL_THIRD).c_str());
-	m_lblArt->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+	m_lblSkill->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 	rc.top += skillLineInterval;
 	StringCchPrintf(textBuffer, 512, (STRSAFE_LPCWSTR)m_skillSet->getSkillName(SL_FOURTH).c_str());
-	m_lblArt->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+	m_lblSkill->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 	rc.top += skillLineInterval;
 	StringCchPrintf(textBuffer, 512, (STRSAFE_LPCWSTR)m_skillSet->getSkillName(SL_FIFTH).c_str());
-	m_lblArt->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+	m_lblSkill->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 
+	/*스킬 라벨 그리기*/
 	switch (m_skillSet->getSkillLocation())
 	{
 	case SL_FIRST:
@@ -543,7 +557,33 @@ void BattleState::renderFixedText(int scrWidth, int scrHeight)
 		StringCchPrintf(textBuffer, 512, (STRSAFE_LPCWSTR)m_skillSet->getSkillName(SL_FIFTH).c_str());
 		break;
 	}
-	m_lblArt->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 0.0f, 1.0f, 1.0f ) );
+	m_lblSkill->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 0.0f, 1.0f, 1.0f ) );
+
+
+	rc.top = scrHeight - 190;
+	rc.left = scrWidth - 410;
+
+	switch (m_skillSet->getSkillLocation())
+	{
+	case SL_FIRST:
+		StringCchPrintf(textBuffer, 512, (STRSAFE_LPCWSTR)m_skillSet->getDescription(SL_FIRST).c_str());
+		break;
+	case SL_SECOND:
+		StringCchPrintf(textBuffer, 512, (STRSAFE_LPCWSTR)m_skillSet->getDescription(SL_SECOND).c_str());
+		break;
+	case SL_THIRD:
+		StringCchPrintf(textBuffer, 512, (STRSAFE_LPCWSTR)m_skillSet->getDescription(SL_THIRD).c_str());
+		break;
+	case SL_FOURTH:
+		StringCchPrintf(textBuffer, 512, (STRSAFE_LPCWSTR)m_skillSet->getDescription(SL_FOURTH).c_str());
+		break;
+	case SL_FIFTH:
+		StringCchPrintf(textBuffer, 512, (STRSAFE_LPCWSTR)m_skillSet->getDescription(SL_FIFTH).c_str());
+		break;
+	}
+
+	if (m_SkillContentBox.isOn())
+		m_lblSkillDescription->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 0.8f, 0.8f, 1.0f, 1.0f ) );
 
 }
 

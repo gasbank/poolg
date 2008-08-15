@@ -50,8 +50,10 @@ class NormalAttack : public Skill
 public:
 	NormalAttack()
 	{
-		m_skillName = L"N A"; 
-		m_description = L"일반적인 방법으로 적을 공격합니다.";
+		m_skillName = L"N.A."; 
+		m_description =
+			L"[Normal Attack]\n"
+			L"일반적인 방법으로 적을 공격합니다.\n";
 	
 	
 	}
@@ -64,7 +66,9 @@ public:
 	Heal()
 	{
 		m_skillName = L"Heal";
-		m_description = L"디버그를 통하여 HP를 회복합니다.";
+		m_description =
+			L"[Heal]\n"
+			L"디버그를 통하여 HP를 회복합니다.\n";
 	}
 	virtual void useSkill( BattleState* battleState );
 };

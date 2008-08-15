@@ -48,7 +48,7 @@ public:
 
 	virtual void pushUnitInFront( UnitInput dir ) {}
 
-	void setStat( int statHealth, int statWill, int statCoding, int statDef );
+	void setStat( int statHealth, int statWill, int statCoding, int statDef, int statSen, int statImmu );
 protected:
 	Character();
 
@@ -75,7 +75,7 @@ private:
 
 	struct Stat
 	{
-		int health, will, coding, def;
+		int health, will, coding, def, sence, immun;
 	};
 	Stat					m_stat;
 };

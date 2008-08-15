@@ -403,10 +403,12 @@ void Character::damage( int point )
 	ws->screenFlashing( 0.2f, 1.0f, 0.0f, 0.0f );
 
 	m_curHp -= point;
+
+	printf("Ã¼·ÂÀº? %d\n", m_curHp);
 }
 
 
-void Character::setStat( int statHealth, int statWill, int statCoding, int statDef )
+void Character::setStat( int statHealth, int statWill, int statCoding, int statDef, int statSen, int statImmu )
 {
 	m_stat.health	= statHealth;
 	m_stat.will		= statWill;
@@ -415,6 +417,7 @@ void Character::setStat( int statHealth, int statWill, int statCoding, int statD
 
 	m_maxHp = m_stat.health * m_stat.health / 4 + 50;
 	m_maxCs = m_stat.will * m_stat.will / 10 + 20;
+
 
 	// Hp, Mp update goes here...
 }
@@ -467,12 +470,12 @@ int EpCharacterSetBoundary( void* ptr, int left, int top, int right, int bottom 
 } SCRIPT_CALLABLE_I_PV_I_I_I_I( EpCharacterSetBoundary )
 
 
-int EpCharacterSetStat( void* ptr, int statHealth, int statWill, int statCoding, int statDef )
+int EpCharacterSetStat( void* ptr, int statHealth, int statWill, int statCoding, int statDef, int statSen, int statImmu )
 {
 	Character* instance = reinterpret_cast<Character*>( ptr );
-	instance->Character::setStat( statHealth, statWill, statCoding, statDef );
+	instance->Character::setStat( statHealth, statWill, statCoding, statDef, statSen, statImmu );
 	return 0;
-} SCRIPT_CALLABLE_I_PV_I_I_I_I( EpCharacterSetStat )
+} SCRIPT_CALLABLE_I_PV_I_I_I_I_I_I( EpCharacterSetStat )
 
 
 START_SCRIPT_FACTORY(Character)

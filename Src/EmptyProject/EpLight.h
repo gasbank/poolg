@@ -1,5 +1,7 @@
 #pragma once
 
+enum LightState { LIGHT_FADE, LIGHT_FLICKER, LIGHT_NORMAL };
+
 class EpLight
 {
 public:
@@ -12,14 +14,15 @@ public:
 	void setFadeDuration( float f ) { m_fFadeDuration = f; }
 	void setupLight();
 	void setColor( float r, float g, float b );
+	void setFlickerColor( D3DXCOLOR& color );
 	void turnOnLight();
 	void turnOffLight();
 	void fadeInLight();
 	void fadeOutLight();
-	void flicker( float f ) { m_fFlickerDuration = f; }
+	void flicker( float f );
 
 private:
-	void updateFadeColor( float fElapsedTime );
+	void updateFadeBrightness( float fElapsedTime );
 	void updateFlicker( float fElapsedTime );
 
 	D3DLIGHT9			m_light;
@@ -31,4 +34,9 @@ private:
 	bool				m_bLightValueDirty;
 	float				m_fFadeTimerSign;
 	float				m_fFlickerDuration;
+	D3DXCOLOR			m_cFlickerAmbient;
+	D3DXCOLOR			m_cFlickerDiffuse;
+	D3DXCOLOR			m_cFlickerSpecular;
+	float				m_fBrightness;
+	LightState			m_eLightState;
 };

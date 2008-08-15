@@ -7,6 +7,8 @@ EpLight::EpLight(void)
 	m_fFadeTimer = 0.0f;
 	m_fFadeTimerSign = 1.0f;
 	m_fFlickerDuration = 0.0f;
+	m_eLightState = LIGHT_NORMAL;
+	m_fBrightness = 1.0f;
 }
 
 EpLight::~EpLight(void)
@@ -63,7 +65,8 @@ LRESULT EpLight::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 			fadeOutLight();
 			break;
 		case 'F':
-			setColor( 1.0f, 0.0f, 0.0f );
+			D3DXCOLOR color( 1.0f, 0.0f, 0.0f, 1.0f );
+			setFlickerColor( color );
 			setFadeDuration( 0.5f );
 			flicker( 10.0f );
 			break;
@@ -76,11 +79,35 @@ LRESULT EpLight::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 
 void EpLight::frameMove( FLOAT fElapsedTime )
 {
+	// 스테이트는 기본적으로 LIGHT_NORMAL이고, 아래 과정에서 끝나지 않은 작업이 있으면 변할 수 있음.
+	m_eLightState = LIGHT_NORMAL;
+
+	updateFadeBrightness( fElapsedTime );
+	updateFlicker( fElapsedTime );
+
+	switch ( m_eLightState )
+	{
+	case LIGHT_FADE:
+		m_light.Ambient = m_cAmbient * m_fBrightness;
+		m_light.Diffuse = m_cDiffuse * m_fBrightness;
+		m_light.Specular = m_cSpecular * m_fBrightness;
+		break;
+	case LIGHT_FLICKER:
+		m_light.Ambient = m_cFlickerAmbient * m_fBrightness;
+		m_light.Diffuse = m_cFlickerDiffuse * m_fBrightness;
+		m_light.Specular = m_cFlickerSpecular * m_fBrightness;
+		break;
+	case LIGHT_NORMAL:
+		m_light.Ambient = m_cAmbient;
+		m_light.Diffuse = m_cDiffuse;
+		m_light.Specular = m_cSpecular;
+		break;
+	}
+	
+
 	if ( m_bLightValueDirty )
 		GetG().m_dev->SetLight( 1, &m_light );
 
-	updateFadeColor( fElapsedTime );
-	updateFlicker( fElapsedTime );
 }
 
 void EpLight::fadeInLight()
@@ -107,23 +134,19 @@ void EpLight::turnOffLight()
 	GetG().m_dev->LightEnable( 1, FALSE );
 }
 
-void EpLight::updateFadeColor( float fElapsedTime )
+void EpLight::updateFadeBrightness( float fElapsedTime )
 {
 	if ( 0.0f < m_fFadeTimer && m_fFadeTimer < m_fFadeDuration )
+	{
 		m_fFadeTimer += fElapsedTime * m_fFadeTimerSign;
+		m_eLightState = LIGHT_FADE;
+	}
 	else if ( m_fFadeTimer > m_fFadeDuration )
 		m_fFadeTimer = m_fFadeDuration;
 	else if ( m_fFadeTimer < 0.0f )
 		m_fFadeTimer = 0.0f;
 
-	float fBrightness = abs( sin( D3DXToRadian( 
-		m_fFadeTimer / m_fFadeDuration * 90.0f ) ) );
-
-	m_light.Ambient = m_cAmbient * fBrightness;
-	m_light.Diffuse = m_cDiffuse * fBrightness;
-	m_light.Specular = m_cSpecular * fBrightness;
-
-	m_bLightValueDirty = true;
+	m_fBrightness = abs( sin( D3DXToRadian( m_fFadeTimer / m_fFadeDuration * 90.0f ) ) );
 }
 
 void EpLight::updateFlicker( float fElapsedTime )
@@ -136,7 +159,10 @@ void EpLight::updateFlicker( float fElapsedTime )
 			fadeInLight();
 		else if ( m_fFadeTimer == m_fFadeDuration )
 			fadeOutLight();
-	}
+
+		m_eLightState = LIGHT_FLICKER;
+	} else
+		m_fFlickerDuration = 0.0f;
 }
 
 void EpLight::setColor( float r, float g, float b )
@@ -156,6 +182,24 @@ void EpLight::setColor( float r, float g, float b )
 	m_light.Ambient = m_cAmbient;
 	m_light.Diffuse = m_cDiffuse;
 	m_light.Specular = m_cSpecular;
+
+	m_bLightValueDirty = true;
+}
+
+void EpLight::setFlickerColor( D3DXCOLOR& color )
+{
+	m_cFlickerAmbient = color * 0.3f;
+	m_cFlickerDiffuse = color * 0.6f;
+	m_cFlickerSpecular = color * 0.1f;
+}
+
+void EpLight::flicker( float f )
+{
+	m_fFlickerDuration = f;
+
+	m_light.Ambient = m_cFlickerAmbient;
+	m_light.Diffuse = m_cFlickerDiffuse;
+	m_light.Specular = m_cFlickerSpecular;
 
 	m_bLightValueDirty = true;
 }

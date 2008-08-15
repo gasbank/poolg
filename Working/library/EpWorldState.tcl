@@ -29,6 +29,7 @@ namespace eval EpWorldState {
 		EpUnitSetPosZ				$pHeroUnit -[EpUnitGetUpperRightZ $pHeroUnit]
 		EpCharacterSetStat			$pHeroUnit 30 20 20 10 # Health Will Coding Defence
 		EpCharacterSetMaxAndCurHp		$pHeroUnit 500 -1
+		EpCharacterSetMaxAndCurCs		$pHeroUnit 500 -1
 		EpCharacterSetMoveDuration		$pHeroUnit [expr 0.1]
 		EpCharacterSetColor			$pHeroUnit 255 0 255
 		

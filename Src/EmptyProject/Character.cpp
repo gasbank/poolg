@@ -212,7 +212,7 @@ Character::Character()
 	m_boundaryTileRect.right = 999999;
 
 	ZeroMemory( &m_stat, sizeof(Stat) );
-
+	
 	// Initialize random number
 	srand ( (unsigned)time(NULL) );
 }
@@ -289,7 +289,18 @@ HRESULT Character::rayTesting( UnitInput mappedKey )
 	return hr;
 }
 
-void Character::setMaxAndCurHp( int maxHp, int curHp )
+void Character::setCurHp( int curHp )
+{
+	if ( curHp == -1 )
+		m_curHp = m_maxHp;
+}
+
+void Character::setCurCs( int curCs )
+{
+	if ( curCs == -1 )
+		m_curCs = m_maxCs;
+}
+/*void Character::setMaxAndCurHp( int maxHp, int curHp )
 {
 	if ( maxHp < curHp || maxHp <= 0 )
 		throw std::runtime_error( "Logically incorrect value entered" );
@@ -311,7 +322,7 @@ void Character::setMaxAndCurCs( int maxCs, int curCs )
 
 	m_maxCs = maxCs;
 	m_curCs = curCs;
-}
+}*/
 
 // 지정된 사각형 경계 위에 캐릭터가 있을 때 경계 바깥으로 나가려고 하면 움직일 수 없게 한다.
 void Character::boundaryTesting( UnitInput mappedKey )
@@ -363,6 +374,9 @@ void Character::setStat( int statHealth, int statWill, int statCoding, int statD
 	m_stat.coding	= statCoding;
 	m_stat.def		= statDef;
 
+	m_maxHp = m_stat.health * m_stat.health / 4 + 50;
+	m_maxCs = m_stat.will * m_stat.will / 10 + 20;
+
 	// Hp, Mp update goes here...
 }
 
@@ -378,19 +392,19 @@ Unit* EpCreateCharacter( int tileX, int tileY, int controllable )
 
 } SCRIPT_CALLABLE_PV_I_I_I( EpCreateCharacter )
 
-int EpCharacterSetMaxAndCurHp( void* ptr, int maxHp, int curHp )
+int EpCharacterSetCurHp( void* ptr, int curHp )
 {
 	Character* instance = reinterpret_cast<Character*>( ptr );
-	instance->Character::setMaxAndCurHp( maxHp, curHp );
+	instance->Character::setCurHp( curHp );
 	return 0;
-} SCRIPT_CALLABLE_I_PV_I_I( EpCharacterSetMaxAndCurHp )
+} SCRIPT_CALLABLE_I_PV_I( EpCharacterSetCurHp )
 
-int EpCharacterSetMaxAndCurCs( void* ptr, int maxCs, int curCs )
+int EpCharacterSetCurCs( void* ptr, int curCs )
 {
 	Character* instance = reinterpret_cast<Character*>( ptr );
-	instance->Character::setMaxAndCurCs( maxCs, curCs );
+	instance->Character::setCurCs( curCs );
 	return 0;
-} SCRIPT_CALLABLE_I_PV_I_I( EpCharacterSetMaxAndCurCs )
+} SCRIPT_CALLABLE_I_PV_I( EpCharacterSetCurCs )
 
 int EpCharacterSetMoveDuration( void* ptr, double val )
 {
@@ -424,8 +438,8 @@ int EpCharacterSetStat( void* ptr, int statHealth, int statWill, int statCoding,
 
 START_SCRIPT_FACTORY(Character)
 	CREATE_OBJ_COMMAND( EpCreateCharacter )
-	CREATE_OBJ_COMMAND( EpCharacterSetMaxAndCurHp )
-	CREATE_OBJ_COMMAND( EpCharacterSetMaxAndCurCs )
+	CREATE_OBJ_COMMAND( EpCharacterSetCurHp )
+	CREATE_OBJ_COMMAND( EpCharacterSetCurCs )
 	CREATE_OBJ_COMMAND( EpCharacterSetMoveDuration )
 	CREATE_OBJ_COMMAND( EpCharacterSetColor )
 	CREATE_OBJ_COMMAND( EpCharacterSetBoundary )

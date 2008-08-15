@@ -23,10 +23,10 @@ public:
 	virtual bool frameMove( float fElapsedTime );
 	virtual LRESULT handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 
-	void setMaxAndCurHp( int maxHp, int curHp );
+	void setCurHp( int curHp );
 	int getCurHp() const { return m_curHp; }
 	int getMaxHp() const { return m_maxHp; }
-	void setMaxAndCurCs( int maxCs, int curCs );
+	void setCurCs( int curCs );
 	int getCurCs() const { return m_curCs; }
 	int getMaxCs() const { return m_maxCs; }
 	void damage( int point );

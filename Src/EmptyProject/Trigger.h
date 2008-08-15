@@ -4,11 +4,15 @@
 
 class WorldState;
 
+
 class Trigger
 {
 public:
-	Trigger(void);
-	~Trigger(void);
+	Trigger();
+	virtual ~Trigger(void);
+
+	virtual bool check() = 0;
+
 
 	void positionTrigger();
 	void deadTrigger();
@@ -16,9 +20,23 @@ public:
 
 	void detectBattleAction();
 	void detectTalkAction();
-	void detecCreateAction();
+	void detectCreateAction();
 	void detectHealAction();
+
 private:
 	WorldState* m_ws;
-	Action		m_action;
+};
+
+
+class UnitPositionTrigger : public Trigger
+{
+public:
+	UnitPositionTrigger( Unit* unit, const TileRegion& region );
+	virtual ~UnitPositionTrigger() {}
+
+	virtual bool check();
+
+private:
+	Unit* m_unit;
+	TileRegion m_region;
 };

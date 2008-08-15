@@ -5,11 +5,15 @@
 #include "BattleState.h"
 #include "ScriptManager.h"
 #include "TileManager.h"
-#include "ArnMesh.h"
-#include "ArnCamera.h"
 #include "ShaderWrapper.h"
 #include "Enemy.h"
+#include "Dialog.h"
+#include "Incident.h"
+// Aran Includes
+#include "ArnMesh.h"
 #include "ArnCamera.h"
+
+
 IMPLEMENT_SINGLETON( TileManager );
 TileManager	tileManager;
 
@@ -39,8 +43,6 @@ WorldState::~WorldState(void)
 	{
 		EP_SAFE_RELEASE( *it );
 	}
-
-	delete m_trigger;
 }
 
 HRESULT WorldState::enter()
@@ -48,7 +50,6 @@ HRESULT WorldState::enter()
 	HRESULT hr = S_OK;
 
 	LPDIRECT3DDEVICE9& pd3dDevice =  GetG().m_dev;
-	m_trigger = new Trigger;
 
 	// Aran file init
 	// Room model
@@ -105,21 +106,16 @@ HRESULT WorldState::enter()
 	tileManager.getTile( 33, 57 )->b_createEnemy = true;
 
 
-	// Create sample 3D model(!)
-	/*LPD3DXMESH teapot;
-	D3DXCreateTeapot(pd3dDevice, &teapot, 0);
-	m_heroUnit = Unit::createUnit( teapot );
-	m_heroUnit->setPosZ( -m_heroUnit->getUpperRight().z );
-	m_heroUnit->setRotX( D3DXToRadian( -90 ) );
-	m_heroUnit->setRotZ( D3DXToRadian(  90 ) );*/
 	
 	D3DXCreateBox(pd3dDevice, 1.0f, 1.0f, 1.0f, &m_aTile, 0);
 	
 	setupLight();
 
 
+	// 'enter' function implemented in the script file defines which characters are exist in this world
 	GetScriptManager().execute("EpWorldState::enter");
-
+	
+	// Hero and enemies are defined afterwards
 	
 	// Load dialogs from script
 	std::list<const char*> dialogList;
@@ -130,6 +126,15 @@ HRESULT WorldState::enter()
 		m_scriptedDialog.push_back( Dialog::createDialogByScript( *itDialogList ) );
 		(*m_scriptedDialog.rbegin())->init();
 	}
+
+	assert( m_heroUnit );
+
+	// Incidents construction
+	
+	Trigger* trigger = new UnitPositionTrigger( m_heroUnit, TileRegion( 26, 80, 27, 82 ) );
+	Action* action = new DialogAction( "EpDialog4" );
+	Incident* inc = new Incident( trigger, action );
+	m_incidents.push_back( inc );
 
 
 	//////////////////////////////////////////////////////////////////////////
@@ -312,6 +317,37 @@ HRESULT WorldState::frameMove(double fTime, float fElapsedTime)
 		//DebugBreak();
 	}
 
+	// Detect battle event.
+	// If current selected unit isn't hero unit, and isn't talkable,
+	// regard as enemy. And if hero is in the fight area of enemy, start battle.
+	it = getUnitSet()->begin();
+	for ( ; it != getUnitSet()->end(); ++it )
+	{
+		if ( (*it) != getHeroUnit() )
+		{
+			Enemy* oppCharacter = dynamic_cast<Enemy*>( *it );
+			if ( oppCharacter != NULL && oppCharacter->isTalkable() == false )
+			{
+				if ( isInFightArea( getHeroUnit() , oppCharacter ) == true )
+				{
+					setCurEnemy( oppCharacter );
+
+					getCurEnemyUnit()->setAttack(30);
+
+					if ( GetWorldStateManager().curStateEnum() == GAME_WORLD_STATE_FIELD )
+						GetWorldStateManager().setNextState( GAME_WORLD_STATE_BATTLE );
+				}
+			}
+		}	
+	}
+
+	// Incidents update
+	IncidentList::iterator itInc = m_incidents.begin();
+	for ( ; itInc != m_incidents.end(); ++itInc )
+	{
+		(*itInc)->update();
+	}
+
 	return S_OK;
 }
 
@@ -324,13 +360,22 @@ HRESULT WorldState::release()
 	m_picSmiley.release();
 	m_avatar.release();
 	m_sound.release();
-	//m_dialog.release();
-	DialogList::iterator it = m_scriptedDialog.begin();
-	for ( ; it != m_scriptedDialog.end(); ++it )
-	{
-		(*it)->release();
-	}
 	
+	{
+		DialogList::iterator it = m_scriptedDialog.begin();
+		for ( ; it != m_scriptedDialog.end(); ++it )
+		{
+			(*it)->release();
+		}
+	}
+	{
+		IncidentList::iterator it = m_incidents.begin();
+		for ( ; it != m_incidents.end(); ++it )
+		{
+			(*it)->release();
+		}
+	}
+
 	if (m_afd)
 		release_arnfile(*m_afd);
 	SAFE_DELETE(m_afd);
@@ -488,9 +533,6 @@ UINT WorldState::addUnit( Unit* u )
 		m_heroUnit->setInt (150);
 
 	}
-
-	// 이벤트 트리거링을 위해서 월드에 등록될 때 타일에 한번 들어간다.
-	u->enterTile();
 
 	return m_unitSet.size();
 }

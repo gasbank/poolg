@@ -105,18 +105,24 @@ bool Character::frameMove( float fElapsedTime )
 				// if there is no obstacles
 				if( m_bMovable )
 				{
-					int nextTileX = m_tileBufferX + g_moveAmount[ i ].x;
-					int nextTileY = m_tileBufferY + g_moveAmount[ i ].y;
-					Tile* nextTile = tileManager.getTile( nextTileX, nextTileY );
+					TileRegion entireRegion( 0, 0, s_xSize - 1, s_ySize - 1);
+
+					Point2Uint nextTilePos = {
+						getTileBufferPos().x + g_moveAmount[ i ].x,
+						getTileBufferPos().y + g_moveAmount[ i ].y };
+
+					Tile* nextTile = tileManager.getTile( nextTilePos );
 					assert( nextTile );
-					if( nextTile->b_movable && (nextTileX  > -1 && nextTileX  < s_xSize) && (nextTileY  > -1 && nextTileY  < s_ySize) )
+					if( nextTile->b_movable && entireRegion.isExist( nextTilePos ) )
  					{
 						m_bMoving = true;
 						m_vKeyboardDirection = D3DXVECTOR3( 0, 0, 0 );
 						m_vKeyboardDirection.x += (float) g_moveAmount[ i ].x * s_tileSize;
 						m_vKeyboardDirection.y += (float) g_moveAmount[ i ].y * s_tileSize;
-						m_tileBufferX += g_moveAmount[ i ].x;
-						m_tileBufferY += g_moveAmount[ i ].y;
+
+						setTileBufferPos(
+							getTileBufferPos().x + g_moveAmount[ i ].x,
+							getTileBufferPos().y + g_moveAmount[ i ].y );
 					}
 				}
 				// 가는 방향으로 머리를 돌린다.
@@ -145,10 +151,9 @@ bool Character::frameMove( float fElapsedTime )
 		m_bMoving = false;
 
 		//타일에 맞도록 위치보정
-		if( m_tileBufferX != m_tileX || m_tileBufferY != m_tileY )
+		if( getTileBufferPos() != getTilePos() )
 		{
-			enterTile( m_tileBufferX, m_tileBufferY );
-			setTilePos( m_tileBufferX, m_tileBufferY );
+			setTilePos( getTileBufferPos() );
 		}
 	}
 

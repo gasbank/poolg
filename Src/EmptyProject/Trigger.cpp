@@ -9,8 +9,8 @@
 
 Trigger::Trigger(void)
 {
-	TopStateManager& m_tsm = TopStateManager::getSingleton();
-	m_ws = reinterpret_cast<WorldState*>( m_tsm.getCurState() );
+	TopStateManager& tsm = TopStateManager::getSingleton();
+	m_ws = reinterpret_cast<WorldState*>( tsm.getCurState() );
 }
 
 Trigger::~Trigger(void)
@@ -22,7 +22,7 @@ void Trigger::positionTrigger()
 	detectBattleAction();
 	detectHealAction();
 	detectTalkAction();
-	detecCreateAction();
+	detectCreateAction();
 }
 
 void Trigger::detectBattleAction()
@@ -40,7 +40,7 @@ void Trigger::detectBattleAction()
 			{
 				if ( m_ws->isInFightArea( m_ws->getHeroUnit() , oppCharacter ) == true )
 				{
-					m_action.battleAction( oppCharacter );
+					//m_action.battleAction( oppCharacter );
 				}
 			}
 		}	
@@ -49,8 +49,9 @@ void Trigger::detectBattleAction()
 
 void Trigger::detectTalkAction()
 {
+/*
 	if ( GetTileManager().getTile( GetTileManager().pos2TileX( &m_ws->getHeroPos() ) , GetTileManager().pos2TileY( &m_ws->getHeroPos() ) )->b_eventTalk )
-		m_action.dialogAction( "EpDialog1" );
+		m_action.dialogAction( "EpDialog1" );*/
 }
 
 void Trigger::detectHealAction()
@@ -61,8 +62,24 @@ void Trigger::detectHealAction()
 	}
 }
 
-void Trigger::detecCreateAction()
+void Trigger::detectCreateAction()
 {
-	if ( GetTileManager().getTile( GetTileManager().pos2TileX( &m_ws->getHeroPos() ) , GetTileManager().pos2TileY( &m_ws->getHeroPos() ) )->b_createEnemy )
-		m_action.createUnitAction( 34, 57, 0 );
+	//if ( GetTileManager().getTile( GetTileManager().pos2TileX( &m_ws->getHeroPos() ) , GetTileManager().pos2TileY( &m_ws->getHeroPos() ) )->b_createEnemy )
+	//	m_action.createUnitAction( 34, 57, 0 );
 }
+
+
+//////////////////////////////////////////////////////////////////////////
+
+UnitPositionTrigger::UnitPositionTrigger( Unit* unit, const TileRegion& region )
+{
+	m_unit		= unit;
+	m_region	= region;
+}
+
+
+bool UnitPositionTrigger::check()
+{
+	return m_region.isExist( m_unit->getTilePos() );
+}
+

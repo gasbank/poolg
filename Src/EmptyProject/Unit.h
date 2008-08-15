@@ -1,5 +1,7 @@
 #pragma once
 
+#include "TileManager.h"
+
 class Trigger;
 
 enum UnitInput
@@ -61,12 +63,16 @@ public:
 
 
 	void setTilePos(int tileX, int tileY);
-	void setTileBufferPos(int tileX, int tileY) { m_tileBufferX = tileX; m_tileBufferY = tileY; }
-	UINT getTilePosX() const { return m_tileX; }
-	UINT getTilePosY() const { return m_tileY; }
-	void getTilePos( UINT& x, UINT& y ) const { x = m_tileX; y = m_tileY; }
-	virtual void enterTile( UINT tileX, UINT tileY);
-	virtual void enterTile();
+	void setTilePos( const Point2Uint& newPos );
+	void setTileBufferPos(int tileX, int tileY) { m_tileBufferPos.x = tileX; m_tileBufferPos.y = tileY; }
+	
+	UINT getTilePosX() const { return m_tilePos.x; }
+	UINT getTilePosY() const { return m_tilePos.y; }
+	void getTilePos( UINT& x, UINT& y ) const { x = m_tilePos.x; y = m_tilePos.y; }
+	
+	const Point2Uint& getTilePos() const { return m_tilePos; }
+	const Point2Uint& getTileBufferPos() const { return m_tileBufferPos; }
+
 protected:
 	WorldState* getWorldState() const;
 
@@ -98,12 +104,11 @@ protected:
 	D3DXVECTOR3				m_vKeyboardDirection;
 	D3DXVECTOR3				m_vVelocity;
 	bool					m_bControllable;
-	Trigger*				m_trigger;
 	
-	UINT					m_tileX;
-	UINT					m_tileY;
-	UINT					m_tileBufferX;
-	UINT					m_tileBufferY;
+	
+private:
+	Point2Uint				m_tilePos;
+	Point2Uint				m_tileBufferPos;
 	
 };
 

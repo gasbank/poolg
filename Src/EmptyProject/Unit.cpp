@@ -16,17 +16,13 @@ Unit::Unit()
 	m_pd3dDevice		= 0;
 	m_d3dTex			= 0;
 
-	m_tileX				= 0;
-	m_tileY				= 0;
-	m_tileBufferX		= m_tileX;
-	m_tileBufferY		= m_tileY;
+	m_tilePos			= Point2Uint::ZERO;
+	m_tileBufferPos		= m_tilePos;
 
 	m_vRot				= D3DXVECTOR3(0, 0, 0);
 	m_vPos				= D3DXVECTOR3(0, 0, 0);
 	m_vScale			= D3DXVECTOR3(1.0f, 1.0f, 1.0f);
 	m_bLocalXformDirty	= true;
-
-	m_trigger			= new Trigger;
 
 	D3DXMatrixIdentity(&m_localXform);
 
@@ -41,7 +37,6 @@ Unit::Unit()
 Unit::~Unit()
 {
 	SAFE_RELEASE(m_d3dxMesh);
-	delete m_trigger;
 }
 
 HRESULT Unit::init( LPDIRECT3DDEVICE9 pd3dDevice, LPD3DXMESH mesh )
@@ -63,14 +58,18 @@ HRESULT Unit::init( LPDIRECT3DDEVICE9 pd3dDevice, LPD3DXMESH mesh )
 
 void Unit::setTilePos( int tileX, int tileY )
 {
-	m_tileX = tileX;
-	m_tileY = tileY;
+	m_tilePos.x = tileX;
+	m_tilePos.y = tileY;
 
 	setPos( D3DXVECTOR3( (float)(tileX - (s_xSize / 2)) * s_tileSize, (float)(tileY  - (s_ySize / 2)) * s_tileSize, 0 ) );
 
 	//printf( "%s: setTilePos called (%d, %d)\n", typeid(this).name(), tileX, tileY );
 }
 
+void Unit::setTilePos( const Point2Uint& newPos )
+{
+	setTilePos( newPos.x, newPos.y );
+}
 HRESULT Unit::frameRender()
 {
 	HRESULT hr = S_OK;
@@ -162,20 +161,7 @@ WorldState* Unit::getWorldState() const
 	return static_cast<WorldState*>( TopStateManager::getSingleton().getCurState() );
 }
 
-void Unit::enterTile( UINT tileX, UINT tileY )
-{
-	printf( "현재의 위치 : [%d, %d]\n", tileX, tileY );
-	/*printf( "또다른 현재의 위치 : [%d, %d]\n",
-	GetTileManager().pos2TileX( &getWorldState()->getHeroPos() ),
-	GetTileManager().pos2TileY( &getWorldState()->getHeroPos() ) );*/
 
-	m_trigger->positionTrigger();
-}
-
-void Unit::enterTile()
-{
-	enterTile( getTilePosX(), getTilePosY() );
-}
 //////////////////////////////////////////////////////////////////////////
 
 Unit* EpCreateUnit( int tileX, int tileY, int controllable )

@@ -6,15 +6,18 @@
 #include "Picture.h"
 #include "PictureMap.h"
 #include "Sound.h"
-#include "Unit.h"
 #include "VideoMan.h"
 #include "Character.h"
-#include "Dialog.h"
 #include "ShaderWrapper.h"
 #include "Trigger.h"
 
+class Incident;
+class Unit;
+class Dialog;
+
 typedef std::set<Unit*> UnitSet;
 typedef std::list<Dialog*> DialogList;
+typedef std::list<Incident*> IncidentList;
 
 class WorldState : public State
 {
@@ -54,6 +57,7 @@ public:
 	void screenFlashing( float durationSec, float r, float g, float b );
 
 	Unit* findUnitAtTile( UINT x, UINT y );
+	const Dialog* getCurDialog() const { return m_curDialog; }
 private:
 	void setupLight();
 	void handleCollision( Unit* heroUnit, Unit* opponentUnit );
@@ -70,9 +74,9 @@ private:
 	Picture							m_picSmiley;
 	Picture							m_avatar;
 	Sound							m_sound;
-	//Dialog						m_dialog;
+
 	DialogList						m_scriptedDialog;
-	Trigger*						m_trigger;
+	IncidentList					m_incidents;
 
 
 	float							m_sampleTeapotMeshRot;

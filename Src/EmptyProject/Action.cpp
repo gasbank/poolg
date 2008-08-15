@@ -4,6 +4,8 @@
 #include "WorldState.h"
 #include "WorldStateManager.h"
 #include "Enemy.h"
+#include "Unit.h"
+
 
 Action::Action(void)
 {
@@ -53,4 +55,49 @@ void Action::createUnitAction( int x, int y, bool random )
 	if ( i == 0 )
 		m_ws->addUnit (EpCreateEnemy( x, y ) );
 	i++;
+}
+
+//////////////////////////////////////////////////////////////////////////
+
+BattleAction::BattleAction( const Unit* targetUnit, float dist )
+: m_targetUnit( targetUnit ), m_dist( dist )
+{
+
+}
+BattleAction::~BattleAction( void )
+{
+
+}
+void BattleAction::activate()
+{
+	// Do one-time init of this action
+}
+
+void BattleAction::update()
+{
+
+}
+
+//////////////////////////////////////////////////////////////////////////
+
+DialogAction::DialogAction( const char* dialogName )
+: m_dialogName( dialogName )
+{
+
+}
+
+DialogAction::~DialogAction( void )
+{
+
+}
+
+void DialogAction::activate()
+{
+	assert ( getWs()->getCurDialog() == 0 );
+	getWs()->startDialog( m_dialogName.c_str() );
+}
+
+void DialogAction::update()
+{
+
 }

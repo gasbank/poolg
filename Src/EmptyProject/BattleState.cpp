@@ -12,7 +12,7 @@ BattleState::BattleState()
 	m_pDev = GetG().m_dev;
 	assert( m_pDev );
 	m_ws = 0;
-	m_action = new Action;
+	
 
 	/*UI 초기화 부분입니다.*/
 	float statusBoxWidth = 163;
@@ -137,7 +137,6 @@ BattleState::BattleState()
 
 BattleState::~BattleState()
 {
-	delete m_action;
 	release();
 }
 
@@ -148,7 +147,7 @@ HRESULT BattleState::enter()
 	assert( m_ws );
 	getHero()->clearKey();
 
-	m_action->soundAction( "Start Battle" );
+	//m_action->soundAction( "Start Battle" );
 
 	m_hpBarPlayer.initRate((float)getHero()->getMaxHp());
 	m_hpIllusionPlayer.initRate((float)getHero()->getMaxHp());
@@ -184,7 +183,7 @@ HRESULT BattleState::leave()
 	m_startTime = -1.0f;
 	m_battleLog.clear();
 
-	m_action->soundAction( "End Battle" );
+	//m_action->soundAction( "End Battle" );
 
 	return S_OK;
 }

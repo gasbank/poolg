@@ -58,7 +58,8 @@ LRESULT EpLight::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 	case WM_KEYDOWN:
 		switch( wParam )
 		{
-		case 'I':		
+		case 'I':
+			stopFlicker();
 			fadeInLight();
 			break;
 		case 'O':
@@ -80,6 +81,7 @@ LRESULT EpLight::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 void EpLight::frameMove( FLOAT fElapsedTime )
 {
 	// 스테이트는 기본적으로 LIGHT_NORMAL이고, 아래 과정에서 끝나지 않은 작업이 있으면 변할 수 있음.
+	// 의도는 위와 같았으나 현재 기본으로 LIGHT_FADE 스테이트임.
 	m_eLightState = LIGHT_NORMAL;
 
 	updateFadeBrightness( fElapsedTime );
@@ -139,12 +141,13 @@ void EpLight::updateFadeBrightness( float fElapsedTime )
 	if ( 0.0f < m_fFadeTimer && m_fFadeTimer < m_fFadeDuration )
 	{
 		m_fFadeTimer += fElapsedTime * m_fFadeTimerSign;
-		m_eLightState = LIGHT_FADE;
 	}
 	else if ( m_fFadeTimer > m_fFadeDuration )
 		m_fFadeTimer = m_fFadeDuration;
 	else if ( m_fFadeTimer < 0.0f )
 		m_fFadeTimer = 0.0f;
+
+	m_eLightState = LIGHT_FADE;
 
 	m_fBrightness = abs( sin( D3DXToRadian( m_fFadeTimer / m_fFadeDuration * 90.0f ) ) );
 }

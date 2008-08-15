@@ -20,6 +20,7 @@ public:
 	void fadeInLight();
 	void fadeOutLight();
 	void flicker( float f );
+	void stopFlicker() { m_fFlickerDuration = 0.0f; }
 
 private:
 	void updateFadeBrightness( float fElapsedTime );

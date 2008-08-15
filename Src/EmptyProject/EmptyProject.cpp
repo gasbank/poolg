@@ -42,6 +42,9 @@ D3DCOLOR						g_fillColor;
 LOGMANAGER logMan;
 
 Tcl_Interp*						g_consoleInterp			= 0;
+
+std::wstring g_debugBuffer;
+
 //--------------------------------------------------------------------------------------
 // Rejects any D3D9 devices that aren't acceptable to the app by returning false
 //--------------------------------------------------------------------------------------
@@ -178,7 +181,7 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 	//[윤욱]
 	//g_menubox.init(pd3dDevice, GetG().m_scrWidth, GetG().m_scrHeight);
 
-	V( D3DXCreateFont( pd3dDevice, 20, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Courier New"), &g_pFont) );
+	V( D3DXCreateFont( pd3dDevice, 12, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Gulimche"), &g_pFont) );
 
 	// Orthogonal and fixed view xforms for GUI or fixed element rendering
 	D3DXVECTOR3 eye(0, 0, -50.0f), at(0, 0, 0), up(0, 1.0f, 0);
@@ -246,7 +249,20 @@ void CALLBACK OnFrameMove( double fTime, float fElapsedTime, void* pUserContext 
 	//V( g_alphaShader->getConstantTable()->SetFloat( DXUTGetD3D9Device(), "fTime", (float)fTime ) );
 	
 
+	WCHAR msg[128];
+	
+	StringCchPrintf( msg, 128, L"Camera Pos : (%.2f, %.2f, %.2f)\n",
+		GetG().m_camera.GetEyePt()->x,
+		GetG().m_camera.GetEyePt()->y,
+		GetG().m_camera.GetEyePt()->z );
+	g_debugBuffer.append( msg );
 
+	StringCchPrintf( msg, 128, L"Camera LookAt : (%.2f, %.2f, %.2f)\n",
+		GetG().m_camera.GetLookAtPt()->x,
+		GetG().m_camera.GetLookAtPt()->y,
+		GetG().m_camera.GetLookAtPt()->z );
+	g_debugBuffer.append( msg );
+	
 }
 
 
@@ -295,26 +311,16 @@ void renderDebugText()
 {
 	EpCamera& g_camera = GetG().m_camera;
 
-	WCHAR debugBuffer[512];
 	RECT rc;
 	rc.top = 0;
 	rc.left = 0;
 	rc.right = GetG().m_scrWidth;
 	rc.bottom = GetG().m_scrHeight;
 
-	D3DXCOLOR textColor = D3DXCOLOR( 0.0f, 1.0f, 0.0f, 1.0f );
-	StringCchPrintf( debugBuffer, 512, L"Camera Pos     : (%.2f, %.2f, %.2f)", g_camera.GetEyePt()->x, g_camera.GetEyePt()->y, g_camera.GetEyePt()->z );
-	g_pFont->DrawTextW( 0, debugBuffer, -1, &rc, DT_NOCLIP | DT_RIGHT, textColor );
-	rc.top += 12;
-	StringCchPrintf( debugBuffer, 512, L"Camera LookAt  : (%.2f, %.2f, %.2f)", g_camera.GetLookAtPt()->x, g_camera.GetLookAtPt()->y, g_camera.GetLookAtPt()->z );
-	g_pFont->DrawTextW( 0, debugBuffer, -1, &rc, DT_NOCLIP | DT_RIGHT, textColor );
-	rc.top += 12;
-	StringCchPrintf( debugBuffer, 512, L"Player Pos     : (%.2f, %.2f, %.2f)", g_camera.GetLookAtPt()->x, g_camera.GetLookAtPt()->y, g_camera.GetLookAtPt()->z );
-	g_pFont->DrawTextW( 0, debugBuffer, -1, &rc, DT_NOCLIP | DT_RIGHT, textColor );
-	rc.top += 12;
-	StringCchPrintf( debugBuffer, 512, L"Player TilePos : (%.2f, %.2f, %.2f)", g_camera.GetLookAtPt()->x, g_camera.GetLookAtPt()->y, g_camera.GetLookAtPt()->z );
-	g_pFont->DrawTextW( 0, debugBuffer, -1, &rc, DT_NOCLIP | DT_RIGHT, textColor );
+	D3DXCOLOR textColor = D3DXCOLOR( 1.0f, 0.0f, 0.0f, 1.0f );
+	g_pFont->DrawTextW( 0, g_debugBuffer.c_str(), -1, &rc, DT_NOCLIP | DT_RIGHT, textColor );
 
+	g_debugBuffer.clear();
 }
 
 void renderFixedElements( double fTime, float fElapsedTime )
@@ -570,6 +576,8 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 	DXUTSetCallbackMsgProc( MsgProc );
 	DXUTSetCallbackFrameMove( OnFrameMove );
 	DXUTSetCallbackKeyboard( KeyboardProc );
+
+	g_debugBuffer.resize( 2048 );
 
 	// TODO: Perform any application-level initialization here
 	SetCurrentWorkingDirectory();

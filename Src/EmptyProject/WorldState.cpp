@@ -13,6 +13,7 @@
 IMPLEMENT_SINGLETON( TileManager );
 TileManager	tileManager;
 
+extern std::wstring g_debugBuffer;
 
 WorldState::WorldState(void)
 {
@@ -263,6 +264,7 @@ HRESULT WorldState::frameMove(double fTime, float fElapsedTime)
 		(*it)->frameMove(fElapsedTime);
 	}
 
+	GetG().m_camera.frameMove( fElapsedTime );
 	
 	m_sampleTeapotMeshRot += fElapsedTime * D3DXToRadian(35); // 35 degrees per second
 
@@ -299,6 +301,32 @@ HRESULT WorldState::frameMove(double fTime, float fElapsedTime)
 
 	//////////////////////////////////////////////////////////////////////////
 	
+
+	WCHAR msg[128];
+
+	StringCchPrintf( msg, 128, L"Hero Pos : (%.2f, %.2f, %.2f)\n",
+		m_heroUnit->getPos().x,
+		m_heroUnit->getPos().y,
+		m_heroUnit->getPos().z );
+	g_debugBuffer.append( msg );
+
+	StringCchPrintf( msg, 128, L"Hero TilePos : (%d, %d)\n",
+		m_heroUnit->getTilePosX(),
+		m_heroUnit->getTilePosY() );
+	g_debugBuffer.append( msg );
+
+	D3DXVECTOR3 diff = m_heroUnit->getPos() - *GetG().m_camera.GetEyePt();
+	StringCchPrintf( msg, 128, L"Hero - Camera Pos : (%.4f, %.4f, %.4f)\n",
+		diff.x, diff.y, diff.z );
+	g_debugBuffer.append( msg );
+
+	
+	if ( D3DXVec2Length( (const D3DXVECTOR2*)&diff ) > 0.001f)
+	{
+		// Check for camera and character move inconsistency when field state
+		//DebugBreak();
+	}
+
 	return S_OK;
 }
 

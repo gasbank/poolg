@@ -213,6 +213,8 @@ Character::Character()
 	m_boundaryTileRect.right = 999999;
 	m_trigger			= new Trigger;
 
+	ZeroMemory( &m_stat, sizeof(Stat) );
+
 	// Initialize random number
 	srand ( (unsigned)time(NULL) );
 }
@@ -352,6 +354,21 @@ void Character::enterTile( UINT tileX, UINT tileY )
 
 	m_trigger->positionTrigger();
 }
+
+void Character::setStat( int statHealth, int statWill, int statCoding, int statDef )
+{
+	m_stat.health	= statHealth;
+	m_stat.will		= statWill;
+	m_stat.coding	= statCoding;
+	m_stat.def		= statDef;
+
+	// Hp, Mp update goes here...
+}
+
+
+//////////////////////////////////////////////////////////////////////////
+
+
 Unit* EpCreateCharacter( int tileX, int tileY, int controllable )
 {
 	LPD3DXMESH d3dxMesh;
@@ -388,10 +405,21 @@ int EpCharacterSetBoundary( void* ptr, int left, int top, int right, int bottom 
 	return 0;
 } SCRIPT_CALLABLE_I_PV_I_I_I_I( EpCharacterSetBoundary )
 
+
+int EpCharacterSetStat( void* ptr, int statHealth, int statWill, int statCoding, int statDef )
+{
+	Character* instance = reinterpret_cast<Character*>( ptr );
+	instance->Character::setStat( statHealth, statWill, statCoding, statDef );
+	return 0;
+} SCRIPT_CALLABLE_I_PV_I_I_I_I( EpCharacterSetStat )
+
+
 START_SCRIPT_FACTORY(Character)
 	CREATE_OBJ_COMMAND( EpCreateCharacter )
 	CREATE_OBJ_COMMAND( EpCharacterSetMaxAndCurHp )
 	CREATE_OBJ_COMMAND( EpCharacterSetMoveDuration )
 	CREATE_OBJ_COMMAND( EpCharacterSetColor )
 	CREATE_OBJ_COMMAND( EpCharacterSetBoundary )
+	CREATE_OBJ_COMMAND( EpCharacterSetStat )
+
 END_SCRIPT_FACTORY(Character)

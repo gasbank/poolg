@@ -31,6 +31,8 @@ namespace eval EpWorldState {
 		EpCharacterSetMoveDuration		$pHeroUnit [expr 0.1]
 		EpCharacterSetColor			$pHeroUnit 255 0 255
 		
+		EpCharacterSetStat			$pHeroUnit	1 2 3 4
+		
 		EpCharacterSetColor			$pEnemyUnit1 128 128 0
 		EpCharacterSetMaxAndCurHp		$pEnemyUnit1 2 -1
 		

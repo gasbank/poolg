@@ -44,6 +44,8 @@ public:
 	virtual void pushUnitInFront( UnitInput dir ) {}
 
 	virtual void enterTile( UINT tileX, UINT tileY);
+
+	void setStat( int statHealth, int statWill, int statCoding, int statDef );
 protected:
 	Character();
 
@@ -66,6 +68,12 @@ private:
 	
 	RECT					m_boundaryTileRect;
 	Trigger*				m_trigger;
+
+	struct Stat
+	{
+		int health, will, coding, def;
+	};
+	Stat					m_stat;
 };
 
 Unit* EpCreateCharacter( int tileX, int tileY, int controllable );

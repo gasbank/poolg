@@ -1,6 +1,9 @@
 #pragma once
 
-class Character;
+namespace Aran
+{
+	class Character;
+}
 
 class CharacterAnimationCallback
 {
@@ -12,9 +15,9 @@ public:
 	virtual void DoCallback( void* pData /* in */, void* pResultData /* out */ );
 
 	virtual void DoUnregisterCallback();
-	void AttachCharacter( Character* pCharacter );
-	Character* GetCharacter();
+	void AttachCharacter( Aran::Character* pCharacter );
+	Aran::Character* GetCharacter();
 
 private:
-	Character* pCharacter;
+	Aran::Character* pCharacter;
 };

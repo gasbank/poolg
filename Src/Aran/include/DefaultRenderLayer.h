@@ -1,7 +1,10 @@
 #pragma once
 #include "renderlayer.h"
 
-class Character;
+namespace Aran
+{
+	class Character;
+}
 class ArnObject;
 class ArnSceneGraph;
 struct ArnFileData;
@@ -10,13 +13,13 @@ class DefaultRenderLayer :
 	public RenderLayer
 {
 public:
-	DefaultRenderLayer(Character* pChar);
+	DefaultRenderLayer(Aran::Character* pChar);
 	~DefaultRenderLayer(void);
 
 	virtual HRESULT render(double fTime, float fElapsedTime);
 
 private:
-	Character* m_pChar;
+	Aran::Character* m_pChar;
 };
 
 //////////////////////////////////////////////////////////////////////////

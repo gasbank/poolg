@@ -22,7 +22,7 @@ public:
 	virtual void				interconnect(ArnNode* sceneRoot);
 	// *** INTERNAL USE ONLY END ***
 
-	static const unsigned int	FPS = 60;
+	static const unsigned int	FPS = 25;
 	static CurveName			CurveNameStrToEnum(const char* name);
 private:
 	void						buildFrom(const NodeIpo1* ni);

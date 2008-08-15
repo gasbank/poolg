@@ -178,7 +178,7 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 	//[윤욱]
 	//g_menubox.init(pd3dDevice, GetG().m_scrWidth, GetG().m_scrHeight);
 
-	V( D3DXCreateFont( pd3dDevice, 12, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Gulim"), &g_pFont) );
+	V( D3DXCreateFont( pd3dDevice, 20, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Courier New"), &g_pFont) );
 
 	// Orthogonal and fixed view xforms for GUI or fixed element rendering
 	D3DXVECTOR3 eye(0, 0, -50.0f), at(0, 0, 0), up(0, 1.0f, 0);
@@ -244,66 +244,12 @@ void CALLBACK OnFrameMove( double fTime, float fElapsedTime, void* pUserContext 
 	//mWorldViewProj = *GetG().m_camera.GetViewMatrix() * *GetG().m_camera.GetProjMatrix();
 	//V( g_alphaShader->getConstantTable()->SetMatrix( DXUTGetD3D9Device(), "mWorldViewProj", &mWorldViewProj ) );
 	//V( g_alphaShader->getConstantTable()->SetFloat( DXUTGetD3D9Device(), "fTime", (float)fTime ) );
+	
+
 
 }
 
 
-void renderDebugText()
-{
-	EpCamera& g_camera = GetG().m_camera;
-
-	WCHAR debugBuffer[512];
-	RECT rc;
-	rc.top = 0;
-	rc.left = 0;
-	rc.right = GetG().m_scrWidth;
-	rc.bottom = GetG().m_scrHeight;
-
-	StringCchPrintf(debugBuffer, 512, L"カメラの位置: (%.2f, %.2f, %.2f)", g_camera.GetEyePt()->x, g_camera.GetEyePt()->y, g_camera.GetEyePt()->z);
-	g_pFont->DrawTextW(0, debugBuffer, -1, &rc, DT_NOCLIP | DT_RIGHT, D3DXCOLOR( 0.0f, 1.0f, 0.0f, 1.0f ) );
-	rc.top += 12;
-	StringCchPrintf(debugBuffer, 512, L"カメラの眺める場所: (%.2f, %.2f, %.2f)", g_camera.GetLookAtPt()->x, g_camera.GetLookAtPt()->y, g_camera.GetLookAtPt()->z);
-	g_pFont->DrawTextW(0, debugBuffer, -1, &rc, DT_NOCLIP | DT_RIGHT, D3DXCOLOR( 0.0f, 1.0f, 0.0f, 1.0f ) );
-	rc.top += 12;
-	//StringCchPrintf(debugBuffer, 512, L"タイルの位置: (%.2f, %.2f, %.2f)", g_pic.getPos()->x, g_pic.getPos()->y, g_pic.getPos()->z);
-	//g_pFont->DrawTextW(0, debugBuffer, -1, &rc, DT_NOCLIP | DT_RIGHT, D3DXCOLOR( 0.0f, 1.0f, 0.0f, 1.0f ) );
-	rc.top += 12;
-	StringCchPrintf(debugBuffer, 512, L" - 상하좌우 화살표키를 이용해 카메라를 좌우/가까이멀리 이동 가능");
-	g_pFont->DrawTextW(0, debugBuffer, -1, &rc, DT_NOCLIP | DT_RIGHT, D3DXCOLOR( 0.0f, 1.0f, 1.0f, 1.0f ) );
-	rc.top += 12;
-	StringCchPrintf(debugBuffer, 512, L"   (카메라는 항상 +Z 축을 바라보게 됨)");
-	g_pFont->DrawTextW(0, debugBuffer, -1, &rc, DT_NOCLIP | DT_RIGHT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
-	rc.top += 12;
-	StringCchPrintf(debugBuffer, 512, L" - I/K/J/L키를 이용해 맵 이미지를 상하좌우로 이동 가능");
-	g_pFont->DrawTextW(0, debugBuffer, -1, &rc, DT_NOCLIP | DT_RIGHT, D3DXCOLOR( 0.0f, 1.0f, 1.0f, 1.0f ) );
-	rc.top += 12;
-	StringCchPrintf(debugBuffer, 512, L" - 스페이스키를 이용해 특수기능 작동 (누르고 있으면 필살공격)");
-	g_pFont->DrawTextW(0, debugBuffer, -1, &rc, DT_NOCLIP | DT_RIGHT, D3DXCOLOR( 0.0f, 1.0f, 1.0f, 1.0f ) );
-}
-
-void renderFixedElements(IDirect3DDevice9* pd3dDevice, double fTime, float fElapsedTime)
-{
-	pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
-	pd3dDevice->SetTransform(D3DTS_VIEW, &GetG().g_fixedViewMat);
-	pd3dDevice->SetTransform(D3DTS_PROJECTION, &GetG().g_orthoProjMat);
-
-	//g_menubox.draw(GetG().m_scrWidth, GetG().m_scrHeight);
-	//g_picRhw.draw();
-
-	/*D3DPERF_BeginEvent(0xff00ffff, L"Draw Center Smiley~");
-	{
-	D3DXMATRIX mRot, mScale, mTrans, mWorld;
-	D3DXMatrixRotationZ(&mRot, D3DXToRadian(45));
-	D3DXMatrixScaling(&mScale, 128.0f, 128.0f, 1.0f);
-	D3DXMatrixTranslation(&mTrans, 0, 0, -10.0f);
-	mWorld = mRot * mScale * mTrans;
-	g_picSmiley.setLocalXform(&mWorld);
-	g_picSmiley.draw();
-	}
-	D3DPERF_EndEvent();*/
-
-	renderDebugText();
-}
 
 HRESULT drawAlphaAnimatedPlane( double fTime, float fElapsedTime )
 {
@@ -343,6 +289,44 @@ HRESULT drawBurningTeapot( double fTime, float fElapsedTime )
 	V( g_bombShader->end() );
 	return hr;
 }
+
+
+void renderDebugText()
+{
+	EpCamera& g_camera = GetG().m_camera;
+
+	WCHAR debugBuffer[512];
+	RECT rc;
+	rc.top = 0;
+	rc.left = 0;
+	rc.right = GetG().m_scrWidth;
+	rc.bottom = GetG().m_scrHeight;
+
+	D3DXCOLOR textColor = D3DXCOLOR( 0.0f, 1.0f, 0.0f, 1.0f );
+	StringCchPrintf( debugBuffer, 512, L"Camera Pos     : (%.2f, %.2f, %.2f)", g_camera.GetEyePt()->x, g_camera.GetEyePt()->y, g_camera.GetEyePt()->z );
+	g_pFont->DrawTextW( 0, debugBuffer, -1, &rc, DT_NOCLIP | DT_RIGHT, textColor );
+	rc.top += 12;
+	StringCchPrintf( debugBuffer, 512, L"Camera LookAt  : (%.2f, %.2f, %.2f)", g_camera.GetLookAtPt()->x, g_camera.GetLookAtPt()->y, g_camera.GetLookAtPt()->z );
+	g_pFont->DrawTextW( 0, debugBuffer, -1, &rc, DT_NOCLIP | DT_RIGHT, textColor );
+	rc.top += 12;
+	StringCchPrintf( debugBuffer, 512, L"Player Pos     : (%.2f, %.2f, %.2f)", g_camera.GetLookAtPt()->x, g_camera.GetLookAtPt()->y, g_camera.GetLookAtPt()->z );
+	g_pFont->DrawTextW( 0, debugBuffer, -1, &rc, DT_NOCLIP | DT_RIGHT, textColor );
+	rc.top += 12;
+	StringCchPrintf( debugBuffer, 512, L"Player TilePos : (%.2f, %.2f, %.2f)", g_camera.GetLookAtPt()->x, g_camera.GetLookAtPt()->y, g_camera.GetLookAtPt()->z );
+	g_pFont->DrawTextW( 0, debugBuffer, -1, &rc, DT_NOCLIP | DT_RIGHT, textColor );
+
+}
+
+void renderFixedElements( double fTime, float fElapsedTime )
+{
+	DXUTGetD3D9Device()->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
+	DXUTGetD3D9Device()->SetTransform(D3DTS_VIEW, &GetG().g_fixedViewMat);
+	DXUTGetD3D9Device()->SetTransform(D3DTS_PROJECTION, &GetG().g_orthoProjMat);
+
+	renderDebugText();
+}
+
+
 
 //--------------------------------------------------------------------------------------
 // Render the scene using the D3D9 device
@@ -399,14 +383,8 @@ void CALLBACK OnD3D9FrameRender( IDirect3DDevice9* pd3dDevice, double fTime, flo
 
 		GetTopStateManager().getCurState()->frameRender(pd3dDevice, fTime, fElapsedTime);
 
-
-
-
-
-		//drawAlphaAnimatedPlane( fTime, fElapsedTime );
-
-
-
+		renderFixedElements( fTime, fElapsedTime );
+		
 		//////////////////////////////////////////////////////////////////////////
 		V( pd3dDevice->EndScene() );
 	}

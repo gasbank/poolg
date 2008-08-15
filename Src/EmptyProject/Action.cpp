@@ -15,9 +15,9 @@ Action::~Action(void)
 {
 }
 
-void Action::dialogAction( int index )
+void Action::dialogAction( const char* dialogName )
 {
-	m_ws->startDialog( index );
+	m_ws->startDialog( dialogName );
 }
 
 void Action::battleAction( Enemy* oppCharacter )

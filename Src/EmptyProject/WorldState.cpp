@@ -158,6 +158,9 @@ HRESULT WorldState::enter()
 	D3DXCreatePolygon( pd3dDevice, 10.0f, 32, &m_testPolygon, 0 );
 	m_testPolygon->CloneMesh( D3DXMESH_WRITEONLY, m_alphaShader->getDecl(), pd3dDevice, &m_testPolygonCloned );
 
+
+	m_curDialog = 0;
+
 	return hr;
 }
 
@@ -394,32 +397,11 @@ HRESULT WorldState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 	{
 		if (wParam == VK_RETURN)
 		{
-			if( !getHeroUnit()->getMoving() )
-			{
-				DialogList::iterator it = m_scriptedDialog.begin();
-				for ( ; it != m_scriptedDialog.end(); )
-				{
-					Dialog* dialog = (*it);
-					
-					if ( (m_heroUnit->getTilePosX() == (UINT)dialog->getRegion().left)
-						&& (m_heroUnit->getTilePosY() == (UINT)dialog->getRegion().top) )
-					{
-						if ( dialog->nextDialog() == false )
-						{
-							EP_SAFE_RELEASE( *it );
-							it = m_scriptedDialog.erase( it );
-						}
-						else
-						{
-							++it;
-						}
-					}
-					else
-					{
-						++it;
-					}
-				}
-			}
+			if ( !m_curDialog )
+				startTileDefinedDialogIfExist();
+
+			if ( m_curDialog )
+				proceedCurDialog();
 		}
 	}
 
@@ -567,20 +549,12 @@ bool WorldState::isCollide( const D3DXVECTOR3* vec0, const D3DXVECTOR3* vec1 )
 	return false;
 }
 
-void WorldState::startDialog( int index )
+void WorldState::startDialog( const char* dialogName )
 {
-	DialogList::iterator it = m_scriptedDialog.begin();
-	while ( index )
+	if ( !m_curDialog )
 	{
-		++it;
-		--index;
-	}
-
-	Dialog* dialog = (*it);
-	if ( dialog->nextDialog() == false )
-	{
-		EP_SAFE_RELEASE( *it );
-		it = m_scriptedDialog.erase( it );
+		m_curDialog = getDialogByName( dialogName );
+		proceedCurDialog();
 	}
 }
 
@@ -674,6 +648,47 @@ Unit* WorldState::findUnitAtTile( UINT x, UINT y )
 	return ret;
 }
 
+void WorldState::startTileDefinedDialogIfExist()
+{
+	if( !getHeroUnit()->getMoving() && m_curDialog == 0 )
+	{
+		DialogList::iterator it = m_scriptedDialog.begin();
+		for ( ; it != m_scriptedDialog.end(); )
+		{
+			Dialog* dialog = (*it);
+
+			if ( (m_heroUnit->getTilePosX() == (UINT)dialog->getRegion().left)
+				&& (m_heroUnit->getTilePosY() == (UINT)dialog->getRegion().top) )
+			{
+				m_curDialog = dialog;
+				break;
+			}
+		}
+	}
+}
+
+void WorldState::proceedCurDialog()
+{
+	if ( m_curDialog )
+	{
+		if ( m_curDialog->nextDialog() == false )
+		{
+			m_scriptedDialog.remove( m_curDialog );
+			EP_SAFE_RELEASE( m_curDialog );
+		}
+	}
+}
+
+Dialog* WorldState::getDialogByName( const char* dialogName )
+{
+	DialogList::iterator it = m_scriptedDialog.begin();
+	for ( ; it != m_scriptedDialog.end(); ++it )
+	{
+		if ( (*it)->getDialogName() == dialogName )
+			return (*it);
+	}
+	return 0;
+}
 //////////////////////////////////////////////////////////////////////////
 
 Unit* EpGetHero()

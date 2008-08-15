@@ -12,7 +12,7 @@ Dialog::Dialog(void)
 	m_curSpeakIdx = 0;
 }
 
-Dialog::Dialog( Speak* speakArray, UINT speakCount, const RECT& region, bool bOneTime )
+Dialog::Dialog( Speak* speakArray, UINT speakCount, const RECT& region, bool bOneTime, const char* dialogName )
 {
 	ctorDialogPane();
 	m_speakArray	= speakArray;
@@ -20,6 +20,7 @@ Dialog::Dialog( Speak* speakArray, UINT speakCount, const RECT& region, bool bOn
 	m_curSpeakIdx	= 0;
 	m_region		= region;
 	m_bOneTime		= bOneTime;
+	m_dialogName	= dialogName;
 }
 Dialog::~Dialog(void)
 {
@@ -71,6 +72,7 @@ HRESULT Dialog::release()
 
 HRESULT Dialog::frameMove(double fTime, float fElapsedTime)
 {
+
 	m_contentPic.frameMove(fElapsedTime);
 	m_namePic.frameMove(fElapsedTime);
 	
@@ -191,7 +193,8 @@ Dialog* Dialog::createDialogByScript( const char* dialogName )
 
 	StringCchPrintfA( tempBuf, 256, "%s::oneTime", dialogName );
 	int oneTime = GetScriptManager().readInt( tempBuf );
-	return new Dialog( speakArray, speakCount, region, oneTime?true:false );
+
+	return new Dialog( speakArray, speakCount, region, oneTime?true:false, dialogName );
 }
 
 void Dialog::ctorDialogPane()

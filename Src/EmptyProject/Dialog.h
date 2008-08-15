@@ -29,10 +29,11 @@ public:
 	bool isOneTime() const { return m_bOneTime; }
 	bool isTalking() const { return m_bTalking; }
 	void setOneTime(bool b) { m_bOneTime = b; }
+	const std::string& getDialogName() const { return m_dialogName; }
 
 private:
 	void ctorDialogPane();
-	Dialog( Speak* speakArray, UINT speakCount, const RECT& region, bool bOneTime );
+	Dialog( Speak* speakArray, UINT speakCount, const RECT& region, bool bOneTime, const char* dialogName );
 
 	Picture m_contentPic;
 	Picture m_namePic;
@@ -49,4 +50,5 @@ private:
 	RECT m_contentRect;
 	RECT m_nameRect;
 
+	std::string m_dialogName;
 };

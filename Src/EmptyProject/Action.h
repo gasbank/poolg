@@ -8,7 +8,7 @@ public:
 	Action(void);
 	~Action(void);
 
-	void dialogAction( int index );
+	void dialogAction( const char* dialogName );
 	void unitMoveAction();
 	void battleAction( Enemy* oppCharacter );
 	void screenAction();

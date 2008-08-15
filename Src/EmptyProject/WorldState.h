@@ -47,7 +47,8 @@ public:
 	void removeUnit( Unit* pUnit );
 	bool isInFightArea( Character* heroPt, Character* enemyPt );
 
-	void startDialog( int index );
+	void startDialog( const char* dialogName );
+	Dialog* getDialogByName( const char* dialogName );
 	
 	ArnSceneGraph* getArnSceneGraphPt() { return m_sg; }
 	void screenFlashing( float durationSec, float r, float g, float b );
@@ -56,6 +57,9 @@ public:
 private:
 	void setupLight();
 	void handleCollision( Unit* heroUnit, Unit* opponentUnit );
+
+	void startTileDefinedDialogIfExist();
+	void proceedCurDialog();
 
 	ArnFileData*					m_afd;
 	ArnSceneGraph*					m_sg;
@@ -85,6 +89,8 @@ private:
 	float							m_screenFlashAlphaAngle;
 	float							m_screenFlashDurationSec;
 	D3DXCOLOR						m_screenFlashCV;
+
+	Dialog*							m_curDialog;
 };
 
 SCRIPT_FACTORY( WorldState )

@@ -50,7 +50,7 @@ void Trigger::detectBattleAction()
 void Trigger::detectTalkAction()
 {
 	if ( GetTileManager().getTile( GetTileManager().pos2TileX( &m_ws->getHeroPos() ) , GetTileManager().pos2TileY( &m_ws->getHeroPos() ) )->b_eventTalk )
-		m_action.dialogAction( 0 );
+		m_action.dialogAction( "EpDialog1" );
 }
 
 void Trigger::detectHealAction()

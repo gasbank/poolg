@@ -28,6 +28,12 @@ void Character::attack( int type, Character* enemy )
 	m_attackObjectList.push_back(ao);
 }
 
+void Character::throwHealBall ()
+{
+	AttackObject* ao = HealObject::createHealObject (this);
+	m_attackObjectList.push_back(ao);
+}
+
 void Character::heal (int point)
 {
 	if (m_curHp + point < m_maxHp)

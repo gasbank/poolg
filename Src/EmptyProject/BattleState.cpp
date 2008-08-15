@@ -5,6 +5,7 @@
 #include "WorldState.h"
 #include "Utility.h"
 #include "Action.h"
+#include "Skill.h"
 
 BattleState::BattleState()
 {
@@ -85,7 +86,7 @@ BattleState::BattleState()
 	m_hpBarPlayer.setSize(statusBarWidth, statusBarHeight);
 	m_hpBarPlayer.setPos (statusBoxPlayersPositionX + statusBoxWidth*0.23f, statusBoxPlayersPositionY + statusBoxHeight * 0.82f, 4.5f);
 	
-	m_innerFire.init (L"Images/BattleUI/ChaosAura.png", m_pDev, 0.8f, 3, 9);
+	m_innerFire.init (L"Images/BattleUI/DarkAura.png", m_pDev, 0.8f, 3, 9);
 	m_innerFire.setPos (0, 0, 0);
 
 
@@ -112,6 +113,13 @@ BattleState::BattleState()
 	D3DXCreateFont(m_pDev, 18, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Rockwell Extra Bold"), &m_lblREB);
 	D3DXCreateFont(m_pDev, 25, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblArt);
 
+	/*스킬 초기화 부분*/
+	
+	m_skillSet = new SkillSet();
+	m_skillSet->setBattleState(this);
+
+	m_skillSet->setSkill (SL_FIRST, (Skill*) new NormalAttack());
+	m_skillSet->setSkill (SL_SECOND, (Skill*) new Heal());
 
 
 	m_curTurnType = TT_NATURAL;
@@ -554,16 +562,7 @@ void BattleState::spellArt()
 	{
 		m_curTurnType = TT_NATURAL;
 		m_battleLog.push_back(std::string("힐링을 사용하였습니다."));	
-		int healPoint = getHero()->getInt();
-
-		char stringBuffer[20];
-		_itoa_s (healPoint, stringBuffer, 10);
-		std::string resultLog = stringBuffer;
-		resultLog += "포인트 HP를 회복하였습니다.";
-		m_battleLog.push_back (resultLog.c_str());
-		getHero()->heal (healPoint);
-		setNextTurnType(TT_COMPUTER);
-		passTurn();
+		getHero()->throwHealBall();
 	}
 	/*blank*/
 	else if (m_playerArt == PA_ART3)

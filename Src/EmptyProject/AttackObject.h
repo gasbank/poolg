@@ -35,3 +35,24 @@ private:
 
 	BallAttackObject( Character* target, const D3DXVECTOR3& initPos, const D3DXVECTOR3& fireDir, float retainDist );
 };
+
+class HealObject : public AttackObject
+{
+public:
+	static AttackObject* createHealObject( Character* target );
+	HealObject( Character* target );
+	~HealObject();
+
+	virtual LRESULT handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
+	virtual bool frameMove( float fElapsedTime );
+
+private:
+	Character* m_target;
+	D3DXVECTOR3 m_fireDir;
+	int m_healPoint;
+	float m_radius;
+	float m_radiusVelocity;
+	float m_angle;
+	float m_angularVelocity;
+
+};

@@ -12,7 +12,11 @@ public:
 	static Unit* createCharacter( LPD3DXMESH mesh, int tileX, int tileY, float posZ, bool bControllable );
 	virtual ~Character();
 
+	/*스킬 함수*/
 	void attack(int type, Character* enemy);
+	void throwHealBall();
+
+
 	void heal (int point);
 
 	virtual HRESULT frameRender();

@@ -886,6 +886,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\Skill.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\Skill.h"
+			>
+		</File>
+		<File
 			RelativePath=".\Sound.cpp"
 			>
 		</File>

@@ -101,3 +101,91 @@ BallAttackObject::BallAttackObject( Character* target, const D3DXVECTOR3& initPo
 	m_retainDist = retainDist;
 	m_damage = 1;
 }
+
+HealObject::HealObject( Character* target )
+{
+	m_target = target;
+	D3DXVECTOR3 initialDistance;
+	initialDistance.x = initialDistance.y = initialDistance.z = 5;
+	m_radius = 5;
+	m_radiusVelocity = 0.03f;
+	m_angle = 0;
+	m_angularVelocity = 10;
+
+	float angle = D3DXToRadian (m_angle);
+
+	D3DXVECTOR3 newPos;
+
+	newPos.x = target->getPos().x + m_radius * cos (angle);
+	newPos.y = target->getPos().y + m_radius * sin (angle);
+	newPos.z = target->getPos().z;
+	m_fireDir = target->getPos ();
+
+	setPos( newPos );
+
+	/*힐링 계산식 넣는 곳*/
+	m_healPoint = target->getInt();
+}
+
+HealObject::~HealObject()
+{
+
+}
+
+AttackObject* HealObject::createHealObject( Character* target )
+{
+	HealObject* ho = new HealObject( target );
+	LPD3DXMESH mesh;
+	//D3DXCreateSphere( GetG().m_dev, 0.3f, 16, 16, &mesh, 0 );
+	
+	D3DXCreateBox(GetG().m_dev, 2, 2, 2, &mesh, 0);
+	//D3DXCreateTeapot( GetG().m_dev, mesh, 0);
+	//D3DXCreateTeapot( GetG().m_dev, &mesh, 0);
+	ho->init( GetG().m_dev, mesh );
+	ho->setControllable( false );
+	return ho;
+}
+
+LRESULT HealObject::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
+{
+	return FALSE;
+}
+
+bool HealObject::frameMove( float fElapsedTime )
+{
+	D3DXVECTOR3 newPos;
+	m_radius -= m_radiusVelocity;
+	m_angle += m_angularVelocity;
+	float angle = D3DXToRadian (m_angle);
+	newPos.x = m_fireDir.x + m_radius * cos (angle);
+	newPos.y = m_fireDir.y + m_radius * sin (angle);
+	newPos.z = getPos().z - (m_radiusVelocity/1.5f);
+
+	if ( m_radius <= 0 )
+	{
+		// Hit to the target!
+		m_target->heal (m_healPoint);
+
+		char stringBuffer[20];
+		_itoa_s (m_healPoint, stringBuffer, 10);
+		std::string resultLog = stringBuffer;
+		resultLog += "포인트 HP가 회복됩니다.";
+		getBattleState()->pushBattleLog(resultLog.c_str());
+
+		if (m_target->isControllable())
+		{
+			getBattleState()->setNextTurnType(TT_COMPUTER);
+			getBattleState()->passTurn();
+			GetAudioState().pSoundBank->Play( GetAudioState().iSE, 0, 0, NULL );
+		}
+		else
+		{
+			getBattleState()->setNextTurnType(TT_PLAYER);
+			getBattleState()->passTurn();
+		}
+		return false;
+	}
+
+	setPos( newPos );
+	return Unit::frameMove( fElapsedTime );
+}

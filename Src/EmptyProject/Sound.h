@@ -39,6 +39,9 @@ public:
 	bool bBGMStopped;
 
     int nCurSongPlaying;
+
+	void enterBattle();
+	void leaveBattle();
 };
 
 inline AUDIO_STATE& GetAudioState() { return AUDIO_STATE::getSingleton(); }

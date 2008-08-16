@@ -147,7 +147,7 @@ HRESULT BattleState::enter()
 	assert( m_ws );
 	getHero()->clearKey();
 
-	//m_action->soundAction( "Start Battle" );
+	GetAudioState().enterBattle();
 
 	m_hpBarPlayer.initRate((float)getHero()->getMaxHp());
 	m_hpIllusionPlayer.initRate((float)getHero()->getMaxHp());
@@ -183,7 +183,7 @@ HRESULT BattleState::leave()
 	m_startTime = -1.0f;
 	m_battleLog.clear();
 
-	//m_action->soundAction( "End Battle" );
+	GetAudioState().leaveBattle();
 
 	return S_OK;
 }

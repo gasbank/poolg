@@ -471,3 +471,17 @@ void Sound::Opening()
     if( audioState.pEngine )
         audioState.pEngine->DoWork();
 }
+
+void AUDIO_STATE::enterBattle()
+{
+	audioState.bBGMFade = true;
+	audioState.bMusicFade = false;
+	audioState.pEngine->Stop( GetAudioState().iMusicCategory, 0 );
+	audioState.pSoundBank->Play( GetAudioState().iBattle, 0, 0, NULL );
+}
+
+void AUDIO_STATE::leaveBattle()
+{
+	audioState.bBGMFade = false;
+	audioState.bMusicFade = true;
+}

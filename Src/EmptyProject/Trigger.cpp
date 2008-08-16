@@ -72,7 +72,7 @@ void Trigger::detectCreateAction()
 
 //////////////////////////////////////////////////////////////////////////
 
-UnitPositionTrigger::UnitPositionTrigger( Unit* unit, const TileRegion& region )
+UnitPositionTrigger::UnitPositionTrigger( Unit* unit, TileRegion* region )
 {
 	m_unit		= unit;
 	m_region	= region;
@@ -81,8 +81,22 @@ UnitPositionTrigger::UnitPositionTrigger( Unit* unit, const TileRegion& region )
 
 bool UnitPositionTrigger::check()
 {
-	return m_region.isExist( m_unit->getTilePos() );
+	return m_region->isExist( m_unit->getTilePos() );
 }
+
+Trigger* EpCreateUnitPositionTrigger( void* unit, int x0, int y0, int x1, int y1 )
+{
+	Unit* u = reinterpret_cast<Character*>( unit );
+	Point2Uint start;
+	Point2Uint end;
+	start.x = x0;
+	start.y = y0;
+	end.x = x1;
+	end.y = y1;
+	TileRegion* region = new TileRegion( start, end );
+	return new UnitPositionTrigger( u, region );
+} SCRIPT_CALLABLE_PV_PV_I_I_I_I( EpCreateUnitPositionTrigger )
+
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -116,4 +130,5 @@ Trigger* EpCreateCharHpTrigger( void* ptr, int min, int max, int bInclude )
 
 START_SCRIPT_FACTORY( Trigger )
 	CREATE_OBJ_COMMAND( EpCreateCharHpTrigger )
+	CREATE_OBJ_COMMAND( EpCreateUnitPositionTrigger )
 END_SCRIPT_FACTORY( Trigger )

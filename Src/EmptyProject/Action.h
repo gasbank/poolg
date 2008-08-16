@@ -75,3 +75,17 @@ private:
 	std::string m_soundName;
 };
 
+//////////////////////////////////////////////////////////////////////////
+
+class HealAction : public Action
+{
+public:
+	HealAction( Character* targetChar );
+	virtual ~HealAction();
+
+	virtual void activate();
+	virtual void update();
+
+private:
+	Character* m_targetChar;
+};

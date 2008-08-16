@@ -132,7 +132,6 @@ void SoundAction::activate()
 		GetAudioState().bBGMFade = false;
 		GetAudioState().bMusicFade = true;
 	}
-
 }
 
 void SoundAction::update()
@@ -146,7 +145,34 @@ Action* EpCreateSoundAction( const char* soundName )
 
 //////////////////////////////////////////////////////////////////////////
 
+HealAction::HealAction( Character* targetChar )
+: m_targetChar ( targetChar )
+{
+}
+
+HealAction::~HealAction()
+{
+}
+
+void HealAction::activate()
+{
+	m_targetChar->heal( 9999 );
+}
+
+void HealAction::update()
+{
+}
+
+Action* EpCreateHealAction( void* targetChar )
+{
+	Character* c = reinterpret_cast<Character*>( targetChar );
+	return new HealAction( c );
+}  SCRIPT_CALLABLE_PV_PV( EpCreateHealAction )
+
+//////////////////////////////////////////////////////////////////////////
+
 START_SCRIPT_FACTORY( Action )
 	CREATE_OBJ_COMMAND( EpCreateDialogAction )
 	CREATE_OBJ_COMMAND( EpCreateSoundAction )
+	CREATE_OBJ_COMMAND( EpCreateHealAction )
 END_SCRIPT_FACTORY( Action )

@@ -1,5 +1,5 @@
 namespace eval EpWorldState {
-	variable pWorld testEnemy
+	variable pWorld testEnemy pHeroUnit
 	
 	proc init {pCurWorld} {
 		variable pWorld
@@ -30,9 +30,17 @@ namespace eval EpWorldState {
 		set incCount	[ EpRegisterIncident $incident ]
 		EpOutputDebugString " - Incident count: $incCount\n"
 	}
+
+	proc registerIncident3 {} {
+		variable pHeroUnit
+			
+		
+		
+	}
 	
 	proc enter {} {
 		variable testEnemy
+		variable pHeroUnit
 		
 		EpOutputDebugString " - WorldState enter\n"
 		
@@ -56,7 +64,7 @@ namespace eval EpWorldState {
 		EpUnitSetPosZ				$pHeroUnit -[EpUnitGetUpperRightZ $pHeroUnit]
                                                                   # Health Will Coding Defence Sense Immunity
 		EpCharacterSetStat			$pHeroUnit    7     5     7       5      5      5
-		EpCharacterSetCurHp			$pHeroUnit -1
+		EpCharacterSetCurHp			$pHeroUnit 10
 		EpCharacterSetCurCs			$pHeroUnit -1
 		EpCharacterSetMoveDuration		$pHeroUnit [expr 0.2]
 		EpCharacterSetColor			$pHeroUnit 255 0 255
@@ -109,6 +117,7 @@ namespace eval EpWorldState {
 		
 		registerIncident1
 		registerIncident2
+		registerIncident3
 	}
 	
 	proc leave {} {

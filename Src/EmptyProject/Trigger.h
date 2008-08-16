@@ -33,14 +33,14 @@ SCRIPT_FACTORY( Trigger )
 class UnitPositionTrigger : public Trigger
 {
 public:
-	UnitPositionTrigger( Unit* unit, const TileRegion& region );
+	UnitPositionTrigger( Unit* unit, TileRegion* region );
 	virtual ~UnitPositionTrigger() {}
 
 	virtual bool check();
 
 private:
 	Unit* m_unit;
-	TileRegion m_region;
+	TileRegion* m_region;
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -60,3 +60,4 @@ private:
 	bool m_bInclude;
 };
 
+//////////////////////////////////////////////////////////////////////////

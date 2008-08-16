@@ -388,7 +388,8 @@ HRESULT WorldState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 		}
 		if (wParam == VK_F5)
 		{
-			GetWorldStateManager().setNextState(GAME_WORLD_STATE_MENU);
+			if ( GetWorldStateManager().curStateEnum() != GAME_WORLD_STATE_BATTLE )
+				GetWorldStateManager().setNextState(GAME_WORLD_STATE_MENU);
 		}
 		if (wParam == 'P')
 		{

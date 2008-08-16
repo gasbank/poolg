@@ -431,11 +431,6 @@ HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 			}
 		}
 
-		if ( wParam == VK_F4 )
-		{
-			GetWorldStateManager().setNextState(GAME_WORLD_STATE_FIELD);
-		}
-
 			
 	}
 

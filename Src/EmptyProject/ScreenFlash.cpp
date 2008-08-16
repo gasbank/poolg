@@ -50,6 +50,7 @@ HRESULT ScreenFlash::frameRender()
 	return hr;
 }
 
+
 HRESULT ScreenFlash::frameMove( double fTime, float fElapsedTime )
 {
 	//////////////////////////////////////////////////////////////////////////
@@ -74,7 +75,7 @@ HRESULT ScreenFlash::frameMove( double fTime, float fElapsedTime )
 	else
 		m_bStop = true;
 
-	printf("%f \n", m_screenFlashAlphaAngle);
+	//printf("%f \n", m_screenFlashAlphaAngle);
 
 	V( m_alphaShader->getConstantTable()->SetFloat( 
 		DXUTGetD3D9Device(), 

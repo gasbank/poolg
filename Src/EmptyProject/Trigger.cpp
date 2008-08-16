@@ -136,11 +136,12 @@ TotalAnnihilationTrigger::~TotalAnnihilationTrigger()
 
 bool TotalAnnihilationTrigger::check()
 {
+	int i = 0;
 	// 말을 못하는 Enemy, 즉 죽일 수 있는 적이 남은 경우 TotalAnnihilation 실패로 간주.
 	for ( UnitSet::iterator it = m_pUs->begin(); it != m_pUs->end(); it++ )
 	{
 		if ( (*it)->getType() == UT_ENEMY )
-			if ( !static_cast<Enemy*>(*it)->isTalkable() )
+			if ( !static_cast<Enemy*>(*it)->isTalkable() && !static_cast<Enemy*>(*it)->getRemoveFlag() )
 				return false;
 	}
 

@@ -144,7 +144,7 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 	{
 		const char* worldName = *it;
 
-		StringCchPrintfA( scriptCommand, 512, "library/%s.tcl", worldName );
+		StringCchPrintfA( scriptCommand, 512, "Script/%s.tcl", worldName );
 		GetScriptManager().executeFile( scriptCommand );
 		StringCchPrintfA( scriptCommand, 512, "%s::modelFilePath", worldName );
 		const char* modelFilePath = GetScriptManager().readString( scriptCommand );
@@ -637,8 +637,8 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 
 	// Script Manager Initialization
 	CreateScriptManagerIfNotExist();
-	GetScriptManager().executeFile( "library/EpInitScript.tcl" );
-	GetScriptManager().executeFile( "library/EpDialog1.tcl" );
+	GetScriptManager().executeFile( "Script/EpInitScript.tcl" );
+	GetScriptManager().executeFile( "Script/EpDialog1.tcl" );
 
 	/*GetScriptManager().executeFile( "library/EpWorldList.tcl" );
 	

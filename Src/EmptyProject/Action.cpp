@@ -95,8 +95,8 @@ DialogAction::~DialogAction( void )
 
 void DialogAction::activate()
 {
-	assert ( getWs()->getCurDialog() == 0 );
-	getWs()->startDialog( m_dialogName.c_str() );
+	assert ( GetWorldManager().getCurWorld()->getCurDialog() == 0 );
+	GetWorldManager().getCurWorld()->startDialog( m_dialogName.c_str() );
 }
 
 void DialogAction::update()

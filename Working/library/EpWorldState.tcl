@@ -56,31 +56,31 @@ namespace eval EpWorldState {
 		EpCharacterSetCurHp			$pEnemyUnit1 -1
 		
 		EpCharacterSetColor			$pEnemyUnit2 0 255 255
-		EpCharacterSetStat			$pEnemyUnit2 6 1 4 1 1 1
+		EpCharacterSetStat			$pEnemyUnit2 3 1 4 1 1 1
 		EpCharacterSetCurHp			$pEnemyUnit2 -1
 		
 		EpCharacterSetColor			$pEnemyUnit3 255 255 0
-		EpCharacterSetStat			$pEnemyUnit3 5 1 4 1 1 1
+		EpCharacterSetStat			$pEnemyUnit3 5 1 2 1 1 1
 		EpCharacterSetCurHp			$pEnemyUnit3 -1
 
 		EpCharacterSetColor			$pEnemyUnit4 0 128 128
-		EpCharacterSetStat			$pEnemyUnit4 5 1 5 1 1 1
+		EpCharacterSetStat			$pEnemyUnit4 2 1 5 1 1 1
 		EpCharacterSetCurHp			$pEnemyUnit4 -1
 
 		EpCharacterSetColor			$pEnemyUnit5 128 0 128
-		EpCharacterSetStat			$pEnemyUnit5 4 1 5 1 1 1
+		EpCharacterSetStat			$pEnemyUnit5 4 1 2 1 1 1
 		EpCharacterSetCurHp			$pEnemyUnit5 -1
 
 		EpCharacterSetColor			$pEnemyUnit6 64 64 0
 		EpCharacterSetCurHp			$pEnemyUnit6 -1
-		EpCharacterSetStat			$pEnemyUnit6 4 1 4 1 1 1
+		EpCharacterSetStat			$pEnemyUnit6 3 1 3 1 1 1
 
 		EpCharacterSetColor			$pEnemyUnit7 0 64 64
 		EpCharacterSetStat			$pEnemyUnit7 6 1 1 1 1 1
 		EpCharacterSetCurHp			$pEnemyUnit7 -1
 
 		EpCharacterSetColor			$pEnemyUnit8 0 0 0
-		EpCharacterSetStat			$pEnemyUnit8 4 1 1 1 1 1
+		EpCharacterSetStat			$pEnemyUnit8 2 1 5 1 1 1
 		EpCharacterSetCurHp			$pEnemyUnit8 -1
 		
 		EpCharacterSetColor			$pNPCUnit1 0 255 0

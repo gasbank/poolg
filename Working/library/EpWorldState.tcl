@@ -64,6 +64,22 @@ namespace eval EpWorldState {
 		set incCount	[ EpRegisterIncident $incident ]
 		EpOutputDebugString " - Incident count: $incCount\n"
 	}
+
+	proc registerIncident5 {} {
+		variable pWorld
+		variable pHeroUnit
+		
+		set trigger		[ EpCreateUnTotalAnnihilationTrigger $pWorld ]
+		set action		[ EpCreateDialogAction "EpDialogReturn" ]
+		set incident		[ EpCreateIncident $trigger $action ]
+
+		set trigger2		[ EpCreateUnitPositionTrigger $pHeroUnit 50 33 59 33 ]
+
+		EpAddTriggerToIncident $incident $trigger2
+
+		set incCount	[ EpRegisterIncident $incident ]
+		EpOutputDebugString " - Incident count: $incCount\n"
+	}
 	
 	proc enter {} {
 		variable testEnemy
@@ -146,6 +162,7 @@ namespace eval EpWorldState {
 		registerIncident2
 		registerIncident3
 		registerIncident4
+		registerIncident5
 	}
 	
 	proc leave {} {

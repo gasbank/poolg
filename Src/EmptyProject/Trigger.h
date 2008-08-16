@@ -74,3 +74,16 @@ public:
 private:
 	UnitSet* m_pUs;
 };
+
+//////////////////////////////////////////////////////////////////////////
+
+class UnTotalAnnihilationTrigger : public Trigger
+{
+public:
+	UnTotalAnnihilationTrigger( WorldState* );
+	virtual ~UnTotalAnnihilationTrigger();
+	virtual bool check();
+
+private:
+	UnitSet* m_pUs;
+};

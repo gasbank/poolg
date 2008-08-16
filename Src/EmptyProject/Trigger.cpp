@@ -155,6 +155,37 @@ Trigger* EpCreateTotalAnnihilationTrigger( void* pWorld )
 
 //////////////////////////////////////////////////////////////////////////
 
+UnTotalAnnihilationTrigger::UnTotalAnnihilationTrigger( WorldState* pWs )
+{
+	m_pUs = pWs->getUnitSet();
+}
+
+UnTotalAnnihilationTrigger::~UnTotalAnnihilationTrigger()
+{
+
+}
+
+bool UnTotalAnnihilationTrigger::check()
+{
+	int i = 0;
+	// 말을 못하는 Enemy, 즉 죽일 수 있는 적이 남은 경우 TotalAnnihilation 실패로 간주.
+	for ( UnitSet::iterator it = m_pUs->begin(); it != m_pUs->end(); it++ )
+	{
+		if ( (*it)->getType() == UT_ENEMY )
+			if ( !static_cast<Enemy*>(*it)->isTalkable() && !static_cast<Enemy*>(*it)->getRemoveFlag() )
+				return true;
+	}
+
+	return false;
+}
+
+Trigger* EpCreateUnTotalAnnihilationTrigger( void* pWorld )
+{
+	return new UnTotalAnnihilationTrigger( reinterpret_cast<WorldState*>(pWorld) );
+} SCRIPT_CALLABLE_PV_PV( EpCreateUnTotalAnnihilationTrigger )
+
+//////////////////////////////////////////////////////////////////////////
+
 Trigger* EpCreateCharHpTrigger( void* ptr, int min, int max, int bInclude )
 {
 	Character* c = reinterpret_cast<Character*>( ptr );
@@ -166,4 +197,5 @@ START_SCRIPT_FACTORY( Trigger )
 	CREATE_OBJ_COMMAND( EpCreateCharHpTrigger )
 	CREATE_OBJ_COMMAND( EpCreateUnitPositionTrigger )
 	CREATE_OBJ_COMMAND( EpCreateTotalAnnihilationTrigger )
+	CREATE_OBJ_COMMAND( EpCreateUnTotalAnnihilationTrigger )
 END_SCRIPT_FACTORY( Trigger )

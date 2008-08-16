@@ -1,4 +1,4 @@
-set EpDialogList [list EpDialog1 EpDialog2 EpDialog3 EpDialog4 EpDialogStop EpDialogHeal EpDialogBox EpDialogMirror EpDialogLaserOff EpDialogLaserOn EpDialogSave];
+set EpDialogList [list EpDialog1 EpDialog2 EpDialog3 EpDialog4 EpDialogStop EpDialogHeal EpDialogBox EpDialogMirror EpDialogLaserOff EpDialogLaserOn EpDialogSave EpDialogReturn];
 
 namespace eval EpDialog1 {
 	
@@ -168,5 +168,17 @@ namespace eval EpDialogSave {
 	
 	set dialog [ list\
 		$player		"지금까지의 기록을 저장할 수 있습니다"\
+	];	
+}
+
+namespace eval EpDialogReturn {
+	
+	set region [ list 21 14 -1 -1 ]; ;# left, top, right, bottom
+	set oneTime 0;
+	
+	set player "SYSTEM"
+	
+	set dialog [ list\
+		$player		"괭이 좀 찾아보세요.... 님 제발 근성좀"\
 	];	
 }

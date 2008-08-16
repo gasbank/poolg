@@ -10,6 +10,7 @@
 #include "Character.h"
 #include "ShaderWrapper.h"
 #include "Trigger.h"
+#include "ScreenFlash.h"
 
 class Incident;
 class Unit;
@@ -55,7 +56,6 @@ public:
 	Dialog* getDialogByName( const char* dialogName );
 	
 	ArnSceneGraph* getArnSceneGraphPt() { return m_sg; }
-	void screenFlashing( float durationSec, float r, float g, float b );
 
 	Unit* findUnitAtTile( UINT x, UINT y );
 	const Dialog* getCurDialog() const { return m_curDialog; }
@@ -88,14 +88,9 @@ private:
 	
 	UnitSet							m_unitSet;
 
-	AlphaShader*					m_alphaShader;
-	LPD3DXMESH						m_testPolygon;
-	LPD3DXMESH						m_testPolygonCloned;
-	float							m_screenFlashAlphaAngle;
-	float							m_screenFlashDurationSec;
-	D3DXCOLOR						m_screenFlashCV;
-
 	Dialog*							m_curDialog;
+
+	ScreenFlash						m_screenFlash;
 };
 
 SCRIPT_FACTORY( WorldState )

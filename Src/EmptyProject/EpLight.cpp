@@ -1,5 +1,7 @@
 #include "EmptyProjectPCH.h"
 #include "EpLight.h"
+#include "TopStateManager.h"
+#include "WorldState.h"
 
 EpLight::EpLight(void)
 {
@@ -9,6 +11,11 @@ EpLight::EpLight(void)
 	m_fFlickerDuration = 0.0f;
 	m_eLightState = LIGHT_NORMAL;
 	m_fBrightness = 1.0f;
+
+	D3DXVECTOR3 dir( 0.0f, 1.0f, 0.0f );
+	D3DXVECTOR3 pos( -38.0f, -10.0f, -40.0f );
+	m_vDir = dir;
+	m_vPos = pos;
 }
 
 EpLight::~EpLight(void)
@@ -26,21 +33,19 @@ void EpLight::setupLight()
 	D3DCOLORVALUE cvSpc = { 0.1f, 0.1f, 0.1f, 1.0f };
 	m_light.Specular = cvSpc;
 
-	D3DXVECTOR3 dir(0.0f, 0.0f, 10.0f);
-	D3DXVec3Normalize((D3DXVECTOR3*)&m_light.Direction, &dir);
+	
+	D3DXVec3Normalize((D3DXVECTOR3*)&m_light.Direction, &m_vDir);
+	D3DXVec3Normalize((D3DXVECTOR3*)&m_light.Position, &m_vPos);
 
-	D3DXVECTOR3 pos(-38.0f, -10.0f, -5.0f);
-	D3DXVec3Normalize((D3DXVECTOR3*)&m_light.Position, &pos);
-
-	m_light.Falloff = 1.0f; 
+	m_light.Falloff	= 1.0f; 
 	m_light.Phi = D3DXToRadian(80);
 	m_light.Theta = D3DXToRadian(10);
 
 	m_light.Type = D3DLIGHT_DIRECTIONAL;
 	m_light.Range = 1000.0f;
 
-	m_light.Attenuation0 = 1.0f;
-	m_light.Attenuation1 = 0.0f;
+	m_light.Attenuation0 = 0.1f;
+	m_light.Attenuation1 = 0.01f;
 	m_light.Attenuation2 = 0.0f;
 
 	GetG().m_dev->SetLight(1, &m_light);
@@ -53,6 +58,8 @@ void EpLight::setupLight()
 
 LRESULT EpLight::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
+	D3DXCOLOR color( 1.0f, 0.0f, 0.0f, 1.0f );
+	//static D3DXVECTOR3 vPos( -38.0f, -10.0f, 10.0f) ;
 	switch ( uMsg )
 	{
 	case WM_KEYDOWN:
@@ -66,14 +73,27 @@ LRESULT EpLight::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 			fadeOutLight();
 			break;
 		case 'F':
-			D3DXCOLOR color( 1.0f, 0.0f, 0.0f, 1.0f );
 			setFlickerColor( color );
 			setFadeDuration( 0.5f );
 			flicker( 10.0f );
 			break;
+	/*	case VK_UP:
+			vPos.x += 1.0f;
+			break;
+		case VK_DOWN:
+			vPos.x -= 1.0f;
+			break;
+		case VK_LEFT:
+			vPos.y += 1.0f;
+			break;
+		case VK_RIGHT:
+			vPos.y -= 1.0f;
+			break;*/
 		}
 		break;
 	}
+
+	/*setLightPos(vPos);*/
 
 	return S_OK;
 }
@@ -105,11 +125,21 @@ void EpLight::frameMove( FLOAT fElapsedTime )
 		m_light.Specular = m_cSpecular;
 		break;
 	}
-	
+
+	//m_vDir = *GetG().m_camera.GetLookAtPt();
+	//m_vPos = *GetG().m_camera.GetEyePt();
+
+	//D3DXVec3Normalize((D3DXVECTOR3*)&m_light.Direction, &m_vDir);
+	//D3DXVec3Normalize((D3DXVECTOR3*)&m_light.Position, &m_vPos);
+
+	m_bLightValueDirty = true;
 
 	if ( m_bLightValueDirty )
+	{
 		GetG().m_dev->SetLight( 1, &m_light );
-
+		m_bLightValueDirty = false;
+		//printf("lightPos: %f %f %f \n", m_light.Position.x, m_light.Position.y, m_light.Position.z );
+	}
 }
 
 void EpLight::fadeInLight()
@@ -164,6 +194,7 @@ void EpLight::updateFlicker( float fElapsedTime )
 			fadeOutLight();
 
 		m_eLightState = LIGHT_FLICKER;
+
 	} else
 		m_fFlickerDuration = 0.0f;
 }

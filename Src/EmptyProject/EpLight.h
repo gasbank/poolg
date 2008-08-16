@@ -15,6 +15,8 @@ public:
 	void setupLight();
 	void setColor( float r, float g, float b );
 	void setFlickerColor( D3DXCOLOR& color );
+	void setLightPos( D3DXVECTOR3& pos ) { m_light.Position = pos; m_bLightValueDirty = true; }
+	void setLightDir( D3DXVECTOR3& dir ) { m_light.Direction = dir; m_bLightValueDirty = true; }
 	void turnOnLight();
 	void turnOffLight();
 	void fadeInLight();
@@ -40,4 +42,7 @@ private:
 	D3DXCOLOR			m_cFlickerSpecular;
 	float				m_fBrightness;
 	LightState			m_eLightState;
+
+	D3DXVECTOR3			m_vDir;
+	D3DXVECTOR3			m_vPos;
 };

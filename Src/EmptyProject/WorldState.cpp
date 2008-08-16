@@ -27,8 +27,6 @@ WorldState::WorldState(void)
 	m_sg					= 0;
 	m_heroUnit				= 0;
 	m_curEnemyUnit			= 0;
-	m_alphaShader			= 0;
-	m_screenFlashAlphaAngle	= 180.0f;
 
 	char command[128];
 	StringCchPrintfA(command, 128, "EpWorldState::init 0x%p", this);
@@ -140,15 +138,7 @@ HRESULT WorldState::enter()
 	Incident* inc2 = new Incident( trigger, action );
 	m_incidents.push_back( inc2 );*/
 
-	//////////////////////////////////////////////////////////////////////////
-	// Prepare alpha shading
-	m_alphaShader = new AlphaShader();
-	m_alphaShader->initShader( pd3dDevice, L"Shaders/Alpha.vsh" );
-	m_alphaShader->compileShader( "Alpha", "vs_2_0" );
-
-	D3DXCreatePolygon( pd3dDevice, 10.0f, 32, &m_testPolygon, 0 );
-	m_testPolygon->CloneMesh( D3DXMESH_WRITEONLY, m_alphaShader->getDecl(), pd3dDevice, &m_testPolygonCloned );
-	//////////////////////////////////////////////////////////////////////////
+	m_screenFlash.setup();
 
 	m_curDialog = 0;
 
@@ -160,7 +150,7 @@ HRESULT WorldState::enter()
 HRESULT WorldState::leave()
 {
 	// 여긴 적절한 장소는 아닌 것 같지만..
-	m_alphaShader->onResetDevice();
+	m_screenFlash.reset();
 
 	GetScriptManager().execute("EpWorldState::leave");
 
@@ -174,7 +164,7 @@ HRESULT WorldState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, floa
 	
 	HRESULT hr;
 
-	UNREFERENCED_PARAMETER( hr );
+	UNREFERENCED_PARAMETER( hr );	
 
 	//////////////////////////////////////////////////////////////////////////
 	// Perspective Rendering Phase
@@ -213,19 +203,7 @@ HRESULT WorldState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, floa
 		(*itDialog)->frameRender(pd3dDevice, fTime, fElapsedTime);
 	}
 
-
-
-	//////////////////////////////////////////////////////////////////////////
-	// Draw alpha animated plane
-	/*GetG().m_dev->SetRenderState( D3DRS_LIGHTING, FALSE );
-	GetG().m_dev->SetRenderState( D3DRS_CULLMODE, D3DCULL_NONE );
-	GetG().m_dev->SetTexture( 0, 0 );
-	V_RETURN( GetG().m_dev->SetVertexShader( m_alphaShader->getVertexShader() ) );
-	D3DPERF_BeginEvent( 0, L"Draw Alpha Animated" );
-	V_RETURN( m_testPolygonCloned->DrawSubset( 0 ) );
-	D3DPERF_EndEvent();
-	V_RETURN( GetG().m_dev->SetVertexShader( 0 ) );*/
-	//////////////////////////////////////////////////////////////////////////
+	m_screenFlash.frameRender();
 
 	WorldStateManager& wsm = WorldStateManager::getSingleton();
 	wsm.getCurState()->frameRender(pd3dDevice, fTime, fElapsedTime);
@@ -239,6 +217,8 @@ HRESULT WorldState::frameMove(double fTime, float fElapsedTime)
 	EpCamera& camera = GetG().m_camera;
 
 	HRESULT hr;
+
+	UNREFERENCED_PARAMETER( hr );
 	
 	m_pic.frameMove(fElapsedTime);
 	m_avatar.frameMove(fElapsedTime);
@@ -267,32 +247,7 @@ HRESULT WorldState::frameMove(double fTime, float fElapsedTime)
 	m_sg->getSceneRoot()->update(fTime, fElapsedTime);
 	m_sgRat->getSceneRoot()->update(fTime, fElapsedTime);
 
-
-	//////////////////////////////////////////////////////////////////////////
-	// Alpha shading logic
-
-	D3DXMATRIXA16 mWorldViewProj;
-	D3DXMatrixIdentity( &mWorldViewProj );
-	V( m_alphaShader->getConstantTable()->SetMatrix( DXUTGetD3D9Device(), "mWorldViewProj", &mWorldViewProj ) );
-	V( m_alphaShader->getConstantTable()->SetFloat( DXUTGetD3D9Device(), "fTime", (float)fTime ) );
-	
-	// Change alpha for duration m_redFadeDurationSec
-	if ( m_screenFlashAlphaAngle < 90.0f  )
-		m_screenFlashAlphaAngle += fElapsedTime * 180.0f / m_screenFlashDurationSec * 2.0f;
-	else if ( m_screenFlashAlphaAngle < 180.0f  )
-		m_screenFlashAlphaAngle += fElapsedTime * 180.0f / m_screenFlashDurationSec / 4.0f;
-	else
-		m_screenFlashAlphaAngle = 180.0f;
-
-	V( m_alphaShader->getConstantTable()->SetFloat( 
-		DXUTGetD3D9Device(), 
-		"alpha", 
-		abs( sin( D3DXToRadian( m_screenFlashAlphaAngle ) ) / 2 ) ) );
-	V( m_alphaShader->getConstantTable()->SetFloat( DXUTGetD3D9Device(), "diffuseR", m_screenFlashCV.r ) );
-	V( m_alphaShader->getConstantTable()->SetFloat( DXUTGetD3D9Device(), "diffuseG", m_screenFlashCV.g ) );
-	V( m_alphaShader->getConstantTable()->SetFloat( DXUTGetD3D9Device(), "diffuseB", m_screenFlashCV.b ) );
-
-	//////////////////////////////////////////////////////////////////////////
+	m_screenFlash.frameMove( fTime, fElapsedTime );
 	
 
 	WCHAR msg[128];
@@ -363,6 +318,7 @@ HRESULT WorldState::release()
 	m_picSmiley.release();
 	m_avatar.release();
 	m_sound.release();
+	m_screenFlash.release();
 	
 	{
 		DialogList::iterator it = m_scriptedDialog.begin();
@@ -392,10 +348,6 @@ HRESULT WorldState::release()
 
 	SAFE_RELEASE(m_aTile);
 
-	SAFE_RELEASE( m_testPolygon );
-	SAFE_RELEASE( m_testPolygonCloned );
-	EP_SAFE_RELEASE( m_alphaShader );
-
 	return S_OK;
 }
 
@@ -403,6 +355,7 @@ HRESULT WorldState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 {
 	m_pic.handleMessages(hWnd, uMsg, wParam, lParam);
 	m_sound.handleMessages(hWnd, uMsg, wParam, lParam);
+	m_screenFlash.handleMessage( hWnd, uMsg, wParam, lParam );
 
 	bool bTalking = false;
 	
@@ -674,17 +627,6 @@ void WorldState::removeUnit( Unit* pUnit )
 		}	
 	}
 } */
-
-void WorldState::screenFlashing( float durationSec, float r, float g, float b )
-{
-	m_screenFlashDurationSec = durationSec;
-	m_screenFlashCV.r = r;
-	m_screenFlashCV.g = g;
-	m_screenFlashCV.b = b;
-
-	// 이 값에 0.0도를 주면 알아서 180도까지 올라가고 멈추게 된다.
-	m_screenFlashAlphaAngle = 0.0f;
-}
 
 Unit* WorldState::findUnitAtTile( UINT x, UINT y )
 {

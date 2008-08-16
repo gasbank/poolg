@@ -116,34 +116,51 @@ namespace eval EpWorldState {
 		EpCharacterSetColor			$pEnemyUnit1 128 128 0
 		EpCharacterSetStat			$pEnemyUnit1 4 1 3 1 1 1
 		EpCharacterSetCurHp			$pEnemyUnit1 -1
+		EpEnemySetRandomWalkable		$pEnemyUnit1 1
+		EpCharacterSetBoundary			$pEnemyUnit1 23 92 27 88
 		
 		EpCharacterSetColor			$pEnemyUnit2 0 255 255
 		EpCharacterSetStat			$pEnemyUnit2 3 1 4 1 1 1
 		EpCharacterSetCurHp			$pEnemyUnit2 -1
+		EpEnemySetRandomWalkable		$pEnemyUnit2 1
+		EpCharacterSetBoundary			$pEnemyUnit2 35 90 39 86
+
 		
 		EpCharacterSetColor			$pEnemyUnit3 255 255 0
 		EpCharacterSetStat			$pEnemyUnit3 5 1 2 1 1 1
 		EpCharacterSetCurHp			$pEnemyUnit3 -1
+		EpEnemySetRandomWalkable		$pEnemyUnit3 1
+		EpCharacterSetBoundary			$pEnemyUnit3 33 69 37 65
 
 		EpCharacterSetColor			$pEnemyUnit4 0 128 128
 		EpCharacterSetStat			$pEnemyUnit4 2 1 5 1 1 1
 		EpCharacterSetCurHp			$pEnemyUnit4 -1
+		EpEnemySetRandomWalkable		$pEnemyUnit4 1
+		EpCharacterSetBoundary			$pEnemyUnit4 45 75 49 71
 
 		EpCharacterSetColor			$pEnemyUnit5 128 0 128
 		EpCharacterSetStat			$pEnemyUnit5 4 1 2 1 1 1
 		EpCharacterSetCurHp			$pEnemyUnit5 -1
+		EpEnemySetRandomWalkable		$pEnemyUnit5 1
+		EpCharacterSetBoundary			$pEnemyUnit5 60 85 64 81
 
 		EpCharacterSetColor			$pEnemyUnit6 64 64 0
-		EpCharacterSetCurHp			$pEnemyUnit6 -1
 		EpCharacterSetStat			$pEnemyUnit6 3 1 3 1 1 1
+		EpCharacterSetCurHp			$pEnemyUnit6 -1
+		EpEnemySetRandomWalkable		$pEnemyUnit6 1
+		EpCharacterSetBoundary			$pEnemyUnit6 57 60 61 56
 
 		EpCharacterSetColor			$pEnemyUnit7 0 64 64
 		EpCharacterSetStat			$pEnemyUnit7 6 1 1 1 1 1
 		EpCharacterSetCurHp			$pEnemyUnit7 -1
+		EpEnemySetRandomWalkable		$pEnemyUnit7 1
+		EpCharacterSetBoundary			$pEnemyUnit7 34 55 38 51
 
 		EpCharacterSetColor			$pEnemyUnit8 0 0 0
 		EpCharacterSetStat			$pEnemyUnit8 2 1 5 1 1 1
 		EpCharacterSetCurHp			$pEnemyUnit8 -1
+		EpEnemySetRandomWalkable		$pEnemyUnit8 1
+		EpCharacterSetBoundary			$pEnemyUnit8 40 46 44 42
 		
 		EpCharacterSetColor			$pNPCUnit1 0 255 0
 		

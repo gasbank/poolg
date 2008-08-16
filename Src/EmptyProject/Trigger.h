@@ -3,7 +3,9 @@
 #include "Action.h"
 
 class WorldState;
+class Unit;
 
+typedef std::set<Unit*> UnitSet;
 
 class Trigger
 {
@@ -61,3 +63,14 @@ private:
 };
 
 //////////////////////////////////////////////////////////////////////////
+
+class TotalAnnihilationTrigger : public Trigger
+{
+public:
+	TotalAnnihilationTrigger( WorldState* );
+	virtual ~TotalAnnihilationTrigger();
+	virtual bool check();
+
+private:
+	UnitSet* m_pUs;
+};

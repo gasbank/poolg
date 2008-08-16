@@ -7,6 +7,7 @@
 #include "TileManager.h"
 #include "Action.h"
 #include "ScriptManager.h"
+#include "Unit.h"
 
 Trigger::Trigger(void)
 {
@@ -121,6 +122,38 @@ bool CharHpTrigger::check()
 	return false;
 }
 
+//////////////////////////////////////////////////////////////////////////
+
+TotalAnnihilationTrigger::TotalAnnihilationTrigger( WorldState* pWs )
+{
+	m_pUs = pWs->getUnitSet();
+}
+
+TotalAnnihilationTrigger::~TotalAnnihilationTrigger()
+{
+
+}
+
+bool TotalAnnihilationTrigger::check()
+{
+	// 말을 못하는 Enemy, 즉 죽일 수 있는 적이 남은 경우 TotalAnnihilation 실패로 간주.
+	for ( UnitSet::iterator it = m_pUs->begin(); it != m_pUs->end(); it++ )
+	{
+		if ( (*it)->getType() == UT_ENEMY )
+			if ( !static_cast<Enemy*>(*it)->isTalkable() )
+				return false;
+	}
+
+	return true;
+}
+
+Trigger* EpCreateTotalAnnihilationTrigger( void* pWorld )
+{
+	return new TotalAnnihilationTrigger( reinterpret_cast<WorldState*>(pWorld) );
+} SCRIPT_CALLABLE_PV_PV( EpCreateTotalAnnihilationTrigger )
+
+//////////////////////////////////////////////////////////////////////////
+
 Trigger* EpCreateCharHpTrigger( void* ptr, int min, int max, int bInclude )
 {
 	Character* c = reinterpret_cast<Character*>( ptr );
@@ -131,4 +164,5 @@ Trigger* EpCreateCharHpTrigger( void* ptr, int min, int max, int bInclude )
 START_SCRIPT_FACTORY( Trigger )
 	CREATE_OBJ_COMMAND( EpCreateCharHpTrigger )
 	CREATE_OBJ_COMMAND( EpCreateUnitPositionTrigger )
+	CREATE_OBJ_COMMAND( EpCreateTotalAnnihilationTrigger )
 END_SCRIPT_FACTORY( Trigger )

@@ -248,6 +248,7 @@ HRESULT MenuState::frameRender(IDirect3DDevice9* pd3dDevice,  double fTime, floa
 
 		RECT rc;
 		RECT rc2;
+		RECT rc3;
 		rc.top		= 110;
 		rc.left		= 25;
 		rc.right	= 800;
@@ -257,6 +258,11 @@ HRESULT MenuState::frameRender(IDirect3DDevice9* pd3dDevice,  double fTime, floa
 		rc2.left	= (LONG)800-204;
 		rc2.right	= (LONG)800-69;
 		rc2.bottom	= 600;
+
+		rc3.top		= 62;
+		rc3.left	= 446;
+		rc3.right	= 800;
+		rc3.bottom	= 600;
 
 		DWORD dtProp = DT_NOCLIP | DT_CENTER;
 		D3DXCOLOR textColor = D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f );
@@ -302,7 +308,25 @@ HRESULT MenuState::frameRender(IDirect3DDevice9* pd3dDevice,  double fTime, floa
 		rc2.top += (LONG)47;
 		StringCchPrintf(textBuffer, 512, L"%d", ws->getHeroUnit()->getStat().immunity );
 		m_lblREB->DrawTextW(0, textBuffer, -1, &rc2, dtProp, textColor );
-		rc2.top += (LONG)47;
+
+		StringCchPrintf(textBuffer, 512, L"PoolG" );
+		m_lblsREB->DrawTextW(0, textBuffer, -1, &rc3, DT_NOCLIP | DT_LEFT, textColor );
+		rc3.top += (LONG)25;
+		StringCchPrintf(textBuffer, 512, L"He is a mouse who live in the ceiling of" );
+		m_lblsREB->DrawTextW(0, textBuffer, -1, &rc3, DT_NOCLIP | DT_LEFT, textColor );
+		rc3.top += (LONG)19;
+		StringCchPrintf(textBuffer, 512, L"basement floor in Engineering Hall I." );
+		m_lblsREB->DrawTextW(0, textBuffer, -1, &rc3, DT_NOCLIP | DT_LEFT, textColor );
+		rc3.top += (LONG)19;
+		StringCchPrintf(textBuffer, 512, L"One day, People did general cleaning." );
+		m_lblsREB->DrawTextW(0, textBuffer, -1, &rc3, DT_NOCLIP | DT_LEFT, textColor );
+		rc3.top += (LONG)19;
+		StringCchPrintf(textBuffer, 512, L"So, Living place of mice is decreased." );
+		m_lblsREB->DrawTextW(0, textBuffer, -1, &rc3, DT_NOCLIP | DT_LEFT, textColor );
+		rc3.top += (LONG)19;
+		StringCchPrintf(textBuffer, 512, L"And then he goes to repulse the enemy." );
+		m_lblsREB->DrawTextW(0, textBuffer, -1, &rc3, DT_NOCLIP | DT_LEFT, textColor );
+
 	}
 	if ( op_sa == true )
 	{
@@ -370,7 +394,7 @@ HRESULT MenuState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 			case VK_RETURN:
 				select( 0 );
 				break;
-			case VK_F5:
+			case VK_ESCAPE:
 				if ( !op_st && !op_sa && !op_lo )
 					GetWorldStateManager().setNextStateAsPrevState();
 				break;
@@ -417,6 +441,7 @@ HRESULT MenuState::release()
 
 	SAFE_RELEASE( m_lblHYnamL );
 	SAFE_RELEASE( m_lblREB);
+	SAFE_RELEASE( m_lblsREB);
 
 	return S_OK;
 }
@@ -536,6 +561,7 @@ MenuState::MenuState()
 
 	V( D3DXCreateFont(m_pDev, 17, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblHYnamL) );
 	V( D3DXCreateFont(m_pDev, 26, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Rockwell Extra Bold"), &m_lblREB) );
+	V( D3DXCreateFont(m_pDev, 16, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Rockwell Extra Bold"), &m_lblsREB) );
 }
 
 MenuState::~MenuState()

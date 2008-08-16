@@ -23,6 +23,7 @@ private:
 	
 	LPD3DXFONT		m_lblHYnamL;
 	LPD3DXFONT		m_lblREB;
+	LPD3DXFONT		m_lblsREB;
 	
 	LPDIRECT3DDEVICE9	m_pDev;
 

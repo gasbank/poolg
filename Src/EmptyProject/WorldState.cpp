@@ -393,7 +393,7 @@ HRESULT WorldState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 		{
 
 		}
-		if (wParam == VK_F5)
+		if (wParam == VK_ESCAPE)
 		{
 			if ( GetWorldStateManager().curStateEnum() != GAME_WORLD_STATE_BATTLE )
 				GetWorldStateManager().setNextState(GAME_WORLD_STATE_MENU);

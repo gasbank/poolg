@@ -44,7 +44,7 @@ namespace eval EpWorldState {
 		EpUnitSetRotZ				$pHeroUnit [ToRadian 90]
 		EpUnitSetPosZ				$pHeroUnit -[EpUnitGetUpperRightZ $pHeroUnit]
                                                                   # Health Will Coding Defence Sense Immunity
-		EpCharacterSetStat			$pHeroUnit   30     20    20     10     10     10
+		EpCharacterSetStat			$pHeroUnit    5     5     5       5      5      5
 		EpCharacterSetCurHp			$pHeroUnit -1
 		EpCharacterSetCurCs			$pHeroUnit -1
 		EpCharacterSetMoveDuration		$pHeroUnit [expr 0.2]
@@ -52,28 +52,28 @@ namespace eval EpWorldState {
 		
 		
 		EpCharacterSetColor			$pEnemyUnit1 128 128 0
-		EpCharacterSetStat			$pEnemyUnit1 4 1 1 1 1 1
+		EpCharacterSetStat			$pEnemyUnit1 4 1 3 1 1 1
 		EpCharacterSetCurHp			$pEnemyUnit1 -1
 		
 		EpCharacterSetColor			$pEnemyUnit2 0 255 255
-		EpCharacterSetStat			$pEnemyUnit2 6 1 1 1 1 1
+		EpCharacterSetStat			$pEnemyUnit2 6 1 4 1 1 1
 		EpCharacterSetCurHp			$pEnemyUnit2 -1
 		
 		EpCharacterSetColor			$pEnemyUnit3 255 255 0
-		EpCharacterSetStat			$pEnemyUnit3 5 1 1 1 1 1
+		EpCharacterSetStat			$pEnemyUnit3 5 1 4 1 1 1
 		EpCharacterSetCurHp			$pEnemyUnit3 -1
 
 		EpCharacterSetColor			$pEnemyUnit4 0 128 128
-		EpCharacterSetStat			$pEnemyUnit4 5 1 1 1 1 1
+		EpCharacterSetStat			$pEnemyUnit4 5 1 5 1 1 1
 		EpCharacterSetCurHp			$pEnemyUnit4 -1
 
 		EpCharacterSetColor			$pEnemyUnit5 128 0 128
-		EpCharacterSetStat			$pEnemyUnit5 4 1 1 1 1 1
+		EpCharacterSetStat			$pEnemyUnit5 4 1 5 1 1 1
 		EpCharacterSetCurHp			$pEnemyUnit5 -1
 
 		EpCharacterSetColor			$pEnemyUnit6 64 64 0
 		EpCharacterSetCurHp			$pEnemyUnit6 -1
-		EpCharacterSetStat			$pEnemyUnit6 4 1 1 1 1 1
+		EpCharacterSetStat			$pEnemyUnit6 4 1 4 1 1 1
 
 		EpCharacterSetColor			$pEnemyUnit7 0 64 64
 		EpCharacterSetStat			$pEnemyUnit7 6 1 1 1 1 1

@@ -318,7 +318,7 @@ HRESULT MenuState::frameRender(IDirect3DDevice9* pd3dDevice,  double fTime, floa
 		StringCchPrintf(textBuffer, 512, L"basement floor in Engineering Hall I." );
 		m_lblsREB->DrawTextW(0, textBuffer, -1, &rc3, DT_NOCLIP | DT_LEFT, textColor );
 		rc3.top += (LONG)19;
-		StringCchPrintf(textBuffer, 512, L"One day, People did general cleaning." );
+		StringCchPrintf(textBuffer, 512, L"One day, People did 'Big Cleaning'." );
 		m_lblsREB->DrawTextW(0, textBuffer, -1, &rc3, DT_NOCLIP | DT_LEFT, textColor );
 		rc3.top += (LONG)19;
 		StringCchPrintf(textBuffer, 512, L"So, Living place of mice is decreased." );
@@ -395,8 +395,9 @@ HRESULT MenuState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 				select( 0 );
 				break;
 			case VK_ESCAPE:
-				if ( !op_st && !op_sa && !op_lo )
-					GetWorldStateManager().setNextStateAsPrevState();
+				if ( op_st || op_sa || op_lo )
+					select( 0 );
+				GetWorldStateManager().setNextStateAsPrevState();
 				break;
 		}
 	}
@@ -530,7 +531,7 @@ MenuState::MenuState()
 	m_hpbg.setPos ( (0 - scrWidth / 2) + 163, (0 - scrHeight / 2) + 223, 2.5f);
 	m_hpbg.setSize(220, 22);
 
-	m_mpbar.init(L"Images/BattleUI/MPbar.jpg", m_pDev);
+	m_mpbar.init(L"Images/BattleUI/DKbar.jpg", m_pDev);
 	m_mpbar.setPos ( (0 - scrWidth / 2) + 163, (0 - scrHeight / 2) + 171, 2.4f);
 
 	m_mpbg.init(L"Images/BattleUI/MPbg.jpg", m_pDev);

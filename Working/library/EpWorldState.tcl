@@ -44,7 +44,7 @@ namespace eval EpWorldState {
 		EpUnitSetRotZ				$pHeroUnit [ToRadian 90]
 		EpUnitSetPosZ				$pHeroUnit -[EpUnitGetUpperRightZ $pHeroUnit]
                                                                   # Health Will Coding Defence Sense Immunity
-		EpCharacterSetStat			$pHeroUnit    5     5     5       5      5      5
+		EpCharacterSetStat			$pHeroUnit    7     5     7       5      5      5
 		EpCharacterSetCurHp			$pHeroUnit -1
 		EpCharacterSetCurCs			$pHeroUnit -1
 		EpCharacterSetMoveDuration		$pHeroUnit [expr 0.2]

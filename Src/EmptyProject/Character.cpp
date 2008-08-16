@@ -122,9 +122,11 @@ bool Character::frameMove( float fElapsedTime )
 						m_vKeyboardDirection.x += (float) g_moveAmount[ i ].x * s_tileSize;
 						m_vKeyboardDirection.y += (float) g_moveAmount[ i ].y * s_tileSize;
 
+						GetTileManager().getTile( getTilePos().x, getTilePos().y )->b_movable = true;
 						setTileBufferPos(
 							getTileBufferPos().x + g_moveAmount[ i ].x,
 							getTileBufferPos().y + g_moveAmount[ i ].y );
+						GetTileManager().getTile( getTileBufferPos().x, getTileBufferPos().y )->b_movable = false;
 					}
 				}
 				// 가는 방향으로 머리를 돌린다.

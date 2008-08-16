@@ -10,10 +10,11 @@ namespace eval EpWorldState {
 	}
 
 	proc registerIncident1 {} {
+		variable pHeroUnit
 		variable testEnemy
 		
-		set trigger		[ EpCreateCharHpTrigger $testEnemy -100 0 1 ]
-		set action		[ EpCreateDialogAction "EpDialog2" ]
+		set trigger	 [ EpCreateUnitPositionTrigger $pHeroUnit 26 74 26 74 ]
+		set action		[ EpCreateDialogAction "EpDialog1" ]
 		set incident	[ EpCreateIncident $trigger $action ]
 		
 		set incCount	[ EpRegisterIncident $incident ]
@@ -21,28 +22,15 @@ namespace eval EpWorldState {
 	}
 
 	proc registerIncident2 {} {
-		variable testEnemy
-		
-		set trigger		[ EpCreateCharHpTrigger $testEnemy -100 0 1 ]
-		set action		[ EpCreateSoundAction "Start Battle" ]
-		set incident	[ EpCreateIncident $trigger $action ]
-		
-		set incCount	[ EpRegisterIncident $incident ]
-		EpOutputDebugString " - Incident count: $incCount\n"
-	}
-
-	proc registerIncident3 {} {
 		variable pHeroUnit
 		variable testEnemy
 			
-		set trigger [ EpCreateUnitPositionTrigger $pHeroUnit 30 78 30 78 ]
+		set trigger [ EpCreateUnitPositionTrigger $pHeroUnit 44 81 44 81 ]
 		set action		[ EpCreateHealAction $pHeroUnit ]
 		set incident	[ EpCreateIncident $trigger $action ]
 
-		set trigger2		[ EpCreateCharHpTrigger $testEnemy -100 0 1 ]
 		set action2		[ EpCreateDialogAction "EpDialogHeal" ]
 
-		EpAddTriggerToIncident $incident $trigger2
 		EpAddActionToIncident $incident $action2
 
 		
@@ -50,13 +38,29 @@ namespace eval EpWorldState {
 		EpOutputDebugString " - Incident count: $incCount\n"
 	}
 
-	proc registerIncident4 {} {
+	proc registerIncident3 {} {
 		variable pWorld
 		
 		set trigger		[ EpCreateTotalAnnihilationTrigger $pWorld ]
 		set action		[ EpCreateDialogAction "EpDialog2" ]
 		set incident	[ EpCreateIncident $trigger $action ]
 
+		set incCount	[ EpRegisterIncident $incident ]
+		EpOutputDebugString " - Incident count: $incCount\n"
+	}
+
+	proc registerIncident4 {} {
+		variable pHeroUnit
+					
+		set trigger [ EpCreateUnitPositionTrigger $pHeroUnit 26 98 26 98 ]
+		set action		[ EpCreateUnitSpawnAction [createEnem 27 98 0] ]
+		set incident	[ EpCreateIncident $trigger $action ]
+
+		set action2		[ EpCreateUnitSpawnAction [createEnem 28 98 0] ]
+
+		EpAddActionToIncident $incident $action2
+
+		
 		set incCount	[ EpRegisterIncident $incident ]
 		EpOutputDebugString " - Incident count: $incCount\n"
 	}
@@ -67,20 +71,20 @@ namespace eval EpWorldState {
 		
 		EpOutputDebugString " - WorldState enter\n"
 		
-		set testEnemy				[createEnem 27 78];
+		set testEnemy				[createEnem 27 78 1];
 		
 		set pHeroUnit				[createHero 26 74];
 		
-		set pEnemyUnit1				[createEnem 25 90];
-		set pEnemyUnit2				[createEnem 37 88];
-		set pEnemyUnit3				[createEnem 35 67];
-		set pEnemyUnit4				[createEnem 47 73];
-		set pEnemyUnit5				[createEnem 62 83];
-		set pEnemyUnit6				[createEnem 59 58];
-		set pEnemyUnit7				[createEnem 36 53];
-		set pEnemyUnit8				[createEnem 42 44];
-		set pNPCUnit1				[createEnem 47 65];
-		set pTestEnemyUnit			[createEnem 55 40];
+		set pEnemyUnit1				[createEnem 25 90 1];
+		set pEnemyUnit2				[createEnem 37 88 1];
+		set pEnemyUnit3				[createEnem 35 67 1];
+		set pEnemyUnit4				[createEnem 47 73 1];
+		set pEnemyUnit5				[createEnem 62 83 1];
+		set pEnemyUnit6				[createEnem 59 58 1];
+		set pEnemyUnit7				[createEnem 36 53 1];
+		set pEnemyUnit8				[createEnem 42 44 1];
+		set pNPCUnit1				[createEnem 47 65 1];
+		set pTestEnemyUnit			[createEnem 55 40 1];
 		
 		EpUnitSetRotX				$pHeroUnit [ToRadian -90]
 		EpUnitSetRotZ				$pHeroUnit [ToRadian 90]
@@ -138,8 +142,8 @@ namespace eval EpWorldState {
 		EpEnemySetTalkable			$pTestEnemyUnit	1
 		
 		
-		#registerIncident1
-		#registerIncident2
+		registerIncident1
+		registerIncident2
 		registerIncident3
 		registerIncident4
 	}
@@ -167,10 +171,12 @@ namespace eval EpWorldState {
 		return $unit
 	}
 
-	proc createEnem { tileX tileY } {
+	proc createEnem { tileX tileY registerWorld } {
 		variable pWorld
 		set unit [ EpCreateEnemy $tileX $tileY ];
-		EpRegisterToWorld $pWorld $unit
+		if $registerWorld {
+			EpRegisterToWorld $pWorld $unit
+		}
 		return $unit
 	}	
 }

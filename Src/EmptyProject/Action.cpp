@@ -171,8 +171,36 @@ Action* EpCreateHealAction( void* targetChar )
 
 //////////////////////////////////////////////////////////////////////////
 
+UnitSpawnAction::UnitSpawnAction( Unit* createUnit )
+: m_createUnit ( createUnit )
+{
+}
+
+UnitSpawnAction::~UnitSpawnAction()
+{
+}
+
+void UnitSpawnAction::activate()
+{
+	getWs()->addUnit( m_createUnit );
+}
+
+void UnitSpawnAction::update()
+{
+
+}
+
+Action* EpCreateUnitSpawnAction( void* createUnit )
+{
+	Unit* u = reinterpret_cast<Unit*>( createUnit );
+	return new UnitSpawnAction( u );
+}  SCRIPT_CALLABLE_PV_PV( EpCreateUnitSpawnAction )
+
+//////////////////////////////////////////////////////////////////////////
+
 START_SCRIPT_FACTORY( Action )
 	CREATE_OBJ_COMMAND( EpCreateDialogAction )
 	CREATE_OBJ_COMMAND( EpCreateSoundAction )
 	CREATE_OBJ_COMMAND( EpCreateHealAction )
+	CREATE_OBJ_COMMAND( EpCreateUnitSpawnAction ) 
 END_SCRIPT_FACTORY( Action )

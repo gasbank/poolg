@@ -194,7 +194,8 @@ HRESULT WorldState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, floa
 	UnitSet::iterator it = m_unitSet.begin();
 	for ( ; it != m_unitSet.end(); ++it )
 	{
-		(*it)->frameRender();
+		if ( !(*it)->getRemoveFlag() )
+			(*it)->frameRender();
 	}
 	
 	DialogList::iterator itDialog = m_scriptedDialog.begin();
@@ -685,7 +686,7 @@ void WorldState::proceedCurDialog()
 			m_scriptedDialog.remove( m_curDialog );
 			EP_SAFE_RELEASE( m_curDialog );
 		}
-		if ( !m_curDialog->isTalking() )
+		else if ( !m_curDialog->isTalking() )
 			m_curDialog = 0;
 	}
 }

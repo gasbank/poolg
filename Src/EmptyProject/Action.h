@@ -89,3 +89,18 @@ public:
 private:
 	Character* m_targetChar;
 };
+
+//////////////////////////////////////////////////////////////////////////
+
+class UnitSpawnAction : public Action
+{
+public:
+	UnitSpawnAction( Unit* createUnit );
+	virtual ~UnitSpawnAction();
+
+	virtual void activate();
+	virtual void update();
+
+private:
+	Unit* m_createUnit;
+};

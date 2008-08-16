@@ -1830,7 +1830,7 @@ HRESULT WINAPI DXUTMainLoop( HACCEL hAccel )
     if( hAccel != NULL )
         DestroyAcceleratorTable( hAccel );
 
-    GetDXUTState().SetInsideMainloop( false );
+    GetDXUTState().SetInsideMainloop( false );4
 
     return S_OK;
 }

@@ -11,6 +11,8 @@ int slb;
 
 float curHp = 0;
 float maxHp = 0;
+float curCs = 0;
+float maxCs = 0;
 bool op_st = false;
 bool op_sa = false;
 bool op_lo = false;
@@ -169,6 +171,7 @@ HRESULT MenuState::frameMove(double fTime, float fElapsedTime)
 	m_lowin.frameMove(fElapsedTime);
 
 	m_hpbar.frameMove(fElapsedTime);
+	m_mpbar.frameMove(fElapsedTime);
 
 	m_hpbg.frameMove(fElapsedTime);
 	m_mpbg.frameMove(fElapsedTime);
@@ -201,8 +204,6 @@ HRESULT MenuState::frameRender(IDirect3DDevice9* pd3dDevice,  double fTime, floa
 	material.Power = 1.0f;
 	material.Specular = cv2;
 	m_pDev->SetMaterial(&material);
-
-	//drawFixedText(scrWidth, scrHeight);
 
 	m_pDev->SetRenderState(D3DRS_ZENABLE, FALSE);
 	m_menu.draw();
@@ -243,6 +244,65 @@ HRESULT MenuState::frameRender(IDirect3DDevice9* pd3dDevice,  double fTime, floa
 		m_expbg.draw();
 
 		m_hpbar.draw();
+		m_mpbar.draw();
+
+		RECT rc;
+		RECT rc2;
+		rc.top		= 110;
+		rc.left		= 25;
+		rc.right	= 800;
+		rc.bottom	= 600;
+
+		rc2.top		= (LONG)600-364;;
+		rc2.left	= (LONG)800-204;
+		rc2.right	= (LONG)800-69;
+		rc2.bottom	= 600;
+
+		DWORD dtProp = DT_NOCLIP | DT_CENTER;
+		D3DXCOLOR textColor = D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f );
+
+		WorldState* ws = reinterpret_cast<WorldState*>( GetTopStateManager().getState( GAME_TOP_STATE_WORLD ) );
+
+		WCHAR textBuffer[512];
+		rc.top = (LONG)600-364;
+		rc.left = (LONG)800-343;
+		rc.right = (LONG)800-205;
+		StringCchPrintf(textBuffer, 512, L"Health");
+		m_lblREB->DrawTextW(0, textBuffer, -1, &rc, dtProp, textColor);
+		rc.top += (LONG)47;
+		StringCchPrintf(textBuffer, 512, L"Will");
+		m_lblREB->DrawTextW(0, textBuffer, -1, &rc, dtProp, textColor );
+		rc.top += (LONG)47;
+		StringCchPrintf(textBuffer, 512, L"Coding");
+		m_lblREB->DrawTextW(0, textBuffer, -1, &rc, dtProp, textColor );
+		rc.top += (LONG)47;
+		StringCchPrintf(textBuffer, 512, L"Defence");
+		m_lblREB->DrawTextW(0, textBuffer, -1, &rc, dtProp, textColor );
+		rc.top += (LONG)47;
+		StringCchPrintf(textBuffer, 512, L"Sense");
+		m_lblREB->DrawTextW(0, textBuffer, -1, &rc, dtProp, textColor );
+		rc.top += (LONG)47;
+		StringCchPrintf(textBuffer, 512, L"Immunity");
+		m_lblREB->DrawTextW(0, textBuffer, -1, &rc, dtProp, textColor );
+		
+		StringCchPrintf(textBuffer, 512, L"%d", ws->getHeroUnit()->getStat().health );
+		m_lblREB->DrawTextW(0, textBuffer, -1, &rc2, dtProp, textColor );
+		rc2.top += (LONG)47;
+		StringCchPrintf(textBuffer, 512, L"%d", ws->getHeroUnit()->getStat().will );
+		m_lblREB->DrawTextW(0, textBuffer, -1, &rc2, dtProp, textColor );
+		rc2.top += (LONG)47;
+		StringCchPrintf(textBuffer, 512, L"%d", ws->getHeroUnit()->getStat().coding );
+		m_lblREB->DrawTextW(0, textBuffer, -1, &rc2, dtProp, textColor );
+		rc2.top += (LONG)47;
+		StringCchPrintf(textBuffer, 512, L"%d", ws->getHeroUnit()->getStat().def );
+		m_lblREB->DrawTextW(0, textBuffer, -1, &rc2, dtProp, textColor );
+		rc2.top += (LONG)47;
+		StringCchPrintf(textBuffer, 512, L"%d", ws->getHeroUnit()->getStat().sense );
+		m_lblREB->DrawTextW(0, textBuffer, -1, &rc2, dtProp, textColor );
+		rc2.top += (LONG)47;
+		StringCchPrintf(textBuffer, 512, L"%d", ws->getHeroUnit()->getStat().immunity );
+		m_lblREB->DrawTextW(0, textBuffer, -1, &rc2, dtProp, textColor );
+		rc2.top += (LONG)47;
 	}
 	if ( op_sa == true )
 	{
@@ -344,6 +404,7 @@ HRESULT MenuState::release()
 	m_lowin.release();
 
 	m_hpbar.release();
+	m_mpbar.release();
 
 	m_hpbg.release();
 	m_mpbg.release();
@@ -379,9 +440,6 @@ MenuState::MenuState()
 	m_menu.init(L"Images/menu_window.png", m_pDev);
 	m_menu.setPos (menuBoxPositionX, menuBoxPositionY, 3.0f);
 	m_menu.setSize( menuBoxWidth, menuBoxHeight );
-
-	//float trianglePositionX = (float)scrWidth/2 - menuBoxWidth + 7;
-	//float triangleBoxPositionY = (float)scrHeight/2 - menuBoxWidth + pos;
 
 	m_stub.init(L"Images/status_up_button.png", m_pDev);
 	m_stub.setPos ( (float)scrWidth/2 - menuButtonWidth - 20, (float)scrHeight/2 - menuButtonHeight - 30, 2.8f);
@@ -447,6 +505,9 @@ MenuState::MenuState()
 	m_hpbg.setPos ( (0 - scrWidth / 2) + 163, (0 - scrHeight / 2) + 223, 2.5f);
 	m_hpbg.setSize(220, 22);
 
+	m_mpbar.init(L"Images/BattleUI/MPbar.jpg", m_pDev);
+	m_mpbar.setPos ( (0 - scrWidth / 2) + 163, (0 - scrHeight / 2) + 171, 2.4f);
+
 	m_mpbg.init(L"Images/BattleUI/MPbg.jpg", m_pDev);
 	m_mpbg.setPos ( (0 - scrWidth / 2) + 163, (0 - scrHeight / 2) + 171, 2.5f);
 	m_mpbg.setSize(220, 22);
@@ -474,7 +535,7 @@ MenuState::MenuState()
 
 
 	V( D3DXCreateFont(m_pDev, 17, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblHYnamL) );
-	V( D3DXCreateFont(m_pDev, 18, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Rockwell Extra Bold"), &m_lblREB) );
+	V( D3DXCreateFont(m_pDev, 26, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Rockwell Extra Bold"), &m_lblREB) );
 }
 
 MenuState::~MenuState()
@@ -493,7 +554,11 @@ HRESULT MenuState::enter()
 		curHp = (float)( (Character*) ws->getHero() )->getCurHp();
 		maxHp = (float)( (Character*) ws->getHero() )->getMaxHp();
 
+		curCs = (float)( (Character*) ws->getHero() )->getCurCs();
+		maxCs = (float)( (Character*) ws->getHero() )->getMaxCs();
+
 		m_hpbar.setSize(220 * (curHp / maxHp), 22);
+		m_mpbar.setSize(220 * (curCs / maxCs), 22);
 	}
 
 	loc = 0;
@@ -507,29 +572,3 @@ HRESULT MenuState::leave()
 
 	return S_OK;
 }
-
-/*
-void MenuState::drawFixedText(int scrWidth, int scrHeight)
-{
-	WCHAR textBuffer[512];
-	RECT rc;
-	rc.top = 0;
-	rc.left = 0;
-	rc.right = scrWidth;
-	rc.bottom = scrHeight;
-	StringCchPrintf(textBuffer, 512, L"TextTest!!!!");
-	m_lblHYnamL->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 0.0f, 1.0f, 0.0f, 1.0f ) );
-	rc.top += 12;
-	StringCchPrintf(textBuffer, 512, L"HYnamL ±Û¾¾Ã¼ÀÇ ¹¦¹Ì¸¦ ¸¾²¯ ´À²¸º¾½Ã´Ù. W/A/S/D·Î ÁÖÀüÀÚ ÀÌµ¿ °¡´É!!!");
-	m_lblHYnamL->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 0.0f, 1.0f, 0.0f, 1.0f ) );
-
-
-	float statusBoxPlayersPositionX = 10;
-	float statusBoxPlayersPositionY = (float)(scrHeight - 10);
-	rc.top = (LONG)(statusBoxPlayersPositionY - 102);
-	rc.left = (LONG)(statusBoxPlayersPositionX + 5);
-	StringCchPrintf(textBuffer, 512, L"HP");
-	m_lblREB->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
-}
-
-*/

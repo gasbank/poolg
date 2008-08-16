@@ -417,6 +417,8 @@ void Character::setStat( int statHealth, int statWill, int statCoding, int statD
 	m_stat.will		= statWill;
 	m_stat.coding	= statCoding;
 	m_stat.def		= statDef;
+	m_stat.sense	= statSen;
+	m_stat.immunity	= statImmu;
 
 	m_maxHp = m_stat.health * m_stat.health / 4 + 50;
 	m_maxCs = m_stat.will * m_stat.will / 10 + 20;

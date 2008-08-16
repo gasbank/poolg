@@ -9,7 +9,7 @@ public:
 	~MenuState();
 	virtual HRESULT frameMove (double fTime, float fElapsedTime);
 	virtual HRESULT frameRender(IDirect3DDevice9* pd3dDevice,  double fTime, float fElapsedTime);
-	//void drawFixedText (int scrWidth, int scrHeight);
+	void drawFixedText (int scrWidth, int scrHeight);
 	virtual HRESULT handleMessages (HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	virtual HRESULT release ();
 	void select(int move);
@@ -47,6 +47,7 @@ private:
 	Picture m_lowin;
 
 	Picture m_hpbar;
+	Picture m_mpbar;
 	Picture m_hpbg;
 	Picture m_mpbg;
 	Picture m_expbg;

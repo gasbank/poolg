@@ -4,12 +4,10 @@
 class AttackObject;
 class Trigger;
 
-
 struct Stat
 {
-	int health, will, coding, def, sence, immun;
+	int health, will, coding, def, sense, immunity;
 };
-
 
 class Character : public Unit
 {
@@ -42,11 +40,9 @@ public:
 	bool getMoving() { return m_bMoving; }
 	void setAttack (int point) { m_attack = point; }
 	void setInt (int point) {m_intelligence = point; }
-
+	const Stat& getStat() const { return m_stat; }
 	bool isDead() { return (m_curHp<=0); }
 	void setDead() { m_curHp = -1; }
-
-	Stat getStat() const { return m_stat; }
 
 	
 	void setMoveDuration( float val ) { m_moveDuration = val; }

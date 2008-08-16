@@ -24,6 +24,7 @@ Unit::Unit( UnitType type )
 	m_vPos				= D3DXVECTOR3(0, 0, 0);
 	m_vScale			= D3DXVECTOR3(1.0f, 1.0f, 1.0f);
 	m_bLocalXformDirty	= true;
+	m_removeFlag		= false;
 
 	D3DXMatrixIdentity(&m_localXform);
 

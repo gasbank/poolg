@@ -681,6 +681,14 @@
 			Name="Unit"
 			>
 			<File
+				RelativePath=".\AnimationGenerator.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\AnimationGenerator.h"
+				>
+			</File>
+			<File
 				RelativePath=".\AttackObject.cpp"
 				>
 			</File>
@@ -697,6 +705,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\EffectObject.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\EffectObject.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Enemy.cpp"
 				>
 			</File>
@@ -710,6 +726,14 @@
 			</File>
 			<File
 				RelativePath=".\Hero.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SkillObject.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SkillObject.h"
 				>
 			</File>
 			<File

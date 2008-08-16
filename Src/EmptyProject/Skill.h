@@ -55,7 +55,7 @@ public:
 		m_description =
 			L"[Normal Attack]\n"
 			L"일반적인 방법으로 적을 공격합니다.\n";
-		m_csEssentials = 10;
+		m_csEssentials = 3;
 	}
 	virtual void useSkill( BattleState* battleState );
 };
@@ -69,7 +69,7 @@ public:
 		m_description =
 			L"[Heal]\n"
 			L"디버그를 통하여 HP를 회복합니다.\n";
-		m_csEssentials = 20;
+		m_csEssentials = 8;
 	}
 	virtual void useSkill( BattleState* battleState );
 };

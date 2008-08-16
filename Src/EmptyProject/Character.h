@@ -5,6 +5,11 @@ class AttackObject;
 class Trigger;
 
 
+struct Stat
+{
+	int health, will, coding, def, sence, immun;
+};
+
 
 class Character : public Unit
 {
@@ -39,6 +44,9 @@ public:
 	void setInt (int point) {m_intelligence = point; }
 
 	bool isDead() { return (m_curHp<=0); }
+	void setDead() { m_curHp = -1; }
+
+	Stat getStat() const { return m_stat; }
 
 	
 	void setMoveDuration( float val ) { m_moveDuration = val; }
@@ -73,10 +81,7 @@ private:
 	
 	RECT					m_boundaryTileRect;
 
-	struct Stat
-	{
-		int health, will, coding, def, sence, immun;
-	};
+
 	Stat					m_stat;
 };
 

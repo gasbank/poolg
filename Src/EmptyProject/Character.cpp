@@ -24,7 +24,9 @@ void Character::attack( int type, Character* enemy )
 	D3DXVec3Normalize( &fireDir, &fireDir );
 	AttackObject* ao = BallAttackObject::createBallAttackObject( enemy, getPos(), fireDir, dist );
 	BallAttackObject* bao = (BallAttackObject*)ao;
-	bao->setDamage (m_attack);
+	/*일반공격 데미지 계산*/
+	int damage = m_stat.coding + 10 - enemy->getStat().def;
+	bao->setDamage (damage);
 	m_attackObjectList.push_back(ao);
 }
 
@@ -50,7 +52,7 @@ void Character::meditation ()
 void Character::recoverCs()
 {
 	int recoverCsPoint = (int)(m_maxCs * 0.1f);
-	if (m_curCs + recoverCsPoint > m_maxHp)
+	if (m_curCs + recoverCsPoint > m_maxCs)
 		m_curCs = m_maxCs;
 	else
 		m_curCs += recoverCsPoint;

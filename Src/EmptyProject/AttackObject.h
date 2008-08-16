@@ -91,30 +91,8 @@ public:
 private:
 	Character* m_target;
 	D3DXVECTOR3 m_fireDir;
-	int m_meditationPoint;
 	float m_radius;
 	float m_radiusVelocity;
 	float m_angle;
 	float m_angularVelocity;
-
 };
-/*
-class MeditationObject : public AttackObject
-{
-public:
-	static AttackObject* createMeditationObject( Character* target , int index);
-	MeditationObject( Character* target );
-	~MeditationObject();
-
-	virtual LRESULT handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
-	virtual bool frameMove( float fElapsedTime );
-
-private:
-	Character* m_target;
-	D3DXVECTOR3 m_fireDir;
-	float m_velocity;
-	float m_accelRate;
-	int m_meditationPoint;
-	int m_index;
-}
-*/

@@ -49,6 +49,7 @@ bool BallAttackObject::frameMove( float fElapsedTime )
 			{
 				getBattleState()->pushBattleLog("HP가 모두 소진되었습니다. 게임 오버입니다.");
 				getBattleState()->pushBattleLog("순순히 F5키를 누르고 종료하시죠.");
+				m_target->setDead();
 				getBattleState()->setNextTurnType(TT_NATURAL);
 				getBattleState()->passTurn();
 			}
@@ -65,6 +66,7 @@ bool BallAttackObject::frameMove( float fElapsedTime )
 			if (m_target->isDead())
 			{
 				getBattleState()->pushBattleLog("대상을 섬멸하였습니다! (Enter key로 월드로 복귀)");
+				m_target->setDead();
 				getBattleState()->setNextTurnType(TT_NATURAL);
 				GetAudioState().pSoundBank->Play( GetAudioState().iSE, 0, 0, NULL );
 			}
@@ -75,6 +77,7 @@ bool BallAttackObject::frameMove( float fElapsedTime )
 				GetAudioState().pSoundBank->Play( GetAudioState().iSE, 0, 0, NULL );
 			}
 		}
+
 		return false;
 	}
 
@@ -313,8 +316,6 @@ MeditationObject::MeditationObject( Character* target )
 
 	setPos( newPos );
 
-	/*힐링 계산식 넣는 곳*/
-	m_meditationPoint = target->getInt();
 }
 
 MeditationObject::~MeditationObject()

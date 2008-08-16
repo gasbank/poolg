@@ -39,3 +39,15 @@
 #define SCRIPT_FACTORY(className) class _script_factory_##className { public: static void init(); };
 
 typedef std::list<const char*> ConstCharList;
+
+
+template<typename T> void EpSafeReleaseAll( T& obj ) {
+	T::iterator it = obj.begin();
+	for ( ; it != obj.end(); ++it )
+	{
+		EP_SAFE_RELEASE( *it );
+	}
+	obj.clear();	
+};
+
+#define FLOAT_POS_INF		(0x7f800000)

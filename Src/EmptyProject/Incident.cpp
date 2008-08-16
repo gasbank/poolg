@@ -50,20 +50,22 @@ bool Incident::update()
 
 void Incident::release()
 {
-
+	EpSafeReleaseAll( m_trigger );
+	EpSafeReleaseAll( m_action );
+	
 }
 
 void Incident::addTrigger( Trigger* trigger )
 {
-	TriggerList::iterator it1 = m_trigger.begin();
 	m_trigger.push_back( trigger );
 }
 
 void Incident::addAction( Action* action )
 {
-	ActionList::iterator it2 = m_action.begin();
 	m_action.push_back( action );
 }
+
+
 //////////////////////////////////////////////////////////////////////////
 
 Incident* EpCreateIncident( void* pv1, void* pv2 )

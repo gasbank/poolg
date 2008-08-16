@@ -179,11 +179,13 @@ UnitSpawnAction::UnitSpawnAction( Unit* createUnit )
 
 UnitSpawnAction::~UnitSpawnAction()
 {
+	EP_SAFE_RELEASE( m_createUnit );
 }
 
 void UnitSpawnAction::activate()
 {
 	getWs()->addUnit( m_createUnit );
+	m_createUnit = 0; // Unit instance ownership moved to the world!
 }
 
 void UnitSpawnAction::update()

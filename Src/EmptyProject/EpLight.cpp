@@ -130,8 +130,16 @@ void EpLight::frameMove( FLOAT fElapsedTime )
 	m_vPos = *GetG().m_camera.GetEyePt();
 
 	D3DXVec3Normalize((D3DXVECTOR3*)&m_light.Direction, &m_vDir);
+
+	float vDirLen = D3DXVec3Length( (D3DXVECTOR3*)&m_light.Direction );
+	if ( vDirLen < 1e-5 || vDirLen > 1e6 )
+		m_light.Direction = DX_CONSTS::D3DXVEC3_Z;
+	else
+		m_light.Direction = m_vPos;
+
 	m_light.Position = m_vPos;
 
+	
 	m_bLightValueDirty = true;
 
 	if ( m_bLightValueDirty )

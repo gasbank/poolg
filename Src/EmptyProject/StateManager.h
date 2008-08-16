@@ -24,17 +24,18 @@ public:
 	StateManager(void);
 	virtual ~StateManager(void);
 
-	virtual void setNextState( GameState gs );
-	virtual GameState curStateEnum();
-	virtual GameState prevStateEnum();
+	virtual void init() = 0;
+	virtual void release();
+
+	void setNextState( GameState gs );
+	void setNextStateForced( GameState gs );
+	GameState curStateEnum();
+	GameState prevStateEnum();
 
 	void setNextStateAsPrevState();
 	State* getCurState() const;
 	State* getState( GameState gs );
 	void transit();
-
-	virtual void init() = 0;
-	virtual void release();
 
 protected:
 	StateMap m_states;

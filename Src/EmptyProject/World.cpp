@@ -34,26 +34,20 @@ World::World( const char* worldName, const TCHAR* modelFilePath )
 	m_curEnemyUnit			= 0;
 	m_curDialog				= 0;
 	m_sound					= 0;
-
-
-	char command[128];
-	StringCchPrintfA(command, 128, "%s::init 0x%p", worldName, this);
-	GetScriptManager().execute(command);	
 }
 
 World::~World(void)
 {
-	detachAllUnits();
-	DialogList::iterator it = m_scriptedDialog.begin();
-	for ( ; it != m_scriptedDialog.end(); ++it )
-	{
-		EP_SAFE_RELEASE( *it );
-	}
 }
 
 HRESULT World::init()
 {
 	HRESULT hr = S_OK;
+
+
+	char command[128];
+	StringCchPrintfA( command, 128, "%s::init 0x%p", m_worldName.c_str(), this );
+	GetScriptManager().execute( command );
 
 	LPDIRECT3DDEVICE9& pd3dDevice =  GetG().m_dev;
 
@@ -63,27 +57,6 @@ HRESULT World::init()
 	m_poolgArnFile = new ArnFileData;
 	load_arnfile(_T("rat.arn"), *m_poolgArnFile);
 	m_poolgSg = new ArnSceneGraph(*m_poolgArnFile);
-	ArnMesh* mainWallMesh = dynamic_cast<ArnMesh*>( m_modelSg->getSceneRoot()->getNodeByName("MainWall") );
-	
-
-	//////////////////////////////////////////////////////////////////////////
-	// Room Model MainWall intersection test
-	D3DXVECTOR3 rayStartPos( 0, 0, -2.0f );
-	D3DXVECTOR3 rayDir( 1, 0, 0 );
-	BOOL hit;
-	DWORD hitFaceIndex;
-	float hitU, hitV;
-	float hitDist;
-	LPD3DXBUFFER allHitsBuffer = 0;
-	DWORD allHitSCount;
-	V_RETURN( D3DXIntersect( mainWallMesh->getD3DXMesh(), &rayStartPos, &rayDir,
-		&hit, &hitFaceIndex, &hitU, &hitV, &hitDist, &allHitsBuffer, &allHitSCount ) );
-	
-	D3DXINTERSECTINFO* intersectInfo = static_cast<D3DXINTERSECTINFO*>( allHitsBuffer->GetBufferPointer() );
-	UNREFERENCED_PARAMETER( intersectInfo );
-	//printf("Ray Testing test. (FaceIndex : %ui, Dist : %f)\n", intersectInfo->FaceIndex, intersectInfo->Dist );
-	SAFE_RELEASE( allHitsBuffer );
-	//////////////////////////////////////////////////////////////////////////
 	
 	
 	// Load sample image (vertex and index buffer creation with texture)
@@ -122,7 +95,9 @@ HRESULT World::init()
 
 
 	// 'enter' function implemented in the script file defines which characters are exist in this world
-	GetScriptManager().execute("EpRoomWorld::enter");
+	char scriptCommand[128];
+	StringCchPrintfA( scriptCommand, 128, "%s::enter", m_worldName.c_str() );
+	GetScriptManager().execute( scriptCommand );
 	
 	// Hero and enemies are defined afterwards
 	
@@ -331,21 +306,10 @@ HRESULT World::release()
 	m_picSmiley.release();
 	m_avatar.release();
 	m_screenFlash.release();
-	
-	{
-		DialogList::iterator it = m_scriptedDialog.begin();
-		for ( ; it != m_scriptedDialog.end(); ++it )
-		{
-			(*it)->release();
-		}
-	}
-	{
-		IncidentList::iterator it = m_incidents.begin();
-		for ( ; it != m_incidents.end(); ++it )
-		{
-			(*it)->release();
-		}
-	}
+
+	EpSafeReleaseAll( m_scriptedDialog );
+	EpSafeReleaseAll( m_unitSet );
+	EpSafeReleaseAll( m_incidents );
 
 	if (m_modelArnFile)
 		release_arnfile(*m_modelArnFile);
@@ -506,15 +470,6 @@ UINT World::addUnit( Unit* u )
 	return m_unitSet.size();
 }
 
-void World::detachAllUnits()
-{
-	UnitSet::iterator it = m_unitSet.begin();
-	for ( ; it != m_unitSet.end(); ++it )
-	{
-		EP_SAFE_RELEASE( *it );
-	}
-	m_unitSet.clear();
-}
 const D3DXVECTOR3& World::getEnemyPos()
 {
 	if ( m_curEnemyUnit != NULL )
@@ -727,9 +682,9 @@ World* World::createWorld( const char* worldName, TCHAR* modelFilePath )
 	return ret;
 }
 
-void World::detachAllIncidents()
+void World::addCollisionMesh( ArnMesh* collisionMesh )
 {
-	assert( !"Not implemented yet" );
+	m_collisionMeshes.push_back( collisionMesh );
 }
 //////////////////////////////////////////////////////////////////////////
 

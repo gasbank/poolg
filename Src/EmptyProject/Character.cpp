@@ -290,33 +290,35 @@ HRESULT Character::rayTesting( UnitInput mappedKey )
 
 	// Get mesh data
 	ArnMesh* mainWallMesh = dynamic_cast<ArnMesh*>( ws->getArnSceneGraphPt()->getSceneRoot()->getNodeByName("MainWall") );
-
-	// Select direction
-	D3DXVECTOR3 rayDir( dirArray[mappedKey][0], dirArray[mappedKey][1], dirArray[mappedKey][2] );
-
-	// Get intersection information
-	V_RETURN( D3DXIntersect( 
-		mainWallMesh->getD3DXMesh(), 
-		&rayStartPos, 
-		&rayDir,
-		&hit, 
-		&hitFaceIndex, 
-		&hitU, 
-		&hitV, 
-		&hitDist, 
-		0, 
-		0 ) );
-
-	// If there is collision between ray and face
-	if ( hit )
+	if ( mainWallMesh )
 	{
-		//printf("Ray Testing test. (FaceIndex : %u, Dist : %f)\n", hitFaceIndex, hitDist );
+		// Select direction
+		D3DXVECTOR3 rayDir( dirArray[mappedKey][0], dirArray[mappedKey][1], dirArray[mappedKey][2] );
 
-		// 타일 1.5칸 이내에서 교차하면 그 방향으로 움직이지 않는다.
-		if ( hitDist <= (float) 1.5 * s_tileSize )
-			m_bMovable = false;
+		// Get intersection information
+		V_RETURN( D3DXIntersect( 
+			mainWallMesh->getD3DXMesh(), 
+			&rayStartPos, 
+			&rayDir,
+			&hit, 
+			&hitFaceIndex, 
+			&hitU, 
+			&hitV, 
+			&hitDist, 
+			0, 
+			0 ) );
+
+		// If there is collision between ray and face
+		if ( hit )
+		{
+			//printf("Ray Testing test. (FaceIndex : %u, Dist : %f)\n", hitFaceIndex, hitDist );
+
+			// 타일 1.5칸 이내에서 교차하면 그 방향으로 움직이지 않는다.
+			if ( hitDist <= (float) 1.5 * s_tileSize )
+				m_bMovable = false;
+		}
 	}
-
+	
 	return hr;
 }
 

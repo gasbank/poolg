@@ -62,6 +62,14 @@ void StateManager::setNextState(GameState state)
 	
 }
 
+void StateManager::setNextStateForced( GameState state )
+{
+	if ( m_states.find( state ) != m_states.end() )
+		m_nextState = m_states[state];
+	else
+		throw std::runtime_error( "Invalid GameState enum" );
+}
+
 GameState StateManager::curStateEnum()
 {
 	StateMap::iterator it = m_states.begin();

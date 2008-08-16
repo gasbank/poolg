@@ -51,4 +51,6 @@ private:
 	RECT m_nameRect;
 
 	std::string m_dialogName;
+
+	bool m_bInit;
 };

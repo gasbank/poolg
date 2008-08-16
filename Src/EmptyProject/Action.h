@@ -11,6 +11,7 @@ public:
 
 	virtual void activate() = 0;
 	virtual void update() = 0;
+	virtual void release() {}
 
 	void dialogAction( const char* dialogName );
 	void moveUnitAction();

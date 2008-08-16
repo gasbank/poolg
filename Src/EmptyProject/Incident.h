@@ -17,6 +17,9 @@ public:
 	void addTrigger( Trigger* trigger );
 	void addAction( Action* action );
 	
+	void detachAllTriggers();
+	void detachAllActions();
+
 private:
 	bool m_bActivated;
 	TriggerList m_trigger;

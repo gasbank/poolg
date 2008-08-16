@@ -7,9 +7,11 @@ Dialog::Dialog(void)
 {
 	ctorDialogPane();
 
-	m_speakArray = 0;
-	m_speakCount = 0;
-	m_curSpeakIdx = 0;
+	m_speakArray	= 0;
+	m_speakCount	= 0;
+	m_curSpeakIdx	= 0;
+
+	m_bInit			= false;
 }
 
 Dialog::Dialog( Speak* speakArray, UINT speakCount, const RECT& region, bool bOneTime, const char* dialogName )
@@ -55,6 +57,7 @@ HRESULT Dialog::init()
 	V( D3DXCreateFont( GetG().m_dev, 12, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Gulim"), &m_contentFont) );
 	V( D3DXCreateFont( GetG().m_dev, 12, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("msgothic"), &m_nameFont) );
 
+	m_bInit = true;
 	return hr;
 }
 
@@ -67,53 +70,60 @@ HRESULT Dialog::release()
 	SAFE_RELEASE( m_contentFont );
 	SAFE_DELETE_ARRAY( m_speakArray );
 
+	m_bInit = false;
+
 	return S_OK;
 }
 
 HRESULT Dialog::frameMove(double fTime, float fElapsedTime)
 {
-
-	m_contentPic.frameMove(fElapsedTime);
-	m_namePic.frameMove(fElapsedTime);
-	
+	if ( m_bInit )
+	{
+		m_contentPic.frameMove(fElapsedTime);
+		m_namePic.frameMove(fElapsedTime);
+	}
 	return S_OK;
 }
 
 HRESULT Dialog::frameRender(IDirect3DDevice9* pd3dDevice,  double fTime, float fElapsedTime)
 {
-	GetG().m_dev->SetRenderState(D3DRS_LIGHTING, FALSE);
-	GetG().m_dev->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
-	GetG().m_dev->SetTransform(D3DTS_VIEW, &GetG().g_fixedViewMat);
-	GetG().m_dev->SetTransform(D3DTS_PROJECTION, &GetG().g_orthoProjMat);
-
-	D3DMATERIAL9 material;
-	D3DCOLORVALUE cv, cv2;
-	cv.a = 0.3f; cv.r = 0.1f; cv.g = 0.1f; cv.b = 0.1f;
-	cv2.a = 0.3f; cv2.r = 1.0f; cv2.g = 0.1f; cv2.b = 0.3f;
-	material.Ambient = cv;
-	material.Diffuse = cv2;
-	material.Emissive = cv;
-	material.Power = 1.0f;
-	material.Specular = cv2;
-	GetG().m_dev->SetMaterial(&material);
-
-	//drawFixedText(scrWidth, scrHeight);
-
-	GetG().m_dev->SetRenderState(D3DRS_ZENABLE, FALSE);
-	
-	if( m_bTalking )
+	if ( m_bInit )
 	{
-		D3DPERF_BeginEvent(0x12345678, L"Draw Dialog Pane");
-		m_contentPic.draw();
-		m_namePic.draw();
-		D3DPERF_EndEvent();
+		GetG().m_dev->SetRenderState(D3DRS_LIGHTING, FALSE);
+		GetG().m_dev->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
+		GetG().m_dev->SetTransform(D3DTS_VIEW, &GetG().g_fixedViewMat);
+		GetG().m_dev->SetTransform(D3DTS_PROJECTION, &GetG().g_orthoProjMat);
 
-		printDialog();
-		printName();
+		D3DMATERIAL9 material;
+		D3DCOLORVALUE cv, cv2;
+		cv.a = 0.3f; cv.r = 0.1f; cv.g = 0.1f; cv.b = 0.1f;
+		cv2.a = 0.3f; cv2.r = 1.0f; cv2.g = 0.1f; cv2.b = 0.3f;
+		material.Ambient = cv;
+		material.Diffuse = cv2;
+		material.Emissive = cv;
+		material.Power = 1.0f;
+		material.Specular = cv2;
+		GetG().m_dev->SetMaterial(&material);
 
+		//drawFixedText(scrWidth, scrHeight);
+
+		GetG().m_dev->SetRenderState(D3DRS_ZENABLE, FALSE);
+
+		if( m_bTalking )
+		{
+			D3DPERF_BeginEvent(0x12345678, L"Draw Dialog Pane");
+			m_contentPic.draw();
+			m_namePic.draw();
+			D3DPERF_EndEvent();
+
+			printDialog();
+			printName();
+
+		}
+
+		GetG().m_dev->SetRenderState(D3DRS_ZENABLE, TRUE);
 	}
-
-	GetG().m_dev->SetRenderState(D3DRS_ZENABLE, TRUE);
+	
 	return S_OK;
 }
 

@@ -129,12 +129,14 @@ void Picture::release()
 	SAFE_RELEASE(m_d3dxMesh);
 	SAFE_RELEASE(m_d3dTex);
 	SAFE_RELEASE(m_d3dVB);
+
+	m_bInit = false;
 }
 
 HRESULT Picture::draw(bool textured)
 {
 	HRESULT hr = S_OK;
-
+	
 	if (m_d3dxMesh)
 	{
 		// Non-rhw drawing
@@ -155,7 +157,8 @@ HRESULT Picture::draw(bool textured)
 	}
 	else
 	{
-		assert( !"Should not be called" );
+		OutputDebugStringA( " - WARNING: Picture is not ready but draw() called\n" );
+		// assert( !"Should not be called" );
 	}
 	return hr;
 }

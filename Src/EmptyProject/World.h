@@ -15,6 +15,7 @@ class Incident;
 class Unit;
 class Dialog;
 class Sound;
+class ArnMesh;
 
 typedef std::set<Unit*> UnitSet;
 typedef std::list<Dialog*> DialogList;
@@ -32,15 +33,12 @@ public:
 	HRESULT				handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	HRESULT				release();
 
-	const char*			getWorldName() { return m_worldName.c_str(); }
+	const std::string&	getWorldName() { return m_worldName; }
 	UINT				addUnit( Unit* u );
 	UINT				addIncident( Incident* inc );
 
 	UnitSet::iterator	removeUnit( Unit* pUnit );
 	
-	void				detachAllUnits();
-	void				detachAllIncidents();
-
 	void				setCurEnemy( Character* enemy ) { m_curEnemyUnit = enemy; }
 	
 	const D3DXVECTOR3&	getEnemyPos();
@@ -76,6 +74,8 @@ private:
 	void				proceedCurDialog();
 	void				loadWorldModel();
 
+	void				addCollisionMesh( ArnMesh* collisionMesh );
+
 	ArnFileData*					m_modelArnFile;
 	ArnSceneGraph*					m_modelSg;
 	ArnFileData*					m_poolgArnFile;
@@ -105,6 +105,8 @@ private:
 
 	std::string						m_worldName;
 	std::tstring					m_modelFilePath;
+
+	std::list<ArnMesh*>				m_collisionMeshes;
 	
 };
 

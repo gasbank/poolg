@@ -14,7 +14,7 @@ public:
 	virtual ~Trigger(void);
 
 	virtual bool check() = 0;
-
+	virtual void release() {}
 
 	void positionTrigger();
 	void deadTrigger();

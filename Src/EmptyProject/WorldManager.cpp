@@ -1,6 +1,7 @@
 #include "EmptyProjectPCH.h"
 #include "WorldManager.h"
 #include "World.h"
+#include "WorldStateManager.h"
 
 IMPLEMENT_SINGLETON( WorldManager )
 
@@ -31,6 +32,8 @@ void WorldManager::changeToNextWorldIfExist()
 		m_curWorld = m_nextWorld;
 		m_curWorld->init();
 		m_nextWorld = 0;
+
+		GetWorldStateManager().setNextStateForced(GAME_WORLD_STATE_FIELD);
 	}
 }
 

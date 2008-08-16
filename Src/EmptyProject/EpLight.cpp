@@ -12,7 +12,7 @@ EpLight::EpLight(void)
 	m_eLightState = LIGHT_NORMAL;
 	m_fBrightness = 1.0f;
 
-	D3DXVECTOR3 dir( 0.0f, 1.0f, 0.0f );
+	D3DXVECTOR3 dir( 0.0f, 0.0f, 1.0f );
 	D3DXVECTOR3 pos( -38.0f, -10.0f, -40.0f );
 	m_vDir = dir;
 	m_vPos = pos;
@@ -35,7 +35,7 @@ void EpLight::setupLight()
 
 	
 	D3DXVec3Normalize((D3DXVECTOR3*)&m_light.Direction, &m_vDir);
-	D3DXVec3Normalize((D3DXVECTOR3*)&m_light.Position, &m_vPos);
+	m_light.Position = m_vPos;
 
 	m_light.Falloff	= 1.0f; 
 	m_light.Phi = D3DXToRadian(80);
@@ -44,7 +44,7 @@ void EpLight::setupLight()
 	m_light.Type = D3DLIGHT_DIRECTIONAL;
 	m_light.Range = 1000.0f;
 
-	m_light.Attenuation0 = 0.1f;
+	m_light.Attenuation0 = 1.0f;
 	m_light.Attenuation1 = 0.01f;
 	m_light.Attenuation2 = 0.0f;
 
@@ -126,11 +126,11 @@ void EpLight::frameMove( FLOAT fElapsedTime )
 		break;
 	}
 
-	//m_vDir = *GetG().m_camera.GetLookAtPt();
-	//m_vPos = *GetG().m_camera.GetEyePt();
+	m_vDir = *GetG().m_camera.GetLookAtPt() - *GetG().m_camera.GetEyePt();
+	m_vPos = *GetG().m_camera.GetEyePt();
 
-	//D3DXVec3Normalize((D3DXVECTOR3*)&m_light.Direction, &m_vDir);
-	//D3DXVec3Normalize((D3DXVECTOR3*)&m_light.Position, &m_vPos);
+	D3DXVec3Normalize((D3DXVECTOR3*)&m_light.Direction, &m_vDir);
+	m_light.Position = m_vPos;
 
 	m_bLightValueDirty = true;
 

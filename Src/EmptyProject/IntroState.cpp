@@ -287,7 +287,7 @@ void IntroState::setupLight()
 	D3DXVec3Normalize((D3DXVECTOR3*)&light.Direction, &dir);
 	
 	D3DXVECTOR3 pos(-10.0f, 10.0f, -10.0f);
-	D3DXVec3Normalize((D3DXVECTOR3*)&light.Position, &pos);
+	light.Position = pos;
 
 	// What are these?
 	light.Falloff = 0.5f; 

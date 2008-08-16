@@ -540,17 +540,23 @@ bool WorldState::isInFightArea( Character* heroPt, Character* enemyPt )
 		{ 2, 0}
 	};
 
+	int range = static_cast<Enemy*>(enemyPt)->getFightRange();
 
 	// 적의 전투 범위 타일 안에 주인공이 있는지 판단한다.
-	for ( int i = 0; i < 13; i++ )
+	for ( int i = -range; i <= range; i++ )
 	{
-		if ( (enemyPt->getTilePosX() + fightTileArea[i][0]) == heroPt->getTilePosX()
-			&& (enemyPt->getTilePosY() + fightTileArea[i][1]) == heroPt->getTilePosY() )
+		for ( int j = -(range - abs( i )); j <= (range - abs( i )); j++ )
 		{
-			return true;
+			if ( (enemyPt->getTilePosX() + i ) == heroPt->getTilePosX()
+				&& (enemyPt->getTilePosY() + j ) == heroPt->getTilePosY() )
+			{
+				return true;
+			}
 		}
 	}
 	return false;
+
+	
 }
 
 bool WorldState::isCollide( const D3DXVECTOR3* vec0, const D3DXVECTOR3* vec1 )

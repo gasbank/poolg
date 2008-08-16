@@ -34,8 +34,12 @@ namespace eval EpWorldState {
 	proc registerIncident3 {} {
 		variable pHeroUnit
 			
+		set trigger [ EpCreateUnitPositionTrigger $pHeroUnit 30 78 30 78 ]
+		set action		[ EpCreateHealAction $pHeroUnit ]
+		set incident	[ EpCreateIncident $trigger $action ]
 		
-		
+		set incCount	[ EpRegisterIncident $incident ]
+		EpOutputDebugString " - Incident count: $incCount\n"
 	}
 	
 	proc enter {} {

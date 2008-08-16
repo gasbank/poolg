@@ -49,7 +49,7 @@ public:
 	Character* getCurEnemyUnit() { return m_curEnemyUnit; }
 	void setCurEnemy( Character* enemy ) { m_curEnemyUnit = enemy; }
 	UnitSet* getUnitSet() { return &m_unitSet; }
-	void removeUnit( Unit* pUnit );
+	UnitSet::iterator removeUnit( Unit* pUnit );
 	bool isInFightArea( Character* heroPt, Character* enemyPt );
 
 	void startDialog( const char* dialogName );

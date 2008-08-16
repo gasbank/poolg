@@ -231,12 +231,6 @@ HRESULT WorldState::frameMove(double fTime, float fElapsedTime)
 		(*itDialog)->frameMove( fTime, fElapsedTime );
 	}
 	
-	UnitSet::iterator it = m_unitSet.begin();
-	for ( ; it != m_unitSet.end(); ++it )
-	{
-		(*it)->frameMove(fElapsedTime);
-	}
-
 	GetG().m_camera.frameMove( fElapsedTime );
 	
 	m_sampleTeapotMeshRot += fElapsedTime * D3DXToRadian(35); // 35 degrees per second
@@ -278,8 +272,8 @@ HRESULT WorldState::frameMove(double fTime, float fElapsedTime)
 	// Detect battle event.
 	// If current selected unit isn't hero unit, and isn't talkable,
 	// regard as enemy. And if hero is in the fight area of enemy, start battle.
-	it = getUnitSet()->begin();
-	for ( ; it != getUnitSet()->end(); ++it )
+	UnitSet::iterator it = m_unitSet.begin();
+	for ( ; it != m_unitSet.end(); ++it )
 	{
 		if ( (*it) != getHeroUnit() )
 		{
@@ -305,6 +299,19 @@ HRESULT WorldState::frameMove(double fTime, float fElapsedTime)
 	{
 		(*itInc)->update();
 	}
+
+	UnitSet::iterator it2 = m_unitSet.begin();
+	for ( ; it2 != m_unitSet.end(); )
+	{
+		(*it2)->frameMove(fElapsedTime);
+		if ( (*it2)->getRemoveFlag() )
+		{
+			it2 = removeUnit( *it2 );
+		}
+		else
+			++it2;
+	}
+
 
 	return S_OK;
 }
@@ -587,7 +594,7 @@ void WorldState::handleCollision( Unit* heroUnit, Unit* opponentUnit )
 }
 
 // 유닛의 포인터를 받아서, UnitSet에서 해당 유닛을 찾아 지운다.
-void WorldState::removeUnit( Unit* pUnit )
+UnitSet::iterator WorldState::removeUnit( Unit* pUnit )
 {
 	UnitSet::iterator it = m_unitSet.begin();
 	for ( ; it != m_unitSet.end(); it++ )
@@ -595,10 +602,10 @@ void WorldState::removeUnit( Unit* pUnit )
 		if ( *it == pUnit )
 		{
 			EP_SAFE_RELEASE( pUnit );
-			m_unitSet.erase( it );
-			break;
+			return m_unitSet.erase( it );
 		}
 	}
+	return m_unitSet.end();
 }
 
 /*void WorldState::detectBattleEvent()

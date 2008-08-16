@@ -321,7 +321,7 @@ HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 				TopStateManager& tsm = TopStateManager::getSingleton();
 				WorldState* ws = static_cast<WorldState*>( tsm.getCurState() );
 				GetWorldStateManager().setNextState(GAME_WORLD_STATE_FIELD);
-				ws->removeUnit( getEnemy() );
+				getEnemy()->setRemoveFlag( true ); // Should be deleted before next frame update
 				return S_OK;
 			}
 			return S_OK;

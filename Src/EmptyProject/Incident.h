@@ -3,6 +3,9 @@
 class Trigger;
 class Action;
 
+typedef std::list<Trigger*> TriggerList;
+typedef std::list<Action*> ActionList;
+
 class Incident
 {
 public:
@@ -11,11 +14,13 @@ public:
 
 	void release();
 	bool update();
+	void addTrigger( Trigger* trigger );
+	void addAction( Action* action );
 	
 private:
 	bool m_bActivated;
-	Trigger* m_trigger;
-	Action* m_action;
+	TriggerList m_trigger;
+	ActionList m_action;
 
 };
 

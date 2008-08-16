@@ -78,6 +78,9 @@ public:
 	const Point2Uint& getTileBufferPos() const { return m_tileBufferPos; }
 	
 	UnitType getType() const { return m_type; }
+	void setRemoveFlag( bool flag ) { m_removeFlag = flag; }
+	bool getRemoveFlag() { return m_removeFlag; }
+
 protected:
 	WorldState* getWorldState() const;
 
@@ -109,6 +112,7 @@ protected:
 	D3DXVECTOR3				m_vKeyboardDirection;
 	D3DXVECTOR3				m_vVelocity;
 	bool					m_bControllable;
+	bool					m_removeFlag;
 	
 	
 private:

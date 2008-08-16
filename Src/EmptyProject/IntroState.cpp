@@ -147,7 +147,7 @@ HRESULT IntroState::frameMove( double fTime, float fElapsedTime )
 	}
 	else if (46.0f < fStateTime)
 	{
-		TopStateManager::getSingleton().setNextState(GAME_TOP_STATE_WORLD);
+		TopStateManager::getSingleton().setNextState( GAME_TOP_STATE_PLAY );
 	}
 
 	return S_OK;
@@ -251,7 +251,7 @@ HRESULT IntroState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 	{
 		if (wParam == VK_F4)
 		{
-			TopStateManager::getSingleton().setNextState(GAME_TOP_STATE_WORLD);
+			TopStateManager::getSingleton().setNextState( GAME_TOP_STATE_PLAY );
 		}
 	}
 

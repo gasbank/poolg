@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="Windows-1252"?>
+<?xml version="1.0" encoding="ks_c_5601-1987"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
@@ -589,11 +589,19 @@
 				>
 			</File>
 			<File
-				RelativePath=".\WorldState.cpp"
+				RelativePath=".\PlayState.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\WorldState.h"
+				RelativePath=".\PlayState.h"
+				>
+			</File>
+			<File
+				RelativePath=".\World.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\World.h"
 				>
 			</File>
 		</Filter>
@@ -963,6 +971,14 @@
 		</File>
 		<File
 			RelativePath=".\Utility.h"
+			>
+		</File>
+		<File
+			RelativePath=".\WorldManager.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\WorldManager.h"
 			>
 		</File>
 	</Files>

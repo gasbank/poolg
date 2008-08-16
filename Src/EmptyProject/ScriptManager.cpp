@@ -5,7 +5,7 @@
 #include "Character.h"
 #include "Hero.h"
 #include "Enemy.h"
-#include "WorldState.h"
+#include "World.h"
 #include "Incident.h"
 #include "Trigger.h"
 #include "Action.h"
@@ -95,6 +95,12 @@ Tcl_Obj* ScriptManager::getObject( const char* variableName )
 	return Tcl_GetVar2Ex( m_interp, variableName, 0, 0 );
 }
 
+const char* ScriptManager::readString( const char* variableName )
+{
+	Tcl_Obj* obj = Tcl_GetVar2Ex( m_interp, variableName, 0, 0 );
+	int stringLen;
+	return Tcl_GetStringFromObj( obj, &stringLen );
+}
 int ScriptManager::readInt( const char* variableName )
 {
 	Tcl_Obj* obj = Tcl_GetVar2Ex( m_interp, variableName, 0, 0 );
@@ -103,7 +109,7 @@ int ScriptManager::readInt( const char* variableName )
 	return ret;
 }
 
-bool ScriptManager::readCharPtrList( const char* variableName, std::list<const char*>& strList )
+bool ScriptManager::readCharPtrList( const char* variableName, ConstCharList& strList )
 {
 	Tcl_Obj* retObj;
 	Tcl_Obj* aObj;	
@@ -125,22 +131,23 @@ bool ScriptManager::readCharPtrList( const char* variableName, std::list<const c
 
 void ScriptManager::initBoundings()
 {
+	_script_factory_World::init();
 	_script_factory_Unit::init();
 	_script_factory_Character::init();
 	_script_factory_Hero::init();
 	_script_factory_Enemy::init();
 	_script_factory_TopStateManager::init();
-	_script_factory_WorldState::init();
 	_script_factory_Incident::init();
 	_script_factory_Action::init();
 	_script_factory_Trigger::init();
 
 }
+
 //////////////////////////////////////////////////////////////////////////
 
 int EpSetNextState(int stateID)
 {
-	TopStateManager::getSingleton().setNextState((GameState)stateID);
+	GetTopStateManager().setNextState( (GameState)stateID );
 	return 0;
 
 } SCRIPT_CALLABLE_I_I( EpSetNextState )

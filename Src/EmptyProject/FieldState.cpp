@@ -2,7 +2,7 @@
 #include "FieldState.h"
 #include "WorldStateManager.h"
 #include "TopStateManager.h"
-#include "WorldState.h"
+#include "World.h"
 
 FieldState::FieldState(void)
 {
@@ -66,9 +66,7 @@ void FieldState::setupCamera()
 	EpCamera& camera = G::getSingleton().m_camera;
 
 	// Get hero position
-	TopStateManager& tsm = TopStateManager::getSingleton();
-	WorldState* ws = static_cast<WorldState*>( tsm.getCurState() );
-	const D3DXVECTOR3& vHeroPos = ws->getHeroPos();
+	const D3DXVECTOR3& vHeroPos = getCurWorld()->getHeroPos();
 
 	camera.setAttachPos( &vHeroPos );
 	camera.setSmoothCameraDuration( 3.0f );

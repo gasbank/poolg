@@ -6,8 +6,7 @@ class WorldStateManager : public StateManager, public Singleton<WorldStateManage
 public:
 	WorldStateManager(void);
 	~WorldStateManager(void);
-
-private:
 	virtual void init();
+	
 };
 inline WorldStateManager& GetWorldStateManager() { return WorldStateManager::getSingleton(); }

@@ -1,17 +1,18 @@
 #include "EmptyProjectPCH.h"
 #include "Action.h"
 #include "TopStateManager.h"
-#include "WorldState.h"
+#include "World.h"
 #include "WorldStateManager.h"
 #include "Enemy.h"
 #include "Unit.h"
 #include "ScriptManager.h"
+#include "Sound.h"
 
 
 Action::Action(void)
 {
 	TopStateManager& m_tsm = TopStateManager::getSingleton();
-	m_ws = reinterpret_cast<WorldState*>( m_tsm.getCurState() );
+	m_ws = reinterpret_cast<World*>( m_tsm.getCurState() );
 }
 
 Action::~Action(void)

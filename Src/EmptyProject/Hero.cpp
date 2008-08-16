@@ -2,7 +2,7 @@
 #include "Hero.h"
 #include "ScriptManager.h"
 #include "TileManager.h"
-#include "WorldState.h"
+#include "World.h"
 
 Hero::Hero(void)
 : Character( UT_CHARACTER )

@@ -1,5 +1,5 @@
 #pragma once
-
+#include "WorldManager.h"
 #include "TileManager.h"
 
 class Trigger;
@@ -21,7 +21,7 @@ static const POINT g_moveAmount[4] = {
 	{  1,  0 }
 };
 
-class WorldState;
+class World;
 
 enum UnitType { UT_UNIT, UT_CHARACTER, UT_HERO, UT_ENEMY, UT_ATTACKOBJECT, UT_INNERFIRE };
 
@@ -81,8 +81,10 @@ public:
 	void setRemoveFlag( bool flag ) { m_removeFlag = flag; }
 	bool getRemoveFlag() { return m_removeFlag; }
 
+	World* getCurWorld() { return GetWorldManager().getCurWorld(); }
+
 protected:
-	WorldState* getWorldState() const;
+	World* getWorldState() const;
 
 	virtual UnitInput mapKey( UINT nKey );
 

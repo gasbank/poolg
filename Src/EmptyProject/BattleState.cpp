@@ -2,17 +2,16 @@
 #include "BattleState.h"
 #include "WorldStateManager.h"
 #include "TopStateManager.h"
-#include "WorldState.h"
+#include "World.h"
 #include "Utility.h"
 #include "Action.h"
 #include "Skill.h"
+#include "Sound.h"
 
 BattleState::BattleState()
 {
 	m_pDev = GetG().m_dev;
 	assert( m_pDev );
-	m_ws = 0;
-	
 
 	/*UI 초기화 부분입니다.*/
 	float statusBoxWidth = 163;
@@ -143,8 +142,6 @@ BattleState::~BattleState()
 /* 전투 시작 시 다음 함수가 호출됨*/
 HRESULT BattleState::enter()
 {
-	m_ws = dynamic_cast<WorldState*>( GetTopStateManager().getCurState() );
-	assert( m_ws );
 	getHero()->clearKey();
 
 	GetAudioState().enterBattle();
@@ -318,8 +315,6 @@ HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 		{
 			if (wParam == VK_RETURN)
 			{
-				TopStateManager& tsm = TopStateManager::getSingleton();
-				WorldState* ws = static_cast<WorldState*>( tsm.getCurState() );
 				GetWorldStateManager().setNextState(GAME_WORLD_STATE_FIELD);
 				getEnemy()->setRemoveFlag( true ); // Should be deleted before next frame update
 				return S_OK;
@@ -630,12 +625,12 @@ void BattleState::doComputerAction()
 
 Character* BattleState::getHero()
 {
-	return static_cast<Character*>( m_ws->getHero() );
+	return getCurWorld()->getHeroUnit();
 }
 
 Character* BattleState::getEnemy()
 {
-	return static_cast<Character*>( m_ws->getCurEnemy() );
+	return getCurWorld()->getCurEnemyUnit();
 }
 
 void BattleState::setupCamera()
@@ -645,8 +640,8 @@ void BattleState::setupCamera()
 
 	// WorldState에 접근하기 위한 코드.
 	TopStateManager& tsm = TopStateManager::getSingleton();
-	WorldState* ws = static_cast<WorldState*>( tsm.getCurState() );
-	const D3DXVECTOR3& vEnemyPos = ws->getEnemyPos();
+	World* ws = GetWorldManager().getCurWorld();
+	const D3DXVECTOR3& vEnemyPos = GetWorldManager().getCurWorld()->getEnemyPos();
 	const D3DXVECTOR3& vHeroPos = ws->getHeroPos();
 
 	GetG().m_camera.beginShoulderLookCamera( &vHeroPos, &vEnemyPos );

@@ -8,9 +8,6 @@ IMPLEMENT_SINGLETON(WorldStateManager);
 
 WorldStateManager::WorldStateManager(void)
 {
-	/*m_states = new State*[TOTAL_STATE_COUNT];
-	ZeroMemory( m_states, sizeof(State*) * TOTAL_STATE_COUNT );*/
-	init();
 }
 
 WorldStateManager::~WorldStateManager(void)

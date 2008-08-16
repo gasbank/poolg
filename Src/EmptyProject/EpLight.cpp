@@ -1,7 +1,7 @@
 #include "EmptyProjectPCH.h"
 #include "EpLight.h"
 #include "TopStateManager.h"
-#include "WorldState.h"
+#include "World.h"
 
 EpLight::EpLight(void)
 {

@@ -1,7 +1,7 @@
 #include "EmptyProjectPCH.h"
 #include "Trigger.h"
 #include "TopStateManager.h"
-#include "WorldState.h"
+#include "World.h"
 #include "Enemy.h"
 #include "WorldStateManager.h"
 #include "TileManager.h"
@@ -12,7 +12,7 @@
 Trigger::Trigger(void)
 {
 	TopStateManager& tsm = TopStateManager::getSingleton();
-	m_ws = reinterpret_cast<WorldState*>( tsm.getCurState() );
+	m_ws = reinterpret_cast<World*>( tsm.getCurState() );
 }
 
 Trigger::~Trigger(void)
@@ -124,7 +124,7 @@ bool CharHpTrigger::check()
 
 //////////////////////////////////////////////////////////////////////////
 
-TotalAnnihilationTrigger::TotalAnnihilationTrigger( WorldState* pWs )
+TotalAnnihilationTrigger::TotalAnnihilationTrigger( World* pWs )
 {
 	m_pUs = pWs->getUnitSet();
 }
@@ -150,12 +150,12 @@ bool TotalAnnihilationTrigger::check()
 
 Trigger* EpCreateTotalAnnihilationTrigger( void* pWorld )
 {
-	return new TotalAnnihilationTrigger( reinterpret_cast<WorldState*>(pWorld) );
+	return new TotalAnnihilationTrigger( reinterpret_cast<World*>(pWorld) );
 } SCRIPT_CALLABLE_PV_PV( EpCreateTotalAnnihilationTrigger )
 
 //////////////////////////////////////////////////////////////////////////
 
-UnTotalAnnihilationTrigger::UnTotalAnnihilationTrigger( WorldState* pWs )
+UnTotalAnnihilationTrigger::UnTotalAnnihilationTrigger( World* pWs )
 {
 	m_pUs = pWs->getUnitSet();
 }
@@ -181,7 +181,7 @@ bool UnTotalAnnihilationTrigger::check()
 
 Trigger* EpCreateUnTotalAnnihilationTrigger( void* pWorld )
 {
-	return new UnTotalAnnihilationTrigger( reinterpret_cast<WorldState*>(pWorld) );
+	return new UnTotalAnnihilationTrigger( reinterpret_cast<World*>( pWorld ) );
 } SCRIPT_CALLABLE_PV_PV( EpCreateUnTotalAnnihilationTrigger )
 
 //////////////////////////////////////////////////////////////////////////

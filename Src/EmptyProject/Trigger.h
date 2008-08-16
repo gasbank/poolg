@@ -2,7 +2,7 @@
 #include "Character.h"
 #include "Action.h"
 
-class WorldState;
+class World;
 class Unit;
 
 typedef std::set<Unit*> UnitSet;
@@ -26,7 +26,7 @@ public:
 	void detectHealAction();
 
 private:
-	WorldState* m_ws;
+	World* m_ws;
 };
 SCRIPT_FACTORY( Trigger )
 
@@ -67,7 +67,7 @@ private:
 class TotalAnnihilationTrigger : public Trigger
 {
 public:
-	TotalAnnihilationTrigger( WorldState* );
+	TotalAnnihilationTrigger( World* );
 	virtual ~TotalAnnihilationTrigger();
 	virtual bool check();
 
@@ -80,7 +80,7 @@ private:
 class UnTotalAnnihilationTrigger : public Trigger
 {
 public:
-	UnTotalAnnihilationTrigger( WorldState* );
+	UnTotalAnnihilationTrigger( World* );
 	virtual ~UnTotalAnnihilationTrigger();
 	virtual bool check();
 

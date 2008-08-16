@@ -37,3 +37,5 @@
 #define KEY_IS_DOWN_MASK  0x01
 
 #define SCRIPT_FACTORY(className) class _script_factory_##className { public: static void init(); };
+
+typedef std::list<const char*> ConstCharList;

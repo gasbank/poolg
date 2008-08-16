@@ -1,7 +1,7 @@
 #include "EmptyProjectPCH.h"
 #include "Unit.h"
 #include "ScriptManager.h"
-#include "WorldState.h"
+#include "World.h"
 #include "TopStateManager.h"
 #include "TileManager.h"
 #include "Trigger.h"
@@ -158,12 +158,6 @@ void Unit::setHeadDir( UnitInput unitInput )
 	}
 }
 
-WorldState* Unit::getWorldState() const
-{
-	return static_cast<WorldState*>( TopStateManager::getSingleton().getCurState() );
-}
-
-
 //////////////////////////////////////////////////////////////////////////
 
 Unit* EpCreateUnit( int tileX, int tileY, int controllable )
@@ -185,7 +179,7 @@ int EpReleaseUnit( void* pv )
 
 int EpRegisterToWorld( void* pv1, void* pv2 )
 {
-	WorldState* w = reinterpret_cast<WorldState*>(pv1);
+	World* w = reinterpret_cast<World*>(pv1);
 	Unit* u = reinterpret_cast<Unit*>(pv2);
 	return w->addUnit(u);
 } SCRIPT_CALLABLE_I_PV_PV( EpRegisterToWorld )

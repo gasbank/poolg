@@ -1,4 +1,5 @@
 #pragma once
+#include "WorldManager.h"
 
 class State
 {
@@ -17,6 +18,7 @@ public:
 	virtual HRESULT release() = 0;
 
 	double getStateTime(double fTime);
+	World* getCurWorld() { return GetWorldManager().getCurWorld(); }
 
 protected:
 	double m_startTime;

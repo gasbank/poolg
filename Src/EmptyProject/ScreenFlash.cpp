@@ -4,6 +4,8 @@
 ScreenFlash::ScreenFlash(void)
 {
 	m_alphaShader			= 0;
+	m_testPolygon			= 0;
+	m_testPolygonCloned		= 0;
 	m_screenFlashAlphaAngle	= 180.0f;
 }
 

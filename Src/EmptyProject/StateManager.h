@@ -5,10 +5,10 @@ enum GameState
 	NULL_STATE = 0,
 
 	GAME_TOP_STATE_INTRO = 1000,
-	GAME_TOP_STATE_WORLD,
+	GAME_TOP_STATE_PLAY,
 	GAME_TOP_STATE_CREDIT,
 	
-	GAME_WORLD_STATE_FIELD = 2000,
+	GAME_WORLD_STATE_FIELD = 3000,
 	GAME_WORLD_STATE_BATTLE,
 	GAME_WORLD_STATE_SCORE,
 	GAME_WORLD_STATE_MENU,
@@ -33,13 +33,12 @@ public:
 	State* getState( GameState gs );
 	void transit();
 
+	virtual void init() = 0;
+	virtual void release();
+
 protected:
 	StateMap m_states;
 	State* m_prevStates;
 	State* m_curStates;
 	State* m_nextState;
-
-private:
-	virtual void init() = 0;
-	virtual void release();
 };

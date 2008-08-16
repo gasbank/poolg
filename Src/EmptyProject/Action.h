@@ -1,6 +1,6 @@
 #pragma once
 #include "TileManager.h"
-class WorldState;
+class World;
 class Enemy;
 class Unit;
 
@@ -19,12 +19,12 @@ public:
 	void soundAction( std::string sz );
 	void createUnitAction( int x, int y, bool random );
 
-	WorldState* getWs() { return m_ws; }
+	World* getWs() { return m_ws; }
 protected:
 	Action(void);
 private:
 	
-	WorldState* m_ws;
+	World* m_ws;
 };
 
 SCRIPT_FACTORY( Action )

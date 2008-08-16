@@ -2,7 +2,7 @@
 #include "MenuState.h"
 #include "WorldStateManager.h"
 #include "Character.h"
-#include "WorldState.h"
+#include "World.h"
 #include "TopStateManager.h"
 #include "WorldStateManager.h"
 
@@ -267,7 +267,7 @@ HRESULT MenuState::frameRender(IDirect3DDevice9* pd3dDevice,  double fTime, floa
 		DWORD dtProp = DT_NOCLIP | DT_CENTER;
 		D3DXCOLOR textColor = D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f );
 
-		WorldState* ws = reinterpret_cast<WorldState*>( GetTopStateManager().getState( GAME_TOP_STATE_WORLD ) );
+		World* ws = getCurWorld();
 
 		WCHAR textBuffer[512];
 		rc.top = (LONG)600-364;
@@ -573,7 +573,7 @@ MenuState::~MenuState()
 HRESULT MenuState::enter()
 {
 	TopStateManager& ts = GetTopStateManager();
-	WorldState* ws = static_cast<WorldState*>( ts.getCurState() );
+	World* ws = getCurWorld();
 	ws->getHero()->clearKey();
 
 	if ( ws->getHero() != 0 )

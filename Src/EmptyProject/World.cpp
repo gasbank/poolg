@@ -1,5 +1,5 @@
 #include "EmptyProjectPCH.h"
-#include "WorldState.h"
+#include "World.h"
 #include "WorldStateManager.h"
 #include "TopStateManager.h"
 #include "BattleState.h"
@@ -9,6 +9,7 @@
 #include "Enemy.h"
 #include "Dialog.h"
 #include "Incident.h"
+#include "Sound.h"
 // Aran Includes
 #include "ArnMesh.h"
 #include "ArnCamera.h"
@@ -19,21 +20,28 @@ TileManager	tileManager;
 
 extern std::wstring g_debugBuffer;
 
-WorldState::WorldState(void)
+World::World( const char* worldName, const TCHAR* modelFilePath )
 {
+	m_worldName				= worldName;
+	m_modelFilePath			= modelFilePath;
+	m_modelArnFile			= 0;
+	m_modelSg				= 0;
+	m_poolgArnFile			= 0;
+	m_poolgSg				= 0;
 	m_sampleTeapotMeshRot	= 0;
 	m_aTile					= 0;
-	m_afd					= 0;
-	m_sg					= 0;
 	m_heroUnit				= 0;
 	m_curEnemyUnit			= 0;
+	m_curDialog				= 0;
+	m_sound					= 0;
+
 
 	char command[128];
-	StringCchPrintfA(command, 128, "EpWorldState::init 0x%p", this);
-	GetScriptManager().execute(command);
+	StringCchPrintfA(command, 128, "%s::init 0x%p", worldName, this);
+	GetScriptManager().execute(command);	
 }
 
-WorldState::~WorldState(void)
+World::~World(void)
 {
 	detachAllUnits();
 	DialogList::iterator it = m_scriptedDialog.begin();
@@ -43,22 +51,19 @@ WorldState::~WorldState(void)
 	}
 }
 
-HRESULT WorldState::enter()
+HRESULT World::init()
 {
 	HRESULT hr = S_OK;
 
 	LPDIRECT3DDEVICE9& pd3dDevice =  GetG().m_dev;
 
-	// Aran file init
-	// Room model
-	m_afd = new ArnFileData;
-	load_arnfile(_T("gus2.arn"), *m_afd);
-	m_sg = new ArnSceneGraph(*m_afd);
+	loadWorldModel();
+
 	// Rat model
-	m_afdRat = new ArnFileData;
-	load_arnfile(_T("rat.arn"), *m_afdRat);
-	m_sgRat = new ArnSceneGraph(*m_afdRat);
-	ArnMesh* mainWallMesh = dynamic_cast<ArnMesh*>( m_sg->getSceneRoot()->getNodeByName("MainWall") );
+	m_poolgArnFile = new ArnFileData;
+	load_arnfile(_T("rat.arn"), *m_poolgArnFile);
+	m_poolgSg = new ArnSceneGraph(*m_poolgArnFile);
+	ArnMesh* mainWallMesh = dynamic_cast<ArnMesh*>( m_modelSg->getSceneRoot()->getNodeByName("MainWall") );
 	
 
 	//////////////////////////////////////////////////////////////////////////
@@ -95,7 +100,13 @@ HRESULT WorldState::enter()
 	m_avatar.init(L"Images/smiley.png", pd3dDevice);
 	m_avatar.setSize(1, 1);
 
-	m_sound.init();
+	if ( !m_sound )
+	{
+		m_sound = new Sound;
+		m_sound->init();
+	}
+	else
+		throw std::runtime_error( "Sound should not be init twice or more" );
 
 
 	tileManager.getTile( 14, 14 )->b_movable = false;
@@ -111,14 +122,14 @@ HRESULT WorldState::enter()
 
 
 	// 'enter' function implemented in the script file defines which characters are exist in this world
-	GetScriptManager().execute("EpWorldState::enter");
+	GetScriptManager().execute("EpRoomWorld::enter");
 	
 	// Hero and enemies are defined afterwards
 	
 	// Load dialogs from script
-	std::list<const char*> dialogList;
+	ConstCharList dialogList;
 	GetScriptManager().readCharPtrList( "EpDialogList", dialogList );
-	std::list<const char*>::iterator itDialogList = dialogList.begin();
+	ConstCharList::iterator itDialogList = dialogList.begin();
 	for ( ; itDialogList != dialogList.end(); ++itDialogList )
 	{
 		m_scriptedDialog.push_back( Dialog::createDialogByScript( *itDialogList ) );
@@ -147,20 +158,10 @@ HRESULT WorldState::enter()
 	return hr;
 }
 
-HRESULT WorldState::leave()
-{
-	// 여긴 적절한 장소는 아닌 것 같지만..
-	m_screenFlash.reset();
 
-	GetScriptManager().execute("EpWorldState::leave");
-
-	return S_OK;
-}
-
-HRESULT WorldState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, float fElapsedTime)
+HRESULT World::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, float fElapsedTime)
 {		
 	EpCamera& camera = GetG().m_camera;
-	D3DLIGHT9& light = GetG().m_light;
 	
 	HRESULT hr;
 
@@ -181,8 +182,8 @@ HRESULT WorldState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, floa
 	pd3dDevice->SetFVF(ArnVertex::FVF);
 	D3DXMATRIX transform;
 	D3DXMatrixTranslation( &transform, m_heroUnit->getPos().x, m_heroUnit->getPos().y, m_heroUnit->getPos().z );
-	GetG().m_videoMan.renderMeshesOnly(m_sgRat->getSceneRoot(), transform);
-	GetG().m_videoMan.renderMeshesOnly(m_sg->getSceneRoot());
+	GetG().m_videoMan.renderMeshesOnly(m_poolgSg->getSceneRoot(), transform);
+	GetG().m_videoMan.renderMeshesOnly(m_modelSg->getSceneRoot());
 	
 	//////////////////////////////////////////////////////////////////////////
 	// EP rendering routine (CCW)
@@ -213,7 +214,7 @@ HRESULT WorldState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, floa
 
 }
 
-HRESULT WorldState::frameMove(double fTime, float fElapsedTime)
+HRESULT World::frameMove(double fTime, float fElapsedTime)
 {
 	EpCamera& camera = GetG().m_camera;
 
@@ -224,7 +225,9 @@ HRESULT WorldState::frameMove(double fTime, float fElapsedTime)
 	m_pic.frameMove(fElapsedTime);
 	m_avatar.frameMove(fElapsedTime);
 	camera.frameMove(fElapsedTime);
-	m_sound.UpdateAudio();
+
+	if ( m_sound )
+		m_sound->UpdateAudio();
 	
 	DialogList::iterator itDialog = m_scriptedDialog.begin();
 	for ( ; itDialog != m_scriptedDialog.end(); ++itDialog )
@@ -239,8 +242,8 @@ HRESULT WorldState::frameMove(double fTime, float fElapsedTime)
 	GetWorldStateManager().transit();
 	GetWorldStateManager().getCurState()->frameMove(fTime, fElapsedTime);
 
-	m_sg->getSceneRoot()->update(fTime, fElapsedTime);
-	m_sgRat->getSceneRoot()->update(fTime, fElapsedTime);
+	m_modelSg->getSceneRoot()->update(fTime, fElapsedTime);
+	m_poolgSg->getSceneRoot()->update(fTime, fElapsedTime);
 
 	m_screenFlash.frameMove( fTime, fElapsedTime );
 	
@@ -317,15 +320,16 @@ HRESULT WorldState::frameMove(double fTime, float fElapsedTime)
 	return S_OK;
 }
 
-HRESULT WorldState::release()
+HRESULT World::release()
 {
 	// DO NOT RELEASE THIS POINTER: m_heroUnit
+
+	EP_SAFE_RELEASE( m_sound );
 
 	m_pic.release();
 	m_picRhw.release();
 	m_picSmiley.release();
 	m_avatar.release();
-	m_sound.release();
 	m_screenFlash.release();
 	
 	{
@@ -343,15 +347,15 @@ HRESULT WorldState::release()
 		}
 	}
 
-	if (m_afd)
-		release_arnfile(*m_afd);
-	SAFE_DELETE(m_afd);
-	SAFE_DELETE(m_sg);
+	if (m_modelArnFile)
+		release_arnfile(*m_modelArnFile);
+	SAFE_DELETE(m_modelArnFile);
+	SAFE_DELETE(m_modelSg);
 
-	if (m_afdRat)
-		release_arnfile(*m_afdRat);
-	SAFE_DELETE(m_afdRat);
-	SAFE_DELETE(m_sgRat);
+	if (m_poolgArnFile)
+		release_arnfile(*m_poolgArnFile);
+	SAFE_DELETE(m_poolgArnFile);
+	SAFE_DELETE(m_poolgSg);
 
 
 	SAFE_RELEASE(m_aTile);
@@ -359,11 +363,13 @@ HRESULT WorldState::release()
 	return S_OK;
 }
 
-HRESULT WorldState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+HRESULT World::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	m_pic.handleMessages(hWnd, uMsg, wParam, lParam);
-	m_sound.handleMessages(hWnd, uMsg, wParam, lParam);
 	m_screenFlash.handleMessage( hWnd, uMsg, wParam, lParam );
+
+	if ( m_sound )
+		m_sound->handleMessages(hWnd, uMsg, wParam, lParam);
 
 	bool bTalking = false;
 	
@@ -427,14 +433,12 @@ HRESULT WorldState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 			//////////////////////////////////////////////////////////////////////////
 			// External camera test
 			EpCamera& rCamera = GetG().m_camera;
-			TopStateManager& tsm = TopStateManager::getSingleton();
-			WorldState* ws = static_cast<WorldState*>( tsm.getCurState() );
-			const D3DXVECTOR3& vHeroPos = ws->getHeroPos();
+			const D3DXVECTOR3& vHeroPos = getHeroPos();
 			static bool bExtCam = true;
 			if ( bExtCam )
 			{
 				rCamera.setExternalCamera( 
-					static_cast<ArnCamera*>(m_sg->getSceneRoot()->getNodeByName( "Camera" )) );
+					static_cast<ArnCamera*>(m_modelSg->getSceneRoot()->getNodeByName( "Camera" )) );
 				rCamera.begin( CAMERA_EXTERNAL );
 			}
 			else
@@ -459,7 +463,7 @@ HRESULT WorldState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 	return S_OK;
 }
 
-void WorldState::setupLight() 
+void World::setupLight() 
 {
 	D3DLIGHT9& light = GetG().m_light;
 	LPDIRECT3DDEVICE9& pd3dDevice = GetG().m_dev;
@@ -486,7 +490,7 @@ void WorldState::setupLight()
 	pd3dDevice->SetRenderState( D3DRS_LIGHTING, TRUE );
 }
 
-UINT WorldState::addUnit( Unit* u )
+UINT World::addUnit( Unit* u )
 {
 	m_unitSet.insert(u);
 	// TODO controllable means it is hero?
@@ -502,7 +506,7 @@ UINT WorldState::addUnit( Unit* u )
 	return m_unitSet.size();
 }
 
-void WorldState::detachAllUnits()
+void World::detachAllUnits()
 {
 	UnitSet::iterator it = m_unitSet.begin();
 	for ( ; it != m_unitSet.end(); ++it )
@@ -511,7 +515,7 @@ void WorldState::detachAllUnits()
 	}
 	m_unitSet.clear();
 }
-const D3DXVECTOR3& WorldState::getEnemyPos()
+const D3DXVECTOR3& World::getEnemyPos()
 {
 	if ( m_curEnemyUnit != NULL )
 	{
@@ -523,26 +527,31 @@ const D3DXVECTOR3& WorldState::getEnemyPos()
 	}
 }
 
-const D3DXVECTOR3& WorldState::getHeroPos()
+const D3DXVECTOR3& World::getHeroPos()
 {
 	assert( m_heroUnit );
 	return m_heroUnit->getPos();
 }
 
-bool WorldState::isInFightArea( Character* heroPt, Character* enemyPt )
+bool World::isInFightArea( Character* heroPt, Character* enemyPt )
 {
-	int range = static_cast<Enemy*>(enemyPt)->getFightRange();
+	// 적의 타일 좌표가 0, 0일 때 플레이어가 들어오면 전투가 시작되는 타일 좌표 범위.
+	
+	int fightTileArea[13][2] = { 
+		{-2, 0}, 
+		{-1, 1}, {-1, 0}, {-1, -1}, 
+		{ 0, 2}, { 0, 1}, { 0,  0}, {0, -1}, {0, -2},
+		{ 1, 1}, { 1, 0}, { 1, -1},
+		{ 2, 0}
+	};
 
-	range++;
+	int range = static_cast<Enemy*>(enemyPt)->getFightRange();
 
 	// 적의 전투 범위 타일 안에 주인공이 있는지 판단한다.
 	for ( int i = -range; i <= range; i++ )
 	{
 		for ( int j = -(range - abs( i )); j <= (range - abs( i )); j++ )
 		{
-			if ( range == abs( i ) || range == abs( j ) )
-				continue;
-
 			if ( (enemyPt->getTilePosX() + i ) == heroPt->getTilePosX()
 				&& (enemyPt->getTilePosY() + j ) == heroPt->getTilePosY() )
 			{
@@ -555,7 +564,7 @@ bool WorldState::isInFightArea( Character* heroPt, Character* enemyPt )
 	
 }
 
-bool WorldState::isCollide( const D3DXVECTOR3* vec0, const D3DXVECTOR3* vec1 )
+bool World::isCollide( const D3DXVECTOR3* vec0, const D3DXVECTOR3* vec1 )
 {
 	const float collideRange = 10.0f;
 	float range = sqrt( (vec0->x - vec1->x) * (vec0->x - vec1->x) + (vec0->y - vec1->y) * (vec0->y - vec1->y) );
@@ -565,7 +574,7 @@ bool WorldState::isCollide( const D3DXVECTOR3* vec0, const D3DXVECTOR3* vec1 )
 	return false;
 }
 
-void WorldState::startDialog( const char* dialogName )
+void World::startDialog( const char* dialogName )
 {
 	if ( !m_curDialog )
 	{
@@ -574,7 +583,7 @@ void WorldState::startDialog( const char* dialogName )
 	}
 }
 
-void WorldState::handleCollision( Unit* heroUnit, Unit* opponentUnit )
+void World::handleCollision( Unit* heroUnit, Unit* opponentUnit )
 {
 	// 상대방이 대화 불가능하면 적으로 간주한다.
 	if ( !dynamic_cast<Enemy*>(opponentUnit)->isTalkable() )
@@ -596,7 +605,7 @@ void WorldState::handleCollision( Unit* heroUnit, Unit* opponentUnit )
 }
 
 // 유닛의 포인터를 받아서, UnitSet에서 해당 유닛을 찾아 지운다.
-UnitSet::iterator WorldState::removeUnit( Unit* pUnit )
+UnitSet::iterator World::removeUnit( Unit* pUnit )
 {
 	UnitSet::iterator it = m_unitSet.begin();
 	for ( ; it != m_unitSet.end(); it++ )
@@ -638,7 +647,7 @@ UnitSet::iterator WorldState::removeUnit( Unit* pUnit )
 	}
 } */
 
-Unit* WorldState::findUnitAtTile( UINT x, UINT y )
+Unit* World::findUnitAtTile( UINT x, UINT y )
 {
 	Unit* ret = 0;
 	UnitSet::iterator it = m_unitSet.begin();
@@ -653,7 +662,7 @@ Unit* WorldState::findUnitAtTile( UINT x, UINT y )
 	return ret;
 }
 
-void WorldState::startTileDefinedDialogIfExist()
+void World::startTileDefinedDialogIfExist()
 {
 	if( !getHeroUnit()->getMoving() && m_curDialog == 0 )
 	{
@@ -672,7 +681,7 @@ void WorldState::startTileDefinedDialogIfExist()
 	}
 }
 
-void WorldState::proceedCurDialog()
+void World::proceedCurDialog()
 {
 	if ( m_curDialog )
 	{
@@ -686,7 +695,7 @@ void WorldState::proceedCurDialog()
 	}
 }
 
-Dialog* WorldState::getDialogByName( const char* dialogName )
+Dialog* World::getDialogByName( const char* dialogName )
 {
 	DialogList::iterator it = m_scriptedDialog.begin();
 	for ( ; it != m_scriptedDialog.end(); ++it )
@@ -697,29 +706,47 @@ Dialog* WorldState::getDialogByName( const char* dialogName )
 	return 0;
 }
 
-UINT WorldState::addIncident( Incident* inc )
+UINT World::addIncident( Incident* inc )
 {
 	m_incidents.push_back( inc );
 	return m_incidents.size();
+}
+
+void World::loadWorldModel()
+{
+	// World model init and loading
+	m_modelArnFile = new ArnFileData;
+	load_arnfile( m_modelFilePath.c_str(), *m_modelArnFile );
+	m_modelSg = new ArnSceneGraph( *m_modelArnFile );
+}
+
+World* World::createWorld( const char* worldName, TCHAR* modelFilePath )
+{
+	World* ret = new World( worldName, modelFilePath );
+
+	return ret;
+}
+
+void World::detachAllIncidents()
+{
+	assert( !"Not implemented yet" );
 }
 //////////////////////////////////////////////////////////////////////////
 
 Unit* EpGetHero()
 {
-	WorldState* ws = dynamic_cast<WorldState*>( GetTopStateManager().getState( GAME_TOP_STATE_WORLD ) );
-	assert( ws );
-	return ws->getHero();
+	return GetWorldManager().getCurWorld()->getHero();
+
 } SCRIPT_CALLABLE_PV( EpGetHero )
 
 int EpRegisterIncident( void* ptr )
 {
-	WorldState* ws = dynamic_cast<WorldState*>( GetTopStateManager().getState( GAME_TOP_STATE_WORLD ) );
 	Incident* inc = reinterpret_cast<Incident*>( ptr );
-	assert( ws );
-	return ws->addIncident( inc );
+	return GetWorldManager().getCurWorld()->addIncident( inc );
+
 } SCRIPT_CALLABLE_I_PV( EpRegisterIncident )
 
-START_SCRIPT_FACTORY( WorldState )
+START_SCRIPT_FACTORY( World )
 	CREATE_OBJ_COMMAND( EpGetHero )
 	CREATE_OBJ_COMMAND( EpRegisterIncident )
-END_SCRIPT_FACTORY( WorldState )
+END_SCRIPT_FACTORY( World )

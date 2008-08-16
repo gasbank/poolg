@@ -16,10 +16,11 @@ public:
 	void executeFile(const char* fileName);
 	Tcl_Interp* getInterp() { assert(m_interp); return m_interp; }
 	
+	const char* readString( const char* variableName );
 	bool readRect( const char* variableName, RECT& rect );
 	int readInt( const char* variableName );
 	Tcl_Obj* getObject( const char* variableName );
-	bool readCharPtrList( const char* variableName, std::list<const char*>& strList );
+	bool readCharPtrList( const char* variableName, ConstCharList& strList );
 
 	void initBoundings();
 private:

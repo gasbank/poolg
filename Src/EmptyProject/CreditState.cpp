@@ -170,7 +170,7 @@ HRESULT CreditState::frameMove( double fTime, float fElapsedTime )
 
 	if ( fStateTime >= s_period * 4)
 	{
-		TopStateManager::getSingleton().setNextState( GAME_TOP_STATE_WORLD );
+		TopStateManager::getSingleton().setNextState( GAME_TOP_STATE_PLAY );
 	}
 	return S_OK;
 }
@@ -181,7 +181,7 @@ HRESULT CreditState::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 	{
 		if ( wParam == VK_F4)
 		{
-			TopStateManager::getSingleton().setNextState( GAME_TOP_STATE_WORLD );
+			TopStateManager::getSingleton().setNextState( GAME_TOP_STATE_PLAY );
 		}
 	}
 

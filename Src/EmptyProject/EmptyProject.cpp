@@ -19,8 +19,10 @@
 #include "WorldStateManager.h"
 #include "ShaderWrapper.h"
 #include "TileManager.h"
+#include "World.h"
 
 G								g_g;
+WorldManager*					g_wm					= 0;
 TopStateManager*				g_tsm					= 0;
 WorldStateManager*				g_wsm					= 0;
 ScriptManager*					g_scriptManager			= 0;		// Set to zero is 'CRUCIAL!'
@@ -31,6 +33,7 @@ LPD3DXFONT						g_pFont					= 0;
 LPD3DXEFFECT		            g_pEffect				= 0;
 D3DXHANDLE						g_tech					= 0;
 LPDIRECT3DVERTEXBUFFER9			g_lineElement			= 0;
+HANDLE							g_handle				= 0;		// Signal object to resolve multi-threaded problems on console thread and main app thread
 
 
 LPD3DXMESH						g_testTeapot			= 0;
@@ -113,7 +116,7 @@ bool CALLBACK ModifyDeviceSettings( DXUTDeviceSettings* pDeviceSettings, void* p
 	//pDeviceSettings->d3d9.pp.EnableAutoDepthStencil= TRUE;
 	//pDeviceSettings->d3d9.pp.AutoDepthStencilFormat = D3DFMT_D16;
 
-	pDeviceSettings->d3d9.BehaviorFlags |= D3DCREATE_MULTITHREADED;
+	pDeviceSettings->d3d9.BehaviorFlags |= D3DCREATE_MULTITHREADED; // For multi-threaded console
 
 	return true;
 }
@@ -128,15 +131,45 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 {
 	HRESULT hr;
 	GetG().m_dev = pd3dDevice;
+	VideoMan::getSingleton().SetDev( pd3dDevice );
 	//pd3dDevice->SetRenderState( D3DRS_STENCILENABLE, TRUE );
 	//////////////////////////////////////////////////////////////////////////
 
+	// Configure worlds
+	ConstCharList worldList;
+	GetScriptManager().readCharPtrList( "EpWorldList", worldList );
+	char scriptCommand[512];
+	ConstCharList::iterator it = worldList.begin();
+	for ( ; it != worldList.end(); ++it )
+	{
+		const char* worldName = *it;
+
+		StringCchPrintfA( scriptCommand, 512, "library/%s.tcl", worldName );
+		GetScriptManager().executeFile( scriptCommand );
+		StringCchPrintfA( scriptCommand, 512, "%s::modelFilePath", worldName );
+		const char* modelFilePath = GetScriptManager().readString( scriptCommand );
+		WCHAR mfp[128];
+		size_t numOfConvert;
+		mbstowcs_s( &numOfConvert, mfp, 128, modelFilePath, 512 );
+		World* world = World::createWorld( worldName, mfp );
+		GetWorldManager().addWorld( world );
+	}
+
 	// State Manager Initialization
 	g_tsm = new TopStateManager();
+	GetWorldManager().setNextWorld( "EpRoomWorld" );
+	
 	g_wsm = new WorldStateManager();
 
-	// Init Script
+	g_tsm->init();
+	g_wsm->init();
+
+	// InitGame: State init completed and WorldState instances are allocated in pool area
+	// (world loading is not done yet)
 	GetScriptManager().execute( "EpInitGame" );
+
+	
+
 
 	// Shader
 	/*
@@ -234,6 +267,8 @@ void CALLBACK OnFrameMove( double fTime, float fElapsedTime, void* pUserContext 
 	HRESULT hr;
 
 	UNREFERENCED_PARAMETER( hr );
+
+	GetWorldManager().changeToNextWorldIfExist();
 
 	//////////////////////////////////////////////////////////////////////////
 
@@ -452,13 +487,15 @@ void CALLBACK OnD3D9DestroyDevice( void* pUserContext )
 	//SAFE_RELEASE( g_testPolygon );
 	//SAFE_RELEASE( g_testPolygonCloned );
 
-	SAFE_DELETE( g_tsm );
-	SAFE_DELETE( g_wsm );
+	EP_SAFE_RELEASE( g_tsm );
+	EP_SAFE_RELEASE( g_wsm );
 	EP_SAFE_RELEASE( g_bombShader );
 	//EP_SAFE_RELEASE( g_alphaShader );
 	//EP_SAFE_RELEASE( g_alphaShader );
 
 	SAFE_RELEASE( g_lineElement );
+
+	EP_SAFE_RELEASE( g_wm );
 
 	GetG().m_videoMan.SetDev(0);
 }
@@ -531,7 +568,7 @@ int EpOutputDebugString( const char* msg )
 
 } SCRIPT_CALLABLE_I_PC( EpOutputDebugString )
 
-HANDLE g_handle;
+
 
 unsigned int __stdcall newThread( ClientData cd )
 {
@@ -546,7 +583,7 @@ unsigned int __stdcall newThread( ClientData cd )
 
 	SetEvent( g_handle );
 
-	Tcl_EvalFile( g_consoleInterp, "library/EpThreadTest.tcl" );
+	//Tcl_EvalFile( g_consoleInterp, "library/EpThreadTest.tcl" );
 
 	return 0;
 }
@@ -601,14 +638,20 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 	// Script Manager Initialization
 	CreateScriptManagerIfNotExist();
 	GetScriptManager().executeFile( "library/EpInitScript.tcl" );
-	GetScriptManager().executeFile( "library/EpWorldState.tcl" );
 	GetScriptManager().executeFile( "library/EpDialog1.tcl" );
+
+	/*GetScriptManager().executeFile( "library/EpWorldList.tcl" );
+	
+	GetScriptManager().executeFile( "library/EpCeilingWorld.tcl" );
+	*/
 	//GetScriptManager().executeFile( "library/EpThreadModuleTest.tcl" );
 
 	GetScriptManager().execute( "EpInitApp" );
 
 	GetG().m_camera.SetAttachCameraToModel( true );
 	GetG().m_camera.SetEnablePositionMovement( true );
+
+	g_wm = new WorldManager();
 
 
 	Tcl_ThreadId ttid;

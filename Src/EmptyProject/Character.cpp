@@ -5,7 +5,7 @@
 #include "TileManager.h"
 #include "TopStateManager.h"
 #include "WorldStateManager.h"
-#include "WorldState.h"
+#include "World.h"
 #include "ArnMesh.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -275,8 +275,7 @@ HRESULT Character::rayTesting( UnitInput mappedKey )
 
 	HRESULT hr = S_OK;
 
-	TopStateManager& tsm = TopStateManager::getSingleton();
-	WorldState* ws = static_cast<WorldState*>( tsm.getCurState() );
+	World* ws = GetWorldManager().getCurWorld();
 
 	// Ray starting position as hero position
 	D3DXVECTOR3 rayStartPos( getPos().x, getPos().y, getPos().z - 2.0f );
@@ -402,11 +401,6 @@ void Character::setBoundaryRect( LONG left, LONG top, LONG right, LONG bottom )
 
 void Character::damage( int point )
 {
-	TopStateManager& tsm = TopStateManager::getSingleton();
-	WorldState* ws = static_cast<WorldState*>( tsm.getCurState() );
-
-	//ws->screenFlashing( 0.2f, 1.0f, 0.0f, 0.0f );
-
 	m_curHp -= point;
 
 	printf("Ã¼·ÂÀº? %d\n", m_curHp);

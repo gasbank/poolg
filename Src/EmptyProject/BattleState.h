@@ -8,7 +8,7 @@
 #include "SkillDescBox.h"
 
 class SkillSet;
-class WorldState;
+class World;
 class Action;
 
 enum TurnType { TT_NATURAL, TT_COMPUTER, TT_PLAYER };
@@ -79,8 +79,6 @@ private:
 
 	typedef std::list<std::string> StringList;
 	StringList m_battleLog;
-
-	WorldState*		m_ws;
 	
 	TurnType		m_curTurnType;
 	TurnType		m_nextTurnType;

@@ -8,7 +8,6 @@ StateManager::StateManager(void)
 
 StateManager::~StateManager( void )
 {
-	release();
 }
 void StateManager::setNextStateAsPrevState()
 {
@@ -51,8 +50,16 @@ void StateManager::release()
 
 void StateManager::setNextState(GameState state)
 {
-	if ( m_curStates != m_states[state] )
-		m_nextState = m_states[state];
+	if ( m_states.find( state ) != m_states.end() )
+	{
+		if ( m_curStates != m_states[state] )
+			m_nextState = m_states[state];
+	}
+	else
+	{
+		throw std::runtime_error( "Invalid GameState enum" );
+	}
+	
 }
 
 GameState StateManager::curStateEnum()

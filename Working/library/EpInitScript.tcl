@@ -1,3 +1,4 @@
+set EpWorldList [ list EpCeilingWorld EpRoomWorld EpA213World ]
 
 proc EpInitApp {} {
 	# 16:9 widescreen resolution
@@ -5,7 +6,6 @@ proc EpInitApp {} {
 	set h1 3
 	set multiplier 200
 	EpSetWindowSize [expr $w1 * $multiplier] [expr $h1 * $multiplier]
-	
 	
 }
 

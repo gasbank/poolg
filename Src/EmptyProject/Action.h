@@ -60,3 +60,18 @@ private:
 	std::string m_dialogName;
 };
 
+//////////////////////////////////////////////////////////////////////////
+
+class SoundAction : public Action
+{
+public:
+	SoundAction( const char* soundName );
+	virtual ~SoundAction(void);
+
+	virtual void activate();
+	virtual void update();
+
+private:
+	std::string m_soundName;
+};
+

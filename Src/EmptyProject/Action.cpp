@@ -54,7 +54,7 @@ void Action::createUnitAction( int x, int y, bool random )
 {
 	static int i = 0;
 	if ( i == 0 )
-		m_ws->addUnit (EpCreateEnemy( x, y ) );
+		m_ws->addUnit( EpCreateEnemy( x, y ) );
 	i++;
 }
 
@@ -107,7 +107,46 @@ Action* EpCreateDialogAction( const char* dialogName )
 	return new DialogAction( dialogName );
 } SCRIPT_CALLABLE_PV_PC( EpCreateDialogAction )
 
+//////////////////////////////////////////////////////////////////////////
+
+SoundAction::SoundAction( const char* soundName )
+: m_soundName( soundName )
+{
+}
+
+SoundAction::~SoundAction( void )
+{
+}
+
+void SoundAction::activate()
+{
+	if ( m_soundName == "Start Battle" )
+	{
+		GetAudioState().bBGMFade = true;
+		GetAudioState().bMusicFade = false;
+		GetAudioState().pEngine->Stop( GetAudioState().iMusicCategory, 0 );
+		GetAudioState().pSoundBank->Play( GetAudioState().iBattle, 0, 0, NULL );
+	}
+	else if ( m_soundName == "End Battle" )
+	{
+		GetAudioState().bBGMFade = false;
+		GetAudioState().bMusicFade = true;
+	}
+
+}
+
+void SoundAction::update()
+{
+
+}
+Action* EpCreateSoundAction( const char* soundName )
+{
+	return new SoundAction( soundName );
+}  SCRIPT_CALLABLE_PV_PC( EpCreateSoundAction )
+
+//////////////////////////////////////////////////////////////////////////
 
 START_SCRIPT_FACTORY( Action )
 	CREATE_OBJ_COMMAND( EpCreateDialogAction )
+	CREATE_OBJ_COMMAND( EpCreateSoundAction )
 END_SCRIPT_FACTORY( Action )

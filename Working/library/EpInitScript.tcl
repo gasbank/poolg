@@ -10,8 +10,8 @@ proc EpInitApp {} {
 }
 
 proc EpInitGame {} {
-	EpSetNextState 4
-	
+	set initialState 1001
+	EpSetNextState $initialState
 	EpOutputDebugString "<Script> EpInitGame called\n"
 }
 

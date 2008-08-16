@@ -44,6 +44,7 @@ LOGMANAGER logMan;
 Tcl_Interp*						g_consoleInterp			= 0;
 
 std::wstring g_debugBuffer;
+bool							g_bTileGrid				= false;
 
 //--------------------------------------------------------------------------------------
 // Rejects any D3D9 devices that aren't acceptable to the app by returning false
@@ -335,7 +336,50 @@ void renderFixedElements( double fTime, float fElapsedTime )
 	renderDebugText();
 }
 
+HRESULT renderTileGrid()
+{
+	HRESULT hr = S_OK;
 
+	GetG().m_dev->SetVertexShader( 0 );
+	GetG().m_dev->SetRenderState( D3DRS_LIGHTING, FALSE );
+	GetG().m_dev->SetRenderState( D3DRS_CULLMODE, D3DCULL_NONE );
+	GetG().m_dev->SetTexture( 0, 0 );
+
+	V( GetG().m_dev->SetTransform( D3DTS_VIEW, GetG().m_camera.GetViewMatrix() ) );
+	V( GetG().m_dev->SetTransform( D3DTS_PROJECTION, GetG().m_camera.GetProjMatrix() ) );
+	V( GetG().m_dev->SetFVF( D3DFVF_XYZ | D3DFVF_DIFFUSE ) );
+	V( GetG().m_dev->SetStreamSource( 0, g_lineElement, 0, 16 ) );
+	int i;
+	D3DXMATRIX mWorld, mTrans, mRot, mScaling;
+	D3DXMatrixScaling( &mScaling, (float)(s_xSize) * s_tileSize, 1.0f, 1.0f );
+	for ( i = -s_ySize / 2; i < s_ySize / 2; ++i )
+	{
+		D3DXMatrixTranslation( &mTrans,
+			0,
+			(float)i * s_tileSize,
+			0 );
+		mWorld = mScaling * mTrans;
+		V( GetG().m_dev->SetTransform( D3DTS_WORLD, &mWorld ) );
+		V( GetG().m_dev->DrawPrimitive( D3DPT_LINELIST, 0, 1 ) );
+	}
+
+	D3DXMatrixScaling( &mScaling, (float)(s_ySize) * s_tileSize, 1.0f, 1.0f );
+	D3DXMatrixRotationZ( &mRot, D3DXToRadian( 90 ) );
+	for ( i = -s_xSize / 2; i < s_xSize / 2; ++i )
+	{
+		D3DXMatrixTranslation( &mTrans,
+			(float)i * s_tileSize,
+			0,
+			0 );
+		mWorld = mScaling * mRot * mTrans;
+		V( GetG().m_dev->SetTransform( D3DTS_WORLD, &mWorld ) );
+		D3DPERF_BeginEvent( 0, L"Boundary Line Drawing" );
+		V( GetG().m_dev->DrawPrimitive( D3DPT_LINELIST, 0, 1 ) );
+		D3DPERF_EndEvent();
+	}
+
+	return hr;
+}
 
 //--------------------------------------------------------------------------------------
 // Render the scene using the D3D9 device
@@ -352,45 +396,13 @@ void CALLBACK OnD3D9FrameRender( IDirect3DDevice9* pd3dDevice, double fTime, flo
 	{
 		//drawBurningTeapot( fTime, fElapsedTime );
 
-		GetG().m_dev->SetVertexShader( 0 );
-		GetG().m_dev->SetRenderState( D3DRS_LIGHTING, FALSE );
-		GetG().m_dev->SetRenderState( D3DRS_CULLMODE, D3DCULL_NONE );
-		GetG().m_dev->SetTexture( 0, 0 );
+		if ( g_bTileGrid )
+			renderTileGrid();
 
-		V( GetG().m_dev->SetTransform( D3DTS_VIEW, GetG().m_camera.GetViewMatrix() ) );
-		V( GetG().m_dev->SetTransform( D3DTS_PROJECTION, GetG().m_camera.GetProjMatrix() ) );
-		V( GetG().m_dev->SetFVF( D3DFVF_XYZ | D3DFVF_DIFFUSE ) );
-		V( GetG().m_dev->SetStreamSource( 0, g_lineElement, 0, 16 ) );
-		int i;
-		D3DXMATRIX mWorld, mTrans, mRot, mScaling;
-		D3DXMatrixScaling( &mScaling, (float)(s_xSize) * s_tileSize, 1.0f, 1.0f );
-		for ( i = -s_ySize / 2; i < s_ySize / 2; ++i )
-		{
-			D3DXMatrixTranslation( &mTrans,
-				0,
-				(float)i * s_tileSize,
-				0 );
-			mWorld = mScaling * mTrans;
-			V( GetG().m_dev->SetTransform( D3DTS_WORLD, &mWorld ) );
-			V( GetG().m_dev->DrawPrimitive( D3DPT_LINELIST, 0, 1 ) );
-		}
+		State* curState = GetTopStateManager().getCurState();
 
-		D3DXMatrixScaling( &mScaling, (float)(s_ySize) * s_tileSize, 1.0f, 1.0f );
-		D3DXMatrixRotationZ( &mRot, D3DXToRadian( 90 ) );
-		for ( i = -s_xSize / 2; i < s_xSize / 2; ++i )
-		{
-			D3DXMatrixTranslation( &mTrans,
-				(float)i * s_tileSize,
-				0,
-				0 );
-			mWorld = mScaling * mRot * mTrans;
-			V( GetG().m_dev->SetTransform( D3DTS_WORLD, &mWorld ) );
-			D3DPERF_BeginEvent( 0, L"Boundary Line Drawing" );
-			V( GetG().m_dev->DrawPrimitive( D3DPT_LINELIST, 0, 1 ) );
-			D3DPERF_EndEvent();
-		}
-
-		GetTopStateManager().getCurState()->frameRender(pd3dDevice, fTime, fElapsedTime);
+		curState->frameRender(pd3dDevice, fTime, fElapsedTime);
+		
 
 		renderFixedElements( fTime, fElapsedTime );
 		
@@ -474,18 +486,18 @@ void CALLBACK KeyboardProc( UINT nChar, bool bKeyDown, bool bAltDown, void* pUse
 				g_fillColor = D3DCOLOR_ARGB( 0, 45, 50, 170 );
 			}
 			break;
+		}
+	}
+	else
+	{
+		// Key up
+		switch ( nChar )
+		{
 		case VK_F3:
-			break;
-		case VK_LEFT:
-			break;
-		case VK_RIGHT:
-			break;
-		case VK_UP:
-			break;
-		case VK_DOWN:
+			g_bTileGrid = !g_bTileGrid;
 			break;
 		}
-	}	
+	}
 }
 
 

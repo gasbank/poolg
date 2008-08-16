@@ -639,8 +639,7 @@ Character* BattleState::getEnemy()
 }
 
 void BattleState::setupCamera()
-{
-	//
+{//
 	// 처음 시작시 주인공이 왼쪽 아래, 적이 오른쪽 위에 보이도록 카메라를 움직인다.
 	//
 
@@ -650,38 +649,5 @@ void BattleState::setupCamera()
 	const D3DXVECTOR3& vEnemyPos = ws->getEnemyPos();
 	const D3DXVECTOR3& vHeroPos = ws->getHeroPos();
 
-	EpCamera& camera = G::getSingleton().m_camera;
-
-	// 전투가 일어나는 위치를 구한다. 적의 위치와 주인공 위치의 중간임.
-	D3DXVECTOR3 vBattlePos;
-	vBattlePos.x = (vEnemyPos.x + vHeroPos.x) / 2.0f;
-	vBattlePos.y = (vEnemyPos.y + vHeroPos.y) / 2.0f;
-	vBattlePos.z = (vEnemyPos.z + vHeroPos.z) / 2.0f;
-
-	// 최종 카메라 상태.
-	D3DXVECTOR3 vDesEye( 0.0f, 0.0f, -10.0f );
-	D3DXVECTOR3 vDesLookAt( vBattlePos );
-	D3DXVECTOR3 vDesUp( 0.0f, 0.0f, -1.0f );
-
-	// 주인공으로부터 적으로 이어지는 축을 구한다.
-	D3DXVECTOR3 vBattleAxis;
-	vBattleAxis.x = (vEnemyPos.x - vHeroPos.x);
-	vBattleAxis.y = (vEnemyPos.y - vHeroPos.y);
-	vBattleAxis.z = (vEnemyPos.z - vHeroPos.z);
-
-	// z 축에 대고 vBattleAxis를 45도 돌린다.
-	D3DXVECTOR3 zAxis( 0.0f, 0.0f, 1.0f );
-	Utility::rotateAboutAxis( &vBattleAxis, &zAxis, D3DXToRadian( -45.0f ) );
-
-	// vDesEye를 vBattleAxis에 대고 -45도 만큼 돌린다.
-	Utility::rotateAboutAxis( &vDesEye, &vBattleAxis, D3DXToRadian( -45.0f ) );
-
-	// vDesEye를 주인공 위로 옮긴다.
-	vDesEye.x += vHeroPos.x;
-	vDesEye.y += vHeroPos.y;
-
-	// 자, 이제 카메라의 목적 위치를 구하였다. 이동시켜보자.
-	camera.setDesViewParams( &vDesEye, &vDesLookAt, &vDesUp );
-	camera.setSmoothCameraDuration( 3.0f );
-	camera.begin( CAMERA_SMOOTH );
+	GetG().m_camera.beginShoulderLookCamera( &vHeroPos, &vEnemyPos );
 }

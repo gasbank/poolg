@@ -24,6 +24,7 @@ public:
 	void setAttachPos( const D3DXVECTOR3* pos ) { m_vPos = pos; }
 	void setSmoothCameraDuration( float f ) { m_fSmoothCameraDuration = f; }
 	void setExternalCamera( ArnCamera* arnCam ) { m_pArnCam = arnCam; }
+	void beginShoulderLookCamera( const D3DXVECTOR3* pvMePos, const D3DXVECTOR3* pvOppPos );
 	void begin( RunningCamera rc );
 	D3DXVECTOR3* GetUpPt();
 

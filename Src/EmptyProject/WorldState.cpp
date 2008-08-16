@@ -278,7 +278,7 @@ HRESULT WorldState::frameMove(double fTime, float fElapsedTime)
 		if ( (*it) != getHeroUnit() )
 		{
 			Enemy* oppCharacter = dynamic_cast<Enemy*>( *it );
-			if ( oppCharacter != NULL && oppCharacter->isTalkable() == false )
+			if ( oppCharacter != NULL && oppCharacter->isTalkable() == false && !oppCharacter->getRemoveFlag() )
 			{
 				if ( isInFightArea( getHeroUnit() , oppCharacter ) == true )
 				{
@@ -304,11 +304,11 @@ HRESULT WorldState::frameMove(double fTime, float fElapsedTime)
 	for ( ; it2 != m_unitSet.end(); )
 	{
 		(*it2)->frameMove(fElapsedTime);
-		if ( (*it2)->getRemoveFlag() )
+		/*if ( (*it2)->getRemoveFlag() )
 		{
 			it2 = removeUnit( *it2 );
 		}
-		else
+		else*/
 			++it2;
 	}
 
@@ -685,6 +685,8 @@ void WorldState::proceedCurDialog()
 			m_scriptedDialog.remove( m_curDialog );
 			EP_SAFE_RELEASE( m_curDialog );
 		}
+		if ( !m_curDialog->isTalking() )
+			m_curDialog = 0;
 	}
 }
 

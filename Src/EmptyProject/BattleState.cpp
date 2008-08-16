@@ -91,7 +91,7 @@ BattleState::BattleState()
 	m_hpBarPlayer.setSize(statusBarWidth, statusBarHeight);
 	m_hpBarPlayer.setPos (statusBoxPlayersPositionX + statusBoxWidth*0.23f, statusBoxPlayersPositionY + statusBoxHeight * 0.82f, 4.5f);
 	
-	m_innerFire.init (L"Images/BattleUI/DarkAura.png", m_pDev, 0.8f, 3, 9);
+	m_innerFire.init (L"Images/BattleUI/BGchecker.jpg", m_pDev, 0.8f, 3, 9);
 	m_innerFire.setPos (0, 0, 0);
 
 
@@ -399,7 +399,7 @@ HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 					m_battleLog.push_back(std::string("신도 세미나실은 신성합니다. 존중해주시죠."));
 					break;
 				case 12:
-					m_battleLog.push_back(std::string("일부 스킬들은 연속기로 쓸 수 있습니다."));
+					m_battleLog.push_back(std::string("제육덮밥"));
 					break;
 				case 13:
 					m_battleLog.push_back(std::string("보스는 사실 거미를 무서워하는 듯 하다."));
@@ -421,6 +421,12 @@ HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 					break;
 				case 19:
 					m_battleLog.push_back(std::string("제작 동안 OOO군의 프로젝트 말살 음모가 있었습니다."));
+					break;
+				case 20:
+					m_battleLog.push_back(std::string("맛의진미"));
+					break;
+				case 21:
+					m_battleLog.push_back(std::string("일부 스킬들은 연속기로 쓸 수 있습니다."));
 					break;
 				default:
 					m_battleLog.push_back(std::string("훗, 더 이상의 자세한 팁은 생략한다."));;

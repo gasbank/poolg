@@ -5,13 +5,15 @@ InnerFire::InnerFire(void)
 {
 	m_d3dxMesh = 0;
 	m_d3dTex = 0;
-	m_d3dVB = 0;
 	m_bInit = false;
+	m_angle = 0;
+	m_angleVelocity = 0;
+	m_angleAccelRate = 0.1f;
 }
 
 
 //segment는 어떤 걸 말하는 걸까.
-void InnerFire::init(const TCHAR* imgFileName, LPDIRECT3DDEVICE9 d3dDev, float radius, float height, int angleNumber)
+void InnerFire::init(const TCHAR* imgFileName, LPDIRECT3DDEVICE9 pd3dDevice, float radius, float height, int angleNumber)
 {
 	/*
 	if ( m_bInit )
@@ -28,11 +30,11 @@ void InnerFire::init(const TCHAR* imgFileName, LPDIRECT3DDEVICE9 d3dDev, float r
 	//점
 	UINT vertices = (angleNumber + 1) * 2;
 
-	m_d3dDev = d3dDev;
+	m_pd3dDevice = pd3dDevice;
 
 	D3DXMatrixIdentity(&m_localXform);
 
-	if (FAILED(D3DXCreateMeshFVF(faces, vertices, D3DXMESH_MANAGED, D3DFVF_XYZ | D3DFVF_TEX1, d3dDev, &m_d3dxMesh)))
+	if (FAILED(D3DXCreateMeshFVF(faces, vertices, D3DXMESH_MANAGED, D3DFVF_XYZ | D3DFVF_TEX1, pd3dDevice, &m_d3dxMesh)))
 	{
 		throw std::runtime_error("Mesh creation failed. Check your D3D device");
 	}
@@ -76,7 +78,7 @@ void InnerFire::init(const TCHAR* imgFileName, LPDIRECT3DDEVICE9 d3dDev, float r
 
 	m_d3dxMesh->UnlockIndexBuffer();
 
-	if (FAILED(D3DXCreateTextureFromFile(d3dDev, imgFileName, &m_d3dTex)))
+	if (FAILED(D3DXCreateTextureFromFile(pd3dDevice, imgFileName, &m_d3dTex)))
 	{
 		// ! Programmatical debug breakpoint: You can continue the program by pressing F5
 		DebugBreak();
@@ -104,7 +106,6 @@ void InnerFire::release()
 {
 	SAFE_RELEASE(m_d3dxMesh);
 	SAFE_RELEASE(m_d3dTex);
-	SAFE_RELEASE(m_d3dVB);
 }
 
 HRESULT InnerFire::draw(bool textured)
@@ -114,20 +115,12 @@ HRESULT InnerFire::draw(bool textured)
 	if (m_d3dxMesh)
 	{
 		// Non-rhw drawing
-		m_d3dDev->SetTransform(D3DTS_WORLD, &m_localXform);
+		m_pd3dDevice->SetTransform(D3DTS_WORLD, &m_localXform);
 		if (textured)
-			m_d3dDev->SetTexture(0, m_d3dTex);
+			m_pd3dDevice->SetTexture(0, m_d3dTex);
 		else
-			m_d3dDev->SetTexture(0, 0);
+			m_pd3dDevice->SetTexture(0, 0);
 		m_d3dxMesh->DrawSubset(0);
-	}
-	else if (m_d3dVB)
-	{
-		// RHW drawing
-		m_d3dDev->SetTexture(0, m_d3dTex);
-		m_d3dDev->SetFVF(D3DFVF_XYZRHW | D3DFVF_TEX1);
-		m_d3dDev->SetStreamSource(0, m_d3dVB, 0, sizeof(VertexRhw));
-		m_d3dDev->DrawPrimitive(D3DPT_TRIANGLEFAN, 0, 2);
 	}
 	else
 	{
@@ -136,12 +129,26 @@ HRESULT InnerFire::draw(bool textured)
 	return hr;
 }
 
-void InnerFire::frameMove( float fElapsedTime )
+bool InnerFire::frameMove( float fElapsedTime )
 {
-	D3DXMATRIX mScaling, mTranslation;
+	m_angleVelocity += m_angleAccelRate;
+	m_angle += m_angleVelocity;
+
+	if (m_angle > 360*100)
+		m_angle = 0;
+
+	if (m_angleVelocity > 10000)
+		m_angleVelocity = 0;
+
+
+	D3DXMATRIX mScaling, mTranslation, mRotationX, mRotationY, mRotationZ;
+	D3DXMatrixRotationX(&mRotationX, D3DXToRadian (m_angle/2));
+	D3DXMatrixRotationY(&mRotationY, D3DXToRadian (m_angle/3));
+	D3DXMatrixRotationZ(&mRotationZ, D3DXToRadian (m_angle));
 	D3DXMatrixScaling(&mScaling, 1, 1, 1);
 	D3DXMatrixTranslation(&mTranslation, m_vPos.x, m_vPos.y, m_vPos.z);
 
-	m_localXform = mScaling * mTranslation;
+	m_localXform = mRotationX * mRotationY * mRotationZ * mScaling * mTranslation;
+	return true;
 }
 

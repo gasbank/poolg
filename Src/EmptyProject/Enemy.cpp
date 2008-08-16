@@ -4,7 +4,8 @@
 #include "ScriptManager.h"
 #include "TileManager.h"
 
-Enemy::Enemy(void)
+Enemy::Enemy()
+: Character( UT_ENEMY )
 {
 	m_bRandomWalkable	= false;
 	m_bTalkable			= false;

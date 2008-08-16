@@ -58,7 +58,7 @@ public:
 
 	void setStat( int statHealth, int statWill, int statCoding, int statDef, int statSen, int statImmu );
 protected:
-	Character();
+	Character( UnitType type );
 
 private:
 	HRESULT rayTesting( UnitInput );

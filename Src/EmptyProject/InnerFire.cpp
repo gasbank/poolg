@@ -2,6 +2,7 @@
 #include "InnerFire.h"
 
 InnerFire::InnerFire(void)
+: Unit( UT_INNERFIRE )
 {
 	m_d3dxMesh = 0;
 	m_d3dTex = 0;

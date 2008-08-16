@@ -7,6 +7,7 @@ class BattleState;
 class AttackObject : public Unit
 {
 public:
+	AttackObject() : Unit( UT_ATTACKOBJECT ) {}
 	virtual ~AttackObject(void);
 
 protected:

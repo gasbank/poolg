@@ -70,7 +70,7 @@ void Character::heal (int point)
 
 Unit* Character::createCharacter( LPD3DXMESH mesh, int tileX, int tileY, float posZ, bool bControllable )
 {
-	Character* u = new Character();
+	Character* u = new Character( UT_CHARACTER );
 	u->init( GetG().m_dev, mesh );
 	u->setControllable( bControllable );
 	u->setTilePos( tileX, tileY );
@@ -228,7 +228,8 @@ LRESULT Character::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 }
 
 
-Character::Character()
+Character::Character( UnitType type )
+: Unit( type )
 {
 	m_maxHp				= 5;
 	m_curHp				= m_maxHp;

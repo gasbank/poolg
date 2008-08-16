@@ -23,9 +23,13 @@ static const POINT g_moveAmount[4] = {
 
 class WorldState;
 
+enum UnitType { UT_UNIT, UT_CHARACTER, UT_HERO, UT_ENEMY, UT_ATTACKOBJECT, UT_INNERFIRE };
+
 class Unit
 {
 public:
+	
+
 	static Unit* createUnit( LPD3DXMESH mesh, int tileX = 0, int tileY = 0, float posZ = 0, bool bCtrl = false );
 	virtual ~Unit();
 
@@ -72,7 +76,8 @@ public:
 	
 	const Point2Uint& getTilePos() const { return m_tilePos; }
 	const Point2Uint& getTileBufferPos() const { return m_tileBufferPos; }
-
+	
+	UnitType getType() const { return m_type; }
 protected:
 	WorldState* getWorldState() const;
 
@@ -80,7 +85,7 @@ protected:
 
 //[재우]상속받은 객체가 접근하기 위해 protected로.
 //private:
-	Unit();
+	Unit( UnitType type );
 
 	bool IsKeyDown( BYTE key ) const { return( (key & KEY_IS_DOWN_MASK) == KEY_IS_DOWN_MASK ); }
 	bool WasKeyDown( BYTE key ) const { return( (key & KEY_WAS_DOWN_MASK) == KEY_WAS_DOWN_MASK ); }
@@ -109,6 +114,8 @@ protected:
 private:
 	Point2Uint				m_tilePos;
 	Point2Uint				m_tileBufferPos;
+
+	UnitType				m_type;
 	
 };
 

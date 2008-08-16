@@ -5,7 +5,7 @@ class Enemy :
 	public Character
 {
 public:
-	Enemy(void);
+	
 	virtual ~Enemy(void);
 
 	static Unit* createEnemy( LPD3DXMESH mesh, int tileX, int tileY, float posZ );
@@ -19,6 +19,7 @@ public:
 	bool isTalkable() { return m_bTalkable; }
 
 private:
+	Enemy();
 	void walkRandomly();
 
 	bool m_bRandomWalkable;

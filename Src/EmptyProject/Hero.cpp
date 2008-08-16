@@ -5,6 +5,7 @@
 #include "WorldState.h"
 
 Hero::Hero(void)
+: Character( UT_CHARACTER )
 {
 }
 

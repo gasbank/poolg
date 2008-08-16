@@ -10,7 +10,8 @@ extern TileManager tileManager;
 
 //////////////////////////////////////////////////////////////////////////
 
-Unit::Unit()
+Unit::Unit( UnitType type )
+: m_type( type )
 {
 	m_d3dxMesh			= 0;
 	m_pd3dDevice		= 0;
@@ -130,7 +131,7 @@ void Unit::clearKey()
 
 Unit* Unit::createUnit( LPD3DXMESH mesh, int tileX, int tileY, float posZ, bool bControllable )
 {
-	Unit* u = new Unit();
+	Unit* u = new Unit( UT_UNIT );
 	u->init( GetG().m_dev, mesh );
 	u->setControllable( bControllable );
 	return u;

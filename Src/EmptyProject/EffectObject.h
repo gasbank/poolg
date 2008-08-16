@@ -3,5 +3,5 @@
 
 class EffectObject : public Unit
 {
-
+	EffectObject( UnitType type ) : Unit( type ) {}
 };

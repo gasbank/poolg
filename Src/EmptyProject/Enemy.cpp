@@ -9,7 +9,7 @@ Enemy::Enemy()
 {
 	m_bRandomWalkable	= false;
 	m_bTalkable			= false;
-	m_iFightRange		= 1;
+	m_iFightRange		= 2;
 }
 
 Enemy::~Enemy(void)

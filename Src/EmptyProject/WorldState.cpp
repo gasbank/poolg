@@ -531,23 +531,18 @@ const D3DXVECTOR3& WorldState::getHeroPos()
 
 bool WorldState::isInFightArea( Character* heroPt, Character* enemyPt )
 {
-	// 적의 타일 좌표가 0, 0일 때 플레이어가 들어오면 전투가 시작되는 타일 좌표 범위.
-	
-	int fightTileArea[13][2] = { 
-		{-2, 0}, 
-		{-1, 1}, {-1, 0}, {-1, -1}, 
-		{ 0, 2}, { 0, 1}, { 0,  0}, {0, -1}, {0, -2},
-		{ 1, 1}, { 1, 0}, { 1, -1},
-		{ 2, 0}
-	};
-
 	int range = static_cast<Enemy*>(enemyPt)->getFightRange();
+
+	range++;
 
 	// 적의 전투 범위 타일 안에 주인공이 있는지 판단한다.
 	for ( int i = -range; i <= range; i++ )
 	{
 		for ( int j = -(range - abs( i )); j <= (range - abs( i )); j++ )
 		{
+			if ( range == abs( i ) || range == abs( j ) )
+				continue;
+
 			if ( (enemyPt->getTilePosX() + i ) == heroPt->getTilePosX()
 				&& (enemyPt->getTilePosY() + j ) == heroPt->getTilePosY() )
 			{

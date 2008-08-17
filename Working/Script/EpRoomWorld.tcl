@@ -1,13 +1,13 @@
 namespace eval EpRoomWorld {
-	set modelFilePath	"gus2.arn"
+	set modelFilePath	"room.arn"
 	variable world testEnemy pHeroUnit
 	
-	proc init { pCurWorld } {
+	proc init { curWorld } {
 		variable world
 		
-		EpOutputDebugString " - EpRoomWorld init Ptr: $pCurWorld\n"
+		EpOutputDebugString " - [info level 0] called / curWorld: $curWorld\n"
 		
-		set world				$pCurWorld;
+		set world				$curWorld;
 	}
 
 	proc registerIncident1 {} {
@@ -107,8 +107,8 @@ namespace eval EpRoomWorld {
 		EpUnitSetRotZ				$pHeroUnit [ToRadian 90]
 		EpUnitSetPosZ				$pHeroUnit -[EpUnitGetUpperRightZ $pHeroUnit]
                                              # Health Will Coding Defence Sense Immunity
-		EpCharacterSetStat			$pHeroUnit    7     5     7       5      5      5
-		EpCharacterSetCurHp			$pHeroUnit 10
+		EpCharacterSetStat			$pHeroUnit    100     5     7       5      5      5
+		EpCharacterSetCurHp			$pHeroUnit 100
 		EpCharacterSetCurCs			$pHeroUnit -1
 		EpCharacterSetMoveDuration		$pHeroUnit [expr 0.2]
 		EpCharacterSetColor			$pHeroUnit 255 0 255
@@ -181,6 +181,8 @@ namespace eval EpRoomWorld {
 		registerIncident3
 		registerIncident4
 		registerIncident5
+		
+		createWarpPosition			"EpA213World" 49 28 61 30
 	}
 	
 	proc leave {} {

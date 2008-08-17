@@ -11,8 +11,6 @@
 
 Trigger::Trigger(void)
 {
-	TopStateManager& tsm = TopStateManager::getSingleton();
-	m_ws = reinterpret_cast<World*>( tsm.getCurState() );
 }
 
 Trigger::~Trigger(void)
@@ -29,18 +27,19 @@ void Trigger::positionTrigger()
 
 void Trigger::detectBattleAction()
 {
+	World* curWorld = GetWorldManager().getCurWorld();
 	// Detect battle event.
 	// If current selected unit isn't hero unit, and isn't talkable,
 	// regard as enemy. And if hero is in the fight area of enemy, start battle.
-	UnitSet::iterator it = m_ws->getUnitSet()->begin();
-	for ( ; it != m_ws->getUnitSet()->end(); ++it )
+	UnitSet::iterator it = curWorld->getUnitSet()->begin();
+	for ( ; it != curWorld->getUnitSet()->end(); ++it )
 	{
-		if ( (*it) != m_ws->getHeroUnit() )
+		if ( (*it) != curWorld->getHeroUnit() )
 		{
 			Enemy* oppCharacter = dynamic_cast<Enemy*>( *it );
 			if ( oppCharacter->isTalkable() == false && oppCharacter != NULL )
 			{
-				if ( m_ws->isInFightArea( m_ws->getHeroUnit() , oppCharacter ) == true )
+				if ( curWorld->isInFightArea( curWorld->getHeroUnit() , oppCharacter ) == true )
 				{
 					//m_action.battleAction( oppCharacter );
 				}
@@ -58,9 +57,11 @@ void Trigger::detectTalkAction()
 
 void Trigger::detectHealAction()
 {
-	if ( GetTileManager().getTile( GetTileManager().pos2TileX( &m_ws->getHeroPos() ) , GetTileManager().pos2TileY( &m_ws->getHeroPos() ) )->b_heal )
+	World* curWorld = GetWorldManager().getCurWorld();
+
+	if ( GetTileManager().getTile( GetTileManager().pos2TileX( &curWorld->getHeroPos() ) , GetTileManager().pos2TileY( &curWorld->getHeroPos() ) )->b_heal )
 	{
-		m_ws->getHeroUnit()->heal( 9999 );
+		curWorld->getHeroUnit()->heal( 9999 );
 	}
 }
 
@@ -92,8 +93,8 @@ Trigger* EpCreateUnitPositionTrigger( void* unit, int x0, int y0, int x1, int y1
 	Point2Uint end;
 	start.x = x0;
 	start.y = y0;
-	end.x = x1;
-	end.y = y1;
+	end.x = ( x1 == -1 ) ? x0 : x1;
+	end.y = ( y1 == -1 ) ? y0 : y1;
 	TileRegion* region = new TileRegion( start, end );
 	return new UnitPositionTrigger( u, region );
 } SCRIPT_CALLABLE_PV_PV_I_I_I_I( EpCreateUnitPositionTrigger )

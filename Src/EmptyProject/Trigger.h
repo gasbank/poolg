@@ -25,8 +25,6 @@ public:
 	void detectCreateAction();
 	void detectHealAction();
 
-private:
-	World* m_ws;
 };
 SCRIPT_FACTORY( Trigger )
 

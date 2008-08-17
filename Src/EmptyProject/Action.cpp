@@ -196,11 +196,6 @@ void UnitSpawnAction::update()
 
 }
 
-template<typename T> T* EpCreateAction()
-{
-
-}
-
 Action* EpCreateUnitSpawnAction( void* createUnit )
 {
 	Unit* u = reinterpret_cast<Unit*>( createUnit );
@@ -211,6 +206,26 @@ Action* EpCreateUnitSpawnAction( void* createUnit )
 
 
 
+Action* EpCreateAction( ActionType at, ... )
+{
+	Action* ret = 0;
+	va_list params;
+	int count = 0;
+	
+	switch (at)
+	{
+	case AT_BATTLE:
+		count = 2;
+		va_start( params, count );
+		ret = new BattleAction(
+			va_arg( params, Unit*),
+			va_arg( params, float) );
+		break;
+	}
+	return ret;
+}
+
+
 void ScriptAction::activate()
 {
 	GetScriptManager().execute( m_scriptCommand.c_str() );
@@ -219,11 +234,19 @@ void ScriptAction::update()
 {
 }
 
+Action* EpCreateScriptAction( const char* scriptCommand )
+{
+	ScriptAction* sa = new ScriptAction();
+	sa->setScriptCommand( scriptCommand );
+	return sa;
+}  SCRIPT_CALLABLE_PV_PC( EpCreateScriptAction )
+
 //////////////////////////////////////////////////////////////////////////
 
 START_SCRIPT_FACTORY( Action )
 	CREATE_OBJ_COMMAND( EpCreateDialogAction )
 	CREATE_OBJ_COMMAND( EpCreateSoundAction )
 	CREATE_OBJ_COMMAND( EpCreateHealAction )
-	CREATE_OBJ_COMMAND( EpCreateUnitSpawnAction ) 
+	CREATE_OBJ_COMMAND( EpCreateUnitSpawnAction )
+	CREATE_OBJ_COMMAND( EpCreateScriptAction )
 END_SCRIPT_FACTORY( Action )

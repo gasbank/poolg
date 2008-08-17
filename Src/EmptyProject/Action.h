@@ -4,6 +4,9 @@ class World;
 class Enemy;
 class Unit;
 
+
+enum ActionType { AT_BATTLE, AT_DIALOG, AT_SOUND, AT_HEAL, AT_UNITSPAWN, AT_SCRIPT };
+
 class Action
 {
 public:
@@ -108,12 +111,16 @@ private:
 class ScriptAction : public Action
 {
 public:
-	ScriptAction( const char* scriptCommand );
-	virtual ~ScriptAction();
+	ScriptAction() {}
+	virtual ~ScriptAction() {}
+
+	void setScriptCommand( const char* command ) { m_scriptCommand = command; }
 
 	virtual void activate();
 	virtual void update();
 
 private:
+	
 	std::string m_scriptCommand;
 };
+

@@ -4,10 +4,10 @@ namespace eval EpCeilingWorld {
 	
 	proc init { curWorld } {
 		variable world hero npcGetg npcGloop
-		EpOutputDebugString " - CeilingWorld init Ptr: $curWorld\n"
+		EpOutputDebugString " - [info level 0] called / curWorld: $curWorld\n"
 		set world					$curWorld;
 		
-		set pHeroUnit				[ createHero 78 68 ];
+		set pHeroUnit				[ createHero 30 77 ];
 		                                      # Health Will Coding Defence Sense Immunity
 		EpCharacterSetStat			$pHeroUnit    7     5     7       5      5      5
 		EpCharacterSetCurHp			$pHeroUnit 10
@@ -18,15 +18,19 @@ namespace eval EpCeilingWorld {
 		EpUnitSetRotZ				$pHeroUnit [ToRadian 90]
 		EpUnitSetPosZ				$pHeroUnit -[EpUnitGetUpperRightZ $pHeroUnit]
         
-		set npcGetg					[ createEnemy 70 68 ];
+		set npcGetg					[ createEnemy 34 79 ];
 		EpCharacterSetColor			$npcGetg 128 128 0
 		EpCharacterSetStat			$npcGetg 4 1 3 1 1 1
 		EpCharacterSetCurHp			$npcGetg -1
 		
-		set npcGloop				[ createEnemy 72 72 ];
+		set npcGloop				[ createEnemy 30 82 ];
 		EpCharacterSetColor			$npcGloop 0 255 255
 		EpCharacterSetStat			$npcGloop 3 1 4 1 1 1
 		EpCharacterSetCurHp			$npcGloop -1
+		
+		
+		createWarpPosition			"EpRoomWorld" 25 82
+		
 	}
 
 	proc enter {} {

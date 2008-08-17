@@ -72,8 +72,14 @@ World* EpGetCurWorld()
 	return GetWorldManager().getCurWorld();
 } SCRIPT_CALLABLE_PV( EpGetCurWorld )
 
-
+int EpChangeWorld( const char* worldName )
+{
+	World* w = GetWorldManager().getWorld( worldName );
+	GetWorldManager().setNextWorld( w );
+	return 0;
+} SCRIPT_CALLABLE_I_PC( EpChangeWorld )
 
 START_SCRIPT_FACTORY( WorldManager )
 	CREATE_OBJ_COMMAND( EpGetCurWorld )
+	CREATE_OBJ_COMMAND( EpChangeWorld )
 END_SCRIPT_FACTORY( WorldManager )

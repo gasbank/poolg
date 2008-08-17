@@ -1,6 +1,6 @@
 #include "EmptyProjectPCH.h"
 #include "Action.h"
-#include "TopStateManager.h"
+#include "WorldManager.h"
 #include "World.h"
 #include "WorldStateManager.h"
 #include "Enemy.h"
@@ -11,25 +11,28 @@
 
 Action::Action(void)
 {
-	TopStateManager& m_tsm = TopStateManager::getSingleton();
-	m_ws = reinterpret_cast<World*>( m_tsm.getCurState() );
 }
 
 Action::~Action(void)
 {
 }
 
+World* Action::getCurWorld() const
+{
+	return GetWorldManager().getCurWorld();
+}
+
 void Action::dialogAction( const char* dialogName )
 {
-	m_ws->startDialog( dialogName );
+	getCurWorld()->startDialog( dialogName );
 }
 
 void Action::battleAction( Enemy* oppCharacter )
 {
 	// Set current enemy unit and enter into BattleState
-	m_ws->setCurEnemy( (Character*)oppCharacter );
+	getCurWorld()->setCurEnemy( (Character*)oppCharacter );
 
-	m_ws->getCurEnemyUnit()->setAttack(30);
+	getCurWorld()->getCurEnemyUnit()->setAttack(30);
 
 	if ( GetWorldStateManager().curStateEnum() == GAME_WORLD_STATE_FIELD )
 		GetWorldStateManager().setNextState( GAME_WORLD_STATE_BATTLE );
@@ -55,7 +58,7 @@ void Action::createUnitAction( int x, int y, bool random )
 {
 	static int i = 0;
 	if ( i == 0 )
-		m_ws->addUnit( EpCreateEnemy( x, y ) );
+		getCurWorld()->addUnit( EpCreateEnemy( x, y ) );
 	i++;
 }
 
@@ -184,11 +187,16 @@ UnitSpawnAction::~UnitSpawnAction()
 
 void UnitSpawnAction::activate()
 {
-	getWs()->addUnit( m_createUnit );
+	getCurWorld()->addUnit( m_createUnit );
 	m_createUnit = 0; // Unit instance ownership moved to the world!
 }
 
 void UnitSpawnAction::update()
+{
+
+}
+
+template<typename T> T* EpCreateAction()
 {
 
 }
@@ -198,6 +206,18 @@ Action* EpCreateUnitSpawnAction( void* createUnit )
 	Unit* u = reinterpret_cast<Unit*>( createUnit );
 	return new UnitSpawnAction( u );
 }  SCRIPT_CALLABLE_PV_PV( EpCreateUnitSpawnAction )
+
+//////////////////////////////////////////////////////////////////////////
+
+
+
+void ScriptAction::activate()
+{
+	GetScriptManager().execute( m_scriptCommand.c_str() );
+}
+void ScriptAction::update()
+{
+}
 
 //////////////////////////////////////////////////////////////////////////
 

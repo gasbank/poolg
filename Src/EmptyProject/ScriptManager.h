@@ -77,6 +77,16 @@ void SetTclResult(Tcl_Interp* interp, DWORD trait, Tcl_Obj* tcl_result, const Sc
 
 //////////////////////////////////////////////////////////////////////////
 
+//#define REGISTER_TRAIT_1(a1)									static const DWORD _trait_##a1										= (a1);
+//#define REGISTER_TRAIT_2(a1, a2)								static const DWORD _trait_##a1_##a2									= (a1) | (a2<<4);
+//#define REGISTER_TRAIT_3(a1, a2, a3)							static const DWORD _trait_##a1_##a2_##a3							= (a1) | (a2<<4) | (a3<<8);
+//#define REGISTER_TRAIT_4(a1, a2, a3, a4)						static const DWORD _trait_##a1_##a2_##a3_##a4						= (a1) | (a2<<4) | (a3<<8) | (a4<<12);
+//#define REGISTER_TRAIT_5(a1, a2, a3, a4, a5)					static const DWORD _trait_##a1_##a2_##a3_##a4_##a5					= (a1) | (a2<<4) | (a3<<8) | (a4<<12) | (a5<<16);
+//#define REGISTER_TRAIT_6(a1, a2, a3, a4, a5, a6)				static const DWORD _trait_##a1_##a2_##a3_##a4_##a5_##a6				= (a1) | (a2<<4) | (a3<<8) | (a4<<12) | (a5<<16) | (a6<<20);
+//#define REGISTER_TRAIT_7(a1, a2, a3, a4, a5, a6, a7)			static const DWORD _trait_##a1_##a2_##a3_##a4_##a5_##a6_##a7		= (a1) | (a2<<4) | (a3<<8) | (a4<<12) | (a5<<16) | (a6<<20) | (a7<<24);
+//#define REGISTER_TRAIT_8(a1, a2, a3, a4, a5, a6, a7, a8)		static const DWORD _trait_##a1_##a2_##a3_##a4_##a5_##a6_##a7_##a8	= (a1) | (a2<<4) | (a3<<8) | (a4<<12) | (a5<<16) | (a6<<20) | (a7<<24) | (a7<<28);
+
+
 static const DWORD _trait_I				= AT_I;
 static const DWORD _trait_I_I			= AT_I | (AT_I << 4);
 static const DWORD _trait_I_I_I			= AT_I | (AT_I << 4) | (AT_I << 8);

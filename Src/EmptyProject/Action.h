@@ -20,12 +20,9 @@ public:
 	void soundAction( std::string sz );
 	void createUnitAction( int x, int y, bool random );
 
-	World* getWs() { return m_ws; }
+	World* getCurWorld() const;
 protected:
 	Action(void);
-private:
-	
-	World* m_ws;
 };
 
 SCRIPT_FACTORY( Action )
@@ -104,4 +101,19 @@ public:
 
 private:
 	Unit* m_createUnit;
+};
+
+//////////////////////////////////////////////////////////////////////////
+
+class ScriptAction : public Action
+{
+public:
+	ScriptAction( const char* scriptCommand );
+	virtual ~ScriptAction();
+
+	virtual void activate();
+	virtual void update();
+
+private:
+	std::string m_scriptCommand;
 };

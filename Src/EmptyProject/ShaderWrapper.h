@@ -20,7 +20,7 @@ public:
 	LPDIRECT3DVERTEXSHADER9			getVertexShader() const { return m_pVertexShader; }
 	virtual void					release();
 	virtual void					update( float fTime, float fElapsedTime );
-	virtual HRESULT CALLBACK		onResetDevice();
+	virtual HRESULT CALLBACK		onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext );
 
 	D3DVERTEXELEMENT9* getDecl() const { return m_decl; }
 
@@ -45,7 +45,7 @@ class BombShader : public Shader
 public:
 	BombShader();
 	~BombShader();
-	virtual HRESULT CALLBACK		onResetDevice();
+	virtual HRESULT CALLBACK		onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext );
 
 	void							initMainTechnique() { m_hDefaultTech = m_effect->GetTechniqueByName( "Main" ); }
 	HRESULT							setMainTechnique() { return m_effect->SetTechnique( m_hDefaultTech ); }
@@ -69,6 +69,84 @@ public:
 	~AlphaShader() {}
 
 	virtual HRESULT					initShader( LPDIRECT3DDEVICE9 pd3dDevice, const WCHAR* shaderFileName );
-	virtual HRESULT CALLBACK		onResetDevice();
+	virtual HRESULT CALLBACK		onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext );
+
+};
+
+
+//////////////////////////////////////////////////////////////////////////
+
+struct SCREEN_VERTEX
+{
+	D3DXVECTOR4 pos;
+	DWORD clr;
+	D3DXVECTOR2 tex1;
+
+	static const DWORD FVF;
+};
+
+class MotionBlurShader : public Shader
+{
+public:
+	MotionBlurShader() {}
+	~MotionBlurShader() {}
+
+	virtual HRESULT					initShader( LPDIRECT3DDEVICE9 pd3dDevice, const WCHAR* shaderFileName );
+	virtual HRESULT CALLBACK		onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext );
+
+	void							onCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext );
+	void							onLostDevice();
+	void							onDestroyDevice();
+	void							onFrameMove( double dTime, float fElapsedTime );
+	void							onFrameRender( IDirect3DDevice9* pd3dDevice, double dTime, float fElapsedTime );
+private:
+	
+	void SetupFullscreenQuad( const D3DSURFACE_DESC* pBackBufferSurfaceDesc );
+	LPD3DXSPRITE					m_textSprite;
+	
+	LPDIRECT3DTEXTURE9          g_pFullScreenRenderTarget;
+	LPDIRECT3DSURFACE9          g_pFullScreenRenderTargetSurf;
+
+	LPDIRECT3DTEXTURE9          g_pPixelVelocityTexture1;
+	LPDIRECT3DSURFACE9          g_pPixelVelocitySurf1;
+	LPDIRECT3DTEXTURE9          g_pPixelVelocityTexture2;
+	LPDIRECT3DSURFACE9          g_pPixelVelocitySurf2;
+
+	LPDIRECT3DTEXTURE9          g_pLastFrameVelocityTexture;
+	LPDIRECT3DSURFACE9          g_pLastFrameVelocitySurf;
+	LPDIRECT3DTEXTURE9          g_pCurFrameVelocityTexture;
+	LPDIRECT3DSURFACE9          g_pCurFrameVelocitySurf;
+
+	D3DXHANDLE                  g_hWorld;
+	D3DXHANDLE                  g_hWorldLast;
+	D3DXHANDLE                  g_hMeshTexture;
+	D3DXHANDLE                  g_hWorldViewProjection;
+	D3DXHANDLE                  g_hWorldViewProjectionLast;
+	D3DXHANDLE                  g_hCurFrameVelocityTexture;
+	D3DXHANDLE                  g_hLastFrameVelocityTexture;
+	D3DXHANDLE                  g_hTechWorldWithVelocity;
+	D3DXHANDLE                  g_hPostProcessMotionBlur;
+
+	int                         g_nPasses;          // Number of passes required to render
+	int                         g_nRtUsed;          // Number of render targets used by each pass
+	D3DFORMAT                   g_VelocityTexFormat;    // Texture format for velocity textures
+
+	struct CRenderTargetSet
+	{
+		IDirect3DSurface9* pRT[2][2];  // Two passes, two RTs
+	};
+
+	CRenderTargetSet g_aRTSet[2];            // Two sets of render targets
+	CRenderTargetSet*           g_pCurFrameRTSet;      // Render target set for current frame
+	CRenderTargetSet*           g_pLastFrameRTSet;     // Render target set for last frame
+	SCREEN_VERTEX g_Vertex[4];
+
+	float                       g_fPixelBlurConst;
+	float                       g_fObjectSpeed;
+	float                       g_fCameraSpeed;
+	
+	DWORD                       g_dwBackgroundColor;
+
+	D3DXMATRIX                  g_mViewProjectionLast;
 
 };

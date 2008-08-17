@@ -49,6 +49,7 @@ Tcl_Interp*						g_consoleInterp			= 0;
 std::wstring g_debugBuffer;
 bool							g_bTileGrid				= false;
 
+
 //--------------------------------------------------------------------------------------
 // Rejects any D3D9 devices that aren't acceptable to the app by returning false
 //--------------------------------------------------------------------------------------
@@ -157,8 +158,11 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 
 	// State Manager Initialization
 	g_tsm = new TopStateManager();
-	//GetWorldManager().setNextWorld( "EpRoomWorld" );
-	GetWorldManager().setNextWorld( "EpCeilingWorld" );
+	ConstCharList startWorldName;
+	GetScriptManager().readCharPtrList( "EpStartWorldName", startWorldName );
+	assert( startWorldName.size() == 1 );
+	ConstCharList::iterator startWorldNameIt = startWorldName.begin();
+	GetWorldManager().setNextWorld( *startWorldNameIt );
 	
 	g_wsm = new WorldStateManager();
 
@@ -251,7 +255,7 @@ HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFA
 	g_fillColor = D3DCOLOR_ARGB( 0, 0, 0, 0 );
 
 	if ( g_bombShader )
-		g_bombShader->onResetDevice();
+		g_bombShader->onResetDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
 	//g_alphaShader->onResetDevice();
 
 	GetG().m_EpLight.setupLight();

@@ -127,7 +127,8 @@ void ScreenFlash::screenFlashing( float durationSec, float r, float g, float b )
 	m_screenFlashAlphaAngle = 0.0f;
 }
 
-void ScreenFlash::reset()
+void ScreenFlash::reset( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
+						void* pUserContext )
 {
-	m_alphaShader->onResetDevice();
+	m_alphaShader->onResetDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
 }

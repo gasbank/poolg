@@ -15,6 +15,8 @@ public:
 	void execute(const char* command);
 	void executeFile(const char* fileName);
 	Tcl_Interp* getInterp() { assert(m_interp); return m_interp; }
+
+	static void throwScriptErrorWithMessage( Tcl_Interp* interp );
 	
 	const char* readString( const char* variableName );
 	bool readRect( const char* variableName, RECT& rect );
@@ -22,9 +24,9 @@ public:
 	Tcl_Obj* getObject( const char* variableName );
 	bool readCharPtrList( const char* variableName, ConstCharList& strList );
 
-	void initBoundings();
+	void initScriptBindings();
 private:
-	void throwScriptErrorWithMessage();
+	
 
 	Tcl_Interp* m_interp;
 };

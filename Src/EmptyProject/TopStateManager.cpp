@@ -24,17 +24,3 @@ void TopStateManager::init()
 	m_curStates = 0;
 	m_nextState = 0;
 }
-
-
-//////////////////////////////////////////////////////////////////////////
-
-
-//
-//void* EpGetWorldState()
-//{
-//	return GetTopStateManager().getState( GAME_TOP_STATE_WORLD );
-//} SCRIPT_CALLABLE_PV( EpGetWorldState )
-
-START_SCRIPT_FACTORY( TopStateManager )
-	//CREATE_OBJ_COMMAND( EpGetWorldState )
-END_SCRIPT_FACTORY( TopStateManager )

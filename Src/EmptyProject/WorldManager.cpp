@@ -2,6 +2,7 @@
 #include "WorldManager.h"
 #include "World.h"
 #include "WorldStateManager.h"
+#include "ScriptManager.h"
 
 IMPLEMENT_SINGLETON( WorldManager )
 
@@ -64,3 +65,15 @@ void WorldManager::release()
 {
 	detachAllWorlds();
 }
+
+
+World* EpGetCurWorld()
+{
+	return GetWorldManager().getCurWorld();
+} SCRIPT_CALLABLE_PV( EpGetCurWorld )
+
+
+
+START_SCRIPT_FACTORY( WorldManager )
+	CREATE_OBJ_COMMAND( EpGetCurWorld )
+END_SCRIPT_FACTORY( WorldManager )

@@ -30,11 +30,11 @@ namespace eval EpCeilingWorld {
 	}
 
 	proc enter {} {
-		EpOutputDebugString " - CeilingWorld enter() called\n"
+		EpOutputDebugString " - [info level 0] called\n"
 	}
 	
 	proc leave {} {
-		EpOutputDebugString " - CeilingWorld leave() called\n"
+		EpOutputDebugString " - [info level 0] called\n"
 	}
 
 	proc createHero { tileX tileY } {

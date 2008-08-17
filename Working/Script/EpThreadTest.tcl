@@ -2,9 +2,9 @@
 namespace eval EpThreadTest {
 
 	proc createUnit {} {
-		set ws [ EpGetWorldState ]
-		set en [ EpCreateEnemy 28 76 ]
-		EpRegisterToWorld $ws $en
+		set world [ EpGetCurWorld ]
+		set enemy [ EpCreateEnemy 28 76 ]
+		EpRegisterToWorld $world $enemy
 	}
 	proc printHeroPos {} {
 		set hero [ EpGetHero ]

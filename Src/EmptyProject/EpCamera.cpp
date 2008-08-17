@@ -133,6 +133,7 @@ void EpCamera::updateExternalCamera( ArnCamera* arnCam )
 	//
 	// Transpose of this is view transform matrix
 	//
+	assert( arnCam );
 
 	const ARN_NDD_CAMERA_CHUNK& arnCamData = arnCam->getCameraData();
 

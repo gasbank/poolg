@@ -14,6 +14,3 @@ public:
 	
 };
 inline TopStateManager& GetTopStateManager() { return TopStateManager::getSingleton(); }
-
-
-SCRIPT_FACTORY( TopStateManager )

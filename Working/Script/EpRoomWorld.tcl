@@ -81,12 +81,12 @@ namespace eval EpRoomWorld {
 		set incCount	[ EpRegisterIncident $incident ]
 		EpOutputDebugString " - Incident count: $incCount\n"
 	}
-
+	
 	proc enter {} {
 		variable testEnemy
 		variable pHeroUnit
 		
-		EpOutputDebugString " - EpRoomWorld enter\n"
+		EpOutputDebugString " - [info level 0] called\n"
 		
 		set testEnemy				[createEnem 27 78 1];
 		
@@ -184,7 +184,7 @@ namespace eval EpRoomWorld {
 	}
 	
 	proc leave {} {
-		EpOutputDebugString " - EpRoomWorld leave\n"
+		EpOutputDebugString " - [info level 0] called\n"
 	}
 
 	proc printDialogText {} {

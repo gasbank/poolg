@@ -25,3 +25,5 @@ private:
 	World* m_nextWorld;
 };
 inline WorldManager& GetWorldManager() { return WorldManager::getSingleton(); }
+
+SCRIPT_FACTORY( WorldManager )

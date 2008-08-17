@@ -43,7 +43,7 @@ HRESULT ScriptManager::release()
 void ScriptManager::execute( const char* command )
 {
 	if ( Tcl_Eval( m_interp, command ) != TCL_OK )
-		throwScriptErrorWithMessage();
+		throwScriptErrorWithMessage( m_interp );
 }
 
 void ScriptManager::executeFile( const char* fileName )
@@ -54,19 +54,20 @@ void ScriptManager::executeFile( const char* fileName )
 	if (!f)
 		throw std::runtime_error("Script file opening failed");
 #endif
+
 	if ( Tcl_EvalFile( m_interp, fileName ) != TCL_OK )
-		throwScriptErrorWithMessage();
+		throwScriptErrorWithMessage( m_interp );
 }
 
-void ScriptManager::throwScriptErrorWithMessage()
+void ScriptManager::throwScriptErrorWithMessage( Tcl_Interp* interp )
 {
-	char lineNo[32];
-	StringCchPrintfA( lineNo, 32, "Line: %d\n", m_interp->errorLine );
+	// Caution: 'trace' may contain wrong message of you call another script command afterwards
+	const char* trace = Tcl_GetVar( interp, "errorInfo", TCL_GLOBAL_ONLY );
+
 	OutputDebugStringA( "\n@@@------------------------- SCRIPT ERROR -------------------------@@@\n" );
-	OutputDebugStringA( lineNo );
-	OutputDebugStringA( m_interp->result );
+	OutputDebugStringA( trace );
 	OutputDebugStringA( "\n@@@------------------------- SCRIPT ERROR -------------------------@@@\n\n" );
-	throw std::runtime_error( m_interp->result );
+	throw std::runtime_error( trace );
 }
 
 bool ScriptManager::readRect( const char* variableName, RECT& rect )
@@ -127,20 +128,19 @@ bool ScriptManager::readCharPtrList( const char* variableName, ConstCharList& st
 	return true;
 }
 
+#define INIT_BINDING(className) _script_factory_##className::init()
 
-
-void ScriptManager::initBoundings()
+void ScriptManager::initScriptBindings()
 {
-	_script_factory_World::init();
-	_script_factory_Unit::init();
-	_script_factory_Character::init();
-	_script_factory_Hero::init();
-	_script_factory_Enemy::init();
-	_script_factory_TopStateManager::init();
-	_script_factory_Incident::init();
-	_script_factory_Action::init();
-	_script_factory_Trigger::init();
-
+	INIT_BINDING( WorldManager );
+	INIT_BINDING( World );
+	INIT_BINDING( Unit );
+	INIT_BINDING( Character );
+	INIT_BINDING( Hero );
+	INIT_BINDING( Enemy );
+	INIT_BINDING( Incident );
+	INIT_BINDING( Action );
+	INIT_BINDING( Trigger );
 }
 
 //////////////////////////////////////////////////////////////////////////

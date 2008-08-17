@@ -584,13 +584,14 @@ unsigned int __stdcall newThread( ClientData cd )
 	if (Tcl_Init(g_consoleInterp) == TCL_ERROR)
 		return TCL_ERROR;
 
-	GetScriptManager().initBoundings();
+	GetScriptManager().initScriptBindings();
 
 	CREATE_OBJ_COMMAND( EpOutputDebugString );
 
 	SetEvent( g_handle );
 
-	//Tcl_EvalFile( g_consoleInterp, "library/EpThreadTest.tcl" );
+	if ( Tcl_EvalFile( g_consoleInterp, "Script/EpThreadTest.tcl" ) != TCL_OK )
+		ScriptManager::throwScriptErrorWithMessage( g_consoleInterp );
 
 	return 0;
 }

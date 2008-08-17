@@ -10,11 +10,11 @@ namespace eval EpA213World {
 	}
 
 	proc enter {} {
-
+		EpOutputDebugString " - [info level 0] called\n"
 	}
 	
 	proc leave {} {
-		EpOutputDebugString " - EpA213World leave\n"
+		EpOutputDebugString " - [info level 0] called\n"
 	}
 
 }

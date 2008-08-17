@@ -223,6 +223,17 @@ double EpUnitGetUpperRightZ( void* ptr )
 	return instance->Unit::getUpperRight().z;
 } SCRIPT_CALLABLE_D_PV( EpUnitGetUpperRightZ )
 
+Tcl_Obj* EpUnitGetPos( void* ptr )
+{
+	Unit* instance = reinterpret_cast<Unit*>( ptr );
+	Tcl_Obj* retObjv[3];
+	retObjv[0] = Tcl_NewDoubleObj( instance->getPos().x );
+	retObjv[1] = Tcl_NewDoubleObj( instance->getPos().y );
+	retObjv[2] = Tcl_NewDoubleObj( instance->getPos().z );
+	Tcl_Obj* ret = Tcl_NewListObj( 3, retObjv );
+	return ret;
+} SCRIPT_CALLABLE_OBJ_PV( EpUnitGetPos )
+
 int EpUnitPrintTilePos( void* ptr )
 {
 	Unit* instance = reinterpret_cast<Unit*>( ptr );
@@ -244,4 +255,5 @@ START_SCRIPT_FACTORY( Unit )
 	CREATE_OBJ_COMMAND( EpUnitSetPosZ )
 	CREATE_OBJ_COMMAND( EpUnitGetUpperRightZ )
 	CREATE_OBJ_COMMAND( EpUnitPrintTilePos )
+	CREATE_OBJ_COMMAND( EpUnitGetPos )
 END_SCRIPT_FACTORY( Unit )

@@ -73,7 +73,7 @@ void ScriptManager::throwScriptErrorWithMessage( Tcl_Interp* interp )
 bool ScriptManager::readRect( const char* variableName, RECT& rect )
 {
 	Tcl_Obj* retObj;
-	Tcl_Obj* aObj;	
+	Tcl_Obj* aObj;
 	int retObjLength;	
 	retObj = Tcl_GetVar2Ex( m_interp, variableName, 0, 0 );
 	Tcl_ListObjLength( m_interp, retObj, &retObjLength );
@@ -220,9 +220,8 @@ void ParseTclArgumentByTrait( DWORD trait, Tcl_Interp* interp, Tcl_Obj *CONST ob
 		trait = trait >> 4;
 		i++;
 	}
-
 }
-void SetTclResult(DWORD trait, Tcl_Obj* tcl_result, const ScriptArgumentList& argList)
+void SetTclResult(Tcl_Interp* interp, DWORD trait, Tcl_Obj* tcl_result, const ScriptArgumentList& argList)
 {
 	switch (trait & 0xf)
 	{
@@ -237,6 +236,9 @@ void SetTclResult(DWORD trait, Tcl_Obj* tcl_result, const ScriptArgumentList& ar
 		break;
 	case AT_D:
 		Tcl_SetDoubleObj( tcl_result, argList[0].d );
+		break;
+	case AT_OBJ:
+		Tcl_SetObjResult( interp, argList[0].obj );
 		break;
 	default:
 		throw std::runtime_error("Trait incorrect");

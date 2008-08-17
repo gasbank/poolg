@@ -54,10 +54,10 @@ namespace eval EpRoomWorld {
 		variable pHeroUnit
 					
 		set trigger [ EpCreateUnitPositionTrigger $pHeroUnit 26 98 26 98 ]
-		set action		[ EpCreateUnitSpawnAction [createEnem 27 98 0] ]
+		set action		[ EpCreateUnitSpawnAction [createEnemy 27 98 0] ]
 		set incident	[ EpCreateIncident $trigger $action ]
 
-		set action2		[ EpCreateUnitSpawnAction [createEnem 28 98 0] ]
+		set action2		[ EpCreateUnitSpawnAction [createEnemy 28 98 0] ]
 
 		EpAddActionToIncident $incident $action2
 
@@ -88,25 +88,25 @@ namespace eval EpRoomWorld {
 		
 		EpOutputDebugString " - [info level 0] called\n"
 		
-		set testEnemy				[createEnem 27 78 1];
+		set testEnemy				[createEnemy 27 78 1];
 		
 		set pHeroUnit				[createHero 26 74];
 		
-		set pEnemyUnit1				[createEnem 25 90 1];
-		set pEnemyUnit2				[createEnem 37 88 1];
-		set pEnemyUnit3				[createEnem 35 67 1];
-		set pEnemyUnit4				[createEnem 47 73 1];
-		set pEnemyUnit5				[createEnem 62 83 1];
-		set pEnemyUnit6				[createEnem 59 58 1];
-		set pEnemyUnit7				[createEnem 36 53 1];
-		set pEnemyUnit8				[createEnem 42 44 1];
-		set pNPCUnit1				[createEnem 47 65 1];
-		set pTestEnemyUnit			[createEnem 55 40 1];
+		set pEnemyUnit1				[createEnemy 25 90 1];
+		set pEnemyUnit2				[createEnemy 37 88 1];
+		set pEnemyUnit3				[createEnemy 35 67 1];
+		set pEnemyUnit4				[createEnemy 47 73 1];
+		set pEnemyUnit5				[createEnemy 62 83 1];
+		set pEnemyUnit6				[createEnemy 59 58 1];
+		set pEnemyUnit7				[createEnemy 36 53 1];
+		set pEnemyUnit8				[createEnemy 42 44 1];
+		set pNPCUnit1				[createEnemy 47 65 1];
+		set pTestEnemyUnit			[createEnemy 55 40 1];
 		
 		EpUnitSetRotX				$pHeroUnit [ToRadian -90]
 		EpUnitSetRotZ				$pHeroUnit [ToRadian 90]
 		EpUnitSetPosZ				$pHeroUnit -[EpUnitGetUpperRightZ $pHeroUnit]
-                                                                  # Health Will Coding Defence Sense Immunity
+                                             # Health Will Coding Defence Sense Immunity
 		EpCharacterSetStat			$pHeroUnit    7     5     7       5      5      5
 		EpCharacterSetCurHp			$pHeroUnit 10
 		EpCharacterSetCurCs			$pHeroUnit -1
@@ -199,12 +199,5 @@ namespace eval EpRoomWorld {
 		return $unit
 	}
 	
-	proc createEnem { tileX tileY registerWorld } {
-		variable world
-		set unit [ EpCreateEnemy $tileX $tileY ];
-		if $registerWorld {
-			EpRegisterToWorld $world $unit
-		}
-		return $unit
-	}
+	
 }

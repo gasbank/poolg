@@ -19,12 +19,12 @@ namespace eval EpThreadTest {
 		if { [string first "eval" $data] == 0 } {
 			
 			if [catch { eval [string range $data 5 end] } result] {
-				puts "Bad command."
+				puts $::errorInfo
 			}
 			
 		} elseif { [string first "uplevel" $data] == 0 } {
 			if [catch { uplevel [string range $data 8 end] } result] {
-				puts "Bad command."
+				puts $::errorInfo
 			}
 		} else {
 			switch $data {
@@ -46,7 +46,7 @@ namespace eval EpThreadTest {
 				}
 				default {
 					if [string length $data] {
-						puts "Bad command."
+						puts $::errorInfo
 					}
 				}
 			}

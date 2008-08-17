@@ -37,17 +37,4 @@ namespace eval EpCeilingWorld {
 		EpOutputDebugString " - [info level 0] called\n"
 	}
 
-	proc createHero { tileX tileY } {
-		variable world
-		set unit [ EpCreateHero $tileX $tileY ];
-		EpRegisterToWorld $world $unit
-		return $unit
-	}
-
-	proc createEnemy { tileX tileY } {
-		variable world
-		set unit [ EpCreateEnemy $tileX $tileY ];
-		EpRegisterToWorld $world $unit
-		return $unit
-	}	
 }

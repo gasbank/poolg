@@ -6,7 +6,6 @@ proc EpInitApp {} {
 	set h1 3
 	set multiplier 200
 	EpSetWindowSize [expr $w1 * $multiplier] [expr $h1 * $multiplier]
-	
 }
 
 proc EpInitGame {} {
@@ -15,19 +14,25 @@ proc EpInitGame {} {
 	EpOutputDebugString "<Script> EpInitGame called\n"
 }
 
-proc EpUnitOnMove {direction} {
-	EpOutputDebugString "procedure called with argument: $direction\n"
+####################################################################################
+
+proc createHero { tileX tileY } {
+	set curWorld [ EpGetCurWorld ];
+	set unit [ EpCreateHero $tileX $tileY ];
+	EpRegisterToWorld $curWorld $unit
+	return $unit
 }
 
-proc square_tcl {arg1} {
-	set x [expr {$arg1 * $arg1}];
-	return $x
+proc createEnemy { tileX tileY { registerWorld 1 } } {
+	set curWorld [ EpGetCurWorld ];
+	set unit [ EpCreateEnemy $tileX $tileY ];
+	if $registerWorld {
+		EpRegisterToWorld $curWorld $unit
+	}
+	return $unit
 }
 
-proc printSquare {arg1} {
-	set x [square_tcl $arg1];
-	puts " printSquare result: $x"
-}
+####################################################################################
 
 proc ToRadian {deg} {
 	return [expr $deg * 3.14159265358979323846 / 180.0]

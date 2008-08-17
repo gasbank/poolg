@@ -197,7 +197,16 @@ void ParseTclArgumentByTrait( DWORD trait, Tcl_Interp* interp, Tcl_Obj *CONST ob
 		{
 		case AT_I:
 			if ( Tcl_GetIntFromObj( interp, objv[i], &sa.i ) != TCL_OK )
+			{
+				/*
+				 * If you caught this error, you probably missed '$' character
+				 * on the first place of a variable name in the script file.
+				 * Note that tcl recognize a variable name without a preceding '$' to
+				 * simple lexical string.
+				 *
+				 */
 				throw std::runtime_error("Integer argument access failed");
+			}
 			break;
 		case AT_PV:
 			if ( Tcl_GetLongFromObj( interp, objv[i], (long*)&sa.i ) != TCL_OK )

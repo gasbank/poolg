@@ -14,7 +14,6 @@ namespace eval EpThreadTest {
 	proc localHandler {} {
 		# get the data from stdin
 		gets stdin data
-		# client will exit if you type "exit". How original!
 		
 		if { [string first "eval" $data] == 0 } {
 			
@@ -28,7 +27,10 @@ namespace eval EpThreadTest {
 			}
 		} else {
 			switch $data {
-				exit { exit }
+				exit {
+					# client will exit if you type "exit". How original!
+					exit
+				}
 				ls {
 					puts "So classical"
 				}

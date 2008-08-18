@@ -191,9 +191,6 @@ void EpLight::updateFadeBrightness( float fElapsedTime )
 	m_eLightState = LIGHT_FADE;
 
 	m_fBrightness = abs( sin( D3DXToRadian( m_fFadeTimer / m_fFadeDuration * 90.0f ) ) );
-
-	printf( "FadeTimer = %f \n", m_fFadeTimer );
-	printf( "Brightness = %f \n", m_fBrightness );
 }
 
 void EpLight::updateFlicker( float fElapsedTime )

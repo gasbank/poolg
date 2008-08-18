@@ -13,4 +13,3 @@ BattleState* SkillObject::getBattleState()
 {
 	return reinterpret_cast<BattleState*>( GetWorldStateManager().getCurState() );
 }
-

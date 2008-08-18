@@ -122,6 +122,7 @@ HRESULT World::init()
 
 	GetG().m_EpLight.fadeInLight();
 
+
 	return hr;
 }
 
@@ -190,7 +191,7 @@ HRESULT World::frameMove(double fTime, float fElapsedTime)
 	
 	m_pic.frameMove(fElapsedTime);
 	m_avatar.frameMove(fElapsedTime);
-	camera.frameMove(fElapsedTime);
+	//camera.frameMove(fElapsedTime);
 
 	if ( m_sound )
 		m_sound->UpdateAudio();
@@ -201,7 +202,7 @@ HRESULT World::frameMove(double fTime, float fElapsedTime)
 		(*itDialog)->frameMove( fTime, fElapsedTime );
 	}
 	
-	GetG().m_camera.frameMove( fElapsedTime );
+	//GetG().m_camera.frameMove( fElapsedTime );
 	
 	m_sampleTeapotMeshRot += fElapsedTime * D3DXToRadian(35); // 35 degrees per second
 

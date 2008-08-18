@@ -242,6 +242,27 @@ Action* EpCreateUnitMoveAction( void* targetUnit, const char* input )
 
 //////////////////////////////////////////////////////////////////////////
 
+void FadeAction::activate()
+{
+	GetG().m_EpLight.setFadeDuration( m_fDuration );
+	if ( m_iType == 0 )
+		GetG().m_EpLight.fadeInLight();
+	else if ( m_iType == 1 )
+		GetG().m_EpLight.fadeOutLight();
+}
+
+void FadeAction::update()
+{
+
+}
+
+Action* EpCreateFadeAction( int type, int durationMs )
+{
+	return new FadeAction( type, (float)durationMs / 1000 );
+} SCRIPT_CALLABLE_PV_I_I( EpCreateFadeAction )
+
+//////////////////////////////////////////////////////////////////////////
+
 START_SCRIPT_FACTORY( Action )
 	CREATE_OBJ_COMMAND( EpCreateDialogAction )
 	CREATE_OBJ_COMMAND( EpCreateSoundAction )
@@ -249,4 +270,5 @@ START_SCRIPT_FACTORY( Action )
 	CREATE_OBJ_COMMAND( EpCreateUnitSpawnAction )
 	CREATE_OBJ_COMMAND( EpCreateScriptAction )
 	CREATE_OBJ_COMMAND( EpCreateUnitMoveAction )
+	CREATE_OBJ_COMMAND( EpCreateFadeAction )
 END_SCRIPT_FACTORY( Action )

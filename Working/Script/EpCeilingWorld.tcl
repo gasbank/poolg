@@ -13,6 +13,17 @@ namespace eval EpCeilingWorld {
 		set incCount	[ EpRegisterIncident $incident ]
 		EpOutputDebugString " - Incident count: $incCount\n"
 	}
+
+	proc registerIncidentFade {} {
+		variable pHeroUnit
+
+		set trigger		[ EpCreateUnitPositionTrigger	$pHeroUnit 31 77 31 77 ]
+		set action		[ EpCreateFadeAction			1 1500 ]
+		set incident	[ EpCreateIncident				$trigger $action 0 ]
+
+		set incCount	[ EpRegisterIncident			$incident ]
+		EpOutputDebugString " - Incident count: $incCount\n"
+	}
 	
 	proc init { curWorld } {
 		variable world hero npcGetg npcGloop
@@ -48,6 +59,7 @@ namespace eval EpCeilingWorld {
 
 
 		registerIncidentInitTalk
+		registerIncidentFade
 		
 		createWarpPosition			"EpRoomWorld" 25 82
 	}

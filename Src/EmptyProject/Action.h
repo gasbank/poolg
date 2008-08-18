@@ -6,7 +6,7 @@ class Enemy;
 class Unit;
 
 
-enum ActionType { AT_BATTLE, AT_DIALOG, AT_SOUND, AT_HEAL, AT_UNITSPAWN, AT_SCRIPT };
+enum ActionType { AT_BATTLE, AT_DIALOG, AT_SOUND, AT_HEAL, AT_UNITSPAWN, AT_SCRIPT, AT_FADE };
 
 class Action
 {
@@ -133,3 +133,18 @@ private:
 	std::string m_scriptCommand;
 };
 
+//////////////////////////////////////////////////////////////////////////
+
+class FadeAction : public Action
+{
+public:
+	FadeAction( int type, float duration ) { m_iType = type; m_fDuration = duration; }
+	virtual ~FadeAction() {}
+
+	virtual void activate();
+	virtual void update();
+
+private:
+	int m_iType;
+	float m_fDuration;
+};

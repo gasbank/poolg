@@ -451,6 +451,8 @@ UINT World::addUnit( Unit* u )
 
 	}
 
+	GetTileManager().getTile( u->getTilePos() )->b_movable = false;
+
 	return m_unitSet.size();
 }
 

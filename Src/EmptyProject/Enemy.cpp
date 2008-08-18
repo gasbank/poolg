@@ -27,8 +27,7 @@ Unit* Enemy::createEnemy( LPD3DXMESH mesh, int tileX, int tileY, float posZ )
 	u->setControllable( false );
 	u->setTilePos( tileX, tileY );
 	u->setTileBufferPos( tileX, tileY );
-	GetTileManager().getTile( tileX, tileY )->b_movable = false;
-	
+		
 	// As default, enemy's model is GwengYi
 	PlayState* ps = static_cast<PlayState*>(GetTopStateManager().getState( GAME_TOP_STATE_PLAY ));
 	ArnSceneGraph* charSceneGraph = ps->getCharacterSceneGraph();

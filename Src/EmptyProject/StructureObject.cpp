@@ -21,7 +21,6 @@ Unit* StructureObject::createStructureObject( LPD3DXMESH mesh, int tileX, int ti
 	u->setTilePos( tileX, tileY );
 	u->setTileBufferPos( tileX, tileY );
 	u->setPushable( pushable );
-	GetTileManager().getTile( tileX, tileY )->b_movable = false;
 
 	return u;
 }

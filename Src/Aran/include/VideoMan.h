@@ -24,6 +24,7 @@
 class Character;
 class ArnCamera;
 class ArnNode;
+class ArnMesh;
 
 struct MY_COLOR_VERTEX
 {
@@ -205,6 +206,7 @@ public:
 	void setWorldViewProjection( const D3DXMATRIX& matWorld, const D3DXMATRIX& matView, const D3DXMATRIX& matProj );
 
 	void renderMeshesOnly(ArnNode* node, const D3DXMATRIX& globalXform = DX_CONSTS::D3DXMAT_IDENTITY);
+	void renderSingleMesh(ArnMesh* mesh, const D3DXMATRIX& globalXform = DX_CONSTS::D3DXMAT_IDENTITY);
 	float getFPS() const { return m_fFPS; }
 
 private:

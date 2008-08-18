@@ -1,6 +1,6 @@
 namespace eval EpRoomWorld {
 	set modelFilePath	"room.arn"
-	variable world testEnemy pHeroUnit
+	variable world testEnemy pHeroUnit pTestEnemyUnit
 	
 	proc init { curWorld } {
 		variable world
@@ -57,6 +57,7 @@ namespace eval EpRoomWorld {
 	proc registerIncidentUnClear {} {
 		variable world
 		variable pHeroUnit
+		variable pTestEnemyUnit
 		
 		set trigger		[ EpCreateUnTotalAnnihilationTrigger $world ]
 		set action		[ EpCreateDialogAction "EpDialogReturn" ]
@@ -64,9 +65,11 @@ namespace eval EpRoomWorld {
 
 		set trigger2		[ EpCreateUnitPositionTrigger $pHeroUnit 50 33 59 33 ]
 		set action2		[ EpCreateUnitMoveAction $pHeroUnit "UP" ]
+		set action3		[ EpCreateUnitMoveAction $pTestEnemyUnit "DOWN" ]
 
 		EpAddTriggerToIncident $incident $trigger2
 		EpAddActionToIncident $incident $action2
+		EpAddActionToIncident $incident $action3
 
 		set incCount	[ EpRegisterIncident $incident ]
 		EpOutputDebugString " - Incident count: $incCount\n"
@@ -75,6 +78,7 @@ namespace eval EpRoomWorld {
 	proc enter {} {
 		variable testEnemy
 		variable pHeroUnit
+		variable pTestEnemyUnit
 		
 		EpOutputDebugString " - [info level 0] called\n"
 		
@@ -161,7 +165,7 @@ namespace eval EpRoomWorld {
 
 		# Setting Test Enemy Unit
 		EpCharacterSetColor			$pTestEnemyUnit 255 255 255
-		EpEnemySetRandomWalkable		$pTestEnemyUnit	1
+		EpEnemySetRandomWalkable		$pTestEnemyUnit	0
 		EpCharacterSetBoundary			$pTestEnemyUnit 3 -22 5 -25  ;# left, top, right, bottom
 		EpEnemySetTalkable			$pTestEnemyUnit	1
 		

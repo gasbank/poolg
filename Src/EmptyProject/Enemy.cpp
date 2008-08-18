@@ -23,6 +23,7 @@ Unit* Enemy::createEnemy( LPD3DXMESH mesh, int tileX, int tileY, float posZ )
 	u->setControllable( false );
 	u->setTilePos( tileX, tileY );
 	u->setTileBufferPos( tileX, tileY );
+	GetTileManager().getTile( tileX, tileY )->b_movable = false;
 
 	return u;
 }

@@ -26,6 +26,7 @@ Unit::Unit( UnitType type )
 	m_vScale			= D3DXVECTOR3(1.0f, 1.0f, 1.0f);
 	m_bLocalXformDirty	= true;
 	m_removeFlag		= false;
+	m_bForcedMove		= false;
 	m_dm				= NULL;
 
 	D3DXMatrixIdentity(&m_localXform);
@@ -96,6 +97,8 @@ bool Unit::frameMove( float fElapsedTime )
 		m_dm->frameMove ( fElapsedTime );
 
 	updateLocalXform();
+	if ( m_bForcedMove )
+		forcedMoveTest();
 
 	return true;
 }
@@ -163,6 +166,43 @@ void Unit::setHeadDir( UnitInput unitInput )
 	}
 }
 
+void Unit::setForcedMove( int i )
+{
+	UnitInput mappedKey = (UnitInput)i ;
+
+	if( mappedKey != UNIT_UNKNOWN )
+	{
+		if( FALSE == IsKeyDown( m_aKeys[mappedKey] ) )
+		{
+			m_aKeys[ mappedKey ] = KEY_WAS_DOWN_MASK | KEY_IS_DOWN_MASK;
+			++m_cKeysDown;
+		}
+	}
+
+	m_bForcedMove = true;
+	
+}
+
+void Unit::forcedMoveTest()
+{
+	if ( m_tilePos != m_tileBufferPos )
+	{
+		for ( int j = 0; j < UNIT_MAX_KEYS; j++ )
+		{
+			if( IsKeyDown( m_aKeys[ (UnitInput)j ] ) )
+			{
+
+				UnitInput mappedKey = (UnitInput)j;
+				if( mappedKey != UNIT_UNKNOWN && ( DWORD )mappedKey < 8 )
+				{
+					m_aKeys[ mappedKey ] &= ~KEY_IS_DOWN_MASK;
+					--m_cKeysDown;
+				}
+			}
+		}
+		m_bForcedMove = false;
+	}
+}
 //////////////////////////////////////////////////////////////////////////
 
 Unit* EpCreateUnit( int tileX, int tileY, int controllable )

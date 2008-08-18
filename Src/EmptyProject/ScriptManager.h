@@ -103,6 +103,7 @@ static const DWORD _trait_PV_PV			= AT_PV | (AT_PV << 4);
 static const DWORD _trait_PV_PC			= AT_PV | (AT_PC << 4);
 static const DWORD _trait_PV_I_I		= AT_PV | (AT_I << 4) | (AT_I << 8);
 static const DWORD _trait_PV_PV_I		= AT_PV | (AT_PV << 4) | (AT_I << 8);
+static const DWORD _trait_PV_PV_PC		= AT_PV | (AT_PV << 4) | (AT_PC << 8);
 static const DWORD _trait_PV_I_I_I		= AT_PV | (AT_I << 4) | (AT_I << 8) | (AT_I << 12);
 static const DWORD _trait_PV_PV_PV		= AT_PV | (AT_PV << 4) | (AT_PV << 8) ;
 static const DWORD _trait_PV_PV_PV_I	= AT_PV | (AT_PV << 4) | (AT_PV << 8) | (AT_I << 12);
@@ -285,6 +286,13 @@ static const DWORD _trait_OBJ_PV		= AT_OBJ | (AT_PV << 4);
 		args[0].pv = funcName(args[1].pv, args[2].pv, args[3].i);				\
 	}																			\
 	SCRIPT_CALLABLE_END(funcName, PV_PV_PV_I)
+
+#define SCRIPT_CALLABLE_PV_PV_PC(funcName)										\
+	void _wrap_##funcName(ScriptArgumentList& args)								\
+	{																			\
+	args[0].pv = funcName(args[1].pv, args[2].pc);							\
+	}																			\
+	SCRIPT_CALLABLE_END(funcName, PV_PV_PC)
 
 
 #define CREATE_OBJ_COMMAND_ENGINE(funcName)											\

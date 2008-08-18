@@ -85,6 +85,9 @@ public:
 	World* getCurWorld() { return GetWorldManager().getCurWorld(); }
 	void setDynamicMotion (DynamicMotion* dm) { m_dm = dm; }
 
+	void setForcedMove( int i );
+	void forcedMoveTest();
+	
 protected:
 	World* getWorldState() const;
 
@@ -117,6 +120,7 @@ protected:
 	D3DXVECTOR3				m_vVelocity;
 	bool					m_bControllable;
 	bool					m_removeFlag;
+	bool					m_bForcedMove;
 	DynamicMotion*			m_dm;
 	
 	

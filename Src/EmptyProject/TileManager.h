@@ -15,6 +15,11 @@ struct Point2Uint
 		return (x != rhs.x || y != rhs.y );
 	}
 
+	bool operator ==( const Point2Uint& rhs ) const
+	{
+		return (x == rhs.x && y == rhs.y );
+	}
+
 	static Point2Uint ZERO;
 };
 

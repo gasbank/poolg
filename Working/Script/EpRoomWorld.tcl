@@ -63,8 +63,10 @@ namespace eval EpRoomWorld {
 		set incident		[ EpCreateIncident $trigger $action 1 ]
 
 		set trigger2		[ EpCreateUnitPositionTrigger $pHeroUnit 50 33 59 33 ]
+		set action2		[ EpCreateUnitMoveAction $pHeroUnit "UP" ]
 
 		EpAddTriggerToIncident $incident $trigger2
+		EpAddActionToIncident $incident $action2
 
 		set incCount	[ EpRegisterIncident $incident ]
 		EpOutputDebugString " - Incident count: $incCount\n"

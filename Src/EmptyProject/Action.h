@@ -1,5 +1,6 @@
 #pragma once
 #include "TileManager.h"
+
 class World;
 class Enemy;
 class Unit;
@@ -108,6 +109,22 @@ private:
 
 //////////////////////////////////////////////////////////////////////////
 
+class UnitMoveAction : public Action
+{
+public:
+	UnitMoveAction( Unit* targetUnit, std::string input );
+	virtual ~UnitMoveAction();
+
+	virtual void activate();
+	virtual void update();
+
+private:
+	Unit* m_targetUnit;
+	std::string m_input;
+};
+
+//////////////////////////////////////////////////////////////////////////
+
 class ScriptAction : public Action
 {
 public:
@@ -120,7 +137,6 @@ public:
 	virtual void update();
 
 private:
-	
 	std::string m_scriptCommand;
 };
 

@@ -7,6 +7,7 @@
 #include "Unit.h"
 #include "ScriptManager.h"
 #include "Sound.h"
+#include "Unit.h"
 
 
 Action::Action(void)
@@ -243,10 +244,49 @@ Action* EpCreateScriptAction( const char* scriptCommand )
 
 //////////////////////////////////////////////////////////////////////////
 
+UnitMoveAction::UnitMoveAction( Unit* targetUnit, std::string input )
+: m_targetUnit ( targetUnit ), m_input ( input )
+{
+}
+
+UnitMoveAction::~UnitMoveAction()
+{
+}
+
+void UnitMoveAction::activate()
+{
+	int i = 4;
+
+	if ( m_input == "LEFT" )
+		i = 2;
+	else if ( m_input == "RIGHT" )
+		i = 3;
+	else if ( m_input == "UP" )
+		i = 0;
+	else if ( m_input == "DOWN" )
+		i = 1;
+
+	m_targetUnit->setForcedMove( i );
+
+}
+
+void UnitMoveAction::update()
+{
+}
+
+Action* EpCreateUnitMoveAction( void* targetUnit, const char* input )
+{
+	Unit* u = reinterpret_cast<Unit*>( targetUnit );
+	return new UnitMoveAction( u , input );
+} SCRIPT_CALLABLE_PV_PV_PC( EpCreateUnitMoveAction )
+
+//////////////////////////////////////////////////////////////////////////
+
 START_SCRIPT_FACTORY( Action )
 	CREATE_OBJ_COMMAND( EpCreateDialogAction )
 	CREATE_OBJ_COMMAND( EpCreateSoundAction )
 	CREATE_OBJ_COMMAND( EpCreateHealAction )
 	CREATE_OBJ_COMMAND( EpCreateUnitSpawnAction )
 	CREATE_OBJ_COMMAND( EpCreateScriptAction )
+	CREATE_OBJ_COMMAND( EpCreateUnitMoveAction )
 END_SCRIPT_FACTORY( Action )

@@ -87,11 +87,29 @@ namespace eval EpRoomWorld {
 		set incCount	[ EpRegisterIncident $incident ]
 		EpOutputDebugString " - Incident count: $incCount\n"
 	}
+
+	proc registerIncidentSwitch {} {
+		variable world
+		variable TestStObject
+		variable pTestEnemyUnit
+		
+		set trigger		[ EpCreateUnitPositionTrigger $TestStObject 50 35 -1 -1 ]
+		set action		[ EpCreateScriptAction "EpSetDoAnim [EpGetNode Door] 1" ]
+		set incident		[ EpCreateIncident $trigger $action 1 ]
+
+		set action2		[ EpCreateScriptAction "EpSetDoAnim [EpGetNode TofuMan] 1" ]
+		
+		EpAddActionToIncident $incident $action2
+		
+		set incCount	[ EpRegisterIncident $incident ]
+		EpOutputDebugString " - Incident count: $incCount\n"
+	}
 	
 	proc enter {} {
 		variable testEnemy
 		variable pHeroUnit
 		variable pTestEnemyUnit
+		variable TestStObject
 		
 		EpOutputDebugString " - [info level 0] called\n"
 		
@@ -188,7 +206,8 @@ namespace eval EpRoomWorld {
 		registerIncidentClear
 		registerIncidentHidden
 		registerIncidentUnClear
-		Incident_TofuManEnter
+		#Incident_TofuManEnter
+		registerIncidentSwitch
 		
 		# Warp Positions -------------------------------------------------------
 		createWarpPosition			"EpA213World" 49 28 61 30

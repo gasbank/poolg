@@ -60,7 +60,7 @@ union ScriptArgument
 
 typedef std::vector<ScriptArgument> ScriptArgumentList;
 
-void ParseTclArgumentByTrait( DWORD trait, Tcl_Interp* interp, Tcl_Obj *CONST objv[], ScriptArgumentList& argList );
+void ParseTclArgumentByTrait( DWORD trait, Tcl_Interp* interp, int objc, Tcl_Obj *CONST objv[], ScriptArgumentList& argList );
 void SetTclResult(Tcl_Interp* interp, DWORD trait, Tcl_Obj* tcl_result, const ScriptArgumentList& argList);
 
 #define SCRIPT_CALLABLE_END(funcName, traits)																				\
@@ -69,7 +69,7 @@ void SetTclResult(Tcl_Interp* interp, DWORD trait, Tcl_Obj* tcl_result, const Sc
 	{																			\
 		Tcl_Obj* tcl_result = Tcl_GetObjResult(interp);							\
 		ScriptArgumentList argList;												\
-		ParseTclArgumentByTrait(_trait_##traits, interp, objv, argList);		\
+		ParseTclArgumentByTrait(_trait_##traits, interp, objc, objv, argList);	\
 		_wrap_##funcName(argList);												\
 		SetTclResult(interp, _trait_##traits, tcl_result, argList);				\
 		return TCL_OK;															\
@@ -279,10 +279,10 @@ static const DWORD _trait_OBJ_PV		= AT_OBJ | (AT_PV << 4);
 	}																			\
 	SCRIPT_CALLABLE_END(funcName, PV_PV_PI)
 
-#define SCRIPT_CALLABLE_PV_PV_PV_I(funcName)										\
+#define SCRIPT_CALLABLE_PV_PV_PV_I(funcName)									\
 	void _wrap_##funcName(ScriptArgumentList& args)								\
 	{																			\
-	args[0].pv = funcName(args[1].pv, args[2].pv, args[3].i);					\
+		args[0].pv = funcName(args[1].pv, args[2].pv, args[3].i);				\
 	}																			\
 	SCRIPT_CALLABLE_END(funcName, PV_PV_PV_I)
 

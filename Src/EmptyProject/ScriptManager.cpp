@@ -179,10 +179,26 @@ int Tcl_AppInit(Tcl_Interp *interp)
 //////////////////////////////////////////////////////////////////////////
 
 
-void ParseTclArgumentByTrait( DWORD trait, Tcl_Interp* interp, Tcl_Obj *CONST objv[], ScriptArgumentList& argList )
+void ParseTclArgumentByTrait( DWORD trait, Tcl_Interp* interp, int objc, Tcl_Obj *CONST objv[], ScriptArgumentList& argList )
 {
-	if (trait == 0)
+	if ( trait == 0 || (trait & 0xf) == 0 )
 		throw std::runtime_error("Trait value incorrect");
+	DWORD traitCopy = trait;
+	int argCount = 0;
+	while ( traitCopy & 0xf )
+	{
+		++argCount;
+		traitCopy >>= 4;
+	}
+
+	// Check for script caller's argument count and script binder's argument count.
+	// 'objc' includes a script caller's function name itself, so it has argument count + 1.
+	// argCount includes a script binder return type, so it has argument count +1.
+	// Since argCount and objc have both +1 value, we can compare directly.
+	if ( argCount != objc )
+	{
+		throw std::runtime_error( "Trait value and script caller's argument does not match" );
+	}
 
 	ScriptArgument sa;
 	memset( &sa, 0, sizeof( ScriptArgument ) );
@@ -229,6 +245,8 @@ void ParseTclArgumentByTrait( DWORD trait, Tcl_Interp* interp, Tcl_Obj *CONST ob
 		trait = trait >> 4;
 		i++;
 	}
+
+	
 }
 void SetTclResult(Tcl_Interp* interp, DWORD trait, Tcl_Obj* tcl_result, const ScriptArgumentList& argList)
 {

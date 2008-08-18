@@ -17,7 +17,7 @@ public:
 	void					detachChild(ArnNode* child);
 	void					deleteAllChildren();
 	ArnNode*				getLastNode();
-	ArnNode*				getNodeByName(const STRING& name);
+	ArnNode*				getNodeByName(const STRING& name) const;
 	ArnNode*				getNodeAt(unsigned int idx);
 	unsigned int			getNodeCount() const { return m_children.size(); }
 	ArnNode*				getSceneRoot() { if (m_parent) return m_parent->getSceneRoot(); else return this; }

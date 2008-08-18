@@ -14,6 +14,11 @@ public:
 	const D3DXQUATERNION&		getLocalXform_Rot() const { return m_localXform_Rot; }
 	const D3DXVECTOR3&			getLocalXform_Trans() const { return m_localXform_Trans; }
 	D3DXMATRIX					getFinalXform();
+
+	double						getAnimCtrlTime() const;
+	void						setAnimCtrlTime( double dTime );
+	void						setDoAnim( bool bDoAnim );
+	void						advanceTime( float fTime ) { m_d3dxAnimCtrl->AdvanceTime( fTime, 0 ); }
 protected:
 								ArnXformable(NODE_DATA_TYPE ndt);
 
@@ -40,4 +45,6 @@ private:
 	D3DXMATRIX					m_finalLocalXform;
 
 	LPD3DXANIMATIONCONTROLLER	m_d3dxAnimCtrl;
+	bool						m_bDoAnim;
 };
+

@@ -35,7 +35,7 @@ public:
 private:
 	
 	TCHAR m_debugBuffer[512];
-	D3DXMATRIX m_matWorld, m_matView, m_matProjection;
+	
 
 	std::vector<ArnObject*> m_objects;
 

@@ -21,7 +21,7 @@ public:
 	void turnOffLight();
 	void fadeInLight();
 	void fadeOutLight();
-	void flicker( float f );
+	void flicker( float flickerDuration );
 	void stopFlicker() { m_fFlickerDuration = 0.0f; }
 
 private:

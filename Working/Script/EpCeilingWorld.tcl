@@ -14,11 +14,22 @@ namespace eval EpCeilingWorld {
 		EpOutputDebugString " - Incident count: $incCount\n"
 	}
 
-	proc registerIncidentFade {} {
+	proc registerIncidentFadeIn {} {
 		variable pHeroUnit
 
 		set trigger		[ EpCreateUnitPositionTrigger	$pHeroUnit 31 77 31 77 ]
 		set action		[ EpCreateFadeAction			1 1500 ]
+		set incident	[ EpCreateIncident				$trigger $action 0 ]
+
+		set incCount	[ EpRegisterIncident			$incident ]
+		EpOutputDebugString " - Incident count: $incCount\n"
+	}
+
+	proc registerIncidentFadeOut {} {
+		variable pHeroUnit
+
+		set trigger		[ EpCreateUnitPositionTrigger	$pHeroUnit 29 77 29 77 ]
+		set action		[ EpCreateFadeAction			0 3000 ]
 		set incident	[ EpCreateIncident				$trigger $action 0 ]
 
 		set incCount	[ EpRegisterIncident			$incident ]
@@ -59,7 +70,8 @@ namespace eval EpCeilingWorld {
 
 
 		registerIncidentInitTalk
-		registerIncidentFade
+		registerIncidentFadeIn
+		registerIncidentFadeOut
 		
 		createWarpPosition			"EpRoomWorld" 25 82
 	}

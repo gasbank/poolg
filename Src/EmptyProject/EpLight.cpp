@@ -160,7 +160,10 @@ void EpLight::fadeInLight()
 
 void EpLight::fadeOutLight()
 {
-	m_fFadeTimer -= 0.01f;
+	if ( m_fFadeTimer > m_fFadeDuration)
+		m_fFadeTimer = m_fFadeDuration - 0.01f;
+	else
+		m_fFadeTimer -= 0.01f;
 	m_fFadeTimerSign = -1.0f;
 }
 
@@ -188,6 +191,9 @@ void EpLight::updateFadeBrightness( float fElapsedTime )
 	m_eLightState = LIGHT_FADE;
 
 	m_fBrightness = abs( sin( D3DXToRadian( m_fFadeTimer / m_fFadeDuration * 90.0f ) ) );
+
+	printf( "FadeTimer = %f \n", m_fFadeTimer );
+	printf( "Brightness = %f \n", m_fBrightness );
 }
 
 void EpLight::updateFlicker( float fElapsedTime )
@@ -235,9 +241,9 @@ void EpLight::setFlickerColor( D3DXCOLOR& color )
 	m_cFlickerSpecular = color * 0.1f;
 }
 
-void EpLight::flicker( float f )
+void EpLight::flicker( float flickerDuration )
 {
-	m_fFlickerDuration = f;
+	m_fFlickerDuration = flickerDuration;
 
 	m_light.Ambient = m_cFlickerAmbient;
 	m_light.Diffuse = m_cFlickerDiffuse;

@@ -14,7 +14,7 @@ public:
 	virtual ~Action(void);
 
 	virtual void activate() = 0;
-	virtual void update() {}
+	virtual bool update( double dTime, float fElapsedTime ) { return false; }
 	virtual void release() {}
 	
 	World* getCurWorld() const;
@@ -54,7 +54,7 @@ public:
 	virtual ~DialogAction(void);
 
 	virtual void activate();
-	virtual void update();
+	virtual bool update( double dTime, float fElapsedTime );
 	
 private:
 	virtual void onActionFinished();
@@ -114,9 +114,11 @@ public:
 	virtual ~UnitMoveAction();
 
 	virtual void activate();
+	virtual bool update( double dTime, float fElapsedTime );
 
 private:
 	Unit* m_targetUnit;
+	float m_activateElapsedTime;
 	std::string m_input;
 };
 
@@ -145,7 +147,7 @@ public:
 	virtual ~FadeAction() {}
 
 	virtual void activate();
-
+	virtual bool update( double dTime, float fElapsedTime );
 private:
 	int m_iType;
 	float m_fDuration;

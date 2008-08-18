@@ -11,6 +11,7 @@ EpLight::EpLight(void)
 	m_fFlickerDuration = 0.0f;
 	m_eLightState = LIGHT_NORMAL;
 	m_fBrightness = 1.0f;
+	m_bInFading = false;
 
 	D3DXVECTOR3 dir( 0.0f, 0.0f, 1.0f );
 	D3DXVECTOR3 pos( -38.0f, -10.0f, -40.0f );
@@ -179,14 +180,21 @@ void EpLight::turnOffLight()
 
 void EpLight::updateFadeBrightness( float fElapsedTime )
 {
+	m_bInFading = true;
 	if ( 0.0f < m_fFadeTimer && m_fFadeTimer < m_fFadeDuration )
 	{
 		m_fFadeTimer += fElapsedTime * m_fFadeTimerSign;
 	}
 	else if ( m_fFadeTimer > m_fFadeDuration )
+	{
 		m_fFadeTimer = m_fFadeDuration;
+		m_bInFading = false;
+	}
 	else if ( m_fFadeTimer < 0.0f )
+	{
 		m_fFadeTimer = 0.0f;
+		m_bInFading = false;
+	}
 
 	m_eLightState = LIGHT_FADE;
 

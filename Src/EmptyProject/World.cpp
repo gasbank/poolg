@@ -268,7 +268,7 @@ HRESULT World::frameMove(double fTime, float fElapsedTime)
 	IncidentList::iterator itInc = m_incidents.begin();
 	for ( ; itInc != m_incidents.end(); ++itInc )
 	{
-		(*itInc)->update();
+		(*itInc)->update( fTime, fElapsedTime );
 	}
 
 	UnitSet::iterator it2 = m_unitSet.begin();

@@ -1,35 +1,48 @@
 namespace eval EpCeilingWorld {
 	set modelFilePath	"ceiling.arn"
-	variable world hero npcGetg npcGloop
-	variable pHeroUnit
+	global world hero npcGetg npcGloop pHeroUnit
 
 	proc registerIncidentInitTalk {} {
-		variable pHeroUnit
+		global world hero npcGetg npcGloop pHeroUnit
 		
-		set trigger	 [ EpCreateUnitPositionTrigger $pHeroUnit 30 77 30 77 ]
-		set action		[ EpCreateDialogAction "EpDialog1" ]
-		set incident	[ EpCreateIncident $trigger $action 0 ]
+		set trigger		[ EpCreateUnitPositionTrigger $pHeroUnit 30 77 30 77 ]
+		set actions		[ EpCreateDialogAction "EpDialog1" ]
+		lappend actions	[ EpCreateDialogAction "EpDialog2" ]
+		lappend actions	[ EpCreateFadeAction out 3500 ]
+		lappend actions	[ EpCreateDialogAction "EpDialog3" ]
+		lappend actions	[ EpCreateFadeAction in 3000 ]
+		lappend actions	[ EpCreateDialogAction "EpDialog4" ]
+		lappend actions	[ EpCreateUnitMoveAction $npcGetg "RIGHT" ]
+		lappend actions	[ EpCreateUnitMoveAction $npcGetg "RIGHT" ]
+		lappend actions	[ EpCreateUnitMoveAction $npcGetg "RIGHT" ]
+		lappend actions	[ EpCreateUnitMoveAction $npcGetg "RIGHT" ]
+		lappend actions	[ EpCreateUnitMoveAction $npcGetg "RIGHT" ]
+		set incident	[ EpCreateBlockingActionIncident $trigger 0 0 ]
+		
+		foreach act $actions {
+			EpAddActionToIncident $incident $act
+		}
 		
 		set incCount	[ EpRegisterIncident $incident ]
 		EpOutputDebugString " - Incident count: $incCount\n"
 	}
 
-	proc registerIncidentFadeIn {} {
-		variable pHeroUnit
+	proc registerIncidentFadeOut {} {
+		global pHeroUnit
 
 		set trigger		[ EpCreateUnitPositionTrigger	$pHeroUnit 31 77 31 77 ]
-		set action		[ EpCreateFadeAction			1 1500 ]
+		set action		[ EpCreateFadeAction			out 1500 ]
 		set incident	[ EpCreateIncident				$trigger $action 0 ]
 
 		set incCount	[ EpRegisterIncident			$incident ]
 		EpOutputDebugString " - Incident count: $incCount\n"
 	}
 
-	proc registerIncidentFadeOut {} {
-		variable pHeroUnit
+	proc registerIncidentFadeIn {} {
+		global pHeroUnit
 
 		set trigger		[ EpCreateUnitPositionTrigger	$pHeroUnit 29 77 29 77 ]
-		set action		[ EpCreateFadeAction			0 3000 ]
+		set action		[ EpCreateFadeAction			in 3000 ]
 		set incident	[ EpCreateIncident				$trigger $action 0 ]
 
 		set incCount	[ EpRegisterIncident			$incident ]
@@ -37,8 +50,8 @@ namespace eval EpCeilingWorld {
 	}
 	
 	proc init { curWorld } {
-		variable world hero npcGetg npcGloop
-		variable pHeroUnit
+		global world hero npcGetg npcGloop
+		global pHeroUnit
 		EpOutputDebugString " - [info level 0] called / curWorld: $curWorld\n"
 		set world					$curWorld;
 		

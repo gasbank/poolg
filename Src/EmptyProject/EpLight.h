@@ -11,6 +11,8 @@ public:
 	virtual LRESULT handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 	virtual void frameMove( FLOAT fElapsedTime );
 
+	bool isInFading() const { return m_bInFading; }
+
 	void setFadeDuration( float f ) { m_fFadeDuration = f; }
 	void setupLight();
 	void setColor( float r, float g, float b );
@@ -23,14 +25,15 @@ public:
 	void fadeOutLight();
 	void flicker( float flickerDuration );
 	void stopFlicker() { m_fFlickerDuration = 0.0f; }
-
 private:
 	void updateFadeBrightness( float fElapsedTime );
 	void updateFlicker( float fElapsedTime );
 
 	D3DLIGHT9			m_light;
 	float				m_fFadeTimer;
+	
 	float				m_fFadeDuration;
+	
 	D3DXCOLOR			m_cAmbient;
 	D3DXCOLOR			m_cDiffuse;
 	D3DXCOLOR			m_cSpecular;
@@ -42,6 +45,8 @@ private:
 	D3DXCOLOR			m_cFlickerSpecular;
 	float				m_fBrightness;
 	LightState			m_eLightState;
+
+	bool				m_bInFading;
 
 	D3DXVECTOR3			m_vDir;
 	D3DXVECTOR3			m_vPos;

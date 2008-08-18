@@ -100,6 +100,7 @@ public:
 	void setColor( int r, int g, int b );
 
 	void setLocalXformDirty() { m_bLocalXformDirty = true; }
+	bool isForcedMove() const { return m_bForcedMove; }
 
 protected:
 	Unit( UnitType type );
@@ -134,6 +135,7 @@ private:
 	bool					m_bControllable;
 	bool					m_removeFlag;
 	bool					m_bForcedMove;
+	
 	DynamicMotion*			m_dm;
 	
 	

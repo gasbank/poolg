@@ -58,10 +58,14 @@ void DialogAction::activate()
 	m_dialog = GetWorldManager().getCurWorld()->startDialog( m_dialogName.c_str() );
 }
 
-void DialogAction::update()
+bool DialogAction::update( double dTime, float fElapsedTime )
 {
 	if ( m_dialog && !m_dialog->isTalking() )
+	{
 		onActionFinished();
+		return false;
+	}
+	return true;
 }
 
 void DialogAction::onActionFinished()
@@ -191,7 +195,7 @@ Action* EpCreateScriptAction( const char* scriptCommand )
 //////////////////////////////////////////////////////////////////////////
 
 UnitMoveAction::UnitMoveAction( Unit* targetUnit, std::string input )
-: m_targetUnit ( targetUnit ), m_input ( input )
+: m_targetUnit ( targetUnit ), m_input ( input ), m_activateElapsedTime( 0 )
 {
 }
 
@@ -213,9 +217,17 @@ void UnitMoveAction::activate()
 		i = 1;
 
 	m_targetUnit->setForcedMove( i );
-
+	m_activateElapsedTime = 0;
 }
 
+bool UnitMoveAction::update( double dTime, float fElapsedTime )
+{
+	m_activateElapsedTime += fElapsedTime;
+	if ( m_activateElapsedTime > 2.0f )
+		return false;
+	else
+		return true;
+}
 Action* EpCreateUnitMoveAction( void* targetUnit, const char* input )
 {
 	Unit* u = reinterpret_cast<Unit*>( targetUnit );
@@ -233,10 +245,19 @@ void FadeAction::activate()
 		GetG().m_EpLight.fadeOutLight();
 }
 
-Action* EpCreateFadeAction( int type, int durationMs )
+bool FadeAction::update( double dTime, float fElapsedTime )
 {
-	return new FadeAction( type, (float)durationMs / 1000 );
-} SCRIPT_CALLABLE_PV_I_I( EpCreateFadeAction )
+	return GetG().m_EpLight.isInFading();
+}
+Action* EpCreateFadeAction( const char* type, int durationMs )
+{
+	int typeNum = 0;
+	if ( strcmp( type, "in") == 0 ) typeNum = 0;
+	else if ( strcmp( type, "out") == 0 ) typeNum = 1;
+	else throw std::runtime_error( "Check your script" );
+
+	return new FadeAction( typeNum, (float)durationMs / 1000 );
+} SCRIPT_CALLABLE_PV_PC_I( EpCreateFadeAction )
 
 //////////////////////////////////////////////////////////////////////////
 

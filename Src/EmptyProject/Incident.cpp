@@ -5,47 +5,54 @@
 #include "ScriptManager.h"
 #include "World.h"
 
+
+Incident::Incident( bool infinite )
+: m_bActivated( false ), m_bInfinite( infinite )
+{
+}
+
 Incident::Incident( Trigger* trigger, Action* action, bool infinite )
 : m_bActivated( false ), m_bInfinite( infinite )
 {
-	TriggerList::iterator it1 = m_trigger.begin();
-	m_trigger.push_back( trigger );
-
-	ActionList::iterator it2 = m_action.begin();
-	m_action.push_back( action );
+	addTrigger( trigger );
+	addAction( action );
 }
+
 Incident::~Incident(void)
 {
 }
 
-bool Incident::update()
+bool Incident::update( double dTime, float fElapsedTime )
 {
 	int i = 0;
 
 	if ( !m_bActivated )
 	{
-		TriggerList::iterator it1 = m_trigger.begin();
-		for( ; it1 != m_trigger.end(); it1++ )
+		TriggerList::iterator itTrig = m_trigger.begin();
+		for( ; itTrig != m_trigger.end(); itTrig++ )
 		{
-			if ( (*it1)->check() )
+			if ( (*itTrig)->check() )
 				i++;
 		}
 		if ( i == (int) m_trigger.size() )
 		{
-			ActionList::iterator it2 = m_action.begin();
-			for( ; it2 != m_action.end(); it2++ )
+			ActionList::iterator itAct = m_action.begin();
+			for( ; itAct != m_action.end(); itAct++ )
 			{
-				(*it2)->activate();
+				(*itAct)->activate();
 				
 			}
 			m_bActivated = true;
 		}
 	}
 
-	ActionList::iterator it3 = m_action.begin();
-	for( ; it3 != m_action.end(); it3++ )
-		(*it3)->update();
-
+	if ( m_bActivated )
+	{
+		ActionList::iterator itAct = m_action.begin();
+		for( ; itAct != m_action.end(); ++itAct )
+			(*itAct)->update( dTime, fElapsedTime );
+	}
+	
 	if ( m_bInfinite && ( GetWorldManager().getCurWorld()->getCurDialog() == 0 ) 
 		&& (GetWorldManager().getCurWorld()->getHero()->getTilePos() != GetWorldManager().getCurWorld()->getHero()->getTileBufferPos()) )
 		m_bActivated = false;
@@ -62,13 +69,81 @@ void Incident::release()
 
 void Incident::addTrigger( Trigger* trigger )
 {
-	m_trigger.push_back( trigger );
+	if ( !m_bActivated )
+	{
+		if ( trigger )
+			m_trigger.push_back( trigger );
+		else
+			OutputDebugString( _T( " - EpWarn: Null 'Trigger' pointer will be ignored.\n" ) );
+	}
+	else
+		throw std::runtime_error( "You cannot add any trigger after the incident activated" );
 }
 
 void Incident::addAction( Action* action )
 {
-	m_action.push_back( action );
+	if ( !m_bActivated )
+	{
+		if ( action )
+			m_action.push_back( action );
+		else
+			OutputDebugString( _T( " - EpWarn: Null 'Action' pointer will be ignored.\n" ) );
+	}
+	else
+		throw std::runtime_error( "You cannot add any action after the incident activated" );
 }
+
+//////////////////////////////////////////////////////////////////////////
+
+BlockingActionIncident::BlockingActionIncident( bool infinite )
+: Incident( infinite )
+{
+}
+
+BlockingActionIncident::BlockingActionIncident( Trigger* trigger, Action* action, bool infinite )
+: Incident( trigger, action, infinite )
+{
+}
+
+bool BlockingActionIncident::update( double dTime, float fElapsedTime )
+{
+	int i = 0;
+	if ( !m_bActivated )
+	{
+		TriggerList::iterator itTrig = m_trigger.begin();
+		for( ; itTrig != m_trigger.end(); itTrig++ )
+		{
+			if ( (*itTrig)->check() )
+				i++;
+		}
+	}
+	
+	if ( i == (int) m_trigger.size() )
+	{
+		assert( m_bActivated == false );
+		
+		// Should be called one time
+		m_bActivated = true;
+		m_curActionIt = m_action.begin();
+		(*m_curActionIt)->activate();
+	}
+
+	if ( m_bActivated && ( m_curActionIt != m_action.end() ) )
+	{
+		if ( (*m_curActionIt)->update( dTime, fElapsedTime ) == false )
+		{
+			++m_curActionIt;
+			if ( m_curActionIt == m_action.end() )
+				return false;
+			else
+				(*m_curActionIt)->activate();
+		}
+		
+	}
+	return true;
+}
+
+
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -86,6 +161,13 @@ Incident* EpCreateIncident( void* pv1, void* pv2, int b )
 
 	return new Incident( trig, act, infinite );
 } SCRIPT_CALLABLE_PV_PV_PV_I( EpCreateIncident )
+
+Incident* EpCreateBlockingActionIncident( void* pv1, void* pv2, int b )
+{
+	Trigger* trig = reinterpret_cast<Trigger*>( pv1 );
+	Action* act = reinterpret_cast<Action*>( pv2 );
+	return new BlockingActionIncident( trig, act, b?true:false );
+} SCRIPT_CALLABLE_PV_PV_PV_I( EpCreateBlockingActionIncident )
 
 int EpAddTriggerToIncident( void* pv1, void* pv2 )
 {
@@ -107,6 +189,10 @@ int EpAddActionToIncident( void* pv1, void* pv2 )
 
 START_SCRIPT_FACTORY( Incident )
 	CREATE_OBJ_COMMAND( EpCreateIncident )
+	CREATE_OBJ_COMMAND( EpCreateBlockingActionIncident )
 	CREATE_OBJ_COMMAND( EpAddTriggerToIncident )
 	CREATE_OBJ_COMMAND( EpAddActionToIncident )
 END_SCRIPT_FACTORY( Incident )
+
+//////////////////////////////////////////////////////////////////////////
+

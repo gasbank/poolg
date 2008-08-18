@@ -143,13 +143,13 @@ bool InnerFire::frameMove( float fElapsedTime )
 
 
 	D3DXMATRIX mScaling, mTranslation, mRotationX, mRotationY, mRotationZ;
-	D3DXMatrixRotationX(&mRotationX, D3DXToRadian (m_angle/2));
-	D3DXMatrixRotationY(&mRotationY, D3DXToRadian (m_angle/3));
+	//D3DXMatrixRotationX(&mRotationX, D3DXToRadian (m_angle/2));
+	//D3DXMatrixRotationY(&mRotationY, D3DXToRadian (m_angle/3));
 	D3DXMatrixRotationZ(&mRotationZ, D3DXToRadian (m_angle));
 	D3DXMatrixScaling(&mScaling, 1, 1, 1);
 	D3DXMatrixTranslation(&mTranslation, m_vPos.x, m_vPos.y, m_vPos.z);
 
-	m_localXform = mRotationX * mRotationY * mRotationZ * mScaling * mTranslation;
+	m_localXform = mRotationZ * mScaling * mTranslation;
 	return true;
 }
 

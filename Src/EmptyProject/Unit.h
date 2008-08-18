@@ -2,6 +2,7 @@
 #include "WorldManager.h"
 #include "TileManager.h"
 
+class DynamicMotion;
 class Trigger;
 
 enum UnitInput
@@ -82,6 +83,7 @@ public:
 	bool getRemoveFlag() { return m_removeFlag; }
 
 	World* getCurWorld() { return GetWorldManager().getCurWorld(); }
+	void setDynamicMotion (DynamicMotion* dm) { m_dm = dm; }
 
 protected:
 	World* getWorldState() const;
@@ -115,6 +117,7 @@ protected:
 	D3DXVECTOR3				m_vVelocity;
 	bool					m_bControllable;
 	bool					m_removeFlag;
+	DynamicMotion*			m_dm;
 	
 	
 private:

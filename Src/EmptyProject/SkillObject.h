@@ -1,5 +1,5 @@
 #pragma once
-#include "EffectObject.h"
+#include "Unit.h"
 
 class BattleState;
 
@@ -10,7 +10,7 @@ public:
 
 protected:
 	BattleState* getBattleState();
-	EffectObject* m_effectObject;
+	Unit* m_effectObject;
 
 private:
 	float m_elapsedTime;

@@ -5,6 +5,7 @@
 #include "TopStateManager.h"
 #include "TileManager.h"
 #include "Trigger.h"
+#include "DynamicMotion.h"
 
 extern TileManager tileManager;
 
@@ -25,6 +26,7 @@ Unit::Unit( UnitType type )
 	m_vScale			= D3DXVECTOR3(1.0f, 1.0f, 1.0f);
 	m_bLocalXformDirty	= true;
 	m_removeFlag		= false;
+	m_dm				= NULL;
 
 	D3DXMatrixIdentity(&m_localXform);
 
@@ -90,6 +92,9 @@ LRESULT Unit::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 
 bool Unit::frameMove( float fElapsedTime )
 {	
+	if (m_dm != NULL)
+		m_dm->frameMove ( fElapsedTime );
+
 	updateLocalXform();
 
 	return true;

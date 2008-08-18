@@ -88,7 +88,7 @@ public:
 	void setForcedMove( int i );
 	void forcedMoveTest();
 	
-	void setArnMesh( ArnMesh* arnMesh ) { m_arnMesh = arnMesh; }
+	void setArnMesh( ArnMesh* arnMesh ) { assert( arnMesh ); m_arnMesh = arnMesh; }
 
 protected:
 	World* getWorldState() const;

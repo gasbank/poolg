@@ -3,6 +3,10 @@
 #include "WorldStateManager.h"
 #include "ScriptManager.h"
 #include "TileManager.h"
+#include "TopStateManager.h"
+#include "PlayState.h"
+#include "ArnSceneGraph.h"
+#include "ArnMesh.h"
 
 Enemy::Enemy()
 : Character( UT_ENEMY )
@@ -24,6 +28,12 @@ Unit* Enemy::createEnemy( LPD3DXMESH mesh, int tileX, int tileY, float posZ )
 	u->setTilePos( tileX, tileY );
 	u->setTileBufferPos( tileX, tileY );
 	GetTileManager().getTile( tileX, tileY )->b_movable = false;
+	
+	// As default, enemy's model is GwengYi
+	PlayState* ps = static_cast<PlayState*>(GetTopStateManager().getState( GAME_TOP_STATE_PLAY ));
+	ArnSceneGraph* charSceneGraph = ps->getCharacterSceneGraph();
+	ArnMesh* arnMesh = static_cast<ArnMesh*>(charSceneGraph->getSceneRoot()->getNodeByName( "GwengYiModel" ));
+	u->setArnMesh( arnMesh );
 
 	return u;
 }

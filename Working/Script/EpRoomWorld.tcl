@@ -97,8 +97,6 @@ namespace eval EpRoomWorld {
 		set pNPCUnit1				[createEnemy 47 65 1];
 		set pTestEnemyUnit			[createEnemy 55 40 1];
 		
-		#EpUnitSetRotX				$pHeroUnit [ToRadian -90]
-		#EpUnitSetRotZ				$pHeroUnit [ToRadian 90]
 		EpUnitSetPosZ				$pHeroUnit -[EpUnitGetUpperRightZ $pHeroUnit]
                                              # Health Will Coding Defence Sense Immunity
 		EpCharacterSetStat			$pHeroUnit    100     5     7       5      5      5
@@ -106,7 +104,6 @@ namespace eval EpRoomWorld {
 		EpCharacterSetCurCs			$pHeroUnit -1
 		EpCharacterSetMoveDuration		$pHeroUnit [expr 0.2]
 		EpCharacterSetColor			$pHeroUnit 255 0 255
-		EpUnitSetArnMesh			$pHeroUnit "PoolGModel"
 		
 		
 		EpCharacterSetColor			$pEnemyUnit1 128 128 0

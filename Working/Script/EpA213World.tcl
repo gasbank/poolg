@@ -19,10 +19,7 @@ namespace eval EpA213World {
 		EpCharacterSetCurCs			$pHeroUnit -1
 		EpCharacterSetMoveDuration	$pHeroUnit [expr 0.2]
 		EpCharacterSetColor			$pHeroUnit 255 0 255
-		#EpUnitSetRotX				$pHeroUnit [ToRadian -90]
-		#EpUnitSetRotZ				$pHeroUnit [ToRadian 90]
 		EpUnitSetPosZ				$pHeroUnit -[EpUnitGetUpperRightZ $pHeroUnit]
-		EpUnitSetArnMesh			$pHeroUnit "PoolGModel"
 	}
 	
 	proc leave {} {

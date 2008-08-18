@@ -3,6 +3,9 @@
 #include "ScriptManager.h"
 #include "TileManager.h"
 #include "World.h"
+#include "TopStateManager.h"
+#include "PlayState.h"
+#include "ArnMesh.h"
 
 Hero::Hero(void)
 : Character( UT_CHARACTER )
@@ -20,6 +23,12 @@ Unit* Hero::createHero( LPD3DXMESH mesh, int tileX, int tileY, float posZ )
 	u->setControllable( true );
 	u->setTilePos( tileX, tileY );
 	u->setTileBufferPos( tileX, tileY );
+
+	// As default, hero's model is PoolG
+	PlayState* ps = static_cast<PlayState*>(GetTopStateManager().getState( GAME_TOP_STATE_PLAY ));
+	ArnSceneGraph* charSceneGraph = ps->getCharacterSceneGraph();
+	ArnMesh* arnMesh = static_cast<ArnMesh*>(charSceneGraph->getSceneRoot()->getNodeByName( "PoolGModel" ));
+	u->setArnMesh( arnMesh );
 
 	return u;
 }

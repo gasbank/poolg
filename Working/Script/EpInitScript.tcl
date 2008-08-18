@@ -42,6 +42,13 @@ proc createWarpPosition { nextWorldName tx0 ty0 { tx1 -1 } { ty1 -1 } } {
 	EpOutputDebugString " - Incident count: $incCount\n"
 }
 
+proc createStructureObject { tileX tileY { pushable 1 } } {
+	set curWorld [ EpGetCurWorld ];
+	set unit [ EpCreateStructureObject $tileX $tileY $pushable ];
+	EpRegisterToWorld $curWorld $unit
+	return $unit
+}
+
 ####################################################################################
 
 proc ToRadian {deg} {

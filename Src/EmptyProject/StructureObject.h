@@ -18,6 +18,9 @@ public:
 
 private:
 	bool	m_bPushable;
+	bool	m_bMoving;
+	float	m_fMovingTime;
+	float	m_moveDuration;
 	
 };
 

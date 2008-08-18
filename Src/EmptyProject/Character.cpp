@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include "Trigger.h"
+#include "StructureObject.h"
 
 
 extern TileManager tileManager;
@@ -100,12 +101,12 @@ bool Character::frameMove( float fElapsedTime )
 		{
 			if( IsKeyDown( m_aKeys[ (UnitInput)i ] ) )
 			{
-				m_bMovable = true;
+				setMovable( true );
 				rayTesting( (UnitInput)i );
 				boundaryTesting( (UnitInput)i );
 
 				// if there is no obstacles
-				if( m_bMovable )
+				if( getMovable() )
 				{
 					TileRegion entireRegion( 0, 0, s_xSize - 1, s_ySize - 1);
 
@@ -131,8 +132,8 @@ bool Character::frameMove( float fElapsedTime )
 				}
 				// 가는 방향으로 머리를 돌린다.
 				this->setHeadDir( (UnitInput)i );
-
-				pushUnitInFront( (UnitInput)i );
+				// 앞에 있는 유닛을 민다.
+				this->pushUnitInFront( (UnitInput)i );
 
 				break;
 			}
@@ -268,60 +269,6 @@ void Character::setColor( int r, int g, int b )
 	m_material.Ambient.a = m_material.Diffuse.a = m_material.Specular.a = 1.0f;
 }
 
-HRESULT Character::rayTesting( UnitInput mappedKey )
-{
-	//////////////////////////////////////////////////////////////////////////
-	// Room Model MainWall intersection test
-
-	HRESULT hr = S_OK;
-
-	World* ws = GetWorldManager().getCurWorld();
-
-	// Ray starting position as hero position
-	D3DXVECTOR3 rayStartPos( getPos().x, getPos().y, getPos().z - 2.0f );
-
-	// Direction data
-	float dirArray[4][3] = { { 0.0f, 1.0f, 0.0f }, { 0.0f, -1.0f, 0.0f }, { -1.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f } };
-
-	BOOL hit;
-	DWORD hitFaceIndex;
-	float hitU, hitV;
-	float hitDist;
-
-	// Get mesh data
-	ArnMesh* mainWallMesh = dynamic_cast<ArnMesh*>( ws->getArnSceneGraphPt()->getSceneRoot()->getNodeByName("MainWall") );
-	if ( mainWallMesh )
-	{
-		// Select direction
-		D3DXVECTOR3 rayDir( dirArray[mappedKey][0], dirArray[mappedKey][1], dirArray[mappedKey][2] );
-
-		// Get intersection information
-		V_RETURN( D3DXIntersect( 
-			mainWallMesh->getD3DXMesh(), 
-			&rayStartPos, 
-			&rayDir,
-			&hit, 
-			&hitFaceIndex, 
-			&hitU, 
-			&hitV, 
-			&hitDist, 
-			0, 
-			0 ) );
-
-		// If there is collision between ray and face
-		if ( hit )
-		{
-			//printf("Ray Testing test. (FaceIndex : %u, Dist : %f)\n", hitFaceIndex, hitDist );
-
-			// 타일 1.5칸 이내에서 교차하면 그 방향으로 움직이지 않는다.
-			if ( hitDist <= (float) 1.5 * s_tileSize )
-				m_bMovable = false;
-		}
-	}
-	
-	return hr;
-}
-
 void Character::setCurHp( int curHp )
 {
 	if ( curHp == -1 )
@@ -376,19 +323,19 @@ void Character::boundaryTesting( UnitInput mappedKey )
 	{
 	case UNIT_MOVE_UP:
 		if ( (UINT)m_boundaryTileRect.top == getTilePosY() )
-			m_bMovable = false;
+			setMovable( false );
 		break;
 	case UNIT_MOVE_DOWN:
 		if ( (UINT)m_boundaryTileRect.bottom == getTilePosY() )
-			m_bMovable = false;
+			setMovable( false );
 		break;
 	case UNIT_MOVE_LEFT:
 		if ( (UINT)m_boundaryTileRect.left == getTilePosX() )
-			m_bMovable = false;
+			setMovable( false );
 		break;
 	case UNIT_MOVE_RIGHT:
 		if ( (UINT)m_boundaryTileRect.right == getTilePosX() )
-			m_bMovable = false;
+			setMovable( false );
 		break;
 	}
 }
@@ -425,6 +372,27 @@ void Character::setStat( int statHealth, int statWill, int statCoding, int statD
 	// Hp, Mp update goes here...
 }
 
+void Character::pushUnitInFront( UnitInput dir )
+{
+	if ( this->getType() == UT_HERO )
+	{
+		Unit* u = GetWorldManager().getCurWorld()->findUnitAtTile( 
+		getTileBufferPos().x + g_moveAmount[ (int)dir ].x,
+		getTileBufferPos().y + g_moveAmount[ (int)dir ].y );
+
+		if ( u )
+		{
+			if ( u->getType() == UT_STRUCTREOBJECT )
+			{
+				StructureObject* s = reinterpret_cast<StructureObject*>(u);
+				if ( s->getPushable() )
+				{
+					s->setForcedMove( (int)dir );
+				}
+			}
+		}
+	}
+}
 
 //////////////////////////////////////////////////////////////////////////
 

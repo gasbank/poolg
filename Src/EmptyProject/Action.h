@@ -17,13 +17,6 @@ public:
 	virtual void update() = 0;
 	virtual void release() {}
 
-	void dialogAction( const char* dialogName );
-	void moveUnitAction();
-	void battleAction( Enemy* oppCharacter );
-	void screenAction();
-	void soundAction( std::string sz );
-	void createUnitAction( int x, int y, bool random );
-
 	World* getCurWorld() const;
 protected:
 	Action(void);

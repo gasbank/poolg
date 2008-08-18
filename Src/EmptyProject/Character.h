@@ -50,21 +50,19 @@ public:
 
 	void setBoundaryRect( LONG left, LONG top, LONG right, LONG bottom );
 
-	virtual void pushUnitInFront( UnitInput dir ) {}
+	virtual void pushUnitInFront( UnitInput dir );
 
 	void setStat( int statHealth, int statWill, int statCoding, int statDef, int statSen, int statImmu );
 protected:
 	Character( UnitType type );
 
 private:
-	HRESULT rayTesting( UnitInput );
 	void boundaryTesting( UnitInput );
 
 	typedef std::list<AttackObject*> AttackObjectList;
 	AttackObjectList m_attackObjectList;
 
 	bool					m_bMoving;
-	bool					m_bMovable;
 	float					m_fMovingTime;
 	int						m_maxHp;
 	int						m_curHp;

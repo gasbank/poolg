@@ -90,6 +90,10 @@ public:
 	
 	void setArnMesh( ArnMesh* arnMesh ) { assert( arnMesh ); m_arnMesh = arnMesh; }
 
+	HRESULT rayTesting( UnitInput );
+	bool getMovable() const { return m_bMovable; }
+	void setMovable(bool val) { m_bMovable = val; }
+
 protected:
 	World* getWorldState() const;
 
@@ -133,6 +137,7 @@ private:
 	UnitType				m_type;
 
 	ArnMesh*				m_arnMesh;
+	bool					m_bMovable;
 };
 
 SCRIPT_FACTORY( Unit )

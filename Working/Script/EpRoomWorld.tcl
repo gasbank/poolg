@@ -96,6 +96,8 @@ namespace eval EpRoomWorld {
 		set pEnemyUnit8				[createEnemy 42 44 1];
 		set pNPCUnit1				[createEnemy 47 65 1];
 		set pTestEnemyUnit			[createEnemy 55 40 1];
+
+		set TestStObject			[createStructureObject 50 40];
 		
 		EpUnitSetPosZ				$pHeroUnit -[EpUnitGetUpperRightZ $pHeroUnit]
                                              # Health Will Coding Defence Sense Immunity
@@ -166,6 +168,7 @@ namespace eval EpRoomWorld {
 		EpEnemySetRandomWalkable		$pTestEnemyUnit	0
 		EpCharacterSetBoundary			$pTestEnemyUnit 3 -22 5 -25  ;# left, top, right, bottom
 		EpEnemySetTalkable			$pTestEnemyUnit	1
+
 		
 		
 		registerIncidentHeal
@@ -183,14 +186,4 @@ namespace eval EpRoomWorld {
 	proc printDialogText {} {
 		EpWriteDialog "ÇÑ±ÛÁ«¶óarlsdgklgtulsdu;asjd;tjhklsaerlushldfhlzxcvhxhjzvbkjzxcfjha;srhqwieutpuiwetp;oiweoptyiisauhljkdflkhzx"
 	}
-	
-	
-	proc createHero { tileX tileY } {
-		variable world
-		set unit [ EpCreateHero $tileX $tileY ];
-		EpRegisterToWorld $world $unit
-		return $unit
-	}
-	
-	
 }

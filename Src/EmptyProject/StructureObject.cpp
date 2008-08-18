@@ -4,6 +4,9 @@
 StructureObject::StructureObject(void)
 : Unit ( UT_STRUCTREOBJECT )
 {
+	m_bMoving			= false;
+	m_fMovingTime		= 0;
+	m_moveDuration		= 1.0f;
 }
 
 StructureObject::~StructureObject(void)
@@ -35,6 +38,71 @@ LRESULT StructureObject::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LP
 
 bool StructureObject::frameMove( float fElapsedTime )
 {
+	if (m_bMoving == false)
+	{
+		m_fMovingTime = 0;
+
+
+		UINT i;
+		for ( i = 0; i < UNIT_MAX_KEYS; i++ )
+		{
+			if( IsKeyDown( m_aKeys[ (UnitInput)i ] ) )
+			{
+				setMovable( true );
+				rayTesting( (UnitInput)i );
+
+				// if there is no obstacles
+				if( getMovable() )
+				{
+					TileRegion entireRegion( 0, 0, s_xSize - 1, s_ySize - 1);
+
+					Point2Uint nextTilePos = {
+						getTileBufferPos().x + g_moveAmount[ i ].x,
+						getTileBufferPos().y + g_moveAmount[ i ].y };
+
+						Tile* nextTile = GetTileManager().getTile( nextTilePos );
+						assert( nextTile );
+						if( nextTile->b_movable && entireRegion.isExist( nextTilePos ) )
+						{
+							m_bMoving = true;
+							m_vKeyboardDirection = D3DXVECTOR3( 0, 0, 0 );
+							m_vKeyboardDirection.x += (float) g_moveAmount[ i ].x * s_tileSize;
+							m_vKeyboardDirection.y += (float) g_moveAmount[ i ].y * s_tileSize;
+
+							GetTileManager().getTile( getTilePos().x, getTilePos().y )->b_movable = true;
+							setTileBufferPos(
+								getTileBufferPos().x + g_moveAmount[ i ].x,
+								getTileBufferPos().y + g_moveAmount[ i ].y );
+							GetTileManager().getTile( getTileBufferPos().x, getTileBufferPos().y )->b_movable = false;
+						}
+				}
+				break;
+			}
+		}
+	}
+
+
+	if (m_bMoving && m_fMovingTime <= m_moveDuration)
+	{
+		// Update velocity
+		m_vVelocity = m_vKeyboardDirection / m_moveDuration;
+
+		// Simple euler method to calculate position delta
+		D3DXVECTOR3 vPosDelta = m_vVelocity * fElapsedTime;
+		m_fMovingTime += fElapsedTime;
+		setPos(getPos() + vPosDelta);
+	}
+	else
+	{
+		m_bMoving = false;
+
+		//타일에 맞도록 위치보정
+		if( getTileBufferPos() != getTilePos() )
+		{
+			setTilePos( getTileBufferPos() );
+		}
+	}
+
 	return Unit::frameMove( fElapsedTime );
 }
 

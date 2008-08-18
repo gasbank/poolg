@@ -14,7 +14,7 @@ public:
 	virtual bool frameMove( float fElapsedTime );
 	virtual LRESULT handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 
-	virtual void pushUnitInFront( UnitInput dir );
+	//virtual void pushUnitInFront( UnitInput dir );
 };
 
 SCRIPT_FACTORY( Hero )

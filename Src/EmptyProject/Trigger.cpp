@@ -17,61 +17,6 @@ Trigger::~Trigger(void)
 {
 }
 
-void Trigger::positionTrigger()
-{
-	detectBattleAction();
-	detectHealAction();
-	detectTalkAction();
-	detectCreateAction();
-}
-
-void Trigger::detectBattleAction()
-{
-	World* curWorld = GetWorldManager().getCurWorld();
-	// Detect battle event.
-	// If current selected unit isn't hero unit, and isn't talkable,
-	// regard as enemy. And if hero is in the fight area of enemy, start battle.
-	UnitSet::iterator it = curWorld->getUnitSet()->begin();
-	for ( ; it != curWorld->getUnitSet()->end(); ++it )
-	{
-		if ( (*it) != curWorld->getHeroUnit() )
-		{
-			Enemy* oppCharacter = dynamic_cast<Enemy*>( *it );
-			if ( oppCharacter->isTalkable() == false && oppCharacter != NULL )
-			{
-				if ( curWorld->isInFightArea( curWorld->getHeroUnit() , oppCharacter ) == true )
-				{
-					//m_action.battleAction( oppCharacter );
-				}
-			}
-		}	
-	}
-}
-
-void Trigger::detectTalkAction()
-{
-/*
-	if ( GetTileManager().getTile( GetTileManager().pos2TileX( &m_ws->getHeroPos() ) , GetTileManager().pos2TileY( &m_ws->getHeroPos() ) )->b_eventTalk )
-		m_action.dialogAction( "EpDialog1" );*/
-}
-
-void Trigger::detectHealAction()
-{
-	World* curWorld = GetWorldManager().getCurWorld();
-
-	if ( GetTileManager().getTile( GetTileManager().pos2TileX( &curWorld->getHeroPos() ) , GetTileManager().pos2TileY( &curWorld->getHeroPos() ) )->b_heal )
-	{
-		curWorld->getHeroUnit()->heal( 9999 );
-	}
-}
-
-void Trigger::detectCreateAction()
-{
-	//if ( GetTileManager().getTile( GetTileManager().pos2TileX( &m_ws->getHeroPos() ) , GetTileManager().pos2TileY( &m_ws->getHeroPos() ) )->b_createEnemy )
-	//	m_action.createUnitAction( 34, 57, 0 );
-}
-
-
 //////////////////////////////////////////////////////////////////////////
 
 UnitPositionTrigger::UnitPositionTrigger( Unit* unit, TileRegion* region )

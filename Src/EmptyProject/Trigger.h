@@ -15,16 +15,6 @@ public:
 
 	virtual bool check() = 0;
 	virtual void release() {}
-
-	void positionTrigger();
-	void deadTrigger();
-	void timeTrigger();
-
-	void detectBattleAction();
-	void detectTalkAction();
-	void detectCreateAction();
-	void detectHealAction();
-
 };
 SCRIPT_FACTORY( Trigger )
 

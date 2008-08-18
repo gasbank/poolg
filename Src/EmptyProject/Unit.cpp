@@ -90,7 +90,6 @@ HRESULT Unit::frameRender()
 	if ( m_arnMesh )
 	{
 		m_pd3dDevice->SetRenderState( D3DRS_CULLMODE, D3DCULL_CW );
-		//m_arnMesh->getD3DXMesh()->DrawSubset( 0 );
 		GetG().m_videoMan.renderMeshesOnly( m_arnMesh, m_localXform );
 		m_pd3dDevice->SetRenderState( D3DRS_CULLMODE, D3DCULL_CCW );
 	}
@@ -125,7 +124,7 @@ void Unit::updateLocalXform()
 		D3DXMatrixRotationY(&mRotY, m_vRot.y);
 		D3DXMatrixRotationZ(&mRotZ, m_vRot.z);
 		D3DXMatrixScaling(&mScale, m_vScale.x, m_vScale.y, m_vScale.z);
-		D3DXMatrixTranslation(&mTrans, m_vPos.x, m_vPos.y, m_vPos.z);
+		D3DXMatrixTranslation(&mTrans, getPos().x, getPos().y, getPos().z);
 		m_localXform = mRotX * mRotY * mRotZ * mScale * mTrans;
 
 		m_bLocalXformDirty = false;
@@ -149,6 +148,7 @@ void Unit::clearKey()
 {
 	for( int i = 0; i < UNIT_MAX_KEYS; i++ )
 		m_aKeys[i] = 0;
+	m_cKeysDown = 0;
 }
 
 Unit* Unit::createUnit( LPD3DXMESH mesh, int tileX, int tileY, float posZ, bool bControllable )
@@ -158,6 +158,27 @@ Unit* Unit::createUnit( LPD3DXMESH mesh, int tileX, int tileY, float posZ, bool 
 	u->setControllable( bControllable );
 	return u;
 }
+
+
+void Unit::setColor( int r, int g, int b )
+{
+	ZeroMemory(&m_material, sizeof(D3DMATERIAL9));
+
+	m_material.Ambient.r = (float)r / 255.0f;
+	m_material.Ambient.g = (float)g / 255.0f;
+	m_material.Ambient.b = (float)b / 255.0f;
+
+	m_material.Diffuse.r = (float)r / 255.0f;
+	m_material.Diffuse.g = (float)g / 255.0f;
+	m_material.Diffuse.b = (float)b / 255.0f;
+
+	m_material.Specular.r = (float)r / 255.0f;
+	m_material.Specular.g = (float)g / 255.0f;
+	m_material.Specular.b = (float)b / 255.0f;
+
+	m_material.Ambient.a = m_material.Diffuse.a = m_material.Specular.a = 1.0f;
+}
+
 
 // 가고자 하는 방향으로 유닛을 회전시킨다.
 void Unit::setHeadDir( UnitInput unitInput )
@@ -387,6 +408,14 @@ int EpUnitSetArnMesh( void* ptr1, const char* ptr2 )
 	return 0;
 } SCRIPT_CALLABLE_I_PV_PC( EpUnitSetArnMesh )
 
+int EpUnitSetColor( void* ptr, int r, int g, int b )
+{
+	Unit* instance = reinterpret_cast<Unit*>( ptr );
+	instance->Unit::setColor( r, g, b );
+	return 0;
+} SCRIPT_CALLABLE_I_PV_I_I_I( EpUnitSetColor )
+
+
 START_SCRIPT_FACTORY( Unit )
 	CREATE_OBJ_COMMAND( EpCreateUnit )
 	CREATE_OBJ_COMMAND( EpReleaseUnit )
@@ -399,4 +428,5 @@ START_SCRIPT_FACTORY( Unit )
 	CREATE_OBJ_COMMAND( EpUnitPrintTilePos )
 	CREATE_OBJ_COMMAND( EpUnitGetPos )
 	CREATE_OBJ_COMMAND( EpUnitSetArnMesh )
+	CREATE_OBJ_COMMAND( EpUnitSetColor )
 END_SCRIPT_FACTORY( Unit )

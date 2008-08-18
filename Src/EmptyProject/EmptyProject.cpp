@@ -538,12 +538,6 @@ void CALLBACK KeyboardProc( UINT nChar, bool bKeyDown, bool bAltDown, void* pUse
 		case VK_F3:
 			g_bTileGrid = !g_bTileGrid;
 			break;
-		case VK_TAB:
-			if ( GetWorldManager().getCurWorld()->getWorldName() == "EpCeilingWorld" )
-				GetWorldManager().setNextWorld( "EpRoomWorld" );
-			else
-				GetWorldManager().setNextWorld( "EpCeilingWorld" );
-			break;
 		}
 	}
 }

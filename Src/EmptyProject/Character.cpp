@@ -119,9 +119,9 @@ bool Character::frameMove( float fElapsedTime )
 					if( nextTile->b_movable && entireRegion.isExist( nextTilePos ) )
  					{
 						m_bMoving = true;
-						m_vKeyboardDirection = D3DXVECTOR3( 0, 0, 0 );
-						m_vKeyboardDirection.x += (float) g_moveAmount[ i ].x * s_tileSize;
-						m_vKeyboardDirection.y += (float) g_moveAmount[ i ].y * s_tileSize;
+						m_vKeyboardDirection.x = (float) g_moveAmount[ i ].x * s_tileSize;
+						m_vKeyboardDirection.y = (float) g_moveAmount[ i ].y * s_tileSize;
+						m_vKeyboardDirection.z = 0;
 
 						GetTileManager().getTile( getTilePos().x, getTilePos().y )->b_movable = true;
 						setTileBufferPos(
@@ -174,6 +174,19 @@ bool Character::frameMove( float fElapsedTime )
 		}
 		else
 			++it;
+	}
+
+	const D3DXVECTOR3& unitPos = Unit::getPos();
+	m_curPos = unitPos + m_moveImpulse;
+	if ( m_moveImpulse != DX_CONSTS::D3DXVEC3_ZERO )
+	{
+		const float decimate = 0.5f;
+		m_moveImpulse *= decimate;
+		if ( D3DXVec3Length( &m_moveImpulse ) < 1e-4 )
+			m_moveImpulse = DX_CONSTS::D3DXVEC3_ZERO;
+
+		//printf( "Char FM: %.2f %.2f %.2f\n", m_curPos.x, m_curPos.y, m_curPos.z );
+		setLocalXformDirty();
 	}
 
 	return Unit::frameMove( fElapsedTime );
@@ -232,7 +245,7 @@ LRESULT Character::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 
 
 Character::Character( UnitType type )
-: Unit( type )
+: Unit( type ), m_moveImpulse( DX_CONSTS::D3DXVEC3_ZERO )
 {
 	m_maxHp				= 5;
 	m_curHp				= m_maxHp;
@@ -248,25 +261,6 @@ Character::Character( UnitType type )
 	
 	// Initialize random number
 	srand ( (unsigned)time(NULL) );
-}
-
-void Character::setColor( int r, int g, int b )
-{
-	ZeroMemory(&m_material, sizeof(D3DMATERIAL9));
-
-	m_material.Ambient.r = (float)r / 255.0f;
-	m_material.Ambient.g = (float)g / 255.0f;
-	m_material.Ambient.b = (float)b / 255.0f;
-
-	m_material.Diffuse.r = (float)r / 255.0f;
-	m_material.Diffuse.g = (float)g / 255.0f;
-	m_material.Diffuse.b = (float)b / 255.0f;
-
-	m_material.Specular.r = (float)r / 255.0f;
-	m_material.Specular.g = (float)g / 255.0f;
-	m_material.Specular.b = (float)b / 255.0f;
-
-	m_material.Ambient.a = m_material.Diffuse.a = m_material.Specular.a = 1.0f;
 }
 
 void Character::setCurHp( int curHp )
@@ -426,12 +420,6 @@ int EpCharacterSetMoveDuration( void* ptr, double val )
 	return 0;
 } SCRIPT_CALLABLE_I_PV_D( EpCharacterSetMoveDuration )
 
-int EpCharacterSetColor( void* ptr, int r, int g, int b )
-{
-	Character* instance = reinterpret_cast<Character*>( ptr );
-	instance->Character::setColor( r, g, b );
-	return 0;
-} SCRIPT_CALLABLE_I_PV_I_I_I( EpCharacterSetColor )
 
 int EpCharacterSetBoundary( void* ptr, int left, int top, int right, int bottom )
 {
@@ -454,8 +442,6 @@ START_SCRIPT_FACTORY(Character)
 	CREATE_OBJ_COMMAND( EpCharacterSetCurHp )
 	CREATE_OBJ_COMMAND( EpCharacterSetCurCs )
 	CREATE_OBJ_COMMAND( EpCharacterSetMoveDuration )
-	CREATE_OBJ_COMMAND( EpCharacterSetColor )
 	CREATE_OBJ_COMMAND( EpCharacterSetBoundary )
 	CREATE_OBJ_COMMAND( EpCharacterSetStat )
-
 END_SCRIPT_FACTORY(Character)

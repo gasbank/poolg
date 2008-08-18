@@ -9,9 +9,7 @@ public:
 	void release ();
 	HRESULT draw (bool textured = true);
 	virtual bool frameMove (float fElapsedTime);
-	void setPos(float x, float y, float z) { m_vPos.x = x; m_vPos.y = y; m_vPos.z = z;}
-
-
+	
 protected:
 	//D3DXMATRIX m_localXform;
 	//LPDIRECT3DDEVICE9 m_d3dDev;

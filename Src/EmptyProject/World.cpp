@@ -252,6 +252,7 @@ HRESULT World::frameMove(double fTime, float fElapsedTime)
 			{
 				if ( isInFightArea( getHeroUnit() , oppCharacter ) == true )
 				{
+					oppCharacter->clearKey(); // No more move!
 					setCurEnemy( oppCharacter );
 
 					getCurEnemyUnit()->setAttack(30);

@@ -75,8 +75,6 @@ protected:
 	virtual PictureInput mapKey( UINT nKey );
 //[재우]이 안의 변수를 상속받은 객체에서 써야 하기에 protected로 하였습니다.
 //private:
-	bool IsKeyDown( BYTE key ) const { return( (key & KEY_IS_DOWN_MASK) == KEY_IS_DOWN_MASK ); }
-	bool WasKeyDown( BYTE key ) const { return( (key & KEY_WAS_DOWN_MASK) == KEY_WAS_DOWN_MASK ); }
 	
 	D3DXMATRIX m_localXform;
 	LPDIRECT3DDEVICE9 m_d3dDev;

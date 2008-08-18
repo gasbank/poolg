@@ -18,7 +18,7 @@ namespace eval EpA213World {
 		EpCharacterSetCurHp			$pHeroUnit 10
 		EpCharacterSetCurCs			$pHeroUnit -1
 		EpCharacterSetMoveDuration	$pHeroUnit [expr 0.2]
-		EpCharacterSetColor			$pHeroUnit 255 0 255
+		EpUnitSetColor			$pHeroUnit 255 0 255
 		EpUnitSetPosZ				$pHeroUnit -[EpUnitGetUpperRightZ $pHeroUnit]
 	}
 	

@@ -36,6 +36,10 @@
 #define KEY_WAS_DOWN_MASK 0x80
 #define KEY_IS_DOWN_MASK  0x01
 
+inline bool IsKeyDown( BYTE key ) { return( (key & KEY_IS_DOWN_MASK) == KEY_IS_DOWN_MASK ); }
+inline bool WasKeyDown( BYTE key ) { return( (key & KEY_WAS_DOWN_MASK) == KEY_WAS_DOWN_MASK ); }
+
+
 #define SCRIPT_FACTORY(className) class _script_factory_##className { public: static void init(); };
 
 typedef std::list<const char*> ConstCharList;

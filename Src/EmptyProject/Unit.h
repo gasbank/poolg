@@ -57,11 +57,12 @@ public:
 	void setScaleY(float val) { m_vScale.y = val; m_bLocalXformDirty = true; }
 	void setScaleZ(float val) { m_vScale.z = val; m_bLocalXformDirty = true; }
 
+	void setPos(float x, float y, float z) { m_vPos.x = x; m_vPos.y = y; m_vPos.z = z; m_bLocalXformDirty = true; }
 	void setPos(const D3DXVECTOR3& val) { m_vPos = val; m_bLocalXformDirty = true; }
 	void setPosX(float val) { m_vPos.x = val; m_bLocalXformDirty = true; }
 	void setPosY(float val) { m_vPos.y = val; m_bLocalXformDirty = true; }
 	void setPosZ(float val) { m_vPos.z = val; m_bLocalXformDirty = true; }
-	const D3DXVECTOR3& getPos() const { return m_vPos; }
+	virtual const D3DXVECTOR3& getPos() const { return m_vPos; }
 
 	bool isControllable() const { return m_bControllable; }
 
@@ -75,6 +76,8 @@ public:
 	UINT getTilePosY() const { return m_tilePos.y; }
 	void getTilePos( UINT& x, UINT& y ) const { x = m_tilePos.x; y = m_tilePos.y; }
 	
+	const D3DXMATRIX& getLocalXform() const { return m_localXform; }
+
 	const Point2Uint& getTilePos() const { return m_tilePos; }
 	const Point2Uint& getTileBufferPos() const { return m_tileBufferPos; }
 	
@@ -94,17 +97,24 @@ public:
 	bool getMovable() const { return m_bMovable; }
 	void setMovable(bool val) { m_bMovable = val; }
 
+	void setColor( int r, int g, int b );
+
+	void setLocalXformDirty() { m_bLocalXformDirty = true; }
+
 protected:
-	World* getWorldState() const;
+	Unit( UnitType type );
+
+	BYTE					m_aKeys[UNIT_MAX_KEYS];
+	UINT					m_cKeysDown;            // Number of camera keys that are down.
+	D3DXVECTOR3				m_vKeyboardDirection;
+	D3DXVECTOR3				m_vVelocity;
+	LPD3DXMESH				m_d3dxMesh;
+	LPDIRECT3DTEXTURE9		m_d3dTex;
 
 	virtual UnitInput mapKey( UINT nKey );
 
-//[재우]상속받은 객체가 접근하기 위해 protected로.
-//private:
-	Unit( UnitType type );
-
-	bool IsKeyDown( BYTE key ) const { return( (key & KEY_IS_DOWN_MASK) == KEY_IS_DOWN_MASK ); }
-	bool WasKeyDown( BYTE key ) const { return( (key & KEY_WAS_DOWN_MASK) == KEY_WAS_DOWN_MASK ); }
+private:
+	World* getWorldState() const;
 
 	struct TeapotVertex
 	{
@@ -112,25 +122,22 @@ protected:
 		float nx, ny, nz;
 	};
 	void updateLocalXform();
-	LPD3DXMESH				m_d3dxMesh;
+	
 	D3DXVECTOR3				m_lowerLeft, m_upperRight; // bounding box params
 	D3DXVECTOR3				m_vRot, m_vPos, m_vScale;
 	bool					m_bLocalXformDirty;
 	D3DXMATRIX				m_localXform;
 	LPDIRECT3DDEVICE9		m_pd3dDevice;
 	D3DMATERIAL9			m_material;
-	LPDIRECT3DTEXTURE9		m_d3dTex;
-	BYTE					m_aKeys[UNIT_MAX_KEYS];
-	UINT					m_cKeysDown;            // Number of camera keys that are down.
-	D3DXVECTOR3				m_vKeyboardDirection;
-	D3DXVECTOR3				m_vVelocity;
+	
+	
 	bool					m_bControllable;
 	bool					m_removeFlag;
 	bool					m_bForcedMove;
 	DynamicMotion*			m_dm;
 	
 	
-private:
+
 	Point2Uint				m_tilePos;
 	Point2Uint				m_tileBufferPos;
 

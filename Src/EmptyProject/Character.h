@@ -28,6 +28,8 @@ public:
 	virtual bool frameMove( float fElapsedTime );
 	virtual LRESULT handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 
+	virtual const D3DXVECTOR3& getPos() const { return m_curPos; }
+
 	void setCurHp( int curHp );
 	int getCurHp() const { return m_curHp; }
 	int getMaxHp() const { return m_maxHp; }
@@ -43,10 +45,10 @@ public:
 	const Stat& getStat() const { return m_stat; }
 	bool isDead() { return (m_curHp<=0); }
 	void setDead() { m_curHp = -1; }
-
+	void addMoveImpulse( const D3DXVECTOR3& impulse ) { m_moveImpulse += impulse; }
 	
 	void setMoveDuration( float val ) { m_moveDuration = val; }
-	void setColor( int r, int g, int b );
+	
 
 	void setBoundaryRect( LONG left, LONG top, LONG right, LONG bottom );
 
@@ -75,6 +77,9 @@ private:
 	
 	RECT					m_boundaryTileRect;
 
+	// Move amount that applied instantly and decimated constantly on every frameMove()
+	D3DXVECTOR3				m_moveImpulse;
+	D3DXVECTOR3				m_curPos;
 
 	Stat					m_stat;
 };

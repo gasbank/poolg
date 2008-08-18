@@ -36,13 +36,15 @@ bool BallAttackObject::frameMove( float fElapsedTime )
 	{
 		// Hit to the target!
 		m_target->damage(m_damage);
+		m_target->addMoveImpulse( -m_fireDir/2 ); // Attacked unit shows startled shake
 
 		char stringBuffer[20];
 		_itoa_s (m_damage, stringBuffer, 10);
 		std::string resultLog = stringBuffer;
 		
 		if (m_target->isControllable())
-		{
+		{ 
+
 			resultLog += "포인트 데미지를 받았다!";
 			getBattleState()->pushBattleLog(resultLog.c_str());
 			if (m_target->isDead())

@@ -8,7 +8,7 @@
 #include "ScriptManager.h"
 #include "Sound.h"
 #include "Unit.h"
-
+#include "Dialog.h"
 
 Action::Action(void)
 {
@@ -39,15 +39,10 @@ void BattleAction::activate()
 	// Do one-time init of this action
 }
 
-void BattleAction::update()
-{
-
-}
-
 //////////////////////////////////////////////////////////////////////////
 
 DialogAction::DialogAction( const char* dialogName )
-: m_dialogName( dialogName )
+: m_dialogName( dialogName ), m_dialog( 0 )
 {
 
 }
@@ -60,12 +55,19 @@ DialogAction::~DialogAction( void )
 void DialogAction::activate()
 {
 	assert ( GetWorldManager().getCurWorld()->getCurDialog() == 0 );
-	GetWorldManager().getCurWorld()->startDialog( m_dialogName.c_str() );
+	m_dialog = GetWorldManager().getCurWorld()->startDialog( m_dialogName.c_str() );
 }
 
 void DialogAction::update()
 {
+	if ( m_dialog && !m_dialog->isTalking() )
+		onActionFinished();
+}
 
+void DialogAction::onActionFinished()
+{
+	OutputDebugString( _T( " - Dialog started by DialogAction has closed.\n" ) );
+	m_dialog = 0;
 }
 Action* EpCreateDialogAction( const char* dialogName )
 {
@@ -99,10 +101,6 @@ void SoundAction::activate()
 	}
 }
 
-void SoundAction::update()
-{
-
-}
 Action* EpCreateSoundAction( const char* soundName )
 {
 	return new SoundAction( soundName );
@@ -122,10 +120,6 @@ HealAction::~HealAction()
 void HealAction::activate()
 {
 	m_targetChar->heal( 9999 );
-}
-
-void HealAction::update()
-{
 }
 
 Action* EpCreateHealAction( void* targetChar )
@@ -150,11 +144,6 @@ void UnitSpawnAction::activate()
 {
 	getCurWorld()->addUnit( m_createUnit );
 	m_createUnit = 0; // Unit instance ownership moved to the world!
-}
-
-void UnitSpawnAction::update()
-{
-
 }
 
 Action* EpCreateUnitSpawnAction( void* createUnit )
@@ -190,9 +179,6 @@ Action* EpCreateAction( ActionType at, ... )
 void ScriptAction::activate()
 {
 	GetScriptManager().execute( m_scriptCommand.c_str() );
-}
-void ScriptAction::update()
-{
 }
 
 Action* EpCreateScriptAction( const char* scriptCommand )
@@ -230,10 +216,6 @@ void UnitMoveAction::activate()
 
 }
 
-void UnitMoveAction::update()
-{
-}
-
 Action* EpCreateUnitMoveAction( void* targetUnit, const char* input )
 {
 	Unit* u = reinterpret_cast<Unit*>( targetUnit );
@@ -249,11 +231,6 @@ void FadeAction::activate()
 		GetG().m_EpLight.fadeInLight();
 	else if ( m_iType == 1 )
 		GetG().m_EpLight.fadeOutLight();
-}
-
-void FadeAction::update()
-{
-
 }
 
 Action* EpCreateFadeAction( int type, int durationMs )

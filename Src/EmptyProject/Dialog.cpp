@@ -6,23 +6,34 @@
 Dialog::Dialog(void)
 {
 	ctorDialogPane();
-
-	m_speakArray	= 0;
-	m_speakCount	= 0;
-	m_curSpeakIdx	= 0;
-
-	m_bInit			= false;
 }
 
 Dialog::Dialog( Speak* speakArray, UINT speakCount, const RECT& region, bool bOneTime, const char* dialogName )
 {
 	ctorDialogPane();
+
 	m_speakArray	= speakArray;
 	m_speakCount	= speakCount;
-	m_curSpeakIdx	= 0;
 	m_region		= region;
 	m_bOneTime		= bOneTime;
 	m_dialogName	= dialogName;
+}
+void Dialog::ctorDialogPane()
+{
+	m_contentPic.init(L"Images/dae-sa.png", GetG().m_dev);
+	m_contentPic.setPos (-(GetG().m_scrWidth / 2.0f), -(GetG().m_scrHeight / 2.0f), 2.8f);
+	m_contentPic.setSize(200, 200);
+	m_namePic.init(L"Images/name_window.png", GetG().m_dev);
+	m_namePic.setPos (-(GetG().m_scrWidth / 2.0f), -(GetG().m_scrHeight / 2.0f) + 200, 2.8f);
+	m_namePic.setSize(150, 60);
+
+	m_speakArray	= 0;
+	m_speakCount	= 0;
+	m_curSpeakIdx	= 0;
+	ZeroMemory( &m_region, sizeof( RECT ) );
+	m_bOneTime		= true;
+	m_bInit			= false;
+	m_bRemoveFlag	= false;
 }
 Dialog::~Dialog(void)
 {
@@ -205,14 +216,4 @@ Dialog* Dialog::createDialogByScript( const char* dialogName )
 	int oneTime = GetScriptManager().readInt( tempBuf );
 
 	return new Dialog( speakArray, speakCount, region, oneTime?true:false, dialogName );
-}
-
-void Dialog::ctorDialogPane()
-{
-	m_contentPic.init(L"Images/dae-sa.png", GetG().m_dev);
-	m_contentPic.setPos (-(GetG().m_scrWidth / 2.0f), -(GetG().m_scrHeight / 2.0f), 2.8f);
-	m_contentPic.setSize(200, 200);
-	m_namePic.init(L"Images/name_window.png", GetG().m_dev);
-	m_namePic.setPos (-(GetG().m_scrWidth / 2.0f), -(GetG().m_scrHeight / 2.0f) + 200, 2.8f);
-	m_namePic.setSize(150, 60);
 }

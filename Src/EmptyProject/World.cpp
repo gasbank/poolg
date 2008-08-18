@@ -517,13 +517,21 @@ bool World::isCollide( const D3DXVECTOR3* vec0, const D3DXVECTOR3* vec1 )
 	return false;
 }
 
-void World::startDialog( const char* dialogName )
+Dialog* World::startDialog( const char* dialogName )
 {
 	if ( !m_curDialog )
 	{
 		m_curDialog = getDialogByName( dialogName );
-		proceedCurDialog();
+
+		if ( m_curDialog->getRemoveFlag() )
+			m_curDialog = 0;
+		else
+			proceedCurDialog();
+
+		return m_curDialog;
 	}
+	else
+		throw std::runtime_error( "Current dialog already exists! Cannot start a new dialog" );
 }
 
 void World::handleCollision( Unit* heroUnit, Unit* opponentUnit )
@@ -630,8 +638,10 @@ void World::proceedCurDialog()
 	{
 		if ( m_curDialog->nextDialog() == false )
 		{
-			m_scriptedDialog.remove( m_curDialog );
-			EP_SAFE_RELEASE( m_curDialog );
+			m_curDialog->setRemoveFlag( true );
+			m_curDialog = 0;
+			/*m_scriptedDialog.remove( m_curDialog );
+			EP_SAFE_RELEASE( m_curDialog );*/
 		}
 		else if ( !m_curDialog->isTalking() )
 			m_curDialog = 0;

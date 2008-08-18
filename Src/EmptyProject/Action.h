@@ -14,12 +14,16 @@ public:
 	virtual ~Action(void);
 
 	virtual void activate() = 0;
-	virtual void update() = 0;
+	virtual void update() {}
 	virtual void release() {}
-
+	
 	World* getCurWorld() const;
+
 protected:
 	Action(void);
+
+private:
+	virtual void onActionFinished() {}
 };
 
 SCRIPT_FACTORY( Action )
@@ -33,7 +37,6 @@ public:
 	virtual ~BattleAction(void);
 
 	virtual void activate();
-	virtual void update();
 
 private:
 	const Unit* m_targetUnit;
@@ -41,6 +44,8 @@ private:
 };
 
 //////////////////////////////////////////////////////////////////////////
+
+class Dialog;
 
 class DialogAction : public Action
 {
@@ -50,9 +55,12 @@ public:
 
 	virtual void activate();
 	virtual void update();
-
+	
 private:
+	virtual void onActionFinished();
+
 	std::string m_dialogName;
+	Dialog* m_dialog;
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -64,7 +72,6 @@ public:
 	virtual ~SoundAction(void);
 
 	virtual void activate();
-	virtual void update();
 
 private:
 	std::string m_soundName;
@@ -79,7 +86,6 @@ public:
 	virtual ~HealAction();
 
 	virtual void activate();
-	virtual void update();
 
 private:
 	Character* m_targetChar;
@@ -94,7 +100,6 @@ public:
 	virtual ~UnitSpawnAction();
 
 	virtual void activate();
-	virtual void update();
 
 private:
 	Unit* m_createUnit;
@@ -109,7 +114,6 @@ public:
 	virtual ~UnitMoveAction();
 
 	virtual void activate();
-	virtual void update();
 
 private:
 	Unit* m_targetUnit;
@@ -127,7 +131,6 @@ public:
 	void setScriptCommand( const char* command ) { m_scriptCommand = command; }
 
 	virtual void activate();
-	virtual void update();
 
 private:
 	std::string m_scriptCommand;
@@ -142,7 +145,6 @@ public:
 	virtual ~FadeAction() {}
 
 	virtual void activate();
-	virtual void update();
 
 private:
 	int m_iType;

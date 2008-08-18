@@ -12,7 +12,7 @@ public:
 		const char* name;		// Speaker name
 		const char* content;
 	};
-	Dialog(void);
+	
 	static Dialog* createDialogByScript( const char* dialogName );
 	~Dialog(void);
 	HRESULT init();
@@ -30,10 +30,14 @@ public:
 	bool isTalking() const { return m_bTalking; }
 	void setOneTime(bool b) { m_bOneTime = b; }
 	const std::string& getDialogName() const { return m_dialogName; }
-
+	bool getRemoveFlag() const { return m_bRemoveFlag; }
+	void setRemoveFlag(bool val) { m_bRemoveFlag = val; }
 private:
-	void ctorDialogPane();
+	Dialog(void);
 	Dialog( Speak* speakArray, UINT speakCount, const RECT& region, bool bOneTime, const char* dialogName );
+
+	void ctorDialogPane();
+	
 
 	Picture m_contentPic;
 	Picture m_namePic;
@@ -53,4 +57,6 @@ private:
 	std::string m_dialogName;
 
 	bool m_bInit;
+	bool m_bRemoveFlag;
+	
 };

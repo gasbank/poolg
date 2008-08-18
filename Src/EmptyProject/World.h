@@ -57,7 +57,7 @@ public:
 	Dialog*				getDialogByName( const char* dialogName );	
 	ArnSceneGraph*		getArnSceneGraphPt() { return m_modelSg; }
 
-	void				startDialog( const char* dialogName );
+	Dialog*				startDialog( const char* dialogName );
 	Unit*				findUnitAtTile( UINT x, UINT y );
 	const Dialog*		getCurDialog() const { return m_curDialog; }
 

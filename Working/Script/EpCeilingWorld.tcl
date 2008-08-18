@@ -1,9 +1,22 @@
 namespace eval EpCeilingWorld {
 	set modelFilePath	"ceiling.arn"
 	variable world hero npcGetg npcGloop
+	variable pHeroUnit
+
+	proc registerIncidentInitTalk {} {
+		variable pHeroUnit
+		
+		set trigger	 [ EpCreateUnitPositionTrigger $pHeroUnit 30 77 30 77 ]
+		set action		[ EpCreateDialogAction "EpDialog1" ]
+		set incident	[ EpCreateIncident $trigger $action 0 ]
+		
+		set incCount	[ EpRegisterIncident $incident ]
+		EpOutputDebugString " - Incident count: $incCount\n"
+	}
 	
 	proc init { curWorld } {
 		variable world hero npcGetg npcGloop
+		variable pHeroUnit
 		EpOutputDebugString " - [info level 0] called / curWorld: $curWorld\n"
 		set world					$curWorld;
 		
@@ -22,15 +35,18 @@ namespace eval EpCeilingWorld {
 		EpCharacterSetColor			$npcGetg 128 128 0
 		EpCharacterSetStat			$npcGetg 4 1 3 1 1 1
 		EpCharacterSetCurHp			$npcGetg -1
+		EpEnemySetTalkable			$npcGetg 1
 		
 		set npcGloop				[ createEnemy 30 82 ];
 		EpCharacterSetColor			$npcGloop 0 255 255
 		EpCharacterSetStat			$npcGloop 3 1 4 1 1 1
 		EpCharacterSetCurHp			$npcGloop -1
-		
+		EpEnemySetTalkable			$npcGloop 1
+
+
+		registerIncidentInitTalk
 		
 		createWarpPosition			"EpRoomWorld" 25 82
-		
 	}
 
 	proc enter {} {

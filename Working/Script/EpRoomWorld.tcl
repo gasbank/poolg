@@ -10,25 +10,13 @@ namespace eval EpRoomWorld {
 		set world				$curWorld;
 	}
 
-	proc registerIncident1 {} {
-		variable pHeroUnit
-		variable testEnemy
-		
-		set trigger	 [ EpCreateUnitPositionTrigger $pHeroUnit 26 74 26 74 ]
-		set action		[ EpCreateDialogAction "EpDialog1" ]
-		set incident	[ EpCreateIncident $trigger $action ]
-		
-		set incCount	[ EpRegisterIncident $incident ]
-		EpOutputDebugString " - Incident count: $incCount\n"
-	}
-
-	proc registerIncident2 {} {
+	proc registerIncidentHeal {} {
 		variable pHeroUnit
 		variable testEnemy
 			
 		set trigger [ EpCreateUnitPositionTrigger $pHeroUnit 44 81 44 81 ]
 		set action		[ EpCreateHealAction $pHeroUnit ]
-		set incident	[ EpCreateIncident $trigger $action ]
+		set incident	[ EpCreateIncident $trigger $action 1 ]
 
 		set action2		[ EpCreateDialogAction "EpDialogHeal" ]
 
@@ -39,23 +27,23 @@ namespace eval EpRoomWorld {
 		EpOutputDebugString " - Incident count: $incCount\n"
 	}
 
-	proc registerIncident3 {} {
+	proc registerIncidentClear {} {
 		variable world
 		
 		set trigger		[ EpCreateTotalAnnihilationTrigger $world ]
 		set action		[ EpCreateDialogAction "EpDialog2" ]
-		set incident	[ EpCreateIncident $trigger $action ]
+		set incident	[ EpCreateIncident $trigger $action 0 ]
 
 		set incCount	[ EpRegisterIncident $incident ]
 		EpOutputDebugString " - Incident count: $incCount\n"
 	}
 	
-	proc registerIncident4 {} {
+	proc registerIncidentHidden {} {
 		variable pHeroUnit
 					
 		set trigger [ EpCreateUnitPositionTrigger $pHeroUnit 26 98 26 98 ]
 		set action		[ EpCreateUnitSpawnAction [createEnemy 27 98 0] ]
-		set incident	[ EpCreateIncident $trigger $action ]
+		set incident	[ EpCreateIncident $trigger $action 0 ]
 
 		set action2		[ EpCreateUnitSpawnAction [createEnemy 28 98 0] ]
 
@@ -66,13 +54,13 @@ namespace eval EpRoomWorld {
 		EpOutputDebugString " - Incident count: $incCount\n"
 	}
 
-	proc registerIncident5 {} {
+	proc registerIncidentUnClear {} {
 		variable world
 		variable pHeroUnit
 		
 		set trigger		[ EpCreateUnTotalAnnihilationTrigger $world ]
 		set action		[ EpCreateDialogAction "EpDialogReturn" ]
-		set incident		[ EpCreateIncident $trigger $action ]
+		set incident		[ EpCreateIncident $trigger $action 1 ]
 
 		set trigger2		[ EpCreateUnitPositionTrigger $pHeroUnit 50 33 59 33 ]
 
@@ -176,11 +164,10 @@ namespace eval EpRoomWorld {
 		EpEnemySetTalkable			$pTestEnemyUnit	1
 		
 		
-		registerIncident1
-		registerIncident2
-		registerIncident3
-		registerIncident4
-		registerIncident5
+		registerIncidentHeal
+		registerIncidentClear
+		registerIncidentHidden
+		registerIncidentUnClear
 		
 		createWarpPosition			"EpA213World" 49 28 61 30
 	}

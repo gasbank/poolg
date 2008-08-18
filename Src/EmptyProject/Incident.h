@@ -9,7 +9,7 @@ typedef std::list<Action*> ActionList;
 class Incident
 {
 public:
-	Incident( Trigger* trigger, Action* action );
+	Incident( Trigger* trigger, Action* action, bool infinite );
 	~Incident(void);
 
 	void release();
@@ -24,6 +24,7 @@ private:
 	bool m_bActivated;
 	TriggerList m_trigger;
 	ActionList m_action;
+	bool m_bInfinite;
 
 };
 

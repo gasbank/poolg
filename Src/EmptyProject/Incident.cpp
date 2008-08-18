@@ -3,9 +3,10 @@
 #include "Trigger.h"
 #include "Action.h"
 #include "ScriptManager.h"
+#include "World.h"
 
-Incident::Incident( Trigger* trigger, Action* action )
-: m_bActivated( false )
+Incident::Incident( Trigger* trigger, Action* action, bool infinite )
+: m_bActivated( false ), m_bInfinite( infinite )
 {
 	TriggerList::iterator it1 = m_trigger.begin();
 	m_trigger.push_back( trigger );
@@ -45,6 +46,10 @@ bool Incident::update()
 	for( ; it3 != m_action.end(); it3++ )
 		(*it3)->update();
 
+	if ( m_bInfinite && ( GetWorldManager().getCurWorld()->getCurDialog() == 0 ) 
+		&& (GetWorldManager().getCurWorld()->getHero()->getTilePos() != GetWorldManager().getCurWorld()->getHero()->getTileBufferPos()) )
+		m_bActivated = false;
+
 	return true;
 }
 
@@ -68,13 +73,19 @@ void Incident::addAction( Action* action )
 
 //////////////////////////////////////////////////////////////////////////
 
-Incident* EpCreateIncident( void* pv1, void* pv2 )
+Incident* EpCreateIncident( void* pv1, void* pv2, int b )
 {
 	Trigger* trig = reinterpret_cast<Trigger*>( pv1 );
 	Action* act = reinterpret_cast<Action*>( pv2 );
 
-	return new Incident( trig, act );
-} SCRIPT_CALLABLE_PV_PV_PV( EpCreateIncident )
+	bool infinite;
+	if ( b == 0 )
+		infinite = false;
+	else
+		infinite = true;
+
+	return new Incident( trig, act, infinite );
+} SCRIPT_CALLABLE_PV_PV_PV_I( EpCreateIncident )
 
 int EpAddTriggerToIncident( void* pv1, void* pv2 )
 {
@@ -93,8 +104,6 @@ int EpAddActionToIncident( void* pv1, void* pv2 )
 
 	return 0;
 } SCRIPT_CALLABLE_I_PV_PV( EpAddActionToIncident )
-
-
 
 START_SCRIPT_FACTORY( Incident )
 	CREATE_OBJ_COMMAND( EpCreateIncident )

@@ -244,7 +244,7 @@ Action* EpCreateUnitMoveAction( void* targetUnit, const char* input )
 
 void FadeAction::activate()
 {
-	GetG().m_EpLight.setFadeDuration( m_fDuration );
+	//GetG().m_EpLight.setFadeDuration( m_fDuration );
 	if ( m_iType == 0 )
 		GetG().m_EpLight.fadeInLight();
 	else if ( m_iType == 1 )

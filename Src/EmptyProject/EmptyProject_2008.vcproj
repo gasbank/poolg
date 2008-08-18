@@ -922,14 +922,6 @@
 			>
 		</File>
 		<File
-			RelativePath=".\Laser.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\Laser.h"
-			>
-		</File>
-		<File
 			RelativePath=".\ScreenFlash.cpp"
 			>
 		</File>

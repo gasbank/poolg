@@ -7,8 +7,8 @@
 
 PlayState::PlayState(void)
 {
-	m_poolgArnFile			= 0;
-	m_poolgSg				= 0;
+	m_CharactersArnFile			= 0;
+	m_CharactersSg				= 0;
 
 	loadArnModels();
 }
@@ -44,7 +44,7 @@ HRESULT PlayState::frameMove( double fTime, float fElapsedTime )
 
 	//GetWorldManager().changeToNextWorldIfExist()
 
-	m_poolgSg->getSceneRoot()->update(fTime, fElapsedTime);
+	m_CharactersSg->getSceneRoot()->update( fTime, fElapsedTime );
 
 	return S_OK;
 }
@@ -57,24 +57,23 @@ HRESULT PlayState::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 
 HRESULT PlayState::release()
 {
-	SAFE_DELETE(m_poolgArnFile);
-	SAFE_DELETE(m_poolgSg);
-
-	if (m_poolgArnFile)
-		release_arnfile(*m_poolgArnFile);
+	SAFE_DELETE(m_CharactersArnFile);
+	SAFE_DELETE(m_CharactersSg);
+	if (m_CharactersArnFile)
+		release_arnfile(*m_CharactersArnFile);
 
 	return S_OK;
 }
 
-ArnSceneGraph* PlayState::getSceneGraph()
+ArnSceneGraph* PlayState::getCharacterSceneGraph()
 {
-	return m_poolgSg;
+	return m_CharactersSg;
 }
 
 void PlayState::loadArnModels()
 {
 	// Hero model
-	m_poolgArnFile = new ArnFileData;
-	load_arnfile(_T("PoolG.arn"), *m_poolgArnFile);
-	m_poolgSg = new ArnSceneGraph(*m_poolgArnFile);
+	m_CharactersArnFile = new ArnFileData;
+	load_arnfile( _T("Characters.arn"), *m_CharactersArnFile );
+	m_CharactersSg = new ArnSceneGraph( *m_CharactersArnFile );
 }

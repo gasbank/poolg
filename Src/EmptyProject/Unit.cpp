@@ -327,7 +327,7 @@ int EpUnitSetArnMesh( void* ptr1, const char* ptr2 )
 	ArnMesh* arnMesh = 
 		static_cast<ArnMesh*>(
 		static_cast<PlayState*>(
-		GetTopStateManager().getState( GAME_TOP_STATE_PLAY ))->getSceneGraph()->getSceneRoot()->getNodeByName( ptr2 ));
+		GetTopStateManager().getState( GAME_TOP_STATE_PLAY ))->getCharacterSceneGraph()->getSceneRoot()->getNodeByName( ptr2 ));
 	instance1->setArnMesh( arnMesh );
 	return 0;
 } SCRIPT_CALLABLE_I_PV_PC( EpUnitSetArnMesh )

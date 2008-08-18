@@ -4,6 +4,7 @@
 class World;
 class ArnSceneGraph;
 struct ArnFileData;
+class ArnMesh;
 
 class PlayState : public State
 {
@@ -21,11 +22,11 @@ public:
 
 	virtual HRESULT release();
 
-	ArnSceneGraph* getSceneGraph();
+	ArnSceneGraph* getCharacterSceneGraph();
 
 private:
 	void loadArnModels();
 
-	ArnFileData*					m_poolgArnFile;
-	ArnSceneGraph*					m_poolgSg;
+	ArnFileData*					m_CharactersArnFile;
+	ArnSceneGraph*					m_CharactersSg;
 };

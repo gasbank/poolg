@@ -3,9 +3,12 @@
 #include "ScriptManager.h"
 #include "World.h"
 #include "TopStateManager.h"
+#include "PlayState.h"
 #include "TileManager.h"
 #include "Trigger.h"
 #include "DynamicMotion.h"
+#include "ArnMesh.h"
+#include "ArnSceneGraph.h"
 
 extern TileManager tileManager;
 
@@ -15,6 +18,7 @@ Unit::Unit( UnitType type )
 : m_type( type )
 {
 	m_d3dxMesh			= 0;
+	m_arnMesh			= 0;
 	m_pd3dDevice		= 0;
 	m_d3dTex			= 0;
 
@@ -82,7 +86,15 @@ HRESULT Unit::frameRender()
 	m_pd3dDevice->SetTransform(D3DTS_WORLD, &m_localXform);
 	m_pd3dDevice->SetTexture(0, m_d3dTex);
 	m_pd3dDevice->SetMaterial(&m_material);
-	m_d3dxMesh->DrawSubset(0);
+
+	if ( m_arnMesh )
+	{
+		m_pd3dDevice->SetRenderState( D3DRS_CULLMODE, D3DCULL_CW );
+		m_arnMesh->getD3DXMesh()->DrawSubset( 0 );
+		m_pd3dDevice->SetRenderState( D3DRS_CULLMODE, D3DCULL_CCW );
+	}
+	else
+		m_d3dxMesh->DrawSubset(0);
 	return hr;
 }
 
@@ -149,21 +161,43 @@ Unit* Unit::createUnit( LPD3DXMESH mesh, int tileX, int tileY, float posZ, bool 
 // 가고자 하는 방향으로 유닛을 회전시킨다.
 void Unit::setHeadDir( UnitInput unitInput )
 {
-	switch ( unitInput )
+	if ( !m_arnMesh )
 	{
-	case UNIT_MOVE_UP:
-		setRotZ( D3DXToRadian( 90 + 0 ) );
-		break;
-	case UNIT_MOVE_DOWN:
-		setRotZ( D3DXToRadian( 90 + 180 ) );
-		break;
-	case UNIT_MOVE_RIGHT:
-		setRotZ( D3DXToRadian( 90 - 90 ) );
-		break;
-	case UNIT_MOVE_LEFT:
-		setRotZ( D3DXToRadian( 90 + 90 ) );
-		break;
+		switch ( unitInput )
+		{
+		case UNIT_MOVE_UP:
+			setRotZ( D3DXToRadian( 90 + 0 ) );
+			break;
+		case UNIT_MOVE_DOWN:
+			setRotZ( D3DXToRadian( 90 + 180 ) );
+			break;
+		case UNIT_MOVE_RIGHT:
+			setRotZ( D3DXToRadian( 90 - 90 ) );
+			break;
+		case UNIT_MOVE_LEFT:
+			setRotZ( D3DXToRadian( 90 + 90 ) );
+			break;
+		}
 	}
+	else
+	{
+		switch ( unitInput )
+		{
+			case UNIT_MOVE_UP:
+				setRotZ( D3DXToRadian( 0 ) );
+				break;
+			case UNIT_MOVE_DOWN:
+				setRotZ( D3DXToRadian( 180 ) );
+				break;
+			case UNIT_MOVE_RIGHT:
+				setRotZ( D3DXToRadian( -90 ) );
+				break;
+			case UNIT_MOVE_LEFT:
+				setRotZ( D3DXToRadian( 90 ) );
+				break;
+		}
+	}
+	
 }
 
 void Unit::setForcedMove( int i )
@@ -287,8 +321,16 @@ int EpUnitPrintTilePos( void* ptr )
 	return 0;
 } SCRIPT_CALLABLE_I_PV( EpUnitPrintTilePos )
 
-
-
+int EpUnitSetArnMesh( void* ptr1, const char* ptr2 )
+{
+	Unit* instance1 = reinterpret_cast<Unit*>( ptr1 );
+	ArnMesh* arnMesh = 
+		static_cast<ArnMesh*>(
+		static_cast<PlayState*>(
+		GetTopStateManager().getState( GAME_TOP_STATE_PLAY ))->getSceneGraph()->getSceneRoot()->getNodeByName( ptr2 ));
+	instance1->setArnMesh( arnMesh );
+	return 0;
+} SCRIPT_CALLABLE_I_PV_PC( EpUnitSetArnMesh )
 
 START_SCRIPT_FACTORY( Unit )
 	CREATE_OBJ_COMMAND( EpCreateUnit )
@@ -301,4 +343,5 @@ START_SCRIPT_FACTORY( Unit )
 	CREATE_OBJ_COMMAND( EpUnitGetUpperRightZ )
 	CREATE_OBJ_COMMAND( EpUnitPrintTilePos )
 	CREATE_OBJ_COMMAND( EpUnitGetPos )
+	CREATE_OBJ_COMMAND( EpUnitSetArnMesh )
 END_SCRIPT_FACTORY( Unit )

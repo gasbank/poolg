@@ -78,8 +78,6 @@ private:
 
 	ArnFileData*					m_modelArnFile;
 	ArnSceneGraph*					m_modelSg;
-	ArnFileData*					m_poolgArnFile;
-	ArnSceneGraph*					m_poolgSg;
 
 	PictureMap						m_pic;
 	Picture							m_picRhw;

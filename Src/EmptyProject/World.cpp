@@ -26,8 +26,6 @@ World::World( const char* worldName, const TCHAR* modelFilePath )
 	m_modelFilePath			= modelFilePath;
 	m_modelArnFile			= 0;
 	m_modelSg				= 0;
-	m_poolgArnFile			= 0;
-	m_poolgSg				= 0;
 	m_sampleTeapotMeshRot	= 0;
 	m_aTile					= 0;
 	m_heroUnit				= 0;
@@ -51,13 +49,7 @@ HRESULT World::init()
 
 	LPDIRECT3DDEVICE9& pd3dDevice =  GetG().m_dev;
 
-	loadWorldModel();
-
-	// Rat model
-	m_poolgArnFile = new ArnFileData;
-	load_arnfile(_T("rat.arn"), *m_poolgArnFile);
-	m_poolgSg = new ArnSceneGraph(*m_poolgArnFile);
-	
+	loadWorldModel();	
 	
 	// Load sample image (vertex and index buffer creation with texture)
 	const UINT mapSegments = 32;
@@ -157,7 +149,6 @@ HRESULT World::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, float fEl
 	pd3dDevice->SetFVF(ArnVertex::FVF);
 	D3DXMATRIX transform;
 	D3DXMatrixTranslation( &transform, m_heroUnit->getPos().x, m_heroUnit->getPos().y, m_heroUnit->getPos().z );
-	GetG().m_videoMan.renderMeshesOnly(m_poolgSg->getSceneRoot(), transform);
 	GetG().m_videoMan.renderMeshesOnly(m_modelSg->getSceneRoot());
 	
 	//////////////////////////////////////////////////////////////////////////
@@ -218,7 +209,6 @@ HRESULT World::frameMove(double fTime, float fElapsedTime)
 	GetWorldStateManager().getCurState()->frameMove(fTime, fElapsedTime);
 
 	m_modelSg->getSceneRoot()->update(fTime, fElapsedTime);
-	m_poolgSg->getSceneRoot()->update(fTime, fElapsedTime);
 
 	m_screenFlash.frameMove( fTime, fElapsedTime );
 	
@@ -315,12 +305,6 @@ HRESULT World::release()
 		release_arnfile(*m_modelArnFile);
 	SAFE_DELETE(m_modelArnFile);
 	SAFE_DELETE(m_modelSg);
-
-	if (m_poolgArnFile)
-		release_arnfile(*m_poolgArnFile);
-	SAFE_DELETE(m_poolgArnFile);
-	SAFE_DELETE(m_poolgSg);
-
 
 	SAFE_RELEASE(m_aTile);
 

@@ -1,6 +1,9 @@
 #pragma once
 #include "State.h"
+
 class World;
+class ArnSceneGraph;
+struct ArnFileData;
 
 class PlayState : public State
 {
@@ -17,4 +20,12 @@ public:
 	virtual HRESULT handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	virtual HRESULT release();
+
+	ArnSceneGraph* getSceneGraph();
+
+private:
+	void loadArnModels();
+
+	ArnFileData*					m_poolgArnFile;
+	ArnSceneGraph*					m_poolgSg;
 };

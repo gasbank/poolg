@@ -27,9 +27,10 @@ namespace eval EpCeilingWorld {
 		EpCharacterSetCurCs			$pHeroUnit -1
 		EpCharacterSetMoveDuration	$pHeroUnit [expr 0.2]
 		EpCharacterSetColor			$pHeroUnit 255 0 255
-		EpUnitSetRotX				$pHeroUnit [ToRadian -90]
-		EpUnitSetRotZ				$pHeroUnit [ToRadian 90]
+		#EpUnitSetRotX				$pHeroUnit [ToRadian -90]
+		#EpUnitSetRotZ				$pHeroUnit [ToRadian 90]
 		EpUnitSetPosZ				$pHeroUnit -[EpUnitGetUpperRightZ $pHeroUnit]
+		EpUnitSetArnMesh			$pHeroUnit "PoolGModel"
         
 		set npcGetg					[ createEnemy 34 79 ];
 		EpCharacterSetColor			$npcGetg 128 128 0

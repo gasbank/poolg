@@ -23,6 +23,7 @@ static const POINT g_moveAmount[4] = {
 };
 
 class World;
+class ArnMesh;
 
 enum UnitType { UT_UNIT, UT_CHARACTER, UT_HERO, UT_ENEMY, UT_ATTACKOBJECT, UT_INNERFIRE };
 
@@ -66,7 +67,6 @@ public:
 
 	void setHeadDir( UnitInput );
 
-
 	void setTilePos(int tileX, int tileY);
 	void setTilePos( const Point2Uint& newPos );
 	void setTileBufferPos(int tileX, int tileY) { m_tileBufferPos.x = tileX; m_tileBufferPos.y = tileY; }
@@ -88,6 +88,8 @@ public:
 	void setForcedMove( int i );
 	void forcedMoveTest();
 	
+	void setArnMesh( ArnMesh* arnMesh ) { m_arnMesh = arnMesh; }
+
 protected:
 	World* getWorldState() const;
 
@@ -129,7 +131,8 @@ private:
 	Point2Uint				m_tileBufferPos;
 
 	UnitType				m_type;
-	
+
+	ArnMesh*				m_arnMesh;
 };
 
 SCRIPT_FACTORY( Unit )

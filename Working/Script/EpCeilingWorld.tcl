@@ -1,5 +1,5 @@
 namespace eval EpCeilingWorld {
-	set modelFilePath	"ceiling.arn"
+	set modelFilePath	"CeilingWorld.arn"
 	global world hero npcGetg npcGloop pHeroUnit
 
 	proc registerIncidentInitTalk {} {

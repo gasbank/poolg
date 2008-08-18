@@ -260,6 +260,58 @@ void Unit::forcedMoveTest()
 	}
 }
 
+float MeshRayClosestIntersectDist( LPD3DXMESH mesh, const D3DXVECTOR3& rayStartPos, const D3DXVECTOR3& rayDir )
+{
+	HRESULT hr;
+	BOOL hit;
+	DWORD hitFaceIndex;
+	float hitU, hitV;
+	float hitDist;
+
+	// Get intersection information
+	V( D3DXIntersect( mesh, &rayStartPos, &rayDir, &hit,  &hitFaceIndex, &hitU, &hitV, &hitDist, 0, 0 ) );
+
+	// If there is collision between ray and face
+	if ( hit )
+	{
+		//printf( "Ray Testing Hit! Dist: %.2f\n", hitDist );
+		return hitDist;
+	}
+	else
+	{
+		//printf( "Ray Testing Not Hit\n", hitDist );
+		return FLOAT_POS_INF;
+	}
+}
+
+// If a ray intersects a triangle within distMin, true is returned.
+// Otherwise false is returned.
+bool FullTraverseExhaustiveRayTesting( ArnNode* node, const D3DXVECTOR3& rayStartPos, const D3DXVECTOR3& rayDir, float distMin )
+{
+	if ( node->getType() == NDT_RT_MESH )
+	{
+		ArnMesh* mesh = static_cast<ArnMesh*>( node );
+		D3DXVECTOR3 relativeRayStartPos = rayStartPos - mesh->getLocalXform_Trans();
+		float dist = MeshRayClosestIntersectDist( mesh->getD3DXMesh(), relativeRayStartPos, rayDir );
+		if ( dist <= distMin )
+			return true;
+		else
+			return false;
+	}
+	else
+	{
+		UINT i;
+		const UINT childCount = node->getNodeCount();
+		for ( i = 0; i < childCount; ++i )
+		{
+			bool ret = FullTraverseExhaustiveRayTesting( node->getNodeAt( i ), rayStartPos, rayDir, distMin );
+			if ( ret )
+				return true;
+		}
+	}
+	return false;
+}
+
 HRESULT Unit::rayTesting( UnitInput mappedKey )
 {
 	//////////////////////////////////////////////////////////////////////////
@@ -269,47 +321,50 @@ HRESULT Unit::rayTesting( UnitInput mappedKey )
 
 	World* ws = GetWorldManager().getCurWorld();
 
-	// Ray starting position as hero position
 	D3DXVECTOR3 rayStartPos( getPos().x, getPos().y, getPos().z - 2.0f );
-
-	// Direction data
 	float dirArray[4][3] = { { 0.0f, 1.0f, 0.0f }, { 0.0f, -1.0f, 0.0f }, { -1.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f } };
+	D3DXVECTOR3 rayDir( dirArray[mappedKey][0], dirArray[mappedKey][1], dirArray[mappedKey][2] );
 
-	BOOL hit;
-	DWORD hitFaceIndex;
-	float hitU, hitV;
-	float hitDist;
+	bool intersected = FullTraverseExhaustiveRayTesting( ws->getArnSceneGraphPt()->getSceneRoot(), rayStartPos, rayDir, 1.5f * s_tileSize );
+	m_bMovable = !intersected;
 
-	// Get mesh data
-	ArnMesh* mainWallMesh = dynamic_cast<ArnMesh*>( ws->getArnSceneGraphPt()->getSceneRoot()->getNodeByName("MainWall") );
-	if ( mainWallMesh )
-	{
-		// Select direction
-		D3DXVECTOR3 rayDir( dirArray[mappedKey][0], dirArray[mappedKey][1], dirArray[mappedKey][2] );
+	//// Get mesh data
+	//ArnMesh* mainWallMesh = dynamic_cast<ArnMesh*>( ws->getArnSceneGraphPt()->getSceneRoot()->getNodeByName("CeilingUpper") );
+	//if ( mainWallMesh )
+	//{
+	//	// Ray starting position as hero position
+	//	D3DXVECTOR3 rayStartPos( getPos().x, getPos().y, getPos().z - 2.0f );
+	//	// Select direction
+	//	float dirArray[4][3] = { { 0.0f, 1.0f, 0.0f }, { 0.0f, -1.0f, 0.0f }, { -1.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f } };
+	//	D3DXVECTOR3 rayDir( dirArray[mappedKey][0], dirArray[mappedKey][1], dirArray[mappedKey][2] );
+	//	BOOL hit;
+	//	DWORD hitFaceIndex;
+	//	float hitU, hitV;
+	//	float hitDist;
 
-		// Get intersection information
-		V_RETURN( D3DXIntersect( 
-			mainWallMesh->getD3DXMesh(), 
-			&rayStartPos, 
-			&rayDir,
-			&hit, 
-			&hitFaceIndex, 
-			&hitU, 
-			&hitV, 
-			&hitDist, 
-			0, 
-			0 ) );
+	//	// Get intersection information
+	//	V_RETURN( D3DXIntersect( 
+	//		mainWallMesh->getD3DXMesh(), 
+	//		&rayStartPos, 
+	//		&rayDir,
+	//		&hit, 
+	//		&hitFaceIndex, 
+	//		&hitU, 
+	//		&hitV, 
+	//		&hitDist, 
+	//		0, 
+	//		0 ) );
 
-		// If there is collision between ray and face
-		if ( hit )
-		{
-			//printf("Ray Testing test. (FaceIndex : %u, Dist : %f)\n", hitFaceIndex, hitDist );
+	//	// If there is collision between ray and face
+	//	if ( hit )
+	//	{
+	//		//printf("Ray Testing test. (FaceIndex : %u, Dist : %f)\n", hitFaceIndex, hitDist );
 
-			// 타일 1.5칸 이내에서 교차하면 그 방향으로 움직이지 않는다.
-			if ( hitDist <= (float) 1.5 * s_tileSize )
-				m_bMovable = false;
-		}
-	}
+	//		// 타일 1.5칸 이내에서 교차하면 그 방향으로 움직이지 않는다.
+	//		if ( hitDist <= (float) 1.5 * s_tileSize )
+	//			m_bMovable = false;
+	//	}
+	//}
 
 	return hr;
 }

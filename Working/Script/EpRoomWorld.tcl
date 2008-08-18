@@ -160,7 +160,7 @@ namespace eval EpRoomWorld {
 		# Setting Test Enemy Unit
 		EpCharacterSetColor			$pTestEnemyUnit 255 255 255
 		EpEnemySetRandomWalkable		$pTestEnemyUnit	1
-		EpCharacterSetBoundary			$pTestEnemyUnit 3 -22 5 -25  # left, top, right, bottom
+		EpCharacterSetBoundary			$pTestEnemyUnit 3 -22 5 -25  ;# left, top, right, bottom
 		EpEnemySetTalkable			$pTestEnemyUnit	1
 		
 		

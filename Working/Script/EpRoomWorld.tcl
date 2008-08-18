@@ -75,6 +75,19 @@ namespace eval EpRoomWorld {
 		EpOutputDebugString " - Incident count: $incCount\n"
 	}
 	
+	proc Incident_TofuManEnter {} {
+		variable pHeroUnit
+		set trigger		[ EpCreateUnitPositionTrigger $pHeroUnit 50 42 59 42 ]
+		set action0		[ EpCreateScriptAction "EpSetDoAnim [EpGetNode Door] 1" ]
+		set action1		[ EpCreateScriptAction "EpSetDoAnim [EpGetNode TofuMan] 1" ]
+		
+		set incident	[ EpCreateIncident $trigger $action0 0 ]
+		EpAddActionToIncident $incident $action1
+		
+		set incCount	[ EpRegisterIncident $incident ]
+		EpOutputDebugString " - Incident count: $incCount\n"
+	}
+	
 	proc enter {} {
 		variable testEnemy
 		variable pHeroUnit
@@ -84,7 +97,7 @@ namespace eval EpRoomWorld {
 		
 		set testEnemy				[createEnemy 27 78 1];
 		
-		set pHeroUnit				[createHero 26 74];
+		set pHeroUnit				[createHero 53 45];
 		
 		set pEnemyUnit1				[createEnemy 25 90 1];
 		set pEnemyUnit2				[createEnemy 37 88 1];
@@ -104,7 +117,7 @@ namespace eval EpRoomWorld {
 		EpCharacterSetStat			$pHeroUnit    100     5     7       5      5      5
 		EpCharacterSetCurHp			$pHeroUnit 100
 		EpCharacterSetCurCs			$pHeroUnit -1
-		EpCharacterSetMoveDuration		$pHeroUnit [expr 0.2]
+		EpCharacterSetMoveDuration		$pHeroUnit [expr 0.05]
 		EpCharacterSetColor			$pHeroUnit 255 0 255
 		
 		
@@ -170,12 +183,14 @@ namespace eval EpRoomWorld {
 		EpEnemySetTalkable			$pTestEnemyUnit	1
 
 		
-		
+		# Incidents ------------------------------------------------------------
 		registerIncidentHeal
 		registerIncidentClear
 		registerIncidentHidden
 		registerIncidentUnClear
+		Incident_TofuManEnter
 		
+		# Warp Positions -------------------------------------------------------
 		createWarpPosition			"EpA213World" 49 28 61 30
 	}
 	

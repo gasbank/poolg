@@ -670,6 +670,11 @@ void World::addCollisionMesh( ArnMesh* collisionMesh )
 {
 	m_collisionMeshes.push_back( collisionMesh );
 }
+
+ArnNode* World::getNode( const char* nodeName ) const
+{
+	return m_modelSg->getSceneRoot()->getNodeByName( nodeName );
+}
 //////////////////////////////////////////////////////////////////////////
 
 Unit* EpGetHero()
@@ -685,7 +690,34 @@ int EpRegisterIncident( void* ptr )
 
 } SCRIPT_CALLABLE_I_PV( EpRegisterIncident )
 
+ArnNode* EpGetNode( const char* nodeName )
+{
+	return GetWorldManager().getCurWorld()->getNode( nodeName );
+
+} SCRIPT_CALLABLE_PV_PC( EpGetNode )
+
+int EpSetDoAnim( void* ptr, int bDoAnim )
+{
+	ArnXformable* xformable = reinterpret_cast<ArnXformable*>( ptr );
+	xformable->setDoAnim( bDoAnim?true:false );
+	return 0;
+
+} SCRIPT_CALLABLE_I_PV_I( EpSetDoAnim )
+
+
+int EpSetAnimTime( void* ptr, double dTime )
+{
+	ArnXformable* xformable = reinterpret_cast<ArnXformable*>( ptr );
+	xformable->setAnimCtrlTime( dTime );
+	return 0;
+
+} SCRIPT_CALLABLE_I_PV_D( EpSetAnimTime )
+
+
 START_SCRIPT_FACTORY( World )
 	CREATE_OBJ_COMMAND( EpGetHero )
 	CREATE_OBJ_COMMAND( EpRegisterIncident )
+	CREATE_OBJ_COMMAND( EpGetNode )
+	CREATE_OBJ_COMMAND( EpSetDoAnim )
+	CREATE_OBJ_COMMAND( EpSetAnimTime )
 END_SCRIPT_FACTORY( World )

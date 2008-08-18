@@ -66,6 +66,7 @@ public:
 	void				setModelFilePath( const TCHAR* modelFilePath ) { m_modelFilePath = modelFilePath; }
 	const std::tstring& getModelFilePath() const { return m_modelFilePath; }
 	
+	ArnNode*			getNode( const char* nodeName ) const;
 private:
 						World( const char* worldName, const TCHAR* modelFilePath );
 	void				setupLight();

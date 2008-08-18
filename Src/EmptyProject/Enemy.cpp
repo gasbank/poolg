@@ -84,7 +84,7 @@ void Enemy::walkRandomly()
 	{
 		UINT i;
 		// Pull virtually pushed key at 33% probability
-		if ( (rand() % 3) )
+		if ( (rand() / (float)RAND_MAX) < 0.1f )
 		{
 			for ( i = 0; i < UNIT_MAX_KEYS; i++ )
 			{

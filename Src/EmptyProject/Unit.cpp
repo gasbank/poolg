@@ -90,7 +90,8 @@ HRESULT Unit::frameRender()
 	if ( m_arnMesh )
 	{
 		m_pd3dDevice->SetRenderState( D3DRS_CULLMODE, D3DCULL_CW );
-		m_arnMesh->getD3DXMesh()->DrawSubset( 0 );
+		//m_arnMesh->getD3DXMesh()->DrawSubset( 0 );
+		GetG().m_videoMan.renderMeshesOnly( m_arnMesh, m_localXform );
 		m_pd3dDevice->SetRenderState( D3DRS_CULLMODE, D3DCULL_CCW );
 	}
 	else

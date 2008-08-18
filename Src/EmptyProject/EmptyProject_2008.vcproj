@@ -729,6 +729,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\StructureObject.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\StructureObject.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Unit.cpp"
 				>
 			</File>

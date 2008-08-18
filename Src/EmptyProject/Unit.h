@@ -25,7 +25,7 @@ static const POINT g_moveAmount[4] = {
 class World;
 class ArnMesh;
 
-enum UnitType { UT_UNIT, UT_CHARACTER, UT_HERO, UT_ENEMY, UT_ATTACKOBJECT, UT_INNERFIRE };
+enum UnitType { UT_UNIT, UT_CHARACTER, UT_HERO, UT_ENEMY, UT_ATTACKOBJECT, UT_INNERFIRE, UT_STRUCTREOBJECT };
 
 class Unit
 {

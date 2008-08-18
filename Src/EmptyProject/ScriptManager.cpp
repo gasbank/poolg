@@ -9,6 +9,7 @@
 #include "Incident.h"
 #include "Trigger.h"
 #include "Action.h"
+#include "StructureObject.h"
 
 int Tcl_AppInit(Tcl_Interp *interp);
 
@@ -141,6 +142,7 @@ void ScriptManager::initScriptBindings()
 	INIT_BINDING( Incident );
 	INIT_BINDING( Action );
 	INIT_BINDING( Trigger );
+	INIT_BINDING( StructureObject );
 }
 
 //////////////////////////////////////////////////////////////////////////

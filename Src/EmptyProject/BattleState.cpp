@@ -7,6 +7,7 @@
 #include "Action.h"
 #include "Skill.h"
 #include "Sound.h"
+#include "TileManager.h"
 
 BattleState::BattleState()
 {
@@ -317,6 +318,7 @@ HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 			{
 				GetWorldStateManager().setNextState(GAME_WORLD_STATE_FIELD);
 				getEnemy()->setRemoveFlag( true ); // Should be deleted before next frame update
+				GetTileManager().getTile( getEnemy()->getTilePos() )->b_movable = true;
 				return S_OK;
 			}
 			return S_OK;

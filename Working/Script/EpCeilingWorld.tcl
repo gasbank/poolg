@@ -37,12 +37,14 @@ namespace eval EpCeilingWorld {
 		EpCharacterSetStat			$npcGetg 4 1 3 1 1 1
 		EpCharacterSetCurHp			$npcGetg -1
 		EpEnemySetTalkable			$npcGetg 1
+		EpUnitSetArnMesh			$npcGetg "PoolGModel"
 		
 		set npcGloop				[ createEnemy 30 82 ];
 		EpCharacterSetColor			$npcGloop 0 255 255
 		EpCharacterSetStat			$npcGloop 3 1 4 1 1 1
 		EpCharacterSetCurHp			$npcGloop -1
 		EpEnemySetTalkable			$npcGloop 1
+		EpUnitSetArnMesh			$npcGloop "PoolGModel"
 
 
 		registerIncidentInitTalk

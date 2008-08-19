@@ -9,6 +9,7 @@
 #include "DynamicMotion.h"
 #include "ArnMesh.h"
 #include "ArnSceneGraph.h"
+#include "Utility.h"
 
 extern TileManager tileManager;
 
@@ -288,13 +289,30 @@ float MeshRayClosestIntersectDist( LPD3DXMESH mesh, const D3DXVECTOR3& rayStartP
 // Otherwise false is returned.
 bool FullTraverseExhaustiveRayTesting( ArnNode* node, const D3DXVECTOR3& rayStartPos, const D3DXVECTOR3& rayDir, float distMin )
 {
-	if ( node->getType() == NDT_RT_MESH )
+	if ( node->getType() == NDT_RT_MESH && strcmp(node->getName(), "Door") == 0)
 	{
 		ArnMesh* mesh = static_cast<ArnMesh*>( node );
-		D3DXVECTOR3 relativeRayStartPos = rayStartPos - mesh->getLocalXform_Trans();
-		float dist = MeshRayClosestIntersectDist( mesh->getD3DXMesh(), relativeRayStartPos, rayDir );
+		const D3DXMATRIX& meshXform = mesh->getFinalLocalXform();
+		D3DXVECTOR3 vScale, vTrans;
+		D3DXQUATERNION qRot;
+		D3DXMatrixDecompose( &vScale, &qRot, &vTrans, &meshXform );
+		D3DXVECTOR3 relativeRayStartPos = rayStartPos - vTrans;
+		D3DXMATRIX mRot;
+		D3DXMatrixRotationQuaternion( &mRot, &qRot );
+		D3DXVECTOR3 relativeRayDir;
+		D3DXVec3TransformCoord( &relativeRayDir, &rayDir, &mRot );
+		float dist = MeshRayClosestIntersectDist( mesh->getD3DXMesh(), relativeRayStartPos, relativeRayDir );
 		if ( dist <= distMin )
+		{
+			printf( " -------------------------------------------------------------\n" );
+			printf( " Ray dist is less than distMin!\n" );
+			printf( " rayStartPos = " );			Utility::printValue( rayStartPos ); printf("\n");
+			printf( " relativeRayStartPos = " );	Utility::printValue( relativeRayStartPos ); printf("\n");
+			printf( " rayDir = " );					Utility::printValue( rayDir ); printf("\n");
+			printf( " relativeRayDir = " );			Utility::printValue( relativeRayDir ); printf("\n");
+			printf( " meshXform = \n" );			Utility::printValue( meshXform ); printf("\n");
 			return true;
+		}
 		else
 			return false;
 	}
@@ -325,7 +343,7 @@ HRESULT Unit::rayTesting( UnitInput mappedKey )
 	float dirArray[4][3] = { { 0.0f, 1.0f, 0.0f }, { 0.0f, -1.0f, 0.0f }, { -1.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f } };
 	D3DXVECTOR3 rayDir( dirArray[mappedKey][0], dirArray[mappedKey][1], dirArray[mappedKey][2] );
 
-	bool intersected = FullTraverseExhaustiveRayTesting( ws->getArnSceneGraphPt()->getSceneRoot(), rayStartPos, rayDir, 1.0f * s_tileSize );
+	bool intersected = FullTraverseExhaustiveRayTesting( ws->getArnSceneGraphPt()->getSceneRoot(), rayStartPos, rayDir, (float)s_tileSize );
 	m_bMovable = !intersected;
 
 	//// Get mesh data

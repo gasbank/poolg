@@ -241,14 +241,14 @@ namespace eval EpRoomWorld {
 		registerIncidentHeal
 		registerIncidentClear
 		registerIncidentHidden
-		registerIncidentUnClear
+		#registerIncidentUnClear
 		#Incident_TofuManEnter
 		registerIncidentSwitch
 		registerIncidentCamera
 		registerIncidentCamera2
 		
 		# Warp Positions -------------------------------------------------------
-		createWarpPosition			"EpA213World" 49 28 61 30
+		#createWarpPosition			"EpA213World" 49 28 61 30
 	}
 	
 	proc leave {} {

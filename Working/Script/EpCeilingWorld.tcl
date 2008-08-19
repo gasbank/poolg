@@ -7,11 +7,8 @@ namespace eval EpCeilingWorld {
 		
 		set trigger		[ EpCreateUnitPositionTrigger $pHeroUnit 30 77 30 77 0x100 ]
 		set actions		[ EpCreateDialogAction "EpDialog1" ]
-		lappend actions	[ EpCreateDialogAction "EpDialog2" ]
-		lappend actions	[ EpCreateFadeAction out 3500 ]
-		lappend actions	[ EpCreateDialogAction "EpDialog3" ]
-		lappend actions	[ EpCreateFadeAction in 3000 ]
-		lappend actions	[ EpCreateDialogAction "EpDialog4" ]
+		lappend actions	[ EpCreateFadeAction out 500 ]
+		lappend actions	[ EpCreateFadeAction in 500 ]
 		lappend actions	[ EpCreateTeleportAction $pHeroUnit 25 82 ]
 		set incident	[ EpCreateBlockingActionIncident $trigger 0 0 ]
 		

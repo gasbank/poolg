@@ -28,7 +28,7 @@ public:
 	virtual bool frameMove( float fElapsedTime );
 	virtual LRESULT handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 
-	virtual const D3DXVECTOR3& getPos() const { return m_curPos; }
+	virtual const D3DXVECTOR3& getPos() { m_curPos = Unit::getPos() + m_moveImpulse; return m_curPos; }
 
 	void setCurHp( int curHp );
 	int getCurHp() const { return m_curHp; }

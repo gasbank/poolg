@@ -63,7 +63,7 @@ namespace eval EpThreadTest {
 						}
 					}
 				}
-			 } result ] {
+			} result ] {
 				puts $::errorInfo
 			}
 		}

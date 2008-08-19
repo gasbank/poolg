@@ -29,7 +29,7 @@ public:
 	void setDesViewParams( D3DXVECTOR3* pvEyePt, D3DXVECTOR3* pvLookatPtg, D3DXVECTOR3* vUp );
 	void setAttachPos( const D3DXVECTOR3* pos ) { m_vPos = pos; }
 	void setSmoothCameraDuration( float f ) { m_fSmoothCameraDuration = f; }
-	void setExternalCamera( ArnCamera* arnCam ) { assert( arnCam ); m_pArnCam = arnCam; }
+	void setExternalCamera( ArnCamera* arnCam ) { _ASSERTE( arnCam && "Camera not found" ); m_pArnCam = arnCam; }
 	void beginShoulderLookCamera( const D3DXVECTOR3* pvMePos, const D3DXVECTOR3* pvOppPos );
 	void begin( RunningCamera rc );
 	D3DXVECTOR3* GetUpPt();

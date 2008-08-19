@@ -10,6 +10,7 @@
 #include "Trigger.h"
 #include "Action.h"
 #include "StructureObject.h"
+#include "TileManager.h"
 
 int Tcl_AppInit(Tcl_Interp *interp);
 
@@ -72,24 +73,26 @@ void ScriptManager::throwScriptErrorWithMessage( Tcl_Interp* interp )
 	throw std::runtime_error( trace );
 }
 
-bool ScriptManager::readRect( const char* variableName, RECT& rect )
+bool ScriptManager::readRect( const char* variableName, TileRegion& rect )
 {
 	Tcl_Obj* retObj;
 	Tcl_Obj* aObj;
-	int retObjLength;	
+	int retObjLength;
+
 	retObj = Tcl_GetVar2Ex( m_interp, variableName, 0, 0 );
 	Tcl_ListObjLength( m_interp, retObj, &retObjLength );
 	assert(retObjLength == 4);
+	long x0, y0, x1, y1;
 	Tcl_ListObjIndex( m_interp, retObj, 0, &aObj );
-	Tcl_GetLongFromObj( m_interp, aObj, &rect.left );
+	Tcl_GetLongFromObj( m_interp, aObj, &x0 );
 	Tcl_ListObjIndex( m_interp, retObj, 1, &aObj );
-	Tcl_GetLongFromObj( m_interp, aObj, &rect.top );
+	Tcl_GetLongFromObj( m_interp, aObj, &y0 );
 	Tcl_ListObjIndex( m_interp, retObj, 2, &aObj );
-	Tcl_GetLongFromObj( m_interp, aObj, &rect.right );
+	Tcl_GetLongFromObj( m_interp, aObj, &x1 );
 	Tcl_ListObjIndex( m_interp, retObj, 3, &aObj );
-	Tcl_GetLongFromObj( m_interp, aObj, &rect.bottom );
+	Tcl_GetLongFromObj( m_interp, aObj, &y1 );
 
-	
+	rect = TileRegion( x0, y0, x1, y1 );
 	return true;
 }
 

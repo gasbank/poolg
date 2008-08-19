@@ -91,7 +91,9 @@ HRESULT World::init()
 	ConstCharList::iterator itDialogList = dialogList.begin();
 	for ( ; itDialogList != dialogList.end(); ++itDialogList )
 	{
-		m_scriptedDialog.push_back( Dialog::createDialogByScript( *itDialogList ) );
+		Dialog* newDlg = Dialog::createDialogByScript( *itDialogList );
+		newDlg->init();
+		m_scriptedDialog.push_back( newDlg );
 		(*m_scriptedDialog.rbegin())->init();
 	}
 
@@ -607,8 +609,7 @@ void World::startTileDefinedDialogIfExist()
 		{
 			Dialog* dialog = (*it);
 
-			if ( (m_heroUnit->getTilePosX() == (UINT)dialog->getRegion().left)
-				&& (m_heroUnit->getTilePosY() == (UINT)dialog->getRegion().top) )
+			if ( dialog->getRegion().isExist( getHeroUnit()->getTilePos() ) )
 			{
 				m_curDialog = dialog;
 				break;

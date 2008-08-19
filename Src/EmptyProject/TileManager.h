@@ -33,13 +33,23 @@ public:
 	
 	inline bool isExist( const Point2Uint& point ) const
 	{
-		return ( point.x >= m_start.x && point.x <= m_end.x && point.y >= m_start.y && point.y <= m_end.y);
+		return ( (point.x >= m_start.x && point.x <= m_end.x && point.y >= m_start.y && point.y <= m_end.y)
+			||	(point.x <= m_start.x && point.x >= m_end.x && point.y <= m_start.y && point.y >= m_end.y)
+			||	(point.x >= m_start.x && point.x <= m_end.x && point.y <= m_start.y && point.y >= m_end.y)
+			||	(point.x <= m_start.x && point.x >= m_end.x && point.y >= m_start.y && point.y <= m_end.y) );
 	}
+
+	TileRegion &TileRegion::operator =(const TileRegion &rhs) { m_start = rhs.m_start; m_end = rhs.m_end; return *this; }
+
+	Point2Uint getStart() const { return m_start; }
+	void setStart(Point2Uint val) { m_start = val; }
+	Point2Uint getEnd() const { return m_end; }
+	void setEnd(Point2Uint val) { m_end = val; }
 
 private:
 	Point2Uint m_start;
 	Point2Uint m_end;
-
+	
 };
 
 //////////////////////////////////////////////////////////////////////////

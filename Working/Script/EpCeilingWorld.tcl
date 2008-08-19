@@ -1,15 +1,14 @@
 namespace eval EpCeilingWorld {
 	set modelFilePath	"CeilingWorld.arn"
+	set dialogNameList [ list introDialog GlooPDialog GetGDialog ]
 	global world hero npcGetg npcGloop pHeroUnit
 
 	proc registerIncidentInitTalk {} {
 		global world hero npcGetg npcGloop pHeroUnit
 		
 		set trigger		[ EpCreateUnitPositionTrigger $pHeroUnit 30 77 30 77 0x100 ]
-		set actions		[ EpCreateDialogAction "EpDialog1" ]
-		lappend actions	[ EpCreateFadeAction out 500 ]
-		lappend actions	[ EpCreateFadeAction in 500 ]
-		lappend actions	[ EpCreateTeleportAction $pHeroUnit 25 82 ]
+		set actions		[ EpCreateDialogAction "EpCeilingWorld::introDialog" ]
+				
 		set incident	[ EpCreateBlockingActionIncident $trigger 0 0 ]
 		
 		foreach act $actions {
@@ -65,5 +64,62 @@ namespace eval EpCeilingWorld {
 	proc leave {} {
 		EpOutputDebugString " - [info level 0] called\n"
 	}
+
+
+
+
+	namespace eval introDialog {
+		
+		set region [ list 0 0 -1 -1 ]; ;# left, top, right, bottom
+		set oneTime 1;
+		
+		set player "PoolG"
+		set npc1 "GlooP"
+		set npc2 "GetG"
+		
+		set dialog [ list\
+			$npc1		"PoolC에서 대청소를 해버리는 바람에, 우리들의 삶의 터전이 좁아저 버렸다네"\
+			$player		"뭬야!"\
+			$npc1		"게다가 앞으론 우리들을 살 수 없도록 언제나 깨끗하게 유지하겠다고 하더군"\
+			$player		"맙소사! 난 가만히 있을 수 없어"\
+			$npc2		"제발 그들을 말려주게"\
+			$player		"이대로 가만히 있을 순 없지. 다녀오겠네"\
+		];
+	}
+
+	namespace eval GlooPDialog {
+	
+		set region [ list 29 83 31 81 ]; ;# left, top, right, bottom
+		set oneTime 0;
+	
+		set player "PoolG"
+		set npc "GlooP"
+	
+		set dialog [ list\
+			$npc		"동아리 방에는 '괭이' 라고 불리는 생물이 돌아다니는 듯 하네"\
+			$player		"뭐하는 녀석인가?"\
+			$npc		"KKK라고 불리는 사람이 그린 고양이라고 하던데...."\
+			$player		"그림이 돌아다닐리가 없잖아"\
+			$npc		"어쩌겠나. 08 프로젝트 팀에게 문의를 하시게"\
+		];	
+	}
+
+	namespace eval GetGDialog {
+	
+		set region [ list 33 80 35 78 ]; ;# left, top, right, bottom
+		set oneTime 0;
+	
+		set player "PoolG"
+		set npc "GetG"
+	
+		set dialog [ list\
+			$npc		"변수는 Private에 넣은뒤, Get 함수로 불러온다면 누가 불러가는지 추적이 편해진다네"\
+			$player		"그것은 코딩의 기초가 아닌가"\
+			$npc		"하지만 이건 C에선 지원하지 않지"\
+			$player		"도대체 왜 아직도 C를 쓰는지 모르겠어"\
+			$npc		"어쩌겠나. 08 프로젝트 팀에게 문의를 하시게"\
+		];	
+	}
+
 
 }

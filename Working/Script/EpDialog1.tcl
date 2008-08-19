@@ -1,23 +1,4 @@
-set EpDialogList [list EpDialog1 EpDialog2 EpDialog3 EpDialog4 EpDialogStop EpDialogHeal EpDialogBox EpDialogMirror EpDialogLaserOff EpDialogLaserOn EpDialogSave EpDialogReturn];
-
-namespace eval EpDialog1 {
-	
-	set region [ list 26 74 -1 -1 ]; ;# left, top, right, bottom
-	set oneTime 1;
-	
-	set player "PoolG"
-	set npc1 "GlooP"
-	set npc2 "GetG"
-	
-	set dialog [ list\
-		$npc1		"PoolC에서 대청소를 해버리는 바람에, 우리들의 삶의 터전이 좁아저 버렸다네"\
-		$player		"뭬야!"\
-		$npc1		"게다가 앞으론 우리들을 살 수 없도록 언제나 깨끗하게 유지하겠다고 하더군"\
-		$player		"맙소사! 난 가만히 있을 수 없어"\
-		$npc2		"제발 그들을 말려주게"\
-		$player		"이대로 가만히 있을 순 없지. 다녀오겠네"\
-	];
-}
+set EpDialogList [list EpDialog2 EpDialog3 EpDialog4 EpDialogStop EpDialogHeal EpDialogBox EpDialogMirror EpDialogLaserOff EpDialogLaserOn EpDialogSave EpDialogReturn];
 
 namespace eval EpDialog2 {
 	

@@ -1,6 +1,8 @@
 #pragma once
 #include "SingletonCreators.h"
 
+class TileRegion;
+
 extern Tcl_Interp* g_consoleInterp;
 
 class ScriptManager : public Singleton<ScriptManager>
@@ -19,7 +21,7 @@ public:
 	static void throwScriptErrorWithMessage( Tcl_Interp* interp );
 	
 	const char* readString( const char* variableName );
-	bool readRect( const char* variableName, RECT& rect );
+	bool readRect( const char* variableName, TileRegion& rect );
 	int readInt( const char* variableName );
 	Tcl_Obj* getObject( const char* variableName );
 	bool readCharPtrList( const char* variableName, ConstCharList& strList );

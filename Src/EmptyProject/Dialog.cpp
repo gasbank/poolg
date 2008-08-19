@@ -8,13 +8,13 @@ Dialog::Dialog(void)
 	ctorDialogPane();
 }
 
-Dialog::Dialog( Speak* speakArray, UINT speakCount, const RECT& region, bool bOneTime, const char* dialogName )
+Dialog::Dialog( Speak* speakArray, UINT speakCount, const TileRegion* region, bool bOneTime, const char* dialogName )
 {
 	ctorDialogPane();
 
 	m_speakArray	= speakArray;
 	m_speakCount	= speakCount;
-	m_region		= region;
+	m_region		= *region;
 	m_bOneTime		= bOneTime;
 	m_dialogName	= dialogName;
 }
@@ -192,7 +192,7 @@ Dialog* Dialog::createDialogByScript( const char* dialogName )
 	Tcl_Interp* interp = GetScriptManager().getInterp();
 	
 	StringCchPrintfA( tempBuf, 256, "%s::region", dialogName );
-	RECT region;
+	TileRegion region;
 	GetScriptManager().readRect( tempBuf, region );
 
 	StringCchPrintfA( tempBuf, 256, "%s::dialog", dialogName );
@@ -215,5 +215,5 @@ Dialog* Dialog::createDialogByScript( const char* dialogName )
 	StringCchPrintfA( tempBuf, 256, "%s::oneTime", dialogName );
 	int oneTime = GetScriptManager().readInt( tempBuf );
 
-	return new Dialog( speakArray, speakCount, region, oneTime?true:false, dialogName );
+	return new Dialog( speakArray, speakCount, &region, oneTime?true:false, dialogName );
 }

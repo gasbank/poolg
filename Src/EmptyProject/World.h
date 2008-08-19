@@ -35,6 +35,7 @@ public:
 	const std::string&	getWorldName() { return m_worldName; }
 	UINT				addUnit( Unit* u );
 	UINT				addIncident( Incident* inc );
+	UINT				addDialog( Dialog* dlg ) { m_scriptedDialog.push_back( dlg ); return m_scriptedDialog.size(); }
 
 	UnitSet::iterator	removeUnit( Unit* pUnit );
 	

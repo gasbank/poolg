@@ -1,6 +1,6 @@
 namespace eval EpA213World {
 	set modelFilePath	"A213World.arn"
-	
+	set dialogNameList [ list  ]
 	proc init { curWorld } {
 		variable world
 		

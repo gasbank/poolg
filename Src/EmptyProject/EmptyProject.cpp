@@ -20,6 +20,7 @@
 #include "ShaderWrapper.h"
 #include "TileManager.h"
 #include "World.h"
+#include "Dialog.h"
 
 G								g_g;
 WorldManager*					g_wm					= 0;
@@ -153,6 +154,20 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 		mbstowcs_s( &numOfConvert, mfp, 128, modelFilePath, 512 );
 		World* world = World::createWorld( worldName, mfp );
 		GetWorldManager().addWorld( world );
+
+		ConstCharList dialogNameList;
+		StringCchPrintfA( scriptCommand, 512, "%s::dialogNameList", worldName );
+		GetScriptManager().readCharPtrList( scriptCommand, dialogNameList );
+
+		ConstCharList::iterator itDlg = dialogNameList.begin();
+		for ( ; itDlg != dialogNameList.end(); ++itDlg )
+		{
+			StringCchPrintfA( scriptCommand, 512, "%s::%s", worldName, *itDlg );
+			Dialog* newDlg = Dialog::createDialogByScript( scriptCommand );
+			newDlg->init();
+			world->addDialog( newDlg );
+		}
+
 	}
 
 	// State Manager Initialization

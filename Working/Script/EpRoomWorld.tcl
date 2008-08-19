@@ -1,5 +1,6 @@
 namespace eval EpRoomWorld {
 	set modelFilePath	"RoomWorld.arn"
+	set dialogNameList [ list  ]
 	variable world testEnemy pHeroUnit pTestEnemyUnit
 	
 	proc init { curWorld } {

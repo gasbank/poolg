@@ -331,9 +331,6 @@ bool FullTraverseExhaustiveRayTesting( ArnNode* node, const D3DXVECTOR3& rayStar
 
 HRESULT Unit::rayTesting( UnitInput mappedKey )
 {
-	//////////////////////////////////////////////////////////////////////////
-	// Room Model MainWall intersection test
-
 	HRESULT hr = S_OK;
 
 	World* ws = GetWorldManager().getCurWorld();
@@ -344,44 +341,6 @@ HRESULT Unit::rayTesting( UnitInput mappedKey )
 
 	bool intersected = FullTraverseExhaustiveRayTesting( ws->getArnSceneGraphPt()->getSceneRoot(), rayStartPos, rayDir, (float)s_tileSize );
 	m_bMovable = !intersected;
-
-	//// Get mesh data
-	//ArnMesh* mainWallMesh = dynamic_cast<ArnMesh*>( ws->getArnSceneGraphPt()->getSceneRoot()->getNodeByName("CeilingUpper") );
-	//if ( mainWallMesh )
-	//{
-	//	// Ray starting position as hero position
-	//	D3DXVECTOR3 rayStartPos( getPos().x, getPos().y, getPos().z - 2.0f );
-	//	// Select direction
-	//	float dirArray[4][3] = { { 0.0f, 1.0f, 0.0f }, { 0.0f, -1.0f, 0.0f }, { -1.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f } };
-	//	D3DXVECTOR3 rayDir( dirArray[mappedKey][0], dirArray[mappedKey][1], dirArray[mappedKey][2] );
-	//	BOOL hit;
-	//	DWORD hitFaceIndex;
-	//	float hitU, hitV;
-	//	float hitDist;
-
-	//	// Get intersection information
-	//	V_RETURN( D3DXIntersect( 
-	//		mainWallMesh->getD3DXMesh(), 
-	//		&rayStartPos, 
-	//		&rayDir,
-	//		&hit, 
-	//		&hitFaceIndex, 
-	//		&hitU, 
-	//		&hitV, 
-	//		&hitDist, 
-	//		0, 
-	//		0 ) );
-
-	//	// If there is collision between ray and face
-	//	if ( hit )
-	//	{
-	//		//printf("Ray Testing test. (FaceIndex : %u, Dist : %f)\n", hitFaceIndex, hitDist );
-
-	//		// 타일 1.5칸 이내에서 교차하면 그 방향으로 움직이지 않는다.
-	//		if ( hitDist <= (float) 1.5 * s_tileSize )
-	//			m_bMovable = false;
-	//	}
-	//}
 
 	return hr;
 }

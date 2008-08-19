@@ -1,5 +1,6 @@
 #pragma once
 #include "Unit.h"
+#include "TileManager.h"
 
 class AttackObject;
 class Trigger;
@@ -80,7 +81,7 @@ private:
 	int						m_attack;		// 일반 공격 스킬에 영향
 	int						m_intelligence; // 힐링 등의 스킬에 영향
 	
-	RECT					m_boundaryTileRect;
+	TileRegion				m_boundaryTileRect;
 
 	// Move amount that applied instantly and decimated constantly on every frameMove()
 	D3DXVECTOR3				m_moveImpulse;

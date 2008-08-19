@@ -56,9 +56,9 @@ bool StructureObject::frameMove( float fElapsedTime )
 				{
 					TileRegion entireRegion( 0, 0, s_xSize - 1, s_ySize - 1);
 
-					Point2Uint nextTilePos = {
+					Point2Uint nextTilePos(
 						getTileBufferPos().x + g_moveAmount[ i ].x,
-						getTileBufferPos().y + g_moveAmount[ i ].y };
+						getTileBufferPos().y + g_moveAmount[ i ].y );
 
 						/*Tile* nextTile = GetTileManager().getTile( nextTilePos );
 						assert( nextTile );*/

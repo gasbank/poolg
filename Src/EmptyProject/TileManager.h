@@ -8,6 +8,8 @@
 
 struct Point2Uint 
 {
+	Point2Uint() { x = 0; y = 0; }
+	Point2Uint( UINT ax, UINT ay ) { x = ax; y = ay; }
 	UINT x, y;
 
 	bool operator !=( const Point2Uint& rhs ) const
@@ -27,16 +29,44 @@ class TileRegion
 {
 public:
 	TileRegion() {}
-	TileRegion( UINT startX, UINT startY, UINT endX, UINT endY ) { m_start.x = startX; m_start.y = startY; m_end.x = endX; m_end.y = endY; }
+	TileRegion( UINT startX, UINT startY, UINT endX, UINT endY )
+	{
+		m_start.x = startX;
+		m_start.y = startY;
+		m_end.x = endX;
+		m_end.y = endY;
+		if ( endX == -1 )
+			m_end.x = m_start.x;
+		if ( endY == -1 )
+			m_end.y = m_start.y;		
+	}
 	TileRegion( const Point2Uint start, const Point2Uint end ) : m_start( start ), m_end( end ) {}
 	~TileRegion() {}
 	
 	inline bool isExist( const Point2Uint& point ) const
 	{
-		return ( (point.x >= m_start.x && point.x <= m_end.x && point.y >= m_start.y && point.y <= m_end.y)
-			||	(point.x <= m_start.x && point.x >= m_end.x && point.y <= m_start.y && point.y >= m_end.y)
-			||	(point.x >= m_start.x && point.x <= m_end.x && point.y <= m_start.y && point.y >= m_end.y)
-			||	(point.x <= m_start.x && point.x >= m_end.x && point.y >= m_start.y && point.y <= m_end.y) );
+		UINT xmin, xmax, ymin, ymax;
+		if (m_start.x < m_end.x)
+		{
+			xmin = m_start.x;
+			xmax = m_end.x;
+		}
+		else
+		{
+			xmin = m_end.x;
+			xmax = m_start.x;
+		}
+		if (m_start.y < m_end.y)
+		{
+			ymin = m_start.y;
+			ymax = m_end.y;
+		}
+		else
+		{
+			ymin = m_end.y;
+			ymax = m_start.y;
+		}
+		return (point.x >= xmin && point.x <= xmax && point.y >= ymin && point.y <= ymax);
 	}
 
 	TileRegion &TileRegion::operator =(const TileRegion &rhs) { m_start = rhs.m_start; m_end = rhs.m_end; return *this; }

@@ -109,9 +109,9 @@ bool Character::frameMove( float fElapsedTime )
 				{
 					TileRegion entireRegion( 0, 0, s_xSize - 1, s_ySize - 1);
 
-					Point2Uint nextTilePos = {
+					Point2Uint nextTilePos(
 						getTileBufferPos().x + g_moveAmount[ i ].x,
-						getTileBufferPos().y + g_moveAmount[ i ].y };
+						getTileBufferPos().y + g_moveAmount[ i ].y );
 
 //  					Tile* nextTile = tileManager.getTile( nextTilePos );
 //  					assert( nextTile );
@@ -250,11 +250,8 @@ Character::Character( UnitType type )
 	m_fMovingTime		= 0;
 	m_moveDuration		= 1.0f;
 	m_bControllable		= true;
-	m_boundaryTileRect.top   = 999999;
-	m_boundaryTileRect.left  = -999999;
-	m_boundaryTileRect.bottom= -999999;
-	m_boundaryTileRect.right = 999999;
-
+	m_boundaryTileRect.setStart( Point2Uint( 0, 0 ) );
+	m_boundaryTileRect.setEnd( Point2Uint( s_xSize - 1, s_ySize - 1 ) );
 	ZeroMemory( &m_stat, sizeof(Stat) );
 	
 	// Initialize random number
@@ -311,33 +308,13 @@ void Character::setMaxAndCurCs( int maxCs, int curCs )
 // 지정된 사각형 경계 위에 캐릭터가 있을 때 경계 바깥으로 나가려고 하면 움직일 수 없게 한다.
 void Character::boundaryTesting( UnitInput mappedKey )
 {
-	switch ( mappedKey )
-	{
-	case UNIT_MOVE_UP:
-		if ( (UINT)m_boundaryTileRect.top == getTilePosY() )
-			setMovable( false );
-		break;
-	case UNIT_MOVE_DOWN:
-		if ( (UINT)m_boundaryTileRect.bottom == getTilePosY() )
-			setMovable( false );
-		break;
-	case UNIT_MOVE_LEFT:
-		if ( (UINT)m_boundaryTileRect.left == getTilePosX() )
-			setMovable( false );
-		break;
-	case UNIT_MOVE_RIGHT:
-		if ( (UINT)m_boundaryTileRect.right == getTilePosX() )
-			setMovable( false );
-		break;
-	}
+	if ( !m_boundaryTileRect.isExist( getTilePos() ) )
+		setMovable( false );
 }
 
-void Character::setBoundaryRect( LONG left, LONG top, LONG right, LONG bottom )
+void Character::setBoundaryRect( LONG x0, LONG y0, LONG x1, LONG y1 )
 {
-	m_boundaryTileRect.top = top; 
-	m_boundaryTileRect.left = left; 
-	m_boundaryTileRect.bottom = bottom; 
-	m_boundaryTileRect.right = right;
+	m_boundaryTileRect = TileRegion( x0, y0, x1, y1 );
 }
 
 void Character::damage( int point )

@@ -155,6 +155,22 @@ private:
 
 //////////////////////////////////////////////////////////////////////////
 
+class TeleportAction : public Action
+{
+public:
+	TeleportAction( Unit* targetUnit, int x, int y );
+	virtual ~TeleportAction();
+
+	virtual void activate();
+
+private:
+	Unit* m_targetUnit;
+	int m_tileX;
+	int m_tileY;
+};
+
+//////////////////////////////////////////////////////////////////////////
+
 class ArnCamera;
 
 class CameraAction : public Action

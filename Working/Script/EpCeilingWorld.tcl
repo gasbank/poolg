@@ -5,18 +5,14 @@ namespace eval EpCeilingWorld {
 	proc registerIncidentInitTalk {} {
 		global world hero npcGetg npcGloop pHeroUnit
 		
-		set trigger		[ EpCreateUnitPositionTrigger $pHeroUnit 30 77 30 77 ]
+		set trigger		[ EpCreateUnitPositionTrigger $pHeroUnit 30 77 30 77 0x100 ]
 		set actions		[ EpCreateDialogAction "EpDialog1" ]
 		lappend actions	[ EpCreateDialogAction "EpDialog2" ]
 		lappend actions	[ EpCreateFadeAction out 3500 ]
 		lappend actions	[ EpCreateDialogAction "EpDialog3" ]
 		lappend actions	[ EpCreateFadeAction in 3000 ]
 		lappend actions	[ EpCreateDialogAction "EpDialog4" ]
-		lappend actions	[ EpCreateUnitMoveAction $npcGetg "RIGHT" ]
-		lappend actions	[ EpCreateUnitMoveAction $npcGetg "RIGHT" ]
-		lappend actions	[ EpCreateUnitMoveAction $npcGetg "RIGHT" ]
-		lappend actions	[ EpCreateUnitMoveAction $npcGetg "RIGHT" ]
-		lappend actions	[ EpCreateUnitMoveAction $npcGetg "RIGHT" ]
+		lappend actions	[ EpCreateTeleportAction $pHeroUnit 25 82 ]
 		set incident	[ EpCreateBlockingActionIncident $trigger 0 0 ]
 		
 		foreach act $actions {
@@ -24,28 +20,6 @@ namespace eval EpCeilingWorld {
 		}
 		
 		set incCount	[ EpRegisterIncident $incident ]
-		EpOutputDebugString " - Incident count: $incCount\n"
-	}
-
-	proc registerIncidentFadeOut {} {
-		global pHeroUnit
-
-		set trigger		[ EpCreateUnitPositionTrigger	$pHeroUnit 31 77 31 77 ]
-		set action		[ EpCreateFadeAction			out 1500 ]
-		set incident	[ EpCreateIncident				$trigger $action 0 ]
-
-		set incCount	[ EpRegisterIncident			$incident ]
-		EpOutputDebugString " - Incident count: $incCount\n"
-	}
-
-	proc registerIncidentFadeIn {} {
-		global pHeroUnit
-
-		set trigger		[ EpCreateUnitPositionTrigger	$pHeroUnit 29 77 29 77 ]
-		set action		[ EpCreateFadeAction			in 3000 ]
-		set incident	[ EpCreateIncident				$trigger $action 0 ]
-
-		set incCount	[ EpRegisterIncident			$incident ]
 		EpOutputDebugString " - Incident count: $incCount\n"
 	}
 		
@@ -83,9 +57,7 @@ namespace eval EpCeilingWorld {
 
 
 		registerIncidentInitTalk
-		registerIncidentFadeIn
-		registerIncidentFadeOut
-		
+			
 		createWarpPosition			"EpRoomWorld" 25 82
 	}
 

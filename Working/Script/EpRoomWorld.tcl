@@ -14,13 +14,15 @@ namespace eval EpRoomWorld {
 		variable pHeroUnit
 		variable testEnemy
 			
-		set trigger [ EpCreateUnitPositionTrigger $pHeroUnit 44 81 44 81 ]
+		set trigger [ EpCreateUnitPositionTrigger $pHeroUnit 44 81 44 81 0x001 ]
 		set action		[ EpCreateHealAction $pHeroUnit ]
 		set incident	[ EpCreateIncident $trigger $action 1 ]
 
 		set action2		[ EpCreateDialogAction "EpDialogHeal" ]
+		set action3		[ EpCreateTeleportAction $pHeroUnit 53 45 ]
 
 		EpAddActionToIncident $incident $action2
+		EpAddActionToIncident $incident $action3
 
 		
 		set incCount	[ EpRegisterIncident $incident ]
@@ -41,7 +43,7 @@ namespace eval EpRoomWorld {
 	proc registerIncidentHidden {} {
 		variable pHeroUnit
 					
-		set trigger [ EpCreateUnitPositionTrigger $pHeroUnit 26 98 26 98 ]
+		set trigger [ EpCreateUnitPositionTrigger $pHeroUnit 26 98 26 98 0x001 ]
 		set action		[ EpCreateUnitSpawnAction [createEnemy 27 98 0] ]
 		set incident	[ EpCreateIncident $trigger $action 0 ]
 
@@ -63,7 +65,7 @@ namespace eval EpRoomWorld {
 		set action		[ EpCreateDialogAction "EpDialogReturn" ]
 		set incident		[ EpCreateIncident $trigger $action 1 ]
 
-		set trigger2		[ EpCreateUnitPositionTrigger $pHeroUnit 50 33 59 33 ]
+		set trigger2		[ EpCreateUnitPositionTrigger $pHeroUnit 50 33 59 33 0x001 ]
 		set action2		[ EpCreateUnitMoveAction $pHeroUnit "UP" ]
 		set action3		[ EpCreateUnitMoveAction $pTestEnemyUnit "DOWN" ]
 
@@ -77,7 +79,7 @@ namespace eval EpRoomWorld {
 	
 	proc Incident_TofuManEnter {} {
 		variable pHeroUnit
-		set trigger		[ EpCreateUnitPositionTrigger $pHeroUnit 50 42 59 42 ]
+		set trigger		[ EpCreateUnitPositionTrigger $pHeroUnit 50 42 59 42 0x001 ]
 		set action0		[ EpCreateScriptAction "EpSetDoAnim [EpGetNode Door] 1" ]
 		set action1		[ EpCreateScriptAction "EpSetDoAnim [EpGetNode TofuMan] 1" ]
 		
@@ -93,7 +95,7 @@ namespace eval EpRoomWorld {
 		variable TestStObject
 		variable pTestEnemyUnit
 		
-		set trigger		[ EpCreateUnitPositionTrigger $TestStObject 50 35 -1 -1 ]
+		set trigger		[ EpCreateUnitPositionTrigger $TestStObject 50 35 -1 -1 0x101 ]
 		set action		[ EpCreateScriptAction "EpSetDoAnim [EpGetNode Door] 1" ]
 		set incident		[ EpCreateIncident $trigger $action 1 ]
 
@@ -108,7 +110,7 @@ namespace eval EpRoomWorld {
 	proc registerIncidentCamera {} {
 		variable pHeroUnit
 		
-		set trigger		[ EpCreateUnitPositionTrigger	$pHeroUnit 52 45 52 45 ]
+		set trigger		[ EpCreateUnitPositionTrigger	$pHeroUnit 52 45 52 45 0x101 ]
 		set action		[ EpCreateCameraAction			external Camera 0 ]
 		set incident	[ EpCreateIncident				$trigger $action 0 ]
 
@@ -119,7 +121,7 @@ namespace eval EpRoomWorld {
 	proc registerIncidentCamera2 {} {
 		variable pHeroUnit
 		
-		set trigger		[ EpCreateUnitPositionTrigger	$pHeroUnit 54 45 54 45 ]
+		set trigger		[ EpCreateUnitPositionTrigger	$pHeroUnit 54 45 54 45 0x101 ]
 		set action		[ EpCreateCameraAction			attach 0 5000 ]
 		set incident	[ EpCreateIncident				$trigger $action 0 ]
 

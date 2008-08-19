@@ -1,5 +1,7 @@
 #include "EmptyProjectPCH.h"
 #include "StructureObject.h"
+#include "World.h"
+#include "WorldManager.h"
 
 StructureObject::StructureObject(void)
 : Unit ( UT_STRUCTREOBJECT )
@@ -61,18 +63,16 @@ bool StructureObject::frameMove( float fElapsedTime )
 
 						Tile* nextTile = GetTileManager().getTile( nextTilePos );
 						assert( nextTile );
-						if( nextTile->b_movable && entireRegion.isExist( nextTilePos ) )
+						if( !GetWorldManager().getCurWorld()->findUnitAtTile( nextTilePos.x, nextTilePos.y ) && entireRegion.isExist( nextTilePos ) )
 						{
 							m_bMoving = true;
 							m_vKeyboardDirection = D3DXVECTOR3( 0, 0, 0 );
 							m_vKeyboardDirection.x += (float) g_moveAmount[ i ].x * s_tileSize;
 							m_vKeyboardDirection.y += (float) g_moveAmount[ i ].y * s_tileSize;
 
-							GetTileManager().getTile( getTilePos().x, getTilePos().y )->b_movable = true;
 							setTileBufferPos(
 								getTileBufferPos().x + g_moveAmount[ i ].x,
 								getTileBufferPos().y + g_moveAmount[ i ].y );
-							GetTileManager().getTile( getTileBufferPos().x, getTileBufferPos().y )->b_movable = false;
 						}
 				}
 				break;

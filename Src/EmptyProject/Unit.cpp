@@ -325,7 +325,7 @@ HRESULT Unit::rayTesting( UnitInput mappedKey )
 	float dirArray[4][3] = { { 0.0f, 1.0f, 0.0f }, { 0.0f, -1.0f, 0.0f }, { -1.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f } };
 	D3DXVECTOR3 rayDir( dirArray[mappedKey][0], dirArray[mappedKey][1], dirArray[mappedKey][2] );
 
-	bool intersected = FullTraverseExhaustiveRayTesting( ws->getArnSceneGraphPt()->getSceneRoot(), rayStartPos, rayDir, 1.5f * s_tileSize );
+	bool intersected = FullTraverseExhaustiveRayTesting( ws->getArnSceneGraphPt()->getSceneRoot(), rayStartPos, rayDir, 1.0f * s_tileSize );
 	m_bMovable = !intersected;
 
 	//// Get mesh data

@@ -73,12 +73,6 @@ HRESULT World::init()
 		throw std::runtime_error( "Sound should not be init twice or more" );
 
 
-	tileManager.getTile( 14, 14 )->b_movable = false;
-	tileManager.getTile( 17, 14 )->b_heal = true;
-	tileManager.getTile( 26, 74 )->b_eventTalk = true;
-	tileManager.getTile( 33, 57 )->b_createEnemy = true;
-
-
 	
 	D3DXCreateBox(pd3dDevice, 1.0f, 1.0f, 1.0f, &m_aTile, 0);
 	
@@ -452,8 +446,6 @@ UINT World::addUnit( Unit* u )
 
 	}
 
-	GetTileManager().getTile( u->getTilePos() )->b_movable = false;
-
 	return m_unitSet.size();
 }
 
@@ -520,6 +512,7 @@ Dialog* World::startDialog( const char* dialogName )
 {
 	if ( !m_curDialog )
 	{
+		getHeroUnit()->clearKey();
 		m_curDialog = getDialogByName( dialogName );
 
 		if ( m_curDialog->getRemoveFlag() )
@@ -616,6 +609,7 @@ void World::startTileDefinedDialogIfExist()
 {
 	if( !getHeroUnit()->getMoving() && m_curDialog == 0 )
 	{
+		getHeroUnit()->clearKey();
 		DialogList::iterator it = m_scriptedDialog.begin();
 		for ( ; it != m_scriptedDialog.end(); ++it )
 		{

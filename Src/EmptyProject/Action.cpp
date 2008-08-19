@@ -264,6 +264,29 @@ Action* EpCreateFadeAction( const char* type, int durationMs )
 
 //////////////////////////////////////////////////////////////////////////
 
+TeleportAction::TeleportAction( Unit* targetUnit, int x, int y )
+: m_targetUnit ( targetUnit ), m_tileX ( x ) , m_tileY ( y )
+{
+}
+
+TeleportAction::~TeleportAction()
+{
+}
+
+void TeleportAction::activate()
+{
+	m_targetUnit->setTileBufferPos( m_tileX, m_tileY );
+	m_targetUnit->setTilePos( m_tileX, m_tileY );
+}
+
+Action* EpCreateTeleportAction( void* targetUnit, int x, int y )
+{
+	Unit* u = reinterpret_cast<Unit*>( targetUnit );
+	return new TeleportAction( u, x, y );
+}  SCRIPT_CALLABLE_PV_PV_I_I( EpCreateTeleportAction )
+
+//////////////////////////////////////////////////////////////////////////
+
 CameraAction::CameraAction( int type, int duration, ArnCamera* arnCam )
 {
 	m_type = type; 
@@ -325,5 +348,6 @@ START_SCRIPT_FACTORY( Action )
 	CREATE_OBJ_COMMAND( EpCreateScriptAction )
 	CREATE_OBJ_COMMAND( EpCreateUnitMoveAction )
 	CREATE_OBJ_COMMAND( EpCreateFadeAction )
+	CREATE_OBJ_COMMAND( EpCreateTeleportAction )
 	CREATE_OBJ_COMMAND( EpCreateCameraAction )
 END_SCRIPT_FACTORY( Action )

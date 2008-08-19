@@ -46,16 +46,19 @@ bool Incident::update( double dTime, float fElapsedTime )
 		}
 	}
 
+	i = 0;
+
 	if ( m_bActivated )
 	{
 		ActionList::iterator itAct = m_action.begin();
 		for( ; itAct != m_action.end(); ++itAct )
-			(*itAct)->update( dTime, fElapsedTime );
+		{
+			if( m_bInfinite && !(*itAct)->update( dTime, fElapsedTime ) )
+				i++;
+		}
+		if ( i == (int) m_action.size() )
+			m_bActivated = false;
 	}
-	
-	if ( m_bInfinite && ( GetWorldManager().getCurWorld()->getCurDialog() == 0 ) 
-		&& (GetWorldManager().getCurWorld()->getHero()->getTilePos() != GetWorldManager().getCurWorld()->getHero()->getTileBufferPos()) )
-		m_bActivated = false;
 
 	return true;
 }

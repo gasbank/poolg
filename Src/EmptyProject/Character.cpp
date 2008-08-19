@@ -116,18 +116,16 @@ bool Character::frameMove( float fElapsedTime )
 
 					Tile* nextTile = tileManager.getTile( nextTilePos );
 					assert( nextTile );
-					if( nextTile->b_movable && entireRegion.isExist( nextTilePos ) )
+					if( !GetWorldManager().getCurWorld()->findUnitAtTile( nextTilePos.x, nextTilePos.y ) && entireRegion.isExist( nextTilePos ) )
  					{
 						m_bMoving = true;
 						m_vKeyboardDirection.x = (float) g_moveAmount[ i ].x * s_tileSize;
 						m_vKeyboardDirection.y = (float) g_moveAmount[ i ].y * s_tileSize;
 						m_vKeyboardDirection.z = 0;
 
-						GetTileManager().getTile( getTilePos().x, getTilePos().y )->b_movable = true;
 						setTileBufferPos(
 							getTileBufferPos().x + g_moveAmount[ i ].x,
 							getTileBufferPos().y + g_moveAmount[ i ].y );
-						GetTileManager().getTile( getTileBufferPos().x, getTileBufferPos().y )->b_movable = false;
 					}
 				}
 				// 가는 방향으로 머리를 돌린다.

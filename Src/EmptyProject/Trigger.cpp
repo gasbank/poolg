@@ -19,19 +19,40 @@ Trigger::~Trigger(void)
 
 //////////////////////////////////////////////////////////////////////////
 
-UnitPositionTrigger::UnitPositionTrigger( Unit* unit, TileRegion* region )
+UnitPositionTrigger::UnitPositionTrigger( Unit* unit, TileRegion* region, UnitPositionTriggerType type )
 {
 	m_unit		= unit;
 	m_region	= region;
+	m_type		= type;
 }
 
 
 bool UnitPositionTrigger::check()
 {
-	return m_region->isExist( m_unit->getTilePos() );
+	bool checkResult = m_region->isExist( m_unit->getTilePos() );
+	bool retValue = false;
+
+	if ( m_type & UPTT_ENTER )
+	{
+		if ( !m_lastCheckResult && checkResult )
+			retValue =  true;
+	}
+	if ( m_type & UPTT_LEAVE )
+	{
+		if ( m_lastCheckResult && !checkResult )
+			retValue =  true;
+	}
+	if ( m_type & UPTT_STAY)
+	{
+		if ( m_lastCheckResult && checkResult )
+			retValue =  true;
+	}
+	
+	m_lastCheckResult = checkResult;
+	return retValue;
 }
 
-Trigger* EpCreateUnitPositionTrigger( void* unit, int x0, int y0, int x1, int y1 )
+Trigger* EpCreateUnitPositionTrigger( void* unit, int x0, int y0, int x1, int y1, int type )
 {
 	Unit* u = reinterpret_cast<Character*>( unit );
 	Point2Uint start;
@@ -41,8 +62,8 @@ Trigger* EpCreateUnitPositionTrigger( void* unit, int x0, int y0, int x1, int y1
 	end.x = ( x1 == -1 ) ? x0 : x1;
 	end.y = ( y1 == -1 ) ? y0 : y1;
 	TileRegion* region = new TileRegion( start, end );
-	return new UnitPositionTrigger( u, region );
-} SCRIPT_CALLABLE_PV_PV_I_I_I_I( EpCreateUnitPositionTrigger )
+	return new UnitPositionTrigger( u, region, (UnitPositionTriggerType)type );
+} SCRIPT_CALLABLE_PV_PV_I_I_I_I_I( EpCreateUnitPositionTrigger )
 
 
 //////////////////////////////////////////////////////////////////////////

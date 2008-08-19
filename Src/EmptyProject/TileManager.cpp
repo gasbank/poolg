@@ -8,7 +8,6 @@ Point2Uint Point2Uint::ZERO = { 0, 0 };
 
 TileManager::TileManager(void)
 {
-	int i, j;
 	int xSize = s_xSize;
 	int ySize = s_ySize;
 	int tileSize = s_tileSize;
@@ -18,16 +17,6 @@ TileManager::TileManager(void)
 		printf( " - Tile SIze Error! Should be positive and even number\n" );
 		system( "pause" );
 		exit( -10 );
-	}
-
-	for(i = 0; i < s_xSize; i++)
-	{
-		for(j = 0; j < s_ySize; j++)
-		{
-			m_tileArray[i][j].b_movable = true;
-			m_tileArray[i][j].b_eventTalk = false;
-			m_tileArray[i][j].b_createEnemy = false;
-		}
 	}
 }
 

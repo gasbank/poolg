@@ -40,7 +40,7 @@ HRESULT Hero::frameRender()
 
 bool Hero::frameMove( float fElapsedTime )
 {
-	printf( "Tile X, Y : %d, %d \n", getTilePosX(), getTilePosY() );
+	//printf( "Tile X, Y : %d, %d \n", getTilePosX(), getTilePosY() );
 	return Character::frameMove( fElapsedTime );
 }
 

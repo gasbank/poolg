@@ -1,6 +1,8 @@
 #include "EmptyProjectPCH.h"
 #include "ScreenFlash.h"
 
+#include "ShaderWrapper.h"
+
 ScreenFlash::ScreenFlash(void)
 {
 	m_alphaShader			= 0;

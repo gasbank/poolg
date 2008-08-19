@@ -35,7 +35,6 @@ D3DXHANDLE						g_tech					= 0;
 LPDIRECT3DVERTEXBUFFER9			g_lineElement			= 0;
 HANDLE							g_handle				= 0;		// Signal object to resolve multi-threaded problems on console thread and main app thread
 
-
 LPD3DXMESH						g_testTeapot			= 0;
 //LPD3DXMESH						g_testPolygon			= 0;
 //LPD3DXMESH						g_testPolygonCloned		= 0;
@@ -173,9 +172,6 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 	// (world loading is not done yet)
 	GetScriptManager().execute( "EpInitGame" );
 
-	
-
-
 	// Shader
 	/*
 	g_bombShader = new BombShader();
@@ -230,6 +226,8 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 	float fAspectRatio = pBackBufferSurfaceDesc->Width / ( FLOAT )pBackBufferSurfaceDesc->Height;
 	g_camera.SetProjParams( D3DX_PI / 4, fAspectRatio, 1.0f, 100000.0f );
 
+	GetG().m_screenFlash.setup();
+	GetG().m_EpLight.setupLight();
 
 	return S_OK;
 }
@@ -258,7 +256,7 @@ HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFA
 		g_bombShader->onResetDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
 	//g_alphaShader->onResetDevice();
 
-	GetG().m_EpLight.setupLight();
+	GetG().m_screenFlash.reset( pd3dDevice, pBackBufferSurfaceDesc, pUserContext);
 
 	return S_OK;
 }
@@ -307,6 +305,7 @@ void CALLBACK OnFrameMove( double fTime, float fElapsedTime, void* pUserContext 
 		GetG().m_camera.GetLookAtPt()->z );
 	g_debugBuffer.append( msg );
 	
+	GetG().m_screenFlash.frameMove( fTime, fElapsedTime );
 }
 
 
@@ -450,6 +449,7 @@ void CALLBACK OnD3D9FrameRender( IDirect3DDevice9* pd3dDevice, double fTime, flo
 		V( pd3dDevice->EndScene() );
 	}
 
+	GetG().m_screenFlash.frameRender();
 }
 
 
@@ -464,6 +464,7 @@ LRESULT CALLBACK MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
 	//g_avatar.handleMessages(hWnd, uMsg, wParam, lParam);
 	g_camera.handleMessages(hWnd, uMsg, wParam, lParam);
 	GetG().m_EpLight.handleMessages(hWnd, uMsg, wParam, lParam);
+	GetG().m_screenFlash.handleMessage( hWnd, uMsg, wParam, lParam );
 
 	if (g_tsm && GetTopStateManager().getCurState())
 		GetTopStateManager().getCurState()->handleMessages(hWnd, uMsg, wParam, lParam);
@@ -503,6 +504,7 @@ void CALLBACK OnD3D9DestroyDevice( void* pUserContext )
 	EP_SAFE_RELEASE( g_wm );
 
 	GetG().m_videoMan.SetDev(0);
+	GetG().m_screenFlash.release();
 }
 
 

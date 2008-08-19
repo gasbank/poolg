@@ -116,6 +116,8 @@ void EpLight::frameMove( FLOAT fElapsedTime )
 		m_light.Specular = m_cSpecular * m_fBrightness;
 		break;
 	case LIGHT_FLICKER:
+		if ( m_fBrightness < 0.3f )
+			m_fBrightness = 0.3f;
 		m_light.Ambient = m_cFlickerAmbient * m_fBrightness;
 		m_light.Diffuse = m_cFlickerDiffuse * m_fBrightness;
 		m_light.Specular = m_cFlickerSpecular * m_fBrightness;
@@ -130,13 +132,11 @@ void EpLight::frameMove( FLOAT fElapsedTime )
 	m_vDir = *GetG().m_camera.GetLookAtPt() - *GetG().m_camera.GetEyePt();
 	m_vPos = *GetG().m_camera.GetEyePt();
 
-	D3DXVec3Normalize((D3DXVECTOR3*)&m_light.Direction, &m_vDir);
-
 	float vDirLen = D3DXVec3Length( (D3DXVECTOR3*)&m_light.Direction );
 	if ( vDirLen < 1e-5 || vDirLen > 1e6 )
 		m_light.Direction = DX_CONSTS::D3DXVEC3_Z;
 	else
-		m_light.Direction = m_vPos;
+		D3DXVec3Normalize((D3DXVECTOR3*)&m_light.Direction, &m_vDir);
 
 	m_light.Position = m_vPos;
 

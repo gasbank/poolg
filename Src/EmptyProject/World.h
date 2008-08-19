@@ -9,7 +9,6 @@
 #include "Character.h"
 #include "ShaderWrapper.h"
 #include "Trigger.h"
-#include "ScreenFlash.h"
 
 class Incident;
 class Unit;
@@ -99,8 +98,6 @@ private:
 	UnitSet							m_unitSet;
 
 	Dialog*							m_curDialog;
-
-	ScreenFlash						m_screenFlash;
 
 	std::string						m_worldName;
 	std::tstring					m_modelFilePath;

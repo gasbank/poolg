@@ -98,7 +98,6 @@ HRESULT World::init()
 	assert( m_heroUnit );
 
 	// Incidents construction
-	
 	/*Trigger* trigger = new UnitPositionTrigger( m_heroUnit, TileRegion( 26, 80, 27, 82 ) );
 	Action* action = new DialogAction( "EpDialog4" );
 	Incident* inc = new Incident( trigger, action );
@@ -107,8 +106,6 @@ HRESULT World::init()
 	/*trigger = new CharHpTrigger( m_heroUnit, 1, 100, true );
 	Incident* inc2 = new Incident( trigger, action );
 	m_incidents.push_back( inc2 );*/
-
-	m_screenFlash.setup();
 
 	m_curDialog = 0;
 
@@ -165,8 +162,6 @@ HRESULT World::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, float fEl
 		(*itDialog)->frameRender(pd3dDevice, fTime, fElapsedTime);
 	}
 
-	m_screenFlash.frameRender();
-
 	WorldStateManager& wsm = WorldStateManager::getSingleton();
 	wsm.getCurState()->frameRender(pd3dDevice, fTime, fElapsedTime);
 
@@ -203,8 +198,6 @@ HRESULT World::frameMove(double fTime, float fElapsedTime)
 	GetWorldStateManager().getCurState()->frameMove(fTime, fElapsedTime);
 
 	m_modelSg->getSceneRoot()->update(fTime, fElapsedTime);
-
-	m_screenFlash.frameMove( fTime, fElapsedTime );
 	
 
 	WCHAR msg[128];
@@ -290,7 +283,6 @@ HRESULT World::release()
 	m_picRhw.release();
 	m_picSmiley.release();
 	m_avatar.release();
-	m_screenFlash.release();
 
 	EpSafeReleaseAll( m_scriptedDialog );
 	EpSafeReleaseAll( m_unitSet );
@@ -309,7 +301,6 @@ HRESULT World::release()
 HRESULT World::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	m_pic.handleMessages(hWnd, uMsg, wParam, lParam);
-	m_screenFlash.handleMessage( hWnd, uMsg, wParam, lParam );
 
 	if ( m_sound )
 		m_sound->handleMessages(hWnd, uMsg, wParam, lParam);
@@ -354,6 +345,7 @@ HRESULT World::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 			printf("이녀석의 y 위치 : %d\n", m_heroUnit->getTilePosY());
 		}
 	}
+
 	if (uMsg == WM_KEYUP)
 	{
 		if (wParam == VK_RETURN)
@@ -365,7 +357,6 @@ HRESULT World::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 				proceedCurDialog();
 		}
 	}
-
 
 	switch ( uMsg )
 	{

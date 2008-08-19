@@ -1,6 +1,5 @@
-#pragma 
-
-#include "ShaderWrapper.h"
+#pragma once
+class AlphaShader;
 
 class ScreenFlash
 {

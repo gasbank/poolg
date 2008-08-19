@@ -2,7 +2,13 @@
 
 #include "ArnCamera.h"
 
-enum RunningCamera { CAMERA_NORMAL, CAMERA_SMOOTH, CAMERA_EXTERNAL, CAMERA_SMOOTH_ATTACH };
+enum RunningCamera { 
+	CAMERA_NORMAL, 
+	CAMERA_SMOOTH, 
+	CAMERA_EXTERNAL, 
+	CAMERA_ATTACH, 
+	CAMERA_SMOOTH_ATTACH 
+};
 
 // CAMERA_NORMAL : SetViewParamsWithUp()에 의해 지정된 위치로 카메라를 옮긴다.
 // CAMERA_SMOOTH : 이전 위치로부터 SetDesViewParams()에 의해 지정된 위치로 카메라를 서서히 옮긴다.
@@ -23,7 +29,7 @@ public:
 	void setDesViewParams( D3DXVECTOR3* pvEyePt, D3DXVECTOR3* pvLookatPtg, D3DXVECTOR3* vUp );
 	void setAttachPos( const D3DXVECTOR3* pos ) { m_vPos = pos; }
 	void setSmoothCameraDuration( float f ) { m_fSmoothCameraDuration = f; }
-	void setExternalCamera( ArnCamera* arnCam ) { m_pArnCam = arnCam; }
+	void setExternalCamera( ArnCamera* arnCam ) { assert( arnCam ); m_pArnCam = arnCam; }
 	void beginShoulderLookCamera( const D3DXVECTOR3* pvMePos, const D3DXVECTOR3* pvOppPos );
 	void begin( RunningCamera rc );
 	D3DXVECTOR3* GetUpPt();
@@ -38,6 +44,7 @@ protected:
 		D3DXVECTOR3* pvEye1, D3DXVECTOR3* pvLookAt1, D3DXVECTOR3* pvUp1,
 		D3DXVECTOR3* pvEye2, D3DXVECTOR3* pvLookAt2, D3DXVECTOR3* pvUp2,
 		float s	);
+	void updateAttachCamera();
 
 	D3DXVECTOR3		m_vUp;
 	ArnCamera*		m_pArnCam;

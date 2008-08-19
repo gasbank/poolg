@@ -675,7 +675,6 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 	DXUTCreateWindow( L"EmptyProject" );
 	DXUTCreateDevice( true, GetG().m_scrWidth, GetG().m_scrHeight );
 
-	// Start the render loop
 	DXUTMainLoop();
 
 	// TODO: Perform any application-level cleanup here

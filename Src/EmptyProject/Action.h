@@ -152,3 +152,22 @@ private:
 	int m_iType;
 	float m_fDuration;
 };
+
+//////////////////////////////////////////////////////////////////////////
+
+class ArnCamera;
+
+class CameraAction : public Action
+{
+public:
+	CameraAction( int type, int duration, ArnCamera* arnCam );
+	CameraAction( int type, int duration );
+	virtual ~CameraAction() {}
+
+	virtual void activate();
+	virtual bool update( double dTime, float fElapsedTime );
+private:
+	int m_type;
+	int m_duration;
+	ArnCamera* m_arnCam;
+};

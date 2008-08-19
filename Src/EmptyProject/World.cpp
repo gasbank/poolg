@@ -42,14 +42,13 @@ HRESULT World::init()
 {
 	HRESULT hr = S_OK;
 
+	loadWorldModel();
 
 	char command[128];
 	StringCchPrintfA( command, 128, "%s::init 0x%p", m_worldName.c_str(), this );
 	GetScriptManager().execute( command );
 
 	LPDIRECT3DDEVICE9& pd3dDevice =  GetG().m_dev;
-
-	loadWorldModel();	
 	
 	// Load sample image (vertex and index buffer creation with texture)
 	const UINT mapSegments = 32;
@@ -84,7 +83,6 @@ HRESULT World::init()
 	D3DXCreateBox(pd3dDevice, 1.0f, 1.0f, 1.0f, &m_aTile, 0);
 	
 	setupLight();
-
 
 	// 'enter' function implemented in the script file defines which characters are exist in this world
 	char scriptCommand[128];
@@ -121,7 +119,8 @@ HRESULT World::init()
 	m_curDialog = 0;
 
 	GetG().m_EpLight.fadeInLight();
-
+	GetG().m_camera.setAttachPos( &getHeroPos() );
+	GetG().m_camera.begin( CAMERA_ATTACH );
 
 	return hr;
 }

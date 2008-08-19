@@ -48,7 +48,7 @@ namespace eval EpCeilingWorld {
 		set incCount	[ EpRegisterIncident			$incident ]
 		EpOutputDebugString " - Incident count: $incCount\n"
 	}
-	
+		
 	proc init { curWorld } {
 		global world hero npcGetg npcGloop
 		global pHeroUnit

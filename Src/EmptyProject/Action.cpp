@@ -9,6 +9,8 @@
 #include "Sound.h"
 #include "Unit.h"
 #include "Dialog.h"
+#include "ArnSceneGraph.h"
+#include "ArnCamera.h"
 
 Action::Action(void)
 {
@@ -249,6 +251,7 @@ bool FadeAction::update( double dTime, float fElapsedTime )
 {
 	return GetG().m_EpLight.isInFading();
 }
+
 Action* EpCreateFadeAction( const char* type, int durationMs )
 {
 	int typeNum = 0;
@@ -261,6 +264,59 @@ Action* EpCreateFadeAction( const char* type, int durationMs )
 
 //////////////////////////////////////////////////////////////////////////
 
+CameraAction::CameraAction( int type, int duration, ArnCamera* arnCam )
+{
+	m_type = type; 
+	m_arnCam = arnCam; 
+	m_duration = duration;
+}
+
+CameraAction::CameraAction( int type, int duration )
+{
+	m_type = type; 
+	m_arnCam = 0; 
+	m_duration = duration;
+}
+
+void CameraAction::activate()
+{
+	GetG().m_camera.setSmoothCameraDuration( (float)m_duration / 1000.0f );
+
+	switch ( m_type )
+	{
+	case 0:
+		GetG().m_camera.setAttachPos( &GetWorldManager().getCurWorld()->getHeroPos() );
+		GetG().m_camera.begin( CAMERA_SMOOTH_ATTACH );
+		break;
+	case 1:
+		GetG().m_camera.setExternalCamera( m_arnCam );
+		GetG().m_camera.begin( CAMERA_EXTERNAL );
+		break;
+	}
+}
+
+bool CameraAction::update( double dTime, float fElapsedTime )
+{
+	return true;
+}
+
+Action* EpCreateCameraAction( const char* type, const char* extCamName, int durationMs  )
+{
+	ArnSceneGraph* arnSceneGraph = GetWorldManager().getCurWorld()->getArnSceneGraphPt();
+	ArnCamera* arnCam = static_cast<ArnCamera*>(arnSceneGraph->getSceneRoot()->getNodeByName( extCamName ));
+
+	if ( strcmp( type, "attach" ) == 0)
+		return new CameraAction( 0, durationMs );
+	else if ( strcmp( type, "external" ) == 0 )
+	{
+		return new CameraAction( 1, durationMs, arnCam );
+	}
+	else
+		throw std::runtime_error( "Type check failed" );
+} SCRIPT_CALLABLE_PV_PC_PC_I( EpCreateCameraAction )
+
+//////////////////////////////////////////////////////////////////////////
+
 START_SCRIPT_FACTORY( Action )
 	CREATE_OBJ_COMMAND( EpCreateDialogAction )
 	CREATE_OBJ_COMMAND( EpCreateSoundAction )
@@ -269,4 +325,5 @@ START_SCRIPT_FACTORY( Action )
 	CREATE_OBJ_COMMAND( EpCreateScriptAction )
 	CREATE_OBJ_COMMAND( EpCreateUnitMoveAction )
 	CREATE_OBJ_COMMAND( EpCreateFadeAction )
+	CREATE_OBJ_COMMAND( EpCreateCameraAction )
 END_SCRIPT_FACTORY( Action )

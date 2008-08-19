@@ -104,6 +104,28 @@ namespace eval EpRoomWorld {
 		set incCount	[ EpRegisterIncident $incident ]
 		EpOutputDebugString " - Incident count: $incCount\n"
 	}
+
+	proc registerIncidentCamera {} {
+		variable pHeroUnit
+		
+		set trigger		[ EpCreateUnitPositionTrigger	$pHeroUnit 52 45 52 45 ]
+		set action		[ EpCreateCameraAction			external Camera 0 ]
+		set incident	[ EpCreateIncident				$trigger $action 0 ]
+
+		set incCount	[ EpRegisterIncident			$incident ]
+		EpOutputDebugString " - Incident count: $incCount\n"
+	}
+
+	proc registerIncidentCamera2 {} {
+		variable pHeroUnit
+		
+		set trigger		[ EpCreateUnitPositionTrigger	$pHeroUnit 54 45 54 45 ]
+		set action		[ EpCreateCameraAction			attach 0 5000 ]
+		set incident	[ EpCreateIncident				$trigger $action 0 ]
+
+		set incCount	[ EpRegisterIncident			$incident ]
+		EpOutputDebugString " - Incident count: $incCount\n"
+	}
 	
 	proc enter {} {
 		variable testEnemy
@@ -209,6 +231,8 @@ namespace eval EpRoomWorld {
 		registerIncidentUnClear
 		#Incident_TofuManEnter
 		registerIncidentSwitch
+		registerIncidentCamera
+		registerIncidentCamera2
 		
 		# Warp Positions -------------------------------------------------------
 		createWarpPosition			"EpA213World" 49 28 61 30

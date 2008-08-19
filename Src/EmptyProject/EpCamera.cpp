@@ -29,6 +29,9 @@ void EpCamera::frameMove( FLOAT fElapsedTime )
 	case CAMERA_SMOOTH_ATTACH:
 		updateSmoothAttachCamera( fElapsedTime );
 		break;
+	case CAMERA_ATTACH:
+		updateAttachCamera();
+		break;
 	}
 
 	if ( m_bViewParamsDirty && !m_bCamManualMovement )
@@ -314,4 +317,19 @@ void EpCamera::beginShoulderLookCamera( const D3DXVECTOR3* pvMePos, const D3DXVE
 	setDesViewParams( &vDesEye, &vDesLookAt, &vDesUp );
 	setSmoothCameraDuration( 3.0f );
 	begin( CAMERA_SMOOTH );
+}
+
+void EpCamera::updateAttachCamera()
+{
+	m_vEye.x = m_vPos->x;
+	m_vEye.y = m_vPos->y;
+	m_vEye.z = m_vPos->z - 30.0f;
+	m_vLookAt.x = m_vPos->x;
+	m_vLookAt.y = m_vPos->y;
+	m_vLookAt.z = m_vPos->z;
+	m_vUp.x = 0.0f;
+	m_vUp.y = 1.0f;
+	m_vUp.z = 0.0f;
+
+	m_bViewParamsDirty = true;
 }

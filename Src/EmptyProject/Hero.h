@@ -15,6 +15,9 @@ public:
 	virtual LRESULT handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 
 	//virtual void pushUnitInFront( UnitInput dir );
+
+private:
+
 };
 
 SCRIPT_FACTORY( Hero )

@@ -42,7 +42,7 @@ bool BallAttackObject::frameMove( float fElapsedTime )
 		_itoa_s (m_damage, stringBuffer, 10);
 		std::string resultLog = stringBuffer;
 		
-		if (m_target->isControllable())
+		if ( m_target->getType() == UT_HERO )
 		{ 
 
 			resultLog += "포인트 데미지를 받았다!";
@@ -93,7 +93,6 @@ AttackObject* BallAttackObject::createBallAttackObject( Character* target, const
 	LPD3DXMESH mesh;
 	D3DXCreateSphere( GetG().m_dev, 0.3f, 16, 16, &mesh, 0 );
 	ao->init( GetG().m_dev, mesh );
-	ao->setControllable( false );
 	ao->setPos( initPos );
 	return ao;
 }
@@ -147,7 +146,6 @@ AttackObject* HealObject::createHealObject( Character* target )
 	//D3DXCreateTeapot( GetG().m_dev, mesh, 0);
 	//D3DXCreateTeapot( GetG().m_dev, &mesh, 0);
 	ho->init( GetG().m_dev, mesh );
-	ho->setControllable( false );
 	return ho;
 }
 
@@ -177,7 +175,7 @@ bool HealObject::frameMove( float fElapsedTime )
 		resultLog += "포인트 HP가 회복됩니다.";
 		getBattleState()->pushBattleLog(resultLog.c_str());
 
-		if (m_target->isControllable())
+		if ( m_target->getType() == UT_HERO )
 		{
 			getBattleState()->setNextTurnType(TT_COMPUTER);
 			getBattleState()->passTurn();
@@ -235,7 +233,6 @@ AttackObject* CsBurnObject::createCsBurnObject( Character* target )
 	//D3DXCreateTeapot( GetG().m_dev, mesh, 0);
 	//D3DXCreateTeapot( GetG().m_dev, &mesh, 0);
 	ho->init( GetG().m_dev, mesh );
-	ho->setControllable( false );
 	return ho;
 }
 
@@ -278,7 +275,7 @@ bool CsBurnObject::frameMove( float fElapsedTime )
 
 		
 
-		if (m_target->isControllable())
+		if ( m_target->getType() == UT_HERO )
 		{
 			getBattleState()->setNextTurnType(TT_COMPUTER);
 			getBattleState()->passTurn();
@@ -335,7 +332,6 @@ AttackObject* MeditationObject::createMeditationObject( Character* target )
 	//D3DXCreateTeapot( GetG().m_dev, mesh, 0);
 	//D3DXCreateTeapot( GetG().m_dev, &mesh, 0);
 	ho->init( GetG().m_dev, mesh );
-	ho->setControllable( false );
 	return ho;
 }
 
@@ -364,7 +360,7 @@ bool MeditationObject::frameMove( float fElapsedTime )
 
 		getBattleState()->pushBattleLog("청명한 기운을 느끼며 CS가 30% 회복됩니다.");
 
-		if (m_target->isControllable())
+		if ( m_target->getType() == UT_HERO )
 		{
 			getBattleState()->setNextTurnType(TT_COMPUTER);
 			getBattleState()->passTurn();

@@ -109,6 +109,7 @@ HRESULT World::init()
 
 	m_curDialog = 0;
 
+	GetG().m_EpLight.setFadeDuration( 5.0f );
 	GetG().m_EpLight.fadeInLight();
 	GetG().m_camera.setAttachPos( &getHeroPos() );
 	GetG().m_camera.begin( CAMERA_ATTACH );
@@ -317,7 +318,7 @@ HRESULT World::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 	UnitSet::iterator it = m_unitSet.begin();
 	for ( ; it != m_unitSet.end(); ++it )
 	{
-		if ( (*it)->getControllable() && GetWorldStateManager().curStateEnum() == GAME_WORLD_STATE_FIELD )
+		if ( (*it)->getType() == UT_HERO && GetWorldStateManager().curStateEnum() == GAME_WORLD_STATE_FIELD )
 		{
 			if ( !bTalking )
 			{
@@ -428,7 +429,7 @@ UINT World::addUnit( Unit* u )
 {
 	m_unitSet.insert(u);
 	// TODO controllable means it is hero?
-	if (u->getControllable())
+	if ( u->getType() == UT_HERO )
 	{
 		/*주인공 유닛 설정*/
 		m_heroUnit = dynamic_cast<Character*>( u );

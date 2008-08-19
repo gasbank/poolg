@@ -22,6 +22,7 @@ Unit::Unit( UnitType type )
 	m_arnMesh			= 0;
 	m_pd3dDevice		= 0;
 	m_d3dTex			= 0;
+	m_bControllable		= 0;
 
 	m_tilePos			= Point2Uint::ZERO;
 	m_tileBufferPos		= m_tilePos;
@@ -152,11 +153,10 @@ void Unit::clearKey()
 	m_cKeysDown = 0;
 }
 
-Unit* Unit::createUnit( LPD3DXMESH mesh, int tileX, int tileY, float posZ, bool bControllable )
+Unit* Unit::createUnit( LPD3DXMESH mesh, int tileX, int tileY, float posZ )
 {
 	Unit* u = new Unit( UT_UNIT );
 	u->init( GetG().m_dev, mesh );
-	u->setControllable( bControllable );
 	return u;
 }
 
@@ -388,14 +388,14 @@ HRESULT Unit::rayTesting( UnitInput mappedKey )
 }
 //////////////////////////////////////////////////////////////////////////
 
-Unit* EpCreateUnit( int tileX, int tileY, int controllable )
+Unit* EpCreateUnit( int tileX, int tileY )
 {
 	LPD3DXMESH d3dxMesh;
 	D3DXCreateTeapot( GetG().m_dev, &d3dxMesh, 0 );
 
-	return Unit::createUnit( d3dxMesh, tileX, tileY, 0, controllable?true:false );
+	return Unit::createUnit( d3dxMesh, tileX, tileY, 0 );
 
-} SCRIPT_CALLABLE_PV_I_I_I( EpCreateUnit )
+} SCRIPT_CALLABLE_PV_I_I( EpCreateUnit )
 
 int EpReleaseUnit( void* pv )
 {

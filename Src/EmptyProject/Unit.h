@@ -32,7 +32,7 @@ class Unit
 public:
 	
 
-	static Unit* createUnit( LPD3DXMESH mesh, int tileX = 0, int tileY = 0, float posZ = 0, bool bCtrl = false );
+	static Unit* createUnit( LPD3DXMESH mesh, int tileX = 0, int tileY = 0, float posZ = 0 );
 	virtual ~Unit();
 
 	HRESULT init(LPDIRECT3DDEVICE9 pd3dDevice, LPD3DXMESH mesh);

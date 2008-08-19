@@ -69,11 +69,10 @@ void Character::heal (int point)
 		m_curHp = m_maxHp;
 }
 
-Unit* Character::createCharacter( LPD3DXMESH mesh, int tileX, int tileY, float posZ, bool bControllable )
+Unit* Character::createCharacter( LPD3DXMESH mesh, int tileX, int tileY, float posZ )
 {
 	Character* u = new Character( UT_CHARACTER );
 	u->init( GetG().m_dev, mesh );
-	u->setControllable( bControllable );
 	u->setTilePos( tileX, tileY );
 	u->setTileBufferPos( tileX, tileY );
 	return u;
@@ -389,13 +388,13 @@ void Character::pushUnitInFront( UnitInput dir )
 //////////////////////////////////////////////////////////////////////////
 
 
-Unit* EpCreateCharacter( int tileX, int tileY, int controllable )
+Unit* EpCreateCharacter( int tileX, int tileY )
 {
 	LPD3DXMESH d3dxMesh;
 	D3DXCreateTeapot( GetG().m_dev, &d3dxMesh, 0 );
-	return Character::createCharacter( d3dxMesh, tileX, tileY, 0, controllable?true:false );
+	return Character::createCharacter( d3dxMesh, tileX, tileY, 0 );
 
-} SCRIPT_CALLABLE_PV_I_I_I( EpCreateCharacter )
+} SCRIPT_CALLABLE_PV_I_I( EpCreateCharacter )
 
 int EpCharacterSetCurHp( void* ptr, int curHp )
 {

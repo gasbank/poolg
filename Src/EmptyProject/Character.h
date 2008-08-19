@@ -12,7 +12,7 @@ struct Stat
 class Character : public Unit
 {
 public:
-	static Unit* createCharacter( LPD3DXMESH mesh, int tileX, int tileY, float posZ, bool bControllable );
+	static Unit* createCharacter( LPD3DXMESH mesh, int tileX, int tileY, float posZ );
 	virtual ~Character();
 
 	/*스킬 함수*/
@@ -84,6 +84,6 @@ private:
 	Stat					m_stat;
 };
 
-Unit* EpCreateCharacter( int tileX, int tileY, int controllable );
+Unit* EpCreateCharacter( int tileX, int tileY );
 
 SCRIPT_FACTORY( Character )

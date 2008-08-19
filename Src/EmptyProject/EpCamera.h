@@ -39,12 +39,12 @@ protected:
 	void updateSmoothCamera( float fElapsedTime );
 	void updateExternalCamera( ArnCamera* arnCam );
 	void updateSmoothAttachCamera( float fElapsedTime );
+	void updateAttachCamera();
 	void lerpViewParams( 
 		D3DXVECTOR3* pvEyeOut, D3DXVECTOR3* pvLookAtOut, D3DXVECTOR3* pvUpOut, 
 		D3DXVECTOR3* pvEye1, D3DXVECTOR3* pvLookAt1, D3DXVECTOR3* pvUp1,
 		D3DXVECTOR3* pvEye2, D3DXVECTOR3* pvLookAt2, D3DXVECTOR3* pvUp2,
 		float s	);
-	void updateAttachCamera();
 
 	D3DXVECTOR3		m_vUp;
 	ArnCamera*		m_pArnCam;

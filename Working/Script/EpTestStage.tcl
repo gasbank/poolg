@@ -1,5 +1,6 @@
 namespace eval EpTestStage {
 	set modelFilePath "TestStage.arn"
+	set dialogNameList [ list  ]
 	global world hero
 	
 	proc init { curWorld } {

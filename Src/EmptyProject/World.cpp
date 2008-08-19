@@ -698,10 +698,14 @@ ArnNode* EpGetNode( const char* nodeName )
 
 int EpSetDoAnim( void* ptr, int bDoAnim )
 {
-	ArnXformable* xformable = reinterpret_cast<ArnXformable*>( ptr );
-	xformable->setDoAnim( bDoAnim?true:false );
-	return 0;
-
+	if ( ptr )
+	{
+		ArnXformable* xformable = reinterpret_cast<ArnXformable*>( ptr );
+		xformable->setDoAnim( bDoAnim?true:false );
+		return 0;
+	}
+	else
+		return -1;
 } SCRIPT_CALLABLE_I_PV_I( EpSetDoAnim )
 
 

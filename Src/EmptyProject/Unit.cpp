@@ -22,7 +22,6 @@ Unit::Unit( UnitType type )
 	m_arnMesh			= 0;
 	m_pd3dDevice		= 0;
 	m_d3dTex			= 0;
-	m_bControllable		= 0;
 
 	m_tilePos			= Point2Uint::ZERO;
 	m_tileBufferPos		= m_tilePos;

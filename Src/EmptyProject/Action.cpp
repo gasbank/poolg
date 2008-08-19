@@ -318,11 +318,6 @@ void CameraAction::activate()
 	}
 }
 
-bool CameraAction::update( double dTime, float fElapsedTime )
-{
-	return true;
-}
-
 Action* EpCreateCameraAction( const char* type, const char* extCamName, int durationMs  )
 {
 	ArnSceneGraph* arnSceneGraph = GetWorldManager().getCurWorld()->getArnSceneGraphPt();
@@ -340,6 +335,25 @@ Action* EpCreateCameraAction( const char* type, const char* extCamName, int dura
 
 //////////////////////////////////////////////////////////////////////////
 
+ControllableAction::ControllableAction( Character* c, bool controllable )
+{
+	m_c = c; 
+	m_bControllable = controllable;
+}
+
+void ControllableAction::activate()
+{
+	m_c->setControllable( m_bControllable );
+}
+
+Action* EpCreateControllableAction( void* target, int controllable )
+{
+	Character* c = reinterpret_cast<Character*>( target );
+	return new ControllableAction( c, controllable?true:false );
+} SCRIPT_CALLABLE_PV_PV_I( EpCreateControllableAction )
+
+//////////////////////////////////////////////////////////////////////////
+
 START_SCRIPT_FACTORY( Action )
 	CREATE_OBJ_COMMAND( EpCreateDialogAction )
 	CREATE_OBJ_COMMAND( EpCreateSoundAction )
@@ -350,4 +364,5 @@ START_SCRIPT_FACTORY( Action )
 	CREATE_OBJ_COMMAND( EpCreateFadeAction )
 	CREATE_OBJ_COMMAND( EpCreateTeleportAction )
 	CREATE_OBJ_COMMAND( EpCreateCameraAction )
+	CREATE_OBJ_COMMAND( EpCreateControllableAction )
 END_SCRIPT_FACTORY( Action )

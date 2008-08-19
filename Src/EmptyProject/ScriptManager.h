@@ -297,12 +297,12 @@ static const DWORD _trait_OBJ_PV		= AT_OBJ | (AT_PV << 4);
 	}																			\
 	SCRIPT_CALLABLE_END(funcName, PV_PV)
 
-#define SCRIPT_CALLABLE_PV_PV_I(funcName)											\
+#define SCRIPT_CALLABLE_PV_PV_I(funcName)										\
 	void _wrap_##funcName(ScriptArgumentList& args)								\
 	{																			\
 	args[0].pv = funcName(args[1].pv, args[2].i);								\
 	}																			\
-	SCRIPT_CALLABLE_END(funcName, PV_PV_PI)
+	SCRIPT_CALLABLE_END(funcName, PV_PV_I)
 
 #define SCRIPT_CALLABLE_PV_PV_PV_I(funcName)									\
 	void _wrap_##funcName(ScriptArgumentList& args)								\

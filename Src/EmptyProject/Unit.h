@@ -40,7 +40,6 @@ public:
 	const D3DXVECTOR3& getUpperRight() const { return m_upperRight; }
 	LPD3DXMESH getMesh() const { return m_d3dxMesh; }
 	void release() { SAFE_RELEASE(m_d3dxMesh); }
-	bool getControllable() const { return m_bControllable; }
 	void clearKey();
 
 	virtual HRESULT frameRender();
@@ -50,7 +49,6 @@ public:
 	void setRotX(float rad) { m_vRot.x = rad; m_bLocalXformDirty = true; }
 	void setRotY(float rad) { m_vRot.y = rad; m_bLocalXformDirty = true; }
 	void setRotZ(float rad) { m_vRot.z = rad; m_bLocalXformDirty = true; }
-	void setControllable(bool bCtrl) { m_bControllable = bCtrl; }
 
 	void setUniformScale(float val) { m_vScale.x = m_vScale.y = m_vScale.z = val; m_bLocalXformDirty = true; }
 	void setScaleX(float val) { m_vScale.x = val; m_bLocalXformDirty = true; }
@@ -63,8 +61,6 @@ public:
 	void setPosY(float val) { m_vPos.y = val; m_bLocalXformDirty = true; }
 	void setPosZ(float val) { m_vPos.z = val; m_bLocalXformDirty = true; }
 	virtual const D3DXVECTOR3& getPos() const { return m_vPos; }
-
-	bool isControllable() const { return m_bControllable; }
 
 	void setHeadDir( UnitInput );
 
@@ -131,8 +127,6 @@ private:
 	LPDIRECT3DDEVICE9		m_pd3dDevice;
 	D3DMATERIAL9			m_material;
 	
-	
-	bool					m_bControllable;
 	bool					m_removeFlag;
 	bool					m_bForcedMove;
 	

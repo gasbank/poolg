@@ -55,6 +55,11 @@ public:
 	virtual void pushUnitInFront( UnitInput dir );
 
 	void setStat( int statHealth, int statWill, int statCoding, int statDef, int statSen, int statImmu );
+
+	void setControllable(bool bCtrl) { m_bControllable = bCtrl; }
+	bool getControllable() const { return m_bControllable; }
+	bool isControllable() const { return m_bControllable; }
+	
 protected:
 	Character( UnitType type );
 
@@ -82,6 +87,8 @@ private:
 	D3DXVECTOR3				m_curPos;
 
 	Stat					m_stat;
+
+	bool					m_bControllable;
 };
 
 Unit* EpCreateCharacter( int tileX, int tileY );

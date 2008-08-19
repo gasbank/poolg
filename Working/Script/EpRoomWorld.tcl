@@ -140,6 +140,17 @@ namespace eval EpRoomWorld {
 		EpOutputDebugString " - Incident count: $incCount\n"
 	}
 	
+	proc registerIncidentControl {} {
+		variable pHeroUnit
+
+		set trigger		[ EpCreateUnitPositionTrigger	$pHeroUnit 55 45 55 45 0x101 ]
+		set action		[ EpCreateControllableAction	$pHeroUnit 1 ]
+		set incident	[ EpCreateIncident				$trigger $action 0 ]
+
+		set incCount	[ EpRegisterIncident			$incident ]
+		EpOutputDebugString " - Incident count: $incCount\n"
+	}
+
 	proc enter {} {
 		variable testEnemy
 		variable pHeroUnit
@@ -246,6 +257,7 @@ namespace eval EpRoomWorld {
 		registerIncidentSwitch
 		registerIncidentCamera
 		registerIncidentCamera2
+		registerIncidentControl
 		
 		# Warp Positions -------------------------------------------------------
 		#createWarpPosition			"EpA213World" 49 28 61 30

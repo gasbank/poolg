@@ -173,6 +173,9 @@ private:
 
 class ArnCamera;
 
+// type == 0 : Camera follow hero
+// type == 1 : Externally defined camera
+
 class CameraAction : public Action
 {
 public:
@@ -181,9 +184,21 @@ public:
 	virtual ~CameraAction() {}
 
 	virtual void activate();
-	virtual bool update( double dTime, float fElapsedTime );
 private:
 	int m_type;
 	int m_duration;
 	ArnCamera* m_arnCam;
+};
+
+//////////////////////////////////////////////////////////////////////////
+
+class ControllableAction : public Action
+{
+public:
+	ControllableAction( Character* c, bool controllable );
+
+	virtual void activate();
+private:
+	Character* m_c;
+	bool m_bControllable;
 };

@@ -211,7 +211,7 @@ LRESULT Character::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 			// state of m_aKeys[] by adding the KEY_WAS_DOWN_MASK|KEY_IS_DOWN_MASK mask
 			// only if the key is not down
 			UnitInput mappedKey = mapKey( ( UINT )wParam );
-			if( mappedKey != UNIT_UNKNOWN )
+			if( mappedKey != UNIT_UNKNOWN && m_bControllable )
 			{
 				if( FALSE == IsKeyDown( m_aKeys[mappedKey] ) )
 				{
@@ -249,6 +249,7 @@ Character::Character( UnitType type )
 	m_bMoving			= false;
 	m_fMovingTime		= 0;
 	m_moveDuration		= 1.0f;
+	m_bControllable		= true;
 	m_boundaryTileRect.top   = 999999;
 	m_boundaryTileRect.left  = -999999;
 	m_boundaryTileRect.bottom= -999999;

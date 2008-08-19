@@ -94,7 +94,6 @@ HRESULT World::init()
 		Dialog* newDlg = Dialog::createDialogByScript( *itDialogList );
 		newDlg->init();
 		m_scriptedDialog.push_back( newDlg );
-		(*m_scriptedDialog.rbegin())->init();
 	}
 
 	assert( m_heroUnit );

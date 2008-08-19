@@ -44,6 +44,8 @@ Dialog::~Dialog(void)
 
 HRESULT Dialog::init()
 {
+	if ( m_bInit )
+		throw std::runtime_error( "Double init error" );
 	HRESULT hr = S_OK;
 
 	const UINT dialogPaneM_H = 200;

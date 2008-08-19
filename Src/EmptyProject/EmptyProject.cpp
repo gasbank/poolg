@@ -21,7 +21,7 @@
 #include "TileManager.h"
 #include "World.h"
 #include "Dialog.h"
-
+#include <process.h>
 G								g_g;
 WorldManager*					g_wm					= 0;
 TopStateManager*				g_tsm					= 0;
@@ -592,12 +592,13 @@ int EpOutputDebugString( const char* msg )
 
 
 
-unsigned int __stdcall newThread( ClientData cd )
+//unsigned int __stdcall newThread( ClientData cd )
+void newThread( void* cd )
 {
 	//printf( "xx ^________^ xx" );
 	g_consoleInterp = Tcl_CreateInterp();
 	if (Tcl_Init(g_consoleInterp) == TCL_ERROR)
-		return TCL_ERROR;
+		throw std::runtime_error( "Tcl_Init() error" );
 
 	GetScriptManager().initScriptBindings();
 
@@ -608,7 +609,7 @@ unsigned int __stdcall newThread( ClientData cd )
 	if ( Tcl_EvalFile( g_consoleInterp, "Script/EpThreadTest.tcl" ) != TCL_OK )
 		ScriptManager::throwScriptErrorWithMessage( g_consoleInterp );
 
-	return 0;
+	//return 0;
 }
 
 
@@ -676,10 +677,11 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 
 	g_wm = new WorldManager();
 
+	uintptr_t t = _beginthread( newThread, 0, 0 );
 
-	Tcl_ThreadId ttid;
+	/*Tcl_ThreadId ttid;
 	if ( Tcl_CreateThread( &ttid, newThread, 0, TCL_THREAD_STACK_DEFAULT, 0 ) != TCL_OK )
-		throw std::runtime_error( "Check your Tcl library to support thread" );
+		throw std::runtime_error( "Check your Tcl library to support thread" );*/
 
 	g_handle = CreateEvent( NULL , TRUE , FALSE , NULL );  
 	ResetEvent( g_handle ); 

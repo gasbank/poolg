@@ -70,6 +70,8 @@ void ScriptManager::throwScriptErrorWithMessage( Tcl_Interp* interp )
 	OutputDebugStringA( "\n@@@------------------------- SCRIPT ERROR -------------------------@@@\n" );
 	OutputDebugStringA( trace );
 	OutputDebugStringA( "\n@@@------------------------- SCRIPT ERROR -------------------------@@@\n\n" );
+
+		
 	throw std::runtime_error( trace );
 }
 
@@ -184,75 +186,111 @@ int Tcl_AppInit(Tcl_Interp *interp)
 
 //////////////////////////////////////////////////////////////////////////
 
+void PrintTclCallerArgumentDebugInfo( Tcl_Interp* interp, int objc, Tcl_Obj *CONST objv[] )
+{
+	char debugInfo[512];
+	OutputDebugStringA( "\n@@@------------------------- SCRIPT ERROR -------------------------@@@\n" );
+	OutputDebugStringA( "Debug Info about procedure arguments invoked by Tcl script side function\n" );
+	StringCchPrintfA( debugInfo, 512, " - Argument count: %d\n", objc ); OutputDebugStringA( debugInfo );
+	int i;
+	for ( i = 0; i < objc; ++i )
+	{
+		StringCchPrintfA( debugInfo, 512,
+			" - Arg %d %s: Byte '%s' / Int %d (0x%p)\n",
+			i, (objv[i]->typePtr)?objv[i]->typePtr->name:"Unknown type", objv[i]->bytes, objv[i]->internalRep.longValue, objv[i]->internalRep.otherValuePtr );
+		OutputDebugStringA( debugInfo );
+	}
+	OutputDebugStringA( "\n@@@------------------------- SCRIPT ERROR -------------------------@@@\n\n" );
+	//Tcl_SetErrorCode( interp, "XXX", 0 );
+	//Tcl_SetErrno( 100 );
+	//Tcl_PosixError( interp );
+	//Tcl_Obj* dicObj = Tcl_NewDictObj();
+	//Tcl_DictObjPut( interp, dicObj, Tcl_NewStringObj( "-errorInfo", 10 ), Tcl_NewStringObj( "-errorinfo", 10 ) );
+	//Tcl_SetReturnOptions(interp, Tcl_NewListObj(objc-1, objv+1));
+	//Tcl_AddErrorInfo( interp, "Ep related procedure's argument parsing error" );
+	//ScriptManager::throwScriptErrorWithMessage( interp );
+}
 
 void ParseTclArgumentByTrait( DWORD trait, Tcl_Interp* interp, int objc, Tcl_Obj *CONST objv[], ScriptArgumentList& argList )
 {
-	if ( trait == 0 || (trait & 0xf) == 0 )
-		throw std::runtime_error("Trait value incorrect");
-	DWORD traitCopy = trait;
-	int argCount = 0;
-	while ( traitCopy & 0xf )
+	try
 	{
-		++argCount;
-		traitCopy >>= 4;
-	}
-
-	// Check for script caller's argument count and script binder's argument count.
-	// 'objc' includes a script caller's function name itself, so it has argument count + 1.
-	// argCount includes a script binder return type, so it has argument count +1.
-	// Since argCount and objc have both +1 value, we can compare directly.
-	if ( argCount != objc )
-	{
-		throw std::runtime_error( "Trait value and script caller's argument does not match" );
-	}
-
-	ScriptArgument sa;
-	memset( &sa, 0, sizeof( ScriptArgument ) );
-	argList.push_back(sa); // Return value set; type is not important at this point
-	trait = trait >> 4;
-
-	unsigned int i = 1;
-	int len = 0;
-	while (trait)
-	{
-		switch (trait & 0xf)
-		{
-		case AT_I:
-			if ( Tcl_GetIntFromObj( interp, objv[i], &sa.i ) != TCL_OK )
-			{
-				/*
-				 * If you caught this error, you probably missed '$' character
-				 * on the first place of a variable name in the script file.
-				 * Note that tcl recognize a variable name without a preceding '$' to
-				 * simple lexical string.
-				 *
-				 */
-				throw std::runtime_error("Integer argument access failed");
-			}
-			break;
-		case AT_PV:
-			if ( Tcl_GetLongFromObj( interp, objv[i], (long*)&sa.i ) != TCL_OK )
-				throw std::runtime_error("Long(raw pointer) argument access failed");
-			break;
-		case AT_PC:
-			sa.pc = Tcl_GetStringFromObj( objv[i], &len );
-			if (sa.pc == 0)
-				throw std::runtime_error("char* argument access failed");
-			break;
-		case AT_D:
-			if ( Tcl_GetDoubleFromObj( interp, objv[i], &sa.d ) != TCL_OK )
-				throw std::runtime_error("Double argument access failed");
-			break;
-		default:
+		if ( trait == 0 || (trait & 0xf) == 0 )
 			throw std::runtime_error("Trait value incorrect");
+		DWORD traitCopy = trait;
+		int argCount = 0;
+		while ( traitCopy & 0xf )
+		{
+			++argCount;
+			traitCopy >>= 4;
 		}
-		argList.push_back(sa);
 
+		// Check for script caller's argument count and script binder's argument count.
+		// 'objc' includes a script caller's function name itself, so it has argument count + 1.
+		// argCount includes a script binder return type, so it has argument count +1.
+		// Since argCount and objc have both +1 value, we can compare directly.
+		if ( argCount != objc )
+		{
+			throw std::runtime_error( "Trait value and script caller's argument does not match" );
+		}
+
+		ScriptArgument sa;
+		memset( &sa, 0, sizeof( ScriptArgument ) );
+		argList.push_back(sa); // Return value set; type is not important at this point
 		trait = trait >> 4;
-		i++;
-	}
 
-	
+		unsigned int i = 1;
+		int len = 0;
+		while (trait)
+		{
+			switch (trait & 0xf)
+			{
+			case AT_I:
+				if ( Tcl_GetIntFromObj( interp, objv[i], &sa.i ) != TCL_OK )
+				{
+					/*
+					 * If you caught this error, you probably missed '$' character
+					 * on the first place of a variable name in the script file.
+					 * Note that tcl recognize a variable name without a preceding '$' to
+					 * simple lexical string.
+					 */
+					throw std::runtime_error("Integer argument access failed");
+				}
+				break;
+			case AT_PV:
+				if ( Tcl_GetLongFromObj( interp, objv[i], (long*)&sa.i ) != TCL_OK )
+				{
+					throw std::runtime_error("Long(raw pointer) argument access failed");
+				}
+				break;
+			case AT_PC:
+				sa.pc = Tcl_GetStringFromObj( objv[i], &len );
+				if (sa.pc == 0)
+				{
+					throw std::runtime_error("char* argument access failed");
+				}
+				break;
+			case AT_D:
+				if ( Tcl_GetDoubleFromObj( interp, objv[i], &sa.d ) != TCL_OK )
+				{
+					throw std::runtime_error("Double argument access failed");
+				}
+				break;
+			default:
+				throw std::runtime_error("Trait value incorrect");
+			}
+			argList.push_back(sa);
+
+			trait = trait >> 4;
+			i++;
+		}
+	}
+	catch ( std::runtime_error& err )
+	{
+		PrintTclCallerArgumentDebugInfo( interp, objc, objv );
+		OutputDebugStringA( err.what() );
+		throw std::runtime_error( __FUNCTION__ );
+	}
 }
 void SetTclResult(Tcl_Interp* interp, DWORD trait, Tcl_Obj* tcl_result, const ScriptArgumentList& argList)
 {

@@ -65,16 +65,23 @@ typedef std::vector<ScriptArgument> ScriptArgumentList;
 void ParseTclArgumentByTrait( DWORD trait, Tcl_Interp* interp, int objc, Tcl_Obj *CONST objv[], ScriptArgumentList& argList );
 void SetTclResult(Tcl_Interp* interp, DWORD trait, Tcl_Obj* tcl_result, const ScriptArgumentList& argList);
 
-#define SCRIPT_CALLABLE_END(funcName, traits)																				\
-	static int _tcl_wrap_##funcName(ClientData clientData, Tcl_Interp *interp,	\
-									int objc, Tcl_Obj *CONST objv[])			\
-	{																			\
-		Tcl_Obj* tcl_result = Tcl_GetObjResult(interp);							\
-		ScriptArgumentList argList;												\
-		ParseTclArgumentByTrait(_trait_##traits, interp, objc, objv, argList);	\
-		_wrap_##funcName(argList);												\
-		SetTclResult(interp, _trait_##traits, tcl_result, argList);				\
-		return TCL_OK;															\
+#define SCRIPT_CALLABLE_END(funcName, traits)											\
+	static int _tcl_wrap_##funcName(ClientData clientData, Tcl_Interp *interp,			\
+									int objc, Tcl_Obj *CONST objv[])					\
+	{																					\
+		Tcl_Obj* tcl_result = Tcl_GetObjResult(interp);									\
+		ScriptArgumentList argList;														\
+		try																				\
+		{																				\
+			ParseTclArgumentByTrait(_trait_##traits, interp, objc, objv, argList);		\
+			_wrap_##funcName(argList);													\
+			SetTclResult(interp, _trait_##traits, tcl_result, argList);					\
+		}																				\
+		catch (...)																		\
+		{																				\
+			return TCL_ERROR;															\
+		}																				\
+		return TCL_OK;																	\
 	}
 
 //////////////////////////////////////////////////////////////////////////

@@ -1,1 +1,1 @@
-nmake -f makefile.vc core OPTS=symbols,msvcrt STATS=memdbg
+nmake -f makefile.vc core OPTS=symbols,msvcrt,threads STATS=memdbg

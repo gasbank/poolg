@@ -261,7 +261,7 @@ namespace eval EpRoomWorld {
 		registerIncidentControl
 		
 		# Warp Positions -------------------------------------------------------
-		#createWarpPosition			"EpA213World" 49 28 61 30
+		createWarpPosition			"EpA213World" 49 28 61 30
 	}
 	
 	proc leave {} {

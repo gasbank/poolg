@@ -34,7 +34,7 @@ LPD3DXFONT						g_pFont					= 0;
 LPD3DXEFFECT		            g_pEffect				= 0;
 D3DXHANDLE						g_tech					= 0;
 LPDIRECT3DVERTEXBUFFER9			g_lineElement			= 0;
-HANDLE							g_handle				= 0;		// Signal object to resolve multi-threaded problems on console thread and main app thread
+HANDLE							g_scriptBindingFinishedEvent				= 0;		// Signal object to resolve multi-threaded problems on console thread and main app thread
 
 LPD3DXMESH						g_testTeapot			= 0;
 //LPD3DXMESH						g_testPolygon			= 0;
@@ -592,8 +592,8 @@ int EpOutputDebugString( const char* msg )
 
 
 
-//unsigned int __stdcall newThread( ClientData cd )
-void newThread( void* cd )
+//unsigned int __stdcall EpConsoleThreadMain( ClientData cd )
+void EpConsoleThreadMain( void* cd )
 {
 	//printf( "xx ^________^ xx" );
 	g_consoleInterp = Tcl_CreateInterp();
@@ -604,7 +604,7 @@ void newThread( void* cd )
 
 	CREATE_OBJ_COMMAND( EpOutputDebugString );
 
-	SetEvent( g_handle );
+	SetEvent( g_scriptBindingFinishedEvent );
 
 	if ( Tcl_EvalFile( g_consoleInterp, "Script/EpThreadTest.tcl" ) != TCL_OK )
 		ScriptManager::throwScriptErrorWithMessage( g_consoleInterp );
@@ -663,13 +663,6 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 	CreateScriptManagerIfNotExist();
 	GetScriptManager().executeFile( "Script/EpInitScript.tcl" );
 	GetScriptManager().executeFile( "Script/EpDialog1.tcl" );
-
-	/*GetScriptManager().executeFile( "library/EpWorldList.tcl" );
-	
-	GetScriptManager().executeFile( "library/EpCeilingWorld.tcl" );
-	*/
-	//GetScriptManager().executeFile( "library/EpThreadModuleTest.tcl" );
-
 	GetScriptManager().execute( "EpInitApp" );
 
 	GetG().m_camera.SetAttachCameraToModel( true );
@@ -677,15 +670,15 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 
 	g_wm = new WorldManager();
 
-	uintptr_t t = _beginthread( newThread, 0, 0 );
+	uintptr_t t = _beginthread( EpConsoleThreadMain, 0, 0 );
 
 	/*Tcl_ThreadId ttid;
-	if ( Tcl_CreateThread( &ttid, newThread, 0, TCL_THREAD_STACK_DEFAULT, 0 ) != TCL_OK )
+	if ( Tcl_CreateThread( &ttid, EpConsoleThreadMain, 0, TCL_THREAD_STACK_DEFAULT, 0 ) != TCL_OK )
 		throw std::runtime_error( "Check your Tcl library to support thread" );*/
 
-	g_handle = CreateEvent( NULL , TRUE , FALSE , NULL );  
-	ResetEvent( g_handle ); 
-	WaitForSingleObject( g_handle, INFINITE );
+	g_scriptBindingFinishedEvent = CreateEvent( NULL , TRUE , FALSE , NULL );  
+	ResetEvent( g_scriptBindingFinishedEvent ); 
+	WaitForSingleObject( g_scriptBindingFinishedEvent, INFINITE );
 
 	// Initialize DXUT and create the desired Win32 window and Direct3D device for the application
 	DXUTInit( true, true ); // Parse the command line and show msgboxes

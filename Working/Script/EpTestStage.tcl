@@ -9,33 +9,18 @@ namespace eval EpTestStage {
 		set world				$curWorld;
 	}
 	
-	proc registerIncidentSwitch {} {
-		global world hero
-		
-		set trigger		[ EpCreateUnitPositionTrigger $TestStObject 50 39 -1 -1 ]
-		set action		[ EpCreateScriptAction "EpSetDoAnim [EpGetNode Door] 1" ]
-		set incident		[ EpCreateIncident $trigger $action 1 ]
-
-		set action2		[ EpCreateScriptAction "EpSetDoAnim [EpGetNode TofuMan] 1" ]
-		
-		EpAddActionToIncident $incident $action2
-		
-		set incCount	[ EpRegisterIncident $incident ]
-		EpOutputDebugString " - Incident count: $incCount\n"
-	}
-
 	proc enter {} {
 		global world hero
 		
 		EpOutputDebugString " - [info level 0] called\n"
 		
-		set pHeroUnit				[ createHero 45 60 ];
+		set pHeroUnit				[ createHero 43 79 ];
 		                                      # Health Will Coding Defence Sense Immunity
 		EpCharacterSetStat			$pHeroUnit    7     5     7       5      5      5
 		EpCharacterSetCurHp			$pHeroUnit 10
 		EpCharacterSetCurCs			$pHeroUnit -1
-		EpCharacterSetMoveDuration	$pHeroUnit [expr 0.2]
-		EpUnitSetColor				$pHeroUnit 255 0 255
+		EpCharacterSetMoveDuration	$pHeroUnit [expr 0.05]
+		EpUnitSetColor				$pHeroUnit 255 128 255
 		EpUnitSetPosZ				$pHeroUnit -[EpUnitGetUpperRightZ $pHeroUnit]
 	}
 	

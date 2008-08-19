@@ -26,31 +26,45 @@ namespace eval EpThreadTest {
 				puts $::errorInfo
 			}
 		} else {
-			switch $data {
-				exit {
-					# client will exit if you type "exit". How original!
-					exit
-				}
-				ls {
-					puts "So classical"
-				}
-				sl {
-					puts "      ====        ________                ___________                   "
-					puts "  _D _|  |_______/        \\__I_I_____===__|_________|                                "
-					puts "   |(_)---  |   H\\________/ |   |        =|___ ___|      _________________           "
-					puts "   /     |  |   H  |  |     |   |         ||_| |_||     _|                \\_____A    "
-					puts "  |      |  |   H  |__--------------------| \[___\] |   =|                        |    "
-					puts "  | ________|___H__/__|_____/\[\]\[\]~\\_______|       |   -|                        |    "
-					puts "  |/ |   |-----------I_____I \[\]\[\] \[\]  D   |=======|____|________________________|_   "
-					puts "__/ =| o |=-~~\\  /~~\\  /~~\\  /~~\\ ____Y___________|__|__________________________|_   "
-					puts "|/-=|___||    ||    ||    ||    |_____/~\\___/          |_D__D__D_|  |_D__D__D_|      "
-					puts " \\_/      \\__/  \\__/  \\__/  \\__/      \\_/               \\_/   \\_/    \\_/   \\_/       "
-				}
-				default {
-					if [string length $data] {
-						puts $::errorInfo
+			if [ catch { 				
+			
+				switch $data {
+					exit {
+						# client will exit if you type "exit". How original!
+						exit
+					}
+					ls {
+						puts "So classical"
+					}
+					sl {
+						puts "      ====        ________                ___________                   "
+						puts "  _D _|  |_______/        \\__I_I_____===__|_________|                                "
+						puts "   |(_)---  |   H\\________/ |   |        =|___ ___|      _________________           "
+						puts "   /     |  |   H  |  |     |   |         ||_| |_||     _|                \\_____A    "
+						puts "  |      |  |   H  |__--------------------| \[___\] |   =|                        |    "
+						puts "  | ________|___H__/__|_____/\[\]\[\]~\\_______|       |   -|                        |    "
+						puts "  |/ |   |-----------I_____I \[\]\[\] \[\]  D   |=======|____|________________________|_   "
+						puts "__/ =| o |=-~~\\  /~~\\  /~~\\  /~~\\ ____Y___________|__|__________________________|_   "
+						puts "|/-=|___||    ||    ||    ||    |_____/~\\___/          |_D__D__D_|  |_D__D__D_|      "
+						puts " \\_/      \\__/  \\__/  \\__/  \\__/      \\_/               \\_/   \\_/    \\_/   \\_/       "
+					}
+					a {
+						EpSetDoAnim [ EpGetNode Needle ] 1
+					}
+					b {
+						EpSetDoAnim [ EpGetNode Needle ] 0
+					}
+					c {
+						EpSetAnimTime [ EpGetNode Needle ] 0
+					}
+					default {
+						if [string length $data] {
+							puts $::errorInfo
+						}
 					}
 				}
+			 } result ] {
+				puts $::errorInfo
 			}
 		}
 		

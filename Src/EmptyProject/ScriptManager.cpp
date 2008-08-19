@@ -57,8 +57,7 @@ void ScriptManager::executeFile( const char* fileName )
 		throw std::runtime_error("Script file opening failed");
 #endif
 
-	if ( Tcl_EvalFile( m_interp,
-		fileName ) != TCL_OK )
+	if ( Tcl_EvalFile( m_interp, fileName ) != TCL_OK )
 		throwScriptErrorWithMessage( m_interp );
 }
 

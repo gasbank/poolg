@@ -288,28 +288,42 @@ float MeshRayClosestIntersectDist( LPD3DXMESH mesh, const D3DXVECTOR3& rayStartP
 // Otherwise false is returned.
 bool FullTraverseExhaustiveRayTesting( ArnNode* node, const D3DXVECTOR3& rayStartPos, const D3DXVECTOR3& rayDir, float distMin )
 {
-	if ( node->getType() == NDT_RT_MESH && strcmp(node->getName(), "Door") == 0)
+	if ( node->getType() == NDT_RT_MESH )
 	{
 		ArnMesh* mesh = static_cast<ArnMesh*>( node );
+		float dist = 0;
 		const D3DXMATRIX& meshXform = mesh->getFinalLocalXform();
-		D3DXVECTOR3 vScale, vTrans;
-		D3DXQUATERNION qRot;
-		D3DXMatrixDecompose( &vScale, &qRot, &vTrans, &meshXform );
-		D3DXVECTOR3 relativeRayStartPos = rayStartPos - vTrans;
-		D3DXMATRIX mRot;
-		D3DXMatrixRotationQuaternion( &mRot, &qRot );
-		D3DXVECTOR3 relativeRayDir;
-		D3DXVec3TransformCoord( &relativeRayDir, &rayDir, &mRot );
-		float dist = MeshRayClosestIntersectDist( mesh->getD3DXMesh(), relativeRayStartPos, relativeRayDir );
+		D3DXVECTOR3 relativeRayStartPos = DX_CONSTS::D3DXVEC3_ZERO;
+		D3DXVECTOR3 relativeRayDir = DX_CONSTS::D3DXVEC3_ZERO;
+
+		if ( mesh->getIpoName().length() == 0 )
+		{
+			relativeRayStartPos = rayStartPos - mesh->getLocalXform_Trans();
+			dist = MeshRayClosestIntersectDist( mesh->getD3DXMesh(), relativeRayStartPos, rayDir );
+		}
+		else
+		{
+			D3DXMATRIX meshXformInv;
+			D3DXVECTOR3 vScale, vTrans;
+			D3DXQUATERNION qRot;
+			D3DXMatrixInverse( &meshXformInv, 0, &meshXform );
+			D3DXMatrixDecompose( &vScale, &qRot, &vTrans, &meshXformInv );
+			D3DXMATRIX mRot;
+			D3DXMatrixRotationQuaternion( &mRot, &qRot );
+			D3DXVec3TransformCoord( &relativeRayStartPos, &rayStartPos, &meshXformInv );
+			D3DXVec3TransformCoord( &relativeRayDir, &rayDir, &mRot );
+			dist = MeshRayClosestIntersectDist( mesh->getD3DXMesh(), relativeRayStartPos, relativeRayDir );
+		}
+		
 		if ( dist <= distMin )
 		{
-			printf( " -------------------------------------------------------------\n" );
+			/*printf( " -------------------------------------------------------------\n" );
 			printf( " Ray dist is less than distMin!\n" );
 			printf( " rayStartPos = " );			Utility::printValue( rayStartPos ); printf("\n");
 			printf( " relativeRayStartPos = " );	Utility::printValue( relativeRayStartPos ); printf("\n");
 			printf( " rayDir = " );					Utility::printValue( rayDir ); printf("\n");
 			printf( " relativeRayDir = " );			Utility::printValue( relativeRayDir ); printf("\n");
-			printf( " meshXform = \n" );			Utility::printValue( meshXform ); printf("\n");
+			printf( " meshXform = \n" );			Utility::printValue( meshXform ); printf("\n");*/
 			return true;
 		}
 		else

@@ -30,11 +30,22 @@ namespace eval EpRoomWorld {
 	}
 
 	proc registerIncidentClear {} {
+		variable pHeroUnit
 		variable world
 		
 		set trigger		[ EpCreateTotalAnnihilationTrigger $world ]
-		set action		[ EpCreateDialogAction "EpDialog2" ]
-		set incident	[ EpCreateIncident $trigger $action 0 ]
+		set actions		[ EpCreateFadeAction out 3500 ]
+		set incident	[ EpCreateBlockingActionIncident $trigger 0 0 ]
+
+		lappend actions		[ EpCreateTeleportAction $pHeroUnit 53 45 ]
+		lappend actions		[ EpCreateFadeAction in 3000 ]
+		lappend actions		[ EpCreateScriptAction "EpSetDoAnim [EpGetNode Door] 1" ]
+		lappend actions		[ EpCreateScriptAction "EpSetDoAnim [EpGetNode TofuMan] 1" ]
+		lappend actions		[ EpCreateDialogAction "EpDialog2" ]
+				
+		foreach act $actions {
+			EpAddActionToIncident $incident $act
+		}
 
 		set incCount	[ EpRegisterIncident $incident ]
 		EpOutputDebugString " - Incident count: $incCount\n"

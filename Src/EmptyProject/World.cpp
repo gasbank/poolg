@@ -596,7 +596,7 @@ Unit* World::findUnitAtTile( UINT x, UINT y )
 	UnitSet::iterator it = m_unitSet.begin();
 	for ( ; it != m_unitSet.end(); ++it )
 	{
-		if ( (*it)->getTilePosX() == x && (*it)->getTilePosY() == y )
+		if ( (*it)->getTilePosX() == x && (*it)->getTilePosY() == y && !(*it)->getRemoveFlag() )
 		{
 			ret = *it;
 			break;

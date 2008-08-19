@@ -51,13 +51,13 @@ public:
 
 	
 
-	Tile* getTile( int x, int y );
-	Tile* getTile( const Point2Uint& pos );
+// 	Tile* getTile( int x, int y );
+// 	Tile* getTile( const Point2Uint& pos );
 	int pos2TileX( const D3DXVECTOR3* pos );
 	int pos2TileY( const D3DXVECTOR3* pos );
 
 private:
-	Tile	m_tileArray[s_xSize][s_ySize];
+	//Tile	m_tileArray[s_xSize][s_ySize];
 };
 
 inline TileManager& GetTileManager() { return TileManager::getSingleton(); }

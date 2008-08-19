@@ -24,15 +24,15 @@ TileManager::~TileManager(void)
 {
 }
 
-Tile* TileManager::getTile( int x, int y )
-{
-	return &m_tileArray[x][y];
-}
-
-Tile* TileManager::getTile( const Point2Uint& pos )
-{
-	return getTile( pos.x, pos.y );
-}
+// Tile* TileManager::getTile( int x, int y )
+// {
+// 	return &m_tileArray[x][y];
+// }
+// 
+// Tile* TileManager::getTile( const Point2Uint& pos )
+// {
+// 	return getTile( pos.x, pos.y );
+// }
 int TileManager::pos2TileX( const D3DXVECTOR3* pos )
 {
 	for ( int i = 0; i < s_xSize; i++ )

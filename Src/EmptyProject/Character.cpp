@@ -114,8 +114,8 @@ bool Character::frameMove( float fElapsedTime )
 						getTileBufferPos().x + g_moveAmount[ i ].x,
 						getTileBufferPos().y + g_moveAmount[ i ].y };
 
-					Tile* nextTile = tileManager.getTile( nextTilePos );
-					assert( nextTile );
+//  					Tile* nextTile = tileManager.getTile( nextTilePos );
+//  					assert( nextTile );
 					if( !GetWorldManager().getCurWorld()->findUnitAtTile( nextTilePos.x, nextTilePos.y ) && entireRegion.isExist( nextTilePos ) )
  					{
 						m_bMoving = true;

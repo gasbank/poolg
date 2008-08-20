@@ -18,7 +18,33 @@ namespace eval EpCeilingWorld {
 		set incCount	[ EpRegisterIncident $incident ]
 		EpOutputDebugString " - Incident count: $incCount\n"
 	}
-		
+
+	proc QuestTalk {} {
+		global world hero npcGetg npcGloop pHeroUnit
+	
+		set trigger		[ EpCreateUnitPositionTrigger $pHeroUnit 33 80 35 78 0x101 ]
+		set actions		[ EpCreateFadeAction out 3500 ]
+		set actions		[ EpCreateScriptAction "EpCeilingWorld::Quest" ]
+		#set actions		[ EpCreateDialogAction "EpCeilingWorld::GetGDialog2" ]
+				
+		set incident	[ EpCreateBlockingActionIncident $trigger 0 0 ]
+
+		foreach act $actions {
+			EpAddActionToIncident $incident $act
+		}
+
+		set incCount	[ EpRegisterIncident $incident ]
+		EpOutputDebugString " - Incident count: $incCount\n"
+	}
+
+	proc Quest {} {
+		global world hero npcGetg npcGloop pHeroUnit
+
+		set questtrigger	 [ EpCreateUnitPositionTrigger $pHeroUnit 29 83 31 81 0x101 ]
+		set questaction		 [ EpCreateFadeAction out 3500 ]
+		set questincident	 [ EpCreateBlockingActionIncident $questtrigger $questaction 0 ]
+	}
+
 	proc init { curWorld } {
 		global world hero npcGetg npcGloop
 		global pHeroUnit
@@ -53,6 +79,7 @@ namespace eval EpCeilingWorld {
 
 
 		registerIncidentInitTalk
+		QuestTalk
 			
 		createWarpPosition			"EpRoomWorld" 25 82
 	}
@@ -89,7 +116,7 @@ namespace eval EpCeilingWorld {
 
 	namespace eval GlooPDialog {
 	
-		set region [ list 29 83 31 81 ]; ;# left, top, right, bottom
+		set region [ list 0 0 0 0 ]; ;# left, top, right, bottom
 		set oneTime 0;
 	
 		set player "PoolG"
@@ -106,7 +133,7 @@ namespace eval EpCeilingWorld {
 
 	namespace eval GetGDialog {
 	
-		set region [ list 33 80 35 78 ]; ;# left, top, right, bottom
+		set region [ list 0 0 0 0 ]; ;# left, top, right, bottom
 		set oneTime 0;
 	
 		set player "PoolG"
@@ -120,6 +147,20 @@ namespace eval EpCeilingWorld {
 			$npc		"어쩌겠나. 08 프로젝트 팀에게 문의를 하시게"\
 		];	
 	}
+
+	namespace eval GetGDialog2 {
+	
+		set region [ list 0 0 0 0 ]; ;# left, top, right, bottom
+		set oneTime 0;
+	
+		set player "PoolG"
+		set npc "GetG"
+	
+		set dialog [ list\
+			$npc		"빠르군"\
+		];	
+	}
+
 
 
 }

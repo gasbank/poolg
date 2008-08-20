@@ -312,7 +312,7 @@ HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 	if (uMsg == WM_KEYDOWN)
 	{
 		/*죽었을 시 enter 키를 입력하면 대상 파괴, 아니면 다른 키 안 받고 메시지 핸들링 종료*/
-		if ( getEnemy()->getCurHp() <= 0 )
+		if ( getEnemy()->getCurHp() <= 0 && !getEnemy()->getSoulAnimation() )
 		{
 			if (wParam == VK_RETURN)
 			{

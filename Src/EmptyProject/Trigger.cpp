@@ -89,6 +89,13 @@ bool CharHpTrigger::check()
 	return false;
 }
 
+Trigger* EpCreateCharHpTrigger( void* ptr, int min, int max, int bInclude )
+{
+	Character* c = reinterpret_cast<Character*>( ptr );
+	return new CharHpTrigger( c, min, max, bInclude?true:false );
+} SCRIPT_CALLABLE_PV_PV_I_I_I( EpCreateCharHpTrigger )
+
+
 //////////////////////////////////////////////////////////////////////////
 
 TotalAnnihilationTrigger::TotalAnnihilationTrigger( World* pWs )
@@ -152,13 +159,6 @@ Trigger* EpCreateUnTotalAnnihilationTrigger( void* pWorld )
 } SCRIPT_CALLABLE_PV_PV( EpCreateUnTotalAnnihilationTrigger )
 
 //////////////////////////////////////////////////////////////////////////
-
-Trigger* EpCreateCharHpTrigger( void* ptr, int min, int max, int bInclude )
-{
-	Character* c = reinterpret_cast<Character*>( ptr );
-	return new CharHpTrigger( c, min, max, bInclude?true:false );
-} SCRIPT_CALLABLE_PV_PV_I_I_I( EpCreateCharHpTrigger )
-
 
 START_SCRIPT_FACTORY( Trigger )
 	CREATE_OBJ_COMMAND( EpCreateCharHpTrigger )

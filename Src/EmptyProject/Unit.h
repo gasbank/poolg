@@ -93,6 +93,8 @@ public:
 	void							startSoulAnimation( float duration, float height );
 	void							setViewAt( const D3DXVECTOR3* at );
 
+	bool getSoulAnimation() { return m_bSoulAnimation; }
+
 protected:
 									Unit( UnitType type );
 	void							setLocalXformDirty()					{ m_bLocalXformDirty = true; }

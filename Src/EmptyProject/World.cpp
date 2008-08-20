@@ -225,6 +225,7 @@ HRESULT World::frameMove(double fTime, float fElapsedTime)
 	}
 
 	battleEventCheck();
+	wannaTalkingEventCheck();
 
 	// Incidents update
 	IncidentList::iterator itInc = m_incidents.begin();
@@ -434,7 +435,7 @@ const D3DXVECTOR3& World::getHeroPos()
 	return m_heroUnit->getPos();
 }
 
-bool World::isInFightArea( Character* heroPt, Character* enemyPt )
+bool World::isInEventArea( Character* heroPt, Character* enemyPt )
 {
 	// 적의 타일 좌표가 0, 0일 때 플레이어가 들어오면 전투가 시작되는 타일 좌표 범위.
 	
@@ -546,7 +547,7 @@ UnitSet::iterator World::removeUnit( Unit* pUnit )
 			Enemy* oppCharacter = dynamic_cast<Enemy*>( *it );
 			if ( oppCharacter->isTalkable() == false )
 			{
-				if ( isInFightArea( m_heroUnit, oppCharacter ) == true )
+				if ( isInEventArea( m_heroUnit, oppCharacter ) == true )
 				{
 					// Set current enemy unit and enter into BattleState
 					m_curEnemyUnit = oppCharacter;
@@ -666,26 +667,61 @@ void World::battleEventCheck()
 			Enemy* oppCharacter = dynamic_cast<Enemy*>( *it );
 			if ( oppCharacter != NULL && oppCharacter->isTalkable() == false && !oppCharacter->getRemoveFlag() )
 			{
-				if ( isInFightArea( getHeroUnit() , oppCharacter ) == true )
+				if ( isInEventArea( getHeroUnit() , oppCharacter ) == true )
 				{
-					oppCharacter->clearKey(); // No more move!
 					setCurEnemy( oppCharacter );
+					
+					// No more move!
+					getCurEnemyUnit()->clearKey(); 					
+					getHeroUnit()->clearKey();
+					getHeroUnit()->setControllable( false );
 
+					// Set power of enemy!
 					getCurEnemyUnit()->setAttack(30);
 
+					// view each other
 					getHero()->setViewAt( &getCurEnemyUnit()->getPos() );
 					getCurEnemyUnit()->setViewAt( &getHero()->getPos() );
-					getHeroUnit()->setControllable( false );
-					getHeroUnit()->clearKey();
-
+					
 					if ( GetWorldStateManager().curStateEnum() == GAME_WORLD_STATE_FIELD )
 						GetWorldStateManager().setNextState( GAME_WORLD_STATE_BATTLE );
 				}
 			}
 		}	
 	}
-
 }
+
+void World::wannaTalkingEventCheck()
+{
+	// Check if hero is in the talking enemy's fight area. If true, the enemy look at hero.
+	// This work is almost same as battle event check.
+	UnitSet::iterator it = m_unitSet.begin();
+	for ( ; it != m_unitSet.end(); ++it )
+	{
+		if ( (*it) != getHeroUnit() )
+		{
+			Enemy* unconfirmedEnemy = dynamic_cast<Enemy*>( *it );
+			if ( unconfirmedEnemy != NULL 
+				&& unconfirmedEnemy->isTalkable() == true
+				&& !unconfirmedEnemy->getRemoveFlag() )
+			{
+				Enemy* talkingEnemy = unconfirmedEnemy;
+
+				if ( isInEventArea( getHeroUnit() , talkingEnemy ) == true )
+				{
+					setCurEnemy( talkingEnemy );
+
+					// no more move!
+					getCurEnemyUnit()->clearKey();
+
+					// View at hero
+					getCurEnemyUnit()->setViewAt( &getHero()->getPos() );					
+				}
+			}
+		}	
+	}
+}
+
 //////////////////////////////////////////////////////////////////////////
 
 Unit* EpGetHero()

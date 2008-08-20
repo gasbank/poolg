@@ -52,7 +52,7 @@ public:
 	Character*			getCurEnemyUnit() { return m_curEnemyUnit; }
 	UnitSet*			getUnitSet() { return &m_unitSet; }
 	
-	bool				isInFightArea( Character* heroPt, Character* enemyPt );
+	bool				isInEventArea( Character* heroPt, Character* enemyPt );
 
 	Dialog*				getDialogByName( const char* dialogName );	
 	ArnSceneGraph*		getArnSceneGraphPt() { return m_modelSg; }
@@ -75,6 +75,7 @@ private:
 	void				proceedCurDialog();
 	void				loadWorldModel();
 	void				battleEventCheck();
+	void				wannaTalkingEventCheck();
 
 	void				addCollisionMesh( ArnMesh* collisionMesh );
 

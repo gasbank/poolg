@@ -183,7 +183,7 @@ namespace eval EpRoomWorld {
 		EpCharacterSetStat			$pHeroUnit    100     5     7       5      5      5
 		EpCharacterSetCurHp			$pHeroUnit 100
 		EpCharacterSetCurCs			$pHeroUnit -1
-		EpCharacterSetMoveDuration		$pHeroUnit [expr 0.05]
+		EpCharacterSetMoveDuration		$pHeroUnit [expr 0.15]
 		EpUnitSetColor			$pHeroUnit 255 0 255
 		
 		

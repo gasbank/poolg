@@ -448,19 +448,20 @@ bool World::isInFightArea( Character* heroPt, Character* enemyPt )
 
 	int range = static_cast<Enemy*>(enemyPt)->getFightRange();
 
-	/*range++;*/
+	range++;
 
 	// 적의 전투 범위 타일 안에 주인공이 있는지 판단한다.
 	for ( int i = -range; i <= range; i++ )
 	{
 		for ( int j = -(range - abs( i )); j <= (range - abs( i )); j++ )
 		{
-			/*if ( abs(i) == range || abs(j) == range )
-				return false;*/
+			if ( (abs( i ) == range) || (abs( j ) == range) )
+				continue;
 
 			if ( (enemyPt->getTilePosX() + i ) == heroPt->getTilePosX()
 				&& (enemyPt->getTilePosY() + j ) == heroPt->getTilePosY() )			
 				return true;
+
 		}
 	}
 	return false;

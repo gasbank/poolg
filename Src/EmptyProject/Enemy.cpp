@@ -127,8 +127,16 @@ int EpEnemySetTalkable( void* ptr, int talkable )
 	return 0;
 } SCRIPT_CALLABLE_I_PV_I( EpEnemySetTalkable )
 
+int EpEnemySetFightRange( void* ptr, int fightRange )
+{
+	Enemy* instance = reinterpret_cast<Enemy*>( ptr );
+	instance->Enemy::setFightRange( fightRange );
+	return 0;
+} SCRIPT_CALLABLE_I_PV_I( EpEnemySetFightRange )
+
 START_SCRIPT_FACTORY(Enemy)
 	CREATE_OBJ_COMMAND( EpCreateEnemy )
 	CREATE_OBJ_COMMAND( EpEnemySetRandomWalkable )
 	CREATE_OBJ_COMMAND( EpEnemySetTalkable )
+	CREATE_OBJ_COMMAND(	EpEnemySetFightRange )
 END_SCRIPT_FACTORY(Enemy)

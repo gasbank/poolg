@@ -30,7 +30,16 @@ enum UnitType { UT_UNIT, UT_CHARACTER, UT_HERO, UT_ENEMY, UT_ATTACKOBJECT, UT_IN
 class Unit
 {
 public:
+	// Ctor and Dtor and create
+									/* Unit class instantiation is prohibited */
 	virtual							~Unit();
+
+	// Virtual Methods
+	virtual HRESULT					frameRender();
+	virtual LRESULT					handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
+	virtual bool					frameMove( float fElapsedTime );
+	virtual const D3DXVECTOR3&		getPos() const			{ return m_vPos; }
+
 
 	HRESULT							init( LPDIRECT3DDEVICE9 pd3dDevice, LPD3DXMESH mesh );
 	const D3DXVECTOR3&				getLowerLeft() const	{ return m_lowerLeft; }
@@ -38,10 +47,6 @@ public:
 	LPD3DXMESH						getMesh() const			{ return m_d3dxMesh; }
 	void							release()				{ SAFE_RELEASE(m_d3dxMesh); }
 	void							clearKey();
-
-	virtual HRESULT					frameRender();
-	virtual LRESULT					handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
-	virtual bool					frameMove( float fElapsedTime );
 
 	void							setRotX( float rad ) { m_vRot.x = rad; m_bLocalXformDirty = true; }
 	void							setRotY( float rad ) { m_vRot.y = rad; m_bLocalXformDirty = true; }
@@ -57,7 +62,7 @@ public:
 	void							setPosX( float val )				{ m_vPos.x = val; m_bLocalXformDirty = true; }
 	void							setPosY( float val )				{ m_vPos.y = val; m_bLocalXformDirty = true; }
 	void							setPosZ( float val )				{ m_vPos.z = val; m_bLocalXformDirty = true; }
-	virtual const D3DXVECTOR3&		getPos() const						{ return m_vPos; }
+	
 
 	void							setHeadDir( UnitInput ui );
 
@@ -97,6 +102,8 @@ public:
 
 protected:
 									Unit( UnitType type );
+	virtual UnitInput				mapKey( UINT nKey ) const;
+
 	void							setLocalXformDirty()					{ m_bLocalXformDirty = true; }
 	HRESULT							rayTesting( UnitInput ui );
 
@@ -107,7 +114,7 @@ protected:
 	LPD3DXMESH						m_d3dxMesh;
 	LPDIRECT3DTEXTURE9				m_d3dTex;
 
-	virtual UnitInput				mapKey( UINT nKey ) const;
+	
 
 private:
 	static Unit*					createUnit( LPD3DXMESH mesh, int tileX = 0, int tileY = 0, float posZ = 0 );

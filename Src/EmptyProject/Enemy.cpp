@@ -45,8 +45,8 @@ bool Enemy::frameMove( float fElapsedTime )
 {
 	WorldStateManager& rWsm = GetWorldStateManager();
 
-	/*if ( m_bRandomWalkable && rWsm.curStateEnum() == GAME_WORLD_STATE_FIELD )
-		walkRandomly();*/
+	if ( m_bRandomWalkable && rWsm.curStateEnum() == GAME_WORLD_STATE_FIELD )
+		walkRandomly();
 
 	return Character::frameMove( fElapsedTime );
 }

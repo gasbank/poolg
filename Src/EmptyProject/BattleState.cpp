@@ -183,6 +183,8 @@ HRESULT BattleState::leave()
 
 	GetAudioState().leaveBattle();
 
+	getHero()->setControllable( true );
+
 	return S_OK;
 }
 

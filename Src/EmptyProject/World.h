@@ -74,6 +74,7 @@ private:
 	void				startTileDefinedDialogIfExist();
 	void				proceedCurDialog();
 	void				loadWorldModel();
+	void				battleEventCheck();
 
 	void				addCollisionMesh( ArnMesh* collisionMesh );
 

@@ -224,33 +224,7 @@ HRESULT World::frameMove(double fTime, float fElapsedTime)
 		//DebugBreak();
 	}
 
-	// Detect battle event.
-	// If current selected unit isn't hero unit, and isn't talkable,
-	// regard as enemy. And if hero is in the fight area of enemy, start battle.
-	UnitSet::iterator it = m_unitSet.begin();
-	for ( ; it != m_unitSet.end(); ++it )
-	{
-		if ( (*it) != getHeroUnit() )
-		{
-			Enemy* oppCharacter = dynamic_cast<Enemy*>( *it );
-			if ( oppCharacter != NULL && oppCharacter->isTalkable() == false && !oppCharacter->getRemoveFlag() )
-			{
-				if ( isInFightArea( getHeroUnit() , oppCharacter ) == true )
-				{
-					oppCharacter->clearKey(); // No more move!
-					setCurEnemy( oppCharacter );
-
-					getCurEnemyUnit()->setAttack(30);
-					
-					getHero()->setViewAt( &getCurEnemyUnit()->getPos() );
-					getCurEnemyUnit()->setViewAt( &getHero()->getPos() );
-
-					if ( GetWorldStateManager().curStateEnum() == GAME_WORLD_STATE_FIELD )
-						GetWorldStateManager().setNextState( GAME_WORLD_STATE_BATTLE );
-				}
-			}
-		}	
-	}
+	battleEventCheck();
 
 	// Incidents update
 	IncidentList::iterator itInc = m_incidents.begin();
@@ -474,7 +448,7 @@ bool World::isInFightArea( Character* heroPt, Character* enemyPt )
 
 	int range = static_cast<Enemy*>(enemyPt)->getFightRange();
 
-	//range++;
+	/*range++;*/
 
 	// 적의 전투 범위 타일 안에 주인공이 있는지 판단한다.
 	for ( int i = -range; i <= range; i++ )
@@ -485,11 +459,8 @@ bool World::isInFightArea( Character* heroPt, Character* enemyPt )
 				return false;*/
 
 			if ( (enemyPt->getTilePosX() + i ) == heroPt->getTilePosX()
-				&& (enemyPt->getTilePosY() + j ) == heroPt->getTilePosY() )
-			{
-				printf(" %d, %d ", i, j );
+				&& (enemyPt->getTilePosY() + j ) == heroPt->getTilePosY() )			
 				return true;
-			}
 		}
 	}
 	return false;
@@ -679,6 +650,40 @@ void World::addCollisionMesh( ArnMesh* collisionMesh )
 ArnNode* World::getNode( const char* nodeName ) const
 {
 	return m_modelSg->getSceneRoot()->getNodeByName( nodeName );
+}
+
+void World::battleEventCheck()
+{
+	// Detect battle event.
+	// If current selected unit isn't hero unit, and isn't talkable,
+	// regard as enemy. And if hero is in the fight area of enemy, start battle.
+	UnitSet::iterator it = m_unitSet.begin();
+	for ( ; it != m_unitSet.end(); ++it )
+	{
+		if ( (*it) != getHeroUnit() )
+		{
+			Enemy* oppCharacter = dynamic_cast<Enemy*>( *it );
+			if ( oppCharacter != NULL && oppCharacter->isTalkable() == false && !oppCharacter->getRemoveFlag() )
+			{
+				if ( isInFightArea( getHeroUnit() , oppCharacter ) == true )
+				{
+					oppCharacter->clearKey(); // No more move!
+					setCurEnemy( oppCharacter );
+
+					getCurEnemyUnit()->setAttack(30);
+
+					getHero()->setViewAt( &getCurEnemyUnit()->getPos() );
+					getCurEnemyUnit()->setViewAt( &getHero()->getPos() );
+					getHeroUnit()->setControllable( false );
+					getHeroUnit()->clearKey();
+
+					if ( GetWorldStateManager().curStateEnum() == GAME_WORLD_STATE_FIELD )
+						GetWorldStateManager().setNextState( GAME_WORLD_STATE_BATTLE );
+				}
+			}
+		}	
+	}
+
 }
 //////////////////////////////////////////////////////////////////////////
 

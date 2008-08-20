@@ -418,6 +418,19 @@ void Unit::updateSoulAnimation( float fElapsedTime )
 	}
 }
 
+void Unit::setViewAt( const D3DXVECTOR3* at )
+{
+	D3DXVECTOR3 positiveY( 0.0f, 1.0f, 0.0f );
+	D3DXVECTOR3 dir = *at - getPos();
+	
+	float rad = Utility::radBetweenVectors( &positiveY, &dir );
+
+	if ( dir.x > 0.0f )
+		rad = -rad;
+
+	setRotZ( rad );
+}
+
 //////////////////////////////////////////////////////////////////////////
 
 Unit* EpCreateUnit( int tileX, int tileY )

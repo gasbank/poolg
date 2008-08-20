@@ -281,6 +281,7 @@ void Character::setCurCs( int curCs )
 	else
 		m_curCs = curCs;
 }
+
 /*void Character::setMaxAndCurHp( int maxHp, int curHp )
 {
 	if ( maxHp < curHp || maxHp <= 0 )

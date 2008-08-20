@@ -241,6 +241,9 @@ HRESULT World::frameMove(double fTime, float fElapsedTime)
 					setCurEnemy( oppCharacter );
 
 					getCurEnemyUnit()->setAttack(30);
+					
+					getHero()->setViewAt( &getCurEnemyUnit()->getPos() );
+					getCurEnemyUnit()->setViewAt( &getHero()->getPos() );
 
 					if ( GetWorldStateManager().curStateEnum() == GAME_WORLD_STATE_FIELD )
 						GetWorldStateManager().setNextState( GAME_WORLD_STATE_BATTLE );
@@ -471,14 +474,20 @@ bool World::isInFightArea( Character* heroPt, Character* enemyPt )
 
 	int range = static_cast<Enemy*>(enemyPt)->getFightRange();
 
+	//range++;
+
 	// 적의 전투 범위 타일 안에 주인공이 있는지 판단한다.
 	for ( int i = -range; i <= range; i++ )
 	{
 		for ( int j = -(range - abs( i )); j <= (range - abs( i )); j++ )
 		{
+			/*if ( abs(i) == range || abs(j) == range )
+				return false;*/
+
 			if ( (enemyPt->getTilePosX() + i ) == heroPt->getTilePosX()
 				&& (enemyPt->getTilePosY() + j ) == heroPt->getTilePosY() )
 			{
+				printf(" %d, %d ", i, j );
 				return true;
 			}
 		}

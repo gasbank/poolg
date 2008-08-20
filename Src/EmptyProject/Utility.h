@@ -7,6 +7,7 @@ public:
 	~Utility(void);
 
 	static void rotateAboutAxis( D3DXVECTOR3* vOut, D3DXVECTOR3* axis, float rad );
+	static float radBetweenVectors( const D3DXVECTOR3* v1, const D3DXVECTOR3* v2 );
 
 	static void printValue( const D3DXVECTOR3& vec3 )
 	{

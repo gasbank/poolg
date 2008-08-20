@@ -22,7 +22,6 @@ void WorldManager::addWorld( World* ws )
 	m_worlds[ ws->getWorldName() ] = ws;
 }
 
-
 void WorldManager::changeToNextWorldIfExist()
 {
 	if ( m_nextWorld && m_nextWorld != m_curWorld && !GetG().m_EpLight.isInFading() )

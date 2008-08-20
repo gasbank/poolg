@@ -29,3 +29,15 @@ void Utility::rotateAboutAxis( D3DXVECTOR3* pvOut, D3DXVECTOR3* pvAxis, float ra
 	pvOut->y = vOutTmp.y;
 	pvOut->z = vOutTmp.z;
 }
+
+float Utility::radBetweenVectors( const D3DXVECTOR3* v1, const D3DXVECTOR3* v2 )
+{
+	// A (dot product) B = abs(A) * abs(B) * cos(rad)
+
+	float AdotB = D3DXVec3Dot( v1, v2 );
+
+	float absA = D3DXVec3Length( v1 );
+	float absB = D3DXVec3Length( v2 );
+
+	return acos( AdotB / ( absA * absB ) );
+}

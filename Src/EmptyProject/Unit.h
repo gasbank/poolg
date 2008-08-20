@@ -100,6 +100,8 @@ public:
 
 	void startSoulAnimation( float duration, float height );
 
+	void setViewAt( const D3DXVECTOR3* at );
+
 protected:
 	Unit( UnitType type );
 

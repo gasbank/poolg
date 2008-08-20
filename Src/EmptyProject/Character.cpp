@@ -12,7 +12,7 @@
 #include <time.h>
 #include "Trigger.h"
 #include "StructureObject.h"
-
+#include "Utility.h"
 
 extern TileManager tileManager;
 
@@ -177,6 +177,12 @@ bool Character::frameMove( float fElapsedTime )
 	m_curPos = unitPos + m_moveImpulse;
 	if ( m_moveImpulse != DX_CONSTS::D3DXVEC3_ZERO )
 	{
+		/*
+		printf( "%s : m_moveImpulse ", getTypeString() ); Utility::printValue( m_moveImpulse ); printf( "\n" );
+		printf( "%s : Unit::getPos() ", getTypeString() ); Utility::printValue( Unit::getPos() ); printf( "\n" );
+		printf( "%s : getPos() ", getTypeString() ); Utility::printValue( getPos() ); printf( "\n" );
+		*/
+
 		const float decimate = 0.5f;
 		m_moveImpulse *= decimate;
 		if ( D3DXVec3Length( &m_moveImpulse ) < 1e-4 )
@@ -252,6 +258,7 @@ Character::Character( UnitType type )
 	m_bControllable		= true;
 	m_boundaryTileRect.setStart( Point2Uint( 0, 0 ) );
 	m_boundaryTileRect.setEnd( Point2Uint( s_xSize - 1, s_ySize - 1 ) );
+	m_curPos			= DX_CONSTS::D3DXVEC3_ZERO;
 	ZeroMemory( &m_stat, sizeof(Stat) );
 	
 	// Initialize random number
@@ -322,7 +329,18 @@ void Character::damage( int point )
 {
 	m_curHp -= point;
 
-	printf("체력은? %d\n", m_curHp);
+	if ( getType() == UT_HERO )
+	{
+		printf( "HERO 체력은? %d\n", m_curHp );
+	}
+	else if ( getType() == UT_ENEMY )
+	{
+		printf( "Enemy 체력은? %d\n", m_curHp );
+	}
+	else
+	{
+		_ASSERTE( !"Character type error or unexpected type" );
+	}
 }
 
 
@@ -368,6 +386,13 @@ void Character::setDead()
 {
 	m_curHp = -1;
 	startSoulAnimation( 3.0f, 3.0f );
+}
+
+void Character::addMoveImpulse( const D3DXVECTOR3& impulse )
+{
+	//printf( "addMoveImpulse called with impulse " ); Utility::printValue( impulse ); printf( "\n" );
+	m_moveImpulse += impulse;
+	//printf( "Now impulse is " ); Utility::printValue( m_moveImpulse ); printf( "\n" );
 }
 //////////////////////////////////////////////////////////////////////////
 

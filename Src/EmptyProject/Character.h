@@ -23,7 +23,7 @@ public:
 	virtual HRESULT						frameRender();
 	virtual bool						frameMove( float fElapsedTime );
 	virtual LRESULT						handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
-	virtual const D3DXVECTOR3&			getPos() { m_curPos = Unit::getPos() + m_moveImpulse; return m_curPos; }
+	virtual const D3DXVECTOR3&			getPos() const { if ( m_moveImpulse != DX_CONSTS::D3DXVEC3_ZERO ) return m_curPos; else return Unit::getPos(); }
 	virtual void						pushUnitInFront( UnitInput dir );
 
 	/*스킬 함수*/
@@ -52,7 +52,7 @@ public:
 	const Stat&							getStat() const				{ return m_stat; }
 	bool								isDead() const				{ return (m_curHp<=0); }
 	void								setDead();
-	void								addMoveImpulse( const D3DXVECTOR3& impulse ) { m_moveImpulse += impulse; }
+	void								addMoveImpulse( const D3DXVECTOR3& impulse );
 	
 	void								setMoveDuration( float val ) { m_moveDuration = val; }	
 	void								setBoundaryRect( LONG left, LONG top, LONG right, LONG bottom );

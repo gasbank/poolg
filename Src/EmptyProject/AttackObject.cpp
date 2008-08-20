@@ -36,7 +36,7 @@ bool BallAttackObject::frameMove( float fElapsedTime )
 	{
 		// Hit to the target!
 		m_target->damage(m_damage);
-		m_target->addMoveImpulse( -m_fireDir/2 ); // Attacked unit shows startled shake
+		m_target->addMoveImpulse( m_fireDir / 2 ); // Attacked unit shows startled shake
 
 		char stringBuffer[20];
 		_itoa_s (m_damage, stringBuffer, 10);

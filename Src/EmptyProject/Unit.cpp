@@ -431,6 +431,23 @@ void Unit::setViewAt( const D3DXVECTOR3* at )
 	setRotZ( rad );
 }
 
+const char* Unit::getTypeString() const
+{
+#define CASE_ENUM_TO_STRING(x) case x: return #x
+	switch ( getType() )
+	{
+		CASE_ENUM_TO_STRING( UT_UNIT );
+		CASE_ENUM_TO_STRING( UT_CHARACTER );
+		CASE_ENUM_TO_STRING( UT_HERO );
+		CASE_ENUM_TO_STRING( UT_ENEMY );
+		CASE_ENUM_TO_STRING( UT_STRUCTREOBJECT );
+		CASE_ENUM_TO_STRING( UT_ATTACKOBJECT );
+		CASE_ENUM_TO_STRING( UT_INNERFIRE );
+	default:
+		_ASSERTE( !"Type string is not found" );
+	}
+	return 0;
+}
 //////////////////////////////////////////////////////////////////////////
 //
 //Unit* EpCreateUnit( int tileX, int tileY )

@@ -38,7 +38,7 @@ public:
 	virtual HRESULT					frameRender();
 	virtual LRESULT					handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 	virtual bool					frameMove( float fElapsedTime );
-	virtual const D3DXVECTOR3&		getPos() const			{ return m_vPos; }
+	virtual const D3DXVECTOR3&		getPos() const { return m_vPos; }
 
 
 	HRESULT							init( LPDIRECT3DDEVICE9 pd3dDevice, LPD3DXMESH mesh );
@@ -86,6 +86,7 @@ public:
 	void							setMovable( bool val )					{ m_bMovable = val; }
 
 	UnitType						getType() const							{ return m_type; }
+	const char*						getTypeString() const;
 	World*							getCurWorld() const						{ return GetWorldManager().getCurWorld(); }
 	void							setDynamicMotion( DynamicMotion* dm )	{ m_dm = dm; }
 	void							setForcedMove( int i );

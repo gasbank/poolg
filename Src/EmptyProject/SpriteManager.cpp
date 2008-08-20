@@ -39,27 +39,47 @@ void SpriteManager::frameRender()
 {
 
 	m_d3dxSprite->Begin( D3DXSPRITE_ALPHABLEND );
-
-	SpriteMap::iterator it = m_spriteMap.begin();
-	for ( ; it != m_spriteMap.end(); ++it )
 	{
-		const Sprite::DrawRequestList& dr = it->second->getDrawRequestList();
-		if ( dr.size() )
+		SpriteMap::iterator it = m_spriteMap.begin();	
+		for ( ; it != m_spriteMap.end(); ++it )
 		{
-			Sprite::DrawRequestList::const_iterator itDr = dr.begin();
-			const DrawRequest* drawReq = *itDr;
-			for ( ; itDr != dr.end(); ++itDr )
+			const Sprite::DrawRequestList& dr = it->second->getDrawRequestList();
+			if ( dr.size() )
 			{
-				m_d3dxSprite->Draw( it->second->getTexture(), &drawReq->srcRect, &drawReq->center, &drawReq->position, drawReq->color );
+				Sprite::DrawRequestList::const_iterator itDr = dr.begin();
+				const DrawRequest* drawReq = *itDr;
+				for ( ; itDr != dr.end(); ++itDr )
+				{
+					m_d3dxSprite->Draw( it->second->getTexture(), &drawReq->srcRect, &drawReq->center, &drawReq->position, drawReq->color );
+				}
 			}
+
 		}
-		
 	}
 	m_d3dxSprite->End();
 
-
+	//////////////////////////////////////////////////////////////////////////
+	
 	m_d3dxObjectSprite->Begin( D3DXSPRITE_ALPHABLEND | D3DXSPRITE_OBJECTSPACE );
-
+	{
+		m_dev->SetTransform( D3DTS_VIEW, GetG().m_camera.GetViewMatrix() );
+		m_dev->SetTransform( D3DTS_PROJECTION, GetG().m_camera.GetProjMatrix() );
+		SpriteMap::iterator it = m_spriteMap.begin();
+		for ( ; it != m_spriteMap.end(); ++it )
+		{
+			const Sprite::DrawRequestList& dr = it->second->getDrawReqXformableList();
+			if ( dr.size() )
+			{
+				Sprite::DrawRequestList::const_iterator itDr = dr.begin();
+				const DrawRequest* drawReq = *itDr;
+				for ( ; itDr != dr.end(); ++itDr )
+				{
+					m_dev->SetTransform( D3DTS_WORLD, &drawReq->xform );
+					m_d3dxObjectSprite->Draw( it->second->getTexture(), &drawReq->srcRect, &drawReq->center, &drawReq->position, drawReq->color );
+				}
+			}
+		}
+	}	
 	m_d3dxObjectSprite->End();
 
 }

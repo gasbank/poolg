@@ -59,7 +59,20 @@ DrawRequest* Sprite::drawRequest( const char* rectName, const D3DXVECTOR3* cente
 
 DrawRequest* Sprite::drawRequestXformable( const char* rectName )
 {
-	return 0;
+	DrawRequest* dr = new DrawRequest();
+	RectMap::iterator it = m_rectMap.find( rectName );
+	if ( it != m_rectMap.end() )
+		dr->srcRect = m_rectMap[ rectName ];
+	else
+		throw std::runtime_error( "Specified rectName does not exist" );
+	
+	dr->center = DX_CONSTS::D3DXVEC3_ZERO;
+	dr->color = D3DCOLOR_RGBA( 255, 255, 255, 255 );
+	dr->position = DX_CONSTS::D3DXVEC3_ZERO;
+	dr->xform = DX_CONSTS::D3DXMAT_IDENTITY;
+
+	m_drawReqXformableList.push_back( dr );
+	return dr;
 }
 
 void Sprite::removeDrawRequest( DrawRequest*& dr )

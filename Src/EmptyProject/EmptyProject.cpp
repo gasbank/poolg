@@ -89,6 +89,7 @@ bool CALLBACK ModifyDeviceSettings( DXUTDeviceSettings* pDeviceSettings, void* p
 }
 
 DrawRequest* g_dr;
+DrawRequest* g_dr2;
 
 //--------------------------------------------------------------------------------------
 // Create any D3D9 resources that will live through a device reset (D3DPOOL_MANAGED)
@@ -221,6 +222,7 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 	sprite->registerRect( "BlueCircle", 0, 0, 128, 128 );
 
 	g_dr = sprite->drawRequest( "BlueCircle", 0, 0, D3DCOLOR_RGBA( 255, 255, 255, 255 ) );
+	g_dr2 = sprite->drawRequestXformable( "BlueCircle" );
 
 	return S_OK;
 }
@@ -268,6 +270,26 @@ HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFA
 void CALLBACK OnFrameMove( double fTime, float fElapsedTime, void* pUserContext )
 {
 	HRESULT hr;
+
+	
+	if (g_dr)
+	{
+		if (g_dr->srcRect.right < 50)
+		{
+			g_spriteManager->getSprite( "GUI" )->removeDrawRequest( g_dr );
+		}
+		else
+		{
+			g_dr->srcRect.right -= 1;
+		}
+	}
+
+
+	D3DXMATRIX mRotX, mRotZ;
+	D3DXMatrixRotationX( &mRotX, D3DXToRadian( 45 ) );
+	D3DXMatrixRotationZ( &mRotZ, D3DXToRadian( (float)fTime ) );
+	g_dr2->xform = mRotX * mRotZ;
+
 	UNREFERENCED_PARAMETER( hr );
 
 	GetWorldManager().changeToNextWorldIfExist();

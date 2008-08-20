@@ -37,12 +37,12 @@ private:
 
 	void draw();
 	const DrawRequestList& getDrawRequestList() const { return m_drawReqList; }
+	const DrawRequestList& getDrawReqXformableList() const { return m_drawReqXformableList; }
 
 	RectMap m_rectMap;
 	LPDIRECT3DTEXTURE9 m_d3dTex;
-
-
 	
-	DrawRequestList m_drawReqList;
+	DrawRequestList m_drawReqList;				// Screen space sprite drawing
+	DrawRequestList m_drawReqXformableList;		// Object(3D) space sprite drawing
 
 };

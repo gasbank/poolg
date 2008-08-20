@@ -24,8 +24,8 @@ namespace eval EpCeilingWorld {
 	
 		set trigger		[ EpCreateUnitPositionTrigger $pHeroUnit 33 80 35 78 0x101 ]
 		set actions		[ EpCreateDialogAction "EpCeilingWorld::GetGDialog" ]
-		set actions		[ EpCreateScriptAction "EpCeilingWorld::Quest" ]
-		#set actions		[ EpCreateDialogAction "EpCeilingWorld::GetGDialog2" ]
+		lappend actions		[ EpCreateScriptAction "EpCeilingWorld::Quest" ]
+		#lappend actions		[ EpCreateDialogAction "EpCeilingWorld::GetGDialog2" ]
 				
 		set incident	[ EpCreateBlockingActionIncident $trigger 0 0 ]
 

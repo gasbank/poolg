@@ -17,6 +17,14 @@ DynamicMotion* DynamicMotion::createDMfireUniformly ( Unit* target, const D3DXVE
 
 bool DMfireUniformly::frameMove(float fElapsedTime)
 {
+	D3DXVECTOR3 newPos = m_target->getPos() + m_fireDir * m_velocity;
+	D3DXVECTOR3 vMoved = m_initPos - newPos;
+	float distToInitPos = D3DXVec3Length( &vMoved );
+	if ( distToInitPos > m_retainDist )
+	{
+		return false;
+	}
+	m_target->setPos(newPos);
 	return true;
 }
 
@@ -28,3 +36,4 @@ DMfireUniformly::DMfireUniformly ( Unit* target, const D3DXVECTOR3& initPos, con
 	m_retainDist = retainDist;
 	m_velocity = velocity;
 }
+

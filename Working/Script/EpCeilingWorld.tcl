@@ -23,7 +23,7 @@ namespace eval EpCeilingWorld {
 		global world hero npcGetg npcGloop pHeroUnit
 	
 		set trigger		[ EpCreateUnitPositionTrigger $pHeroUnit 33 80 35 78 0x101 ]
-		set actions		[ EpCreateFadeAction out 3500 ]
+		set actions		[ EpCreateDialogAction "EpCeilingWorld::GetGDialog" ]
 		set actions		[ EpCreateScriptAction "EpCeilingWorld::Quest" ]
 		#set actions		[ EpCreateDialogAction "EpCeilingWorld::GetGDialog2" ]
 				
@@ -41,8 +41,11 @@ namespace eval EpCeilingWorld {
 		global world hero npcGetg npcGloop pHeroUnit
 
 		set questtrigger	 [ EpCreateUnitPositionTrigger $pHeroUnit 29 83 31 81 0x101 ]
-		set questaction		 [ EpCreateFadeAction out 3500 ]
+		set questaction		 [ EpCreateDialogAction "EpCeilingWorld::GlooPDialog" ]
 		set questincident	 [ EpCreateBlockingActionIncident $questtrigger $questaction 0 ]
+
+		set incCount	[ EpRegisterIncident $questincident ]
+		EpOutputDebugString " - Incident count: $incCount\n"
 	}
 
 	proc init { curWorld } {

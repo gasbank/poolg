@@ -223,7 +223,7 @@ HRESULT Sound::init()
 	for( int i = 0; i < 2; i++ )
 	{
 		CHAR sz[256];
-		StringCchPrintfA( sz, 256, "battle%d-%d", i + 1 );
+		StringCchPrintfA( sz, 256, "battle%d", i + 1 );
 		audioState.iBattle[i] = audioState.pSoundBank->GetCueIndex( sz );
 	}
 	audioState.iOpening = audioState.pSoundBank->GetCueIndex( "opening" );

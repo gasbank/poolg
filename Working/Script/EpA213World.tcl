@@ -34,14 +34,18 @@ namespace eval EpA213World {
 		set animObjects [ list Blocking1 Blocking2 Blocking3 GateRight GateLeft GateCamera ]
 		
 		set trigger			[ EpCreateUnitPositionTrigger	$pHeroUnit 23 75 21 57 0x001 ]
-		set actions			[ EpCreateScriptAction			"EpSetDoAnim [ EpGetNode Blocking1  ] 1" ]
+		set actions			[ EpCreateControllableAction	$pHeroUnit 0 ]
+		lappend actions		[ EpCreateScriptAction			"EpSetDoAnim [ EpGetNode Blocking1  ] 1" ]
 		lappend actions		[ EpCreateScriptAction			"EpSetDoAnim [ EpGetNode Blocking2  ] 1" ]
 		lappend actions		[ EpCreateScriptAction			"EpSetDoAnim [ EpGetNode Blocking3  ] 1" ]
 		lappend actions		[ EpCreateScriptAction			"EpSetDoAnim [ EpGetNode GateRight  ] 1" ]
 		lappend actions		[ EpCreateScriptAction			"EpSetDoAnim [ EpGetNode GateLeft   ] 1" ]
 		lappend actions		[ EpCreateScriptAction			"EpSetDoAnim [ EpGetNode GateCamera ] 1" ]
 		lappend actions		[ EpCreateCameraAction			external GateCamera 0 ]
-		set incident		[ EpCreateIncident $trigger 0 0 ]
+		lappend actions		[ EpCreateDelayAction			15000 ]
+		lappend actions		[ EpCreateCameraAction			attach GateCamera 1500 ]
+		lappend actions		[ EpCreateControllableAction	$pHeroUnit 1 ]
+		set incident		[ EpCreateBlockingActionIncident $trigger 0 0 ]
 		foreach act $actions {
 			EpAddActionToIncident $incident $act
 		}

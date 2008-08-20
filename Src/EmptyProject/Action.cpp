@@ -354,6 +354,30 @@ Action* EpCreateControllableAction( void* target, int controllable )
 
 //////////////////////////////////////////////////////////////////////////
 
+
+DelayAction::DelayAction( int delayMs )
+: m_delayMs( delayMs ), m_activateElapsedTime( 0 )
+{}
+void DelayAction::activate()
+{}
+
+bool DelayAction::update( double dTime, float fElapsedTime )
+{
+	m_activateElapsedTime += fElapsedTime;
+	if ( m_activateElapsedTime > m_delayMs/1000.0f )
+		return false;
+	else
+		return true;
+}
+
+Action* EpCreateDelayAction( int delayMs )
+{
+	return new DelayAction( delayMs );
+} SCRIPT_CALLABLE_PV_I( EpCreateDelayAction )
+
+
+//////////////////////////////////////////////////////////////////////////
+
 START_SCRIPT_FACTORY( Action )
 	CREATE_OBJ_COMMAND( EpCreateDialogAction )
 	CREATE_OBJ_COMMAND( EpCreateSoundAction )
@@ -365,4 +389,6 @@ START_SCRIPT_FACTORY( Action )
 	CREATE_OBJ_COMMAND( EpCreateTeleportAction )
 	CREATE_OBJ_COMMAND( EpCreateCameraAction )
 	CREATE_OBJ_COMMAND( EpCreateControllableAction )
+	CREATE_OBJ_COMMAND( EpCreateDelayAction )
 END_SCRIPT_FACTORY( Action )
+

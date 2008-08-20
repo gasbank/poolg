@@ -105,6 +105,25 @@ private:
 	Unit* m_createUnit;
 };
 
+
+//////////////////////////////////////////////////////////////////////////
+
+// Should be applied blocked type incident only
+class DelayAction : public Action
+{
+public:
+	DelayAction( int delayMs );
+	virtual ~DelayAction() {}
+
+	virtual void activate();
+	virtual bool update( double dTime, float fElapsedTime );
+
+private:
+	float m_activateElapsedTime;
+	int m_delayMs; // delay in milliseconds
+};
+
+
 //////////////////////////////////////////////////////////////////////////
 
 class UnitMoveAction : public Action

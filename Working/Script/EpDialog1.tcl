@@ -1,4 +1,13 @@
-set EpDialogList [list EpDialog2 EpDialog3 EpDialog4 EpDialogStop EpDialogHeal EpDialogBox EpDialogMirror EpDialogLaserOff EpDialogLaserOn EpDialogSave EpDialogReturn];
+#----------------------------------------------------------------------------------#
+#                                                                                  #
+#   EmptyProject: Global Dialogs Definition Script                                 #
+#                                                                                  #
+#----------------------------------------------------------------------------------#
+
+
+set EpDialogList [list	EpDialog2 EpDialog3 EpDialog4 EpDialogStop\
+						EpDialogHeal EpDialogBox EpDialogMirror\
+						EpDialogLaserOff EpDialogLaserOn EpDialogSave EpDialogReturn ];
 
 namespace eval EpDialog2 {
 	

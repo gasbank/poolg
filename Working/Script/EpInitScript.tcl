@@ -1,8 +1,14 @@
+#----------------------------------------------------------------------------------#
+#                                                                                  #
+#   EmptyProject: Initialization Script                                            #
+#                                                                                  #
+#----------------------------------------------------------------------------------#
+
 set EpWorldList [ list EpCeilingWorld EpRoomWorld EpA213World EpTestStage ]
-set EpStartWorldName EpCeilingWorld
+set EpStartWorldName EpTestStage
 
 proc EpInitApp {} {
-	# 16:9 widescreen resolution
+	# Screen Resolution
 	set w1 4
 	set h1 3
 	set multiplier 200
@@ -10,12 +16,19 @@ proc EpInitApp {} {
 }
 
 proc EpInitGame {} {
+	
+	# initialState:		1000	Intro
+	#					1001	Play
+	#					1002	Credit
+	
 	set initialState 1001
 	EpSetNextState $initialState
 	EpOutputDebugString "<Script> EpInitGame called\n"
 }
 
-####################################################################################
+#----------------------------------------------------------------------------------#
+
+# Common Ep functions helpers
 
 proc createHero { tileX tileY } {
 	set curWorld [ EpGetCurWorld ];
@@ -33,6 +46,12 @@ proc createEnemy { tileX tileY { registerWorld 1 } } {
 	return $unit
 }
 
+# enum UnitPositionTriggerType {
+# 	UPTT_ENTER  = 0x001,
+#	UPTT_LEAVE  = 0x010,
+#	UPTT_STAY	= 0x100 
+# };
+
 proc createWarpPosition { nextWorldName tx0 ty0 { tx1 -1 } { ty1 -1 } } {
 	set trigger		[ EpCreateUnitPositionTrigger [ EpGetHero ] $tx0 $ty0 $tx1 $ty1 0x001 ]
 	set action		[ EpCreateScriptAction "EpChangeWorld $nextWorldName" ]
@@ -49,7 +68,9 @@ proc createStructureObject { tileX tileY { pushable 1 } } {
 	return $unit
 }
 
-####################################################################################
+#----------------------------------------------------------------------------------#
+
+# Utilities
 
 proc ToRadian {deg} {
 	return [expr $deg * 3.14159265358979323846 / 180.0]

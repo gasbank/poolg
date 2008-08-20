@@ -74,6 +74,8 @@ void SpriteManager::frameRender()
 				const DrawRequest* drawReq = *itDr;
 				for ( ; itDr != dr.end(); ++itDr )
 				{
+					D3DXMATRIX centerBiased = drawReq->xform;
+					*((D3DXVECTOR3*)&centerBiased._41) -= drawReq->center;
 					m_dev->SetTransform( D3DTS_WORLD, &drawReq->xform );
 					m_d3dxObjectSprite->Draw( it->second->getTexture(), &drawReq->srcRect, &drawReq->center, &drawReq->position, drawReq->color );
 				}

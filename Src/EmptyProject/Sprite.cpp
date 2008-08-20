@@ -15,6 +15,7 @@ void Sprite::release()
 {
 	SAFE_RELEASE( m_d3dTex );
 	EpSafeReleaseAll( m_drawReqList );
+	EpSafeReleaseAll( m_drawReqXformableList );
 }
 
 void Sprite::registerRect( const char* rectName, const RECT& rect )
@@ -37,7 +38,7 @@ void Sprite::registerRect( const char* rectName, long left, long top, long right
 }
 DrawRequest* Sprite::drawRequest( const char* rectName, const D3DXVECTOR3* center, const D3DXVECTOR3* position, D3DCOLOR color )
 {
-	DrawRequest* dr = new DrawRequest();
+	DrawRequest* dr = new DrawRequest( false );
 	RectMap::iterator it = m_rectMap.find( rectName );
 	if ( it != m_rectMap.end() )
 		dr->srcRect = m_rectMap[ rectName ];
@@ -59,14 +60,16 @@ DrawRequest* Sprite::drawRequest( const char* rectName, const D3DXVECTOR3* cente
 
 DrawRequest* Sprite::drawRequestXformable( const char* rectName )
 {
-	DrawRequest* dr = new DrawRequest();
+	DrawRequest* dr = new DrawRequest( true );
 	RectMap::iterator it = m_rectMap.find( rectName );
 	if ( it != m_rectMap.end() )
 		dr->srcRect = m_rectMap[ rectName ];
 	else
 		throw std::runtime_error( "Specified rectName does not exist" );
 	
-	dr->center = DX_CONSTS::D3DXVEC3_ZERO;
+	dr->center.x = (dr->srcRect.right - dr->srcRect.left + 1) * 0.5f;
+	dr->center.y = (dr->srcRect.bottom - dr->srcRect.top + 1) * 0.5f;
+	dr->center.z = 0;
 	dr->color = D3DCOLOR_RGBA( 255, 255, 255, 255 );
 	dr->position = DX_CONSTS::D3DXVEC3_ZERO;
 	dr->xform = DX_CONSTS::D3DXMAT_IDENTITY;
@@ -77,6 +80,10 @@ DrawRequest* Sprite::drawRequestXformable( const char* rectName )
 
 void Sprite::removeDrawRequest( DrawRequest*& dr )
 {
-	m_drawReqList.remove( dr );
+	if ( !dr->bXformable )
+		m_drawReqList.remove( dr );
+	else
+		m_drawReqXformableList.remove( dr );
+
 	EP_SAFE_RELEASE( dr );
 }

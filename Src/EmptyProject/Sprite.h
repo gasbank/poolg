@@ -3,15 +3,28 @@
 class SpriteManager;
 
 typedef std::map<std::string, RECT> RectMap;
-
-struct DrawRequest
+class DrawRequest
 {
+
+public:
+	DrawRequest( bool bXformable ) : bXformable( bXformable ) {}
 	void release() {}
+	const bool bXformable;
 	RECT srcRect;
 	D3DXVECTOR3 center;
 	D3DXVECTOR3 position;
 	D3DXMATRIX xform;
 	D3DCOLOR color;
+private:
+	DrawRequest operator = ( const DrawRequest& rhs )
+	{
+		srcRect		= rhs.srcRect;
+		center		= rhs.center;
+		position	= rhs.position;
+		xform		= rhs.xform;
+		color		= rhs.color;
+		return *this;
+	}
 };
 
 class Sprite

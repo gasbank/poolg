@@ -30,7 +30,6 @@ enum UnitType { UT_UNIT, UT_CHARACTER, UT_HERO, UT_ENEMY, UT_ATTACKOBJECT, UT_IN
 class Unit
 {
 public:
-	static Unit*					createUnit( LPD3DXMESH mesh, int tileX = 0, int tileY = 0, float posZ = 0 );
 	virtual							~Unit();
 
 	HRESULT							init( LPDIRECT3DDEVICE9 pd3dDevice, LPD3DXMESH mesh );
@@ -76,13 +75,13 @@ public:
 	const Point2Uint&				getTileBufferPos() const				{ return m_tileBufferPos; }
 	
 	void							setRemoveFlag( bool flag )				{ m_removeFlag = flag; }
-	bool							getRemoveFlag()							{ return m_removeFlag; }
+	bool							getRemoveFlag() const					{ return m_removeFlag; }
 
 	bool							getMovable() const						{ return m_bMovable; }
 	void							setMovable( bool val )					{ m_bMovable = val; }
 
 	UnitType						getType() const							{ return m_type; }
-	World*							getCurWorld()							{ return GetWorldManager().getCurWorld(); }
+	World*							getCurWorld() const						{ return GetWorldManager().getCurWorld(); }
 	void							setDynamicMotion( DynamicMotion* dm )	{ m_dm = dm; }
 	void							setForcedMove( int i );
 	void							forcedMoveTest();
@@ -106,9 +105,10 @@ protected:
 	LPD3DXMESH						m_d3dxMesh;
 	LPDIRECT3DTEXTURE9				m_d3dTex;
 
-	virtual UnitInput				mapKey( UINT nKey );
+	virtual UnitInput				mapKey( UINT nKey ) const;
 
 private:
+	static Unit*					createUnit( LPD3DXMESH mesh, int tileX = 0, int tileY = 0, float posZ = 0 );
 	World*							getWorldState() const;
 	void							drawSoul();
 	void							updateSoulAnimation( float fElapsedTime );

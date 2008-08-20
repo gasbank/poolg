@@ -142,7 +142,7 @@ void Unit::updateLocalXform()
 	}
 }
 
-UnitInput Unit::mapKey( UINT nKey )
+UnitInput Unit::mapKey( UINT nKey ) const
 {
 	switch( nKey )
 	{
@@ -432,15 +432,15 @@ void Unit::setViewAt( const D3DXVECTOR3* at )
 }
 
 //////////////////////////////////////////////////////////////////////////
-
-Unit* EpCreateUnit( int tileX, int tileY )
-{
-	LPD3DXMESH d3dxMesh;
-	D3DXCreateTeapot( GetG().m_dev, &d3dxMesh, 0 );
-
-	return Unit::createUnit( d3dxMesh, tileX, tileY, 0 );
-
-} SCRIPT_CALLABLE_PV_I_I( EpCreateUnit )
+//
+//Unit* EpCreateUnit( int tileX, int tileY )
+//{
+//	LPD3DXMESH d3dxMesh;
+//	D3DXCreateTeapot( GetG().m_dev, &d3dxMesh, 0 );
+//
+//	return Unit::createUnit( d3dxMesh, tileX, tileY, 0 );
+//
+//} SCRIPT_CALLABLE_PV_I_I( EpCreateUnit )
 
 int EpReleaseUnit( void* pv )
 {
@@ -535,7 +535,7 @@ int EpUnitSetColor( void* ptr, int r, int g, int b )
 
 
 START_SCRIPT_FACTORY( Unit )
-	CREATE_OBJ_COMMAND( EpCreateUnit )
+	//CREATE_OBJ_COMMAND( EpCreateUnit )
 	CREATE_OBJ_COMMAND( EpReleaseUnit )
 	CREATE_OBJ_COMMAND( EpRegisterToWorld )
 	CREATE_OBJ_COMMAND( EpUnitSetRotX )

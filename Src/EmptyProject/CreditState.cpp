@@ -2,7 +2,6 @@
 #include "CreditState.h"
 #include "EpCamera.h"
 #include "TopStateManager.h"
-#include "Unit.h"
 
 const float CreditState::s_period = 7.0f;
 const float CreditState::s_fadeIn = 2.0f;
@@ -48,7 +47,6 @@ CreditState::CreditState( void )
 	m_startTime			= -1.0f;
 	m_textColor			= D3DXCOLOR( 0.8f, 0.9f, 0.7f, 0.0f );
 	m_creditStartTime	= 0;
-	m_text3D			= 0;
 }
 
 CreditState::~CreditState( void )
@@ -69,12 +67,7 @@ HRESULT CreditState::enter()
 
 	setupLight();
 	
-	LPD3DXMESH text3D;
-	createD3DXTextMesh( pd3dDevice, L"Hello World", &text3D, 100, L"Times New Roman" );
-	m_text3D = Unit::createUnit( text3D );
-	m_text3D->setUniformScale( 40.0f );
-	m_text3D->setPosX( - 40.0f * ( m_text3D->getUpperRight().x - m_text3D->getLowerLeft().x ) / 2 );
-
+	
 	ZeroMemory( &m_textMat, sizeof( D3DMATERIAL9 ) );
 	m_textMat.Ambient.r = m_textMat.Ambient.g = m_textMat.Ambient.b = 0.9f;
 	m_textMat.Specular.r = m_textMat.Specular.g = m_textMat.Specular.b = 1.0f;
@@ -166,8 +159,6 @@ HRESULT CreditState::frameMove( double fTime, float fElapsedTime )
 	if ( m_textMatAlpha < 0 )
 		m_textMatAlpha = 0;
 
-	m_text3D->frameMove( fElapsedTime );
-
 	if ( fStateTime >= s_period * 4)
 	{
 		TopStateManager::getSingleton().setNextState( GAME_TOP_STATE_PLAY );
@@ -193,7 +184,6 @@ HRESULT CreditState::release()
 {
 	SAFE_RELEASE( m_d3dxFont );
 	SAFE_RELEASE( m_d3dxFontBig );
-	EP_SAFE_RELEASE(m_text3D);
 	return S_OK;
 }
 

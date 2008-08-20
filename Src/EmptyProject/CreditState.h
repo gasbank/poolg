@@ -1,7 +1,6 @@
 #pragma once
 
 #include "State.h"
-#include "Unit.h"
 
 class CreditState : public State
 {
@@ -25,7 +24,6 @@ private:
 	LPD3DXFONT						m_d3dxFont;
 	LPD3DXFONT						m_d3dxFontBig;
 
-	Unit*							m_text3D;
 	D3DMATERIAL9					m_textMat;
 	float							m_textMatAlpha;
 

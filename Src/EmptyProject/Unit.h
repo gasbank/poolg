@@ -115,8 +115,7 @@ protected:
 private:
 	World* getWorldState() const;
 
-	void drawSoul( D3DXVECTOR3 vTrans, float alpha );
-	void drawSoulAnimation();
+	void drawSoul();
 	void updateSoulAnimation( float fElapsedTime );
 
 	struct TeapotVertex
@@ -151,6 +150,11 @@ private:
 	float					m_fSoulAnimationTimer;
 	float					m_fSoulAnimationDuration;
 	float					m_fSoulAnimationHeight;
+	D3DXMATRIX				m_localXformSoul;
+	D3DMATERIAL9			m_materialSoul;
+	bool					m_bSoulAnimation;
+	D3DXMATRIX				m_prevLocalXform;
+	D3DMATERIAL9			m_prevMaterial;
 };
 
 SCRIPT_FACTORY( Unit )

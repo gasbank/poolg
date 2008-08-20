@@ -22,13 +22,17 @@
 #include "World.h"
 #include "Dialog.h"
 #include <process.h>
+#include "SpriteManager.h"
+#include "Sprite.h"
+
+
 G								g_g;
 WorldManager*					g_wm					= 0;
 TopStateManager*				g_tsm					= 0;
 WorldStateManager*				g_wsm					= 0;
 ScriptManager*					g_scriptManager			= 0;		// Set to zero is 'CRUCIAL!'
 BombShader*						g_bombShader			= 0;
-//AlphaShader*					g_alphaShader			= 0;
+SpriteManager*					g_spriteManager			= 0;
 
 LPD3DXFONT						g_pFont					= 0;
 LPD3DXEFFECT		            g_pEffect				= 0;
@@ -37,8 +41,6 @@ LPDIRECT3DVERTEXBUFFER9			g_lineElement			= 0;
 HANDLE							g_scriptBindingFinishedEvent				= 0;		// Signal object to resolve multi-threaded problems on console thread and main app thread
 
 LPD3DXMESH						g_testTeapot			= 0;
-//LPD3DXMESH						g_testPolygon			= 0;
-//LPD3DXMESH						g_testPolygonCloned		= 0;
 
 D3DCOLOR						g_fillColor;
 
@@ -48,6 +50,10 @@ Tcl_Interp*						g_consoleInterp			= 0;
 
 std::wstring g_debugBuffer;
 bool							g_bTileGrid				= false;
+
+
+LPD3DXSPRITE					g_d3dxSprite			= 0;
+LPDIRECT3DTEXTURE9				g_tex					= 0;
 
 
 //--------------------------------------------------------------------------------------
@@ -82,6 +88,7 @@ bool CALLBACK ModifyDeviceSettings( DXUTDeviceSettings* pDeviceSettings, void* p
 	return true;
 }
 
+DrawRequest* g_dr;
 
 //--------------------------------------------------------------------------------------
 // Create any D3D9 resources that will live through a device reset (D3DPOOL_MANAGED)
@@ -204,6 +211,17 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 	GetG().m_screenFlash.setup();
 	GetG().m_EpLight.setupLight();
 
+
+	V( D3DXCreateSprite( pd3dDevice, &g_d3dxSprite ) );
+	D3DXCreateTextureFromFile( pd3dDevice, L"Images/UI.png", &g_tex );
+
+	g_spriteManager = new SpriteManager( pd3dDevice );
+
+	Sprite* sprite = g_spriteManager->registerSprite( "GUI", "Images/UI.png" );
+	sprite->registerRect( "BlueCircle", 0, 0, 128, 128 );
+
+	g_dr = sprite->drawRequest( "BlueCircle", 0, 0, D3DCOLOR_RGBA( 255, 255, 255, 255 ) );
+
 	return S_OK;
 }
 
@@ -222,6 +240,8 @@ HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFA
 	pd3dDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
 	pd3dDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 	pd3dDevice->SetRenderState(D3DRS_ZENABLE, TRUE);
+
+	// MacBook Air has problem with this render state... strange
 	//pd3dDevice->SetRenderState(D3DRS_SHADEMODE, D3DSHADE_PHONG);
 
 	pd3dDevice->SetSamplerState( 0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR );
@@ -237,6 +257,7 @@ HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFA
 
 	GetG().m_screenFlash.reset( pd3dDevice, pBackBufferSurfaceDesc, pUserContext);
 
+	g_d3dxSprite->OnResetDevice();
 	return S_OK;
 }
 
@@ -247,7 +268,6 @@ HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFA
 void CALLBACK OnFrameMove( double fTime, float fElapsedTime, void* pUserContext )
 {
 	HRESULT hr;
-
 	UNREFERENCED_PARAMETER( hr );
 
 	GetWorldManager().changeToNextWorldIfExist();
@@ -420,9 +440,10 @@ void CALLBACK OnD3D9FrameRender( IDirect3DDevice9* pd3dDevice, double fTime, flo
 		State* curState = GetTopStateManager().getCurState();
 
 		curState->frameRender(pd3dDevice, fTime, fElapsedTime);
-		
 
 		renderFixedElements( fTime, fElapsedTime );
+
+		g_spriteManager->frameRender();
 		
 		//////////////////////////////////////////////////////////////////////////
 		V( pd3dDevice->EndScene() );
@@ -459,6 +480,8 @@ void CALLBACK OnD3D9LostDevice( void* pUserContext )
 {
 	if ( g_bombShader )
 		g_bombShader->onLostDevice();
+	if ( g_d3dxSprite )
+		g_d3dxSprite->OnLostDevice();
 }
 
 
@@ -469,18 +492,19 @@ void CALLBACK OnD3D9DestroyDevice( void* pUserContext )
 {
 	SAFE_RELEASE( g_pFont );
 	SAFE_RELEASE( g_testTeapot );
-	//SAFE_RELEASE( g_testPolygon );
-	//SAFE_RELEASE( g_testPolygonCloned );
 
 	EP_SAFE_RELEASE( g_tsm );
 	EP_SAFE_RELEASE( g_wsm );
 	EP_SAFE_RELEASE( g_bombShader );
-	//EP_SAFE_RELEASE( g_alphaShader );
-	//EP_SAFE_RELEASE( g_alphaShader );
 
 	SAFE_RELEASE( g_lineElement );
 
+	SAFE_RELEASE( g_d3dxSprite );
+	SAFE_RELEASE( g_tex );
+
 	EP_SAFE_RELEASE( g_wm );
+
+	SAFE_DELETE( g_spriteManager );
 
 	GetG().m_videoMan.SetDev(0);
 	GetG().m_screenFlash.release();

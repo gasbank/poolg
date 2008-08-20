@@ -958,6 +958,22 @@
 			>
 		</File>
 		<File
+			RelativePath=".\Sprite.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\Sprite.h"
+			>
+		</File>
+		<File
+			RelativePath=".\SpriteManager.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\SpriteManager.h"
+			>
+		</File>
+		<File
 			RelativePath=".\Utility.cpp"
 			>
 		</File>

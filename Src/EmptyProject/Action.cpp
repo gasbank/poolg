@@ -98,7 +98,7 @@ void SoundAction::activate()
 		GetAudioState().bBGMFade = true;
 		GetAudioState().bMusicFade = false;
 		GetAudioState().pEngine->Stop( GetAudioState().iMusicCategory, 0 );
-		GetAudioState().pSoundBank->Play( GetAudioState().iBattle, 0, 0, NULL );
+		GetAudioState().pSoundBank->Play( GetAudioState().iBattle[GetAudioState().nCurWorld], 0, 0, NULL );
 	}
 	else if ( m_soundName == "End Battle" )
 	{

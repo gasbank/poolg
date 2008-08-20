@@ -1,5 +1,7 @@
 #include "EmptyProjectPCH.h"
 #include "Sound.h"
+#include "WorldManager.h"
+#include "World.h"
 
 IMPLEMENT_SINGLETON( AUDIO_STATE );
 
@@ -21,6 +23,7 @@ HRESULT Sound::init()
 	InitializeCriticalSection( &audioState.cs );
 
 	audioState.nCurSongPlaying = -1;
+	audioState.nCurWorld = -1;
 	
 	audioState.bGlobalPaused = false;
 	audioState.bMusicPaused = false;
@@ -209,12 +212,23 @@ HRESULT Sound::init()
     audioState.iSE = audioState.pSoundBank->GetCueIndex( "se" );
 	for( int i = 0; i < 2; i++ )
     {
-        CHAR sz[256];
-        StringCchPrintfA( sz, 256, "song%d", i + 1 );
-        audioState.iSong[i] = audioState.pSoundBank->GetCueIndex( sz );
+		for( int j = 0; j < 2; j++)
+		{
+	        CHAR sz[256];
+	        StringCchPrintfA( sz, 256, "stage%d-%d", i + 1, j + 1 );
+		    audioState.iStage[i][j] = audioState.pSoundBank->GetCueIndex( sz );
+		}
     }
+
+	for( int i = 0; i < 2; i++ )
+	{
+		CHAR sz[256];
+		StringCchPrintfA( sz, 256, "battle%d-%d", i + 1 );
+		audioState.iBattle[i] = audioState.pSoundBank->GetCueIndex( sz );
+	}
 	audioState.iOpening = audioState.pSoundBank->GetCueIndex( "opening" );
-	audioState.iBattle = audioState.pSoundBank->GetCueIndex( "battle" );
+	audioState.iBoss = audioState.pSoundBank->GetCueIndex( "boss" );
+	audioState.iCeiling = audioState.pSoundBank->GetCueIndex( "ceiling" );
 
 	audioState.iGlobalCategory = audioState.pEngine->GetCategory( "Global" );
 	audioState.iMusicCategory = audioState.pEngine->GetCategory( "Music" );
@@ -251,12 +265,12 @@ LRESULT Sound::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 				if(	audioState.bBGMStopped )
 				{
 					audioState.bBGMStopped = false;
-					audioState.pSoundBank->Play( audioState.iSong[audioState.nCurSongPlaying], 0, 0, NULL );
+					audioState.pSoundBank->Play( audioState.iStage[audioState.nCurWorld][audioState.nCurSongPlaying], 0, 0, NULL );
 				}
 				else
 				{
 					audioState.bBGMStopped = true;
-					audioState.pSoundBank->Stop( audioState.iSong[audioState.nCurSongPlaying], 0 );
+					audioState.pSoundBank->Stop( audioState.iStage[audioState.nCurWorld][audioState.nCurSongPlaying], 0 );
 				}
 			}
 			if( wParam == 'N' )
@@ -329,13 +343,23 @@ void WINAPI XACTNotificationCallback( const XACT_NOTIFICATION* pNotification )
     // In this simple tutorial, we will respond to a cue stop notification for the song 
     // cues by simply playing another song but its ultimately it's up the application 
     // and sound designer to decide what to do when a notification is received. 
+	if( GetWorldManager().getCurWorld()->getWorldName() == "EpRoomWorld" )
+		audioState.nCurWorld = 0;
+	else if( GetWorldManager().getCurWorld()->getWorldName() == "EpA213World" )
+		audioState.nCurWorld = 1;
+	else if( GetWorldManager().getCurWorld()->getWorldName() == "EpCeilingWorld" )
+		audioState.nCurWorld = 2;
+	else
+		audioState.nCurWorld = -1;
 
 	if( audioState.bBGMStopped )
 		return;
 
     if( pNotification->type == XACTNOTIFICATIONTYPE_CUESTOP &&
-        ( pNotification->cue.cueIndex == audioState.iSong[0] ||
-          pNotification->cue.cueIndex == audioState.iSong[1] ) )
+        ( pNotification->cue.cueIndex == audioState.iStage[0][0] ||
+          pNotification->cue.cueIndex == audioState.iStage[0][1] ||
+		  pNotification->cue.cueIndex == audioState.iStage[1][0] ||
+		  pNotification->cue.cueIndex == audioState.iStage[1][1] ) )
     {
         // The previous background song ended, so pick and new song to play it
         EnterCriticalSection( &audioState.cs );
@@ -397,7 +421,14 @@ void Sound::UpdateAudio()
         // has been prepared but no sooner.  The background music does not need to be 
         // zero-latency so the cues do not need to be prepared first 
         audioState.nCurSongPlaying = 0;
-        audioState.pSoundBank->Play( audioState.iSong[audioState.nCurSongPlaying], 0, 0, NULL );
+        if ( audioState.nCurWorld != -1 )
+        {
+        	if ( audioState.nCurWorld == 2 )
+				audioState.pSoundBank->Play( audioState.iCeiling, 0, 0, NULL );
+			else
+				audioState.pSoundBank->Play( audioState.iStage[audioState.nCurWorld][audioState.nCurSongPlaying], 0, 0, NULL );
+				
+        }
     }
 
     if( audioState.bHandleSongStopped )
@@ -406,7 +437,14 @@ void Sound::UpdateAudio()
         audioState.bHandleSongStopped = false;
         LeaveCriticalSection( &audioState.cs );
 
-        audioState.pSoundBank->Play( audioState.iSong[audioState.nCurSongPlaying], 0, 0, NULL );
+		audioState.nCurSongPlaying = 0;
+		if ( audioState.nCurWorld != -1 )
+		{
+			if ( audioState.nCurWorld == 2 )
+				audioState.pSoundBank->Play( audioState.iCeiling, 0, 0, NULL );
+			else
+				audioState.pSoundBank->Play( audioState.iStage[audioState.nCurWorld][audioState.nCurSongPlaying], 0, 0, NULL );
+		}
     }
 
 
@@ -477,7 +515,7 @@ void AUDIO_STATE::enterBattle()
 	audioState.bBGMFade = true;
 	audioState.bMusicFade = false;
 	audioState.pEngine->Stop( GetAudioState().iMusicCategory, 0 );
-	audioState.pSoundBank->Play( GetAudioState().iBattle, 0, 0, NULL );
+	audioState.pSoundBank->Play( GetAudioState().iBattle[GetAudioState().nCurWorld], 0, 0, NULL );
 }
 
 void AUDIO_STATE::leaveBattle()

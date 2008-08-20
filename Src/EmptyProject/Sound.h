@@ -6,9 +6,11 @@ class AUDIO_STATE : public Singleton<AUDIO_STATE>
 {
 public:
 	XACTINDEX iSE;
-    XACTINDEX iSong[2];
+    XACTINDEX iStage[2][2];
 	XACTINDEX iOpening;
-	XACTINDEX iBattle;
+	XACTINDEX iBattle[2];
+	XACTINDEX iBoss;
+	XACTINDEX iCeiling;
 
 	XACTCATEGORY iGlobalCategory;
 	XACTCATEGORY iMusicCategory;
@@ -39,6 +41,7 @@ public:
 	bool bBGMStopped;
 
     int nCurSongPlaying;
+	int nCurWorld;
 
 	void enterBattle();
 	void leaveBattle();

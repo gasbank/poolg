@@ -50,7 +50,7 @@ void EpLight::setupLight()
 	m_light.Attenuation2 = 0.0f;
 
 	GetG().m_dev->SetLight(1, &m_light);
-	GetG().m_dev->LightEnable( 1, FALSE );
+	GetG().m_dev->LightEnable( 1, TRUE );
 
 	m_cAmbient = cvAmb;
 	m_cDiffuse = cvDif;
@@ -105,8 +105,13 @@ void EpLight::frameMove( FLOAT fElapsedTime )
 	// 의도는 위와 같았으나 현재 기본으로 LIGHT_FADE 스테이트임.
 	m_eLightState = LIGHT_NORMAL;
 
-	updateFadeBrightness( fElapsedTime );
-	updateFlicker( fElapsedTime );
+	if ( m_fDelay > 0.0f )
+		m_fDelay -= fElapsedTime;
+	else
+	{
+		updateFadeBrightness( fElapsedTime );
+		updateFlicker( fElapsedTime );
+	}
 
 	switch ( m_eLightState )
 	{
@@ -123,9 +128,9 @@ void EpLight::frameMove( FLOAT fElapsedTime )
 		m_light.Specular = m_cFlickerSpecular * m_fBrightness;
 		break;
 	case LIGHT_NORMAL:
-		m_light.Ambient = m_cAmbient;
-		m_light.Diffuse = m_cDiffuse;
-		m_light.Specular = m_cSpecular;
+		m_light.Ambient = m_cAmbient * m_fBrightness;
+		m_light.Diffuse = m_cDiffuse * m_fBrightness;
+		m_light.Specular = m_cSpecular * m_fBrightness;
 		break;
 	}
 
@@ -140,7 +145,7 @@ void EpLight::frameMove( FLOAT fElapsedTime )
 
 	m_light.Position = m_vPos;
 
-	
+
 	m_bLightValueDirty = true;
 
 	if ( m_bLightValueDirty )
@@ -149,6 +154,7 @@ void EpLight::frameMove( FLOAT fElapsedTime )
 		m_bLightValueDirty = false;
 		//printf("lightPos: %f %f %f \n", m_light.Position.x, m_light.Position.y, m_light.Position.z );
 	}
+
 }
 
 void EpLight::fadeInLight()
@@ -157,6 +163,16 @@ void EpLight::fadeInLight()
 
 	m_fFadeTimer += 0.01f;
 	m_fFadeTimerSign = 1.0f;
+}
+
+void EpLight::fadeInLightForcedDelayed( float delay )
+{
+	turnOnLight();
+
+	m_fFadeTimer = 0.01f;
+	m_fFadeTimerSign = 1.0f;
+
+	m_fDelay = delay;
 }
 
 void EpLight::fadeOutLight()
@@ -200,8 +216,9 @@ void EpLight::updateFadeBrightness( float fElapsedTime )
 
 	m_fBrightness = abs( sin( D3DXToRadian( m_fFadeTimer / m_fFadeDuration * 90.0f ) ) );
 
-	//printf( "FadeTimer = %f \n", m_fFadeTimer );
-	//printf( "Brightness = %f \n", m_fBrightness );
+	
+	/*printf( "FadeTimer = %f \n", m_fFadeTimer );
+	printf( "Brightness = %f \n", m_fBrightness );*/
 }
 
 void EpLight::updateFlicker( float fElapsedTime )

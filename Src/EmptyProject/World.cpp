@@ -110,11 +110,8 @@ HRESULT World::init()
 
 	m_curDialog = 0;
 
-	GetG().m_EpLight.setFadeDuration( 5.0f );
-	GetG().m_EpLight.fadeInLight();
 	GetG().m_camera.setAttachPos( &getHeroPos() );
 	GetG().m_camera.begin( CAMERA_ATTACH );
-
 	return hr;
 }
 

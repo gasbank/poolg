@@ -19,9 +19,11 @@ public:
 	void setFlickerColor( D3DXCOLOR& color );
 	void setLightPos( D3DXVECTOR3& pos ) { m_light.Position = pos; m_bLightValueDirty = true; }
 	void setLightDir( D3DXVECTOR3& dir ) { m_light.Direction = dir; m_bLightValueDirty = true; }
+	void setBrightness( float b ) { m_fBrightness = b; }
 	void turnOnLight();
 	void turnOffLight();
 	void fadeInLight();
+	void fadeInLightForcedDelayed( float d );
 	void fadeOutLight();
 	void flicker( float flickerDuration );
 	void stopFlicker() { m_fFlickerDuration = 0.0f; }
@@ -50,4 +52,6 @@ private:
 
 	D3DXVECTOR3			m_vDir;
 	D3DXVECTOR3			m_vPos;
+
+	float				m_fDelay;
 };

@@ -378,7 +378,7 @@ void Unit::drawSoul( D3DXVECTOR3 vTrans, float alpha )
 	localXform = localXform * translation;
 	
 	D3DCOLORVALUE cv;
-	cv.r = cv.g = cv.b = 0.5f; cv.a = alpha;
+	cv.r = cv.g = cv.b = 1.0f; cv.a = alpha;
 	material.Ambient = material.Diffuse = material.Specular = cv;
 	
 	m_pd3dDevice->SetTransform(D3DTS_WORLD, &localXform);
@@ -409,8 +409,8 @@ void Unit::drawSoulAnimation()
 	float ratio = m_fSoulAnimationTimer / m_fSoulAnimationDuration;
 	float height = sin( D3DXToRadian( ratio * 90.0f + 90.0f ) ) * m_fSoulAnimationHeight;
 
-	D3DXVECTOR3 vTrans( 0.0f, 0.0f, -5.0f);
-	drawSoul( vTrans, 0.3f );
+	D3DXVECTOR3 vTrans( 0.0f, 0.0f, -height );
+	drawSoul( vTrans, ratio / 2.0f );
 
 	if ( m_fSoulAnimationTimer != 0.0f )
 		printf( "Soul height, alpha, timer : %f, %f, %f \n", height, ratio, m_fSoulAnimationTimer );;

@@ -1,5 +1,5 @@
 set EpWorldList [ list EpCeilingWorld EpRoomWorld EpA213World EpTestStage ]
-set EpStartWorldName EpRoomWorld
+set EpStartWorldName EpCeilingWorld
 
 proc EpInitApp {} {
 	# 16:9 widescreen resolution

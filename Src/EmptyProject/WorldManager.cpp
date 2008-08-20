@@ -44,11 +44,13 @@ void WorldManager::setNextWorld( const char* nextWorldName )
 		setNextWorld( m_worlds[ nextWorldName ] );
 	else
 		throw std::runtime_error( "World name not found" );
+
 }
 
 void WorldManager::setNextWorld( World* nextWorld )
 {
 	m_nextWorld = nextWorld;
+
 }
 
 void WorldManager::detachAllWorlds()

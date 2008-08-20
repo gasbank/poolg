@@ -23,6 +23,10 @@ Unit::Unit( UnitType type )
 	m_pd3dDevice		= 0;
 	m_d3dTex			= 0;
 
+	m_fSoulAnimationDuration	= 1.0f;
+	m_fSoulAnimationHeight		= 10.0f;
+	m_fSoulAnimationTimer		= 0.0f;
+
 	m_tilePos			= Point2Uint::ZERO;
 	m_tileBufferPos		= m_tilePos;
 
@@ -80,6 +84,7 @@ void Unit::setTilePos( const Point2Uint& newPos )
 {
 	setTilePos( newPos.x, newPos.y );
 }
+
 HRESULT Unit::frameRender()
 {
 	HRESULT hr = S_OK;
@@ -93,6 +98,8 @@ HRESULT Unit::frameRender()
 		m_pd3dDevice->SetRenderState( D3DRS_CULLMODE, D3DCULL_CW );
 		GetG().m_videoMan.renderMeshesOnly( m_arnMesh, m_localXform );
 		m_pd3dDevice->SetRenderState( D3DRS_CULLMODE, D3DCULL_CCW );
+
+		drawSoulAnimation();
 	}
 	else
 		m_d3dxMesh->DrawSubset(0);
@@ -112,6 +119,8 @@ bool Unit::frameMove( float fElapsedTime )
 	updateLocalXform();
 	if ( m_bForcedMove )
 		forcedMoveTest();
+
+	updateSoulAnimation( fElapsedTime );
 
 	return true;
 }
@@ -358,6 +367,55 @@ HRESULT Unit::rayTesting( UnitInput mappedKey )
 
 	return hr;
 }
+
+void Unit::drawSoul( D3DXVECTOR3 vTrans, float alpha )
+{
+	D3DXMATRIX localXform( m_localXform );
+	D3DMATERIAL9 material( m_material );
+
+	D3DXMATRIX translation;
+	D3DXMatrixTranslation( &translation, vTrans.x, vTrans.y, vTrans.z );
+	localXform = localXform * translation;
+	
+	D3DCOLORVALUE cv;
+	cv.r = cv.g = cv.b = 0.5f; cv.a = alpha;
+	material.Ambient = material.Diffuse = material.Specular = cv;
+	
+	m_pd3dDevice->SetTransform(D3DTS_WORLD, &localXform);
+	m_pd3dDevice->SetMaterial( &material );
+	
+	m_pd3dDevice->SetRenderState( D3DRS_CULLMODE, D3DCULL_CW );
+	m_arnMesh->getD3DXMesh()->DrawSubset( 0 );
+	m_pd3dDevice->SetRenderState( D3DRS_CULLMODE, D3DCULL_CCW );
+}
+
+void Unit::startSoulAnimation( float duration, float height )
+{
+	m_fSoulAnimationTimer = duration;
+	m_fSoulAnimationDuration = duration;
+	m_fSoulAnimationHeight = height;
+}
+
+void Unit::updateSoulAnimation( float fElapsedTime )
+{
+	if ( m_fSoulAnimationTimer > 0.0f )
+		m_fSoulAnimationTimer -= fElapsedTime;
+	else
+		m_fSoulAnimationTimer = 0.0f;
+}
+
+void Unit::drawSoulAnimation()
+{
+	float ratio = m_fSoulAnimationTimer / m_fSoulAnimationDuration;
+	float height = sin( D3DXToRadian( ratio * 90.0f + 90.0f ) ) * m_fSoulAnimationHeight;
+
+	D3DXVECTOR3 vTrans( 0.0f, 0.0f, -5.0f);
+	drawSoul( vTrans, 0.3f );
+
+	if ( m_fSoulAnimationTimer != 0.0f )
+		printf( "Soul height, alpha, timer : %f, %f, %f \n", height, ratio, m_fSoulAnimationTimer );;
+}
+
 //////////////////////////////////////////////////////////////////////////
 
 Unit* EpCreateUnit( int tileX, int tileY )

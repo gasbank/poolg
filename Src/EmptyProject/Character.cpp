@@ -363,6 +363,11 @@ void Character::pushUnitInFront( UnitInput dir )
 	}
 }
 
+void Character::setDead()
+{
+	m_curHp = -1;
+	startSoulAnimation( 5.0f, 10.0f );
+}
 //////////////////////////////////////////////////////////////////////////
 
 

@@ -98,6 +98,8 @@ public:
 	void setLocalXformDirty() { m_bLocalXformDirty = true; }
 	bool isForcedMove() const { return m_bForcedMove; }
 
+	void startSoulAnimation( float duration, float height );
+
 protected:
 	Unit( UnitType type );
 
@@ -112,6 +114,10 @@ protected:
 
 private:
 	World* getWorldState() const;
+
+	void drawSoul( D3DXVECTOR3 vTrans, float alpha );
+	void drawSoulAnimation();
+	void updateSoulAnimation( float fElapsedTime );
 
 	struct TeapotVertex
 	{
@@ -141,6 +147,10 @@ private:
 
 	ArnMesh*				m_arnMesh;
 	bool					m_bMovable;
+
+	float					m_fSoulAnimationTimer;
+	float					m_fSoulAnimationDuration;
+	float					m_fSoulAnimationHeight;
 };
 
 SCRIPT_FACTORY( Unit )

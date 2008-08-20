@@ -45,11 +45,10 @@ public:
 	void setInt (int point) {m_intelligence = point; }
 	const Stat& getStat() const { return m_stat; }
 	bool isDead() { return (m_curHp<=0); }
-	void setDead() { m_curHp = -1; }
+	void setDead();
 	void addMoveImpulse( const D3DXVECTOR3& impulse ) { m_moveImpulse += impulse; }
 	
-	void setMoveDuration( float val ) { m_moveDuration = val; }
-	
+	void setMoveDuration( float val ) { m_moveDuration = val; }	
 
 	void setBoundaryRect( LONG left, LONG top, LONG right, LONG bottom );
 

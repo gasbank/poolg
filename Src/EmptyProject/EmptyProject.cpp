@@ -72,47 +72,7 @@ bool CALLBACK IsD3D9DeviceAcceptable( D3DCAPS9* pCaps, D3DFORMAT AdapterFormat, 
 //--------------------------------------------------------------------------------------
 bool CALLBACK ModifyDeviceSettings( DXUTDeviceSettings* pDeviceSettings, void* pUserContext )
 {
-	assert( DXUT_D3D9_DEVICE == pDeviceSettings->ver );
 
-	HRESULT hr;
-	IDirect3D9* pD3D = DXUTGetD3D9Object();
-	D3DCAPS9 caps;
-	V( pD3D->GetDeviceCaps( pDeviceSettings->d3d9.AdapterOrdinal,
-		pDeviceSettings->d3d9.DeviceType,
-		&caps ) );
-
-	// If device doesn't support HW T&L or doesn't support 1.1 vertex shaders in HW 
-	// then switch to SWVP.
-	if( ( caps.DevCaps & D3DDEVCAPS_HWTRANSFORMANDLIGHT ) == 0 ||
-		caps.VertexShaderVersion < D3DVS_VERSION( 2, 0 ) )
-	{
-		pDeviceSettings->d3d9.BehaviorFlags = D3DCREATE_SOFTWARE_VERTEXPROCESSING;
-	}
-
-	// Debugging vertex shaders requires either REF or software vertex processing 
-	// and debugging pixel shaders requires REF.
-#ifdef DEBUG_VS
-	if( pDeviceSettings->d3d9.DeviceType != D3DDEVTYPE_REF )
-	{
-		pDeviceSettings->d3d9.BehaviorFlags &= ~D3DCREATE_HARDWARE_VERTEXPROCESSING;
-		pDeviceSettings->d3d9.BehaviorFlags &= ~D3DCREATE_PUREDEVICE;
-		pDeviceSettings->d3d9.BehaviorFlags |= D3DCREATE_SOFTWARE_VERTEXPROCESSING;
-	}
-#endif
-#ifdef DEBUG_PS
-	pDeviceSettings->d3d9.DeviceType = D3DDEVTYPE_REF;
-#endif
-
-	// For the first device created if its a REF device, optionally display a warning dialog box
-	static bool s_bFirstTime = true;
-	if( s_bFirstTime )
-	{
-		s_bFirstTime = false;
-		if( pDeviceSettings->d3d9.DeviceType == D3DDEVTYPE_REF )
-		{
-			MessageBox( 0, L"REF mode will run very slowly", L"Caution", MB_ICONEXCLAMATION | MB_OK );
-		}
-	}
 
 	//pDeviceSettings->d3d9.pp.EnableAutoDepthStencil= TRUE;
 	//pDeviceSettings->d3d9.pp.AutoDepthStencilFormat = D3DFMT_D16;
@@ -262,7 +222,7 @@ HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFA
 	pd3dDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
 	pd3dDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 	pd3dDevice->SetRenderState(D3DRS_ZENABLE, TRUE);
-	pd3dDevice->SetRenderState(D3DRS_SHADEMODE, D3DSHADE_PHONG);
+	//pd3dDevice->SetRenderState(D3DRS_SHADEMODE, D3DSHADE_PHONG);
 
 	//g_fillColor = D3DCOLOR_ARGB( 0, 45, 50, 170 );
 	g_fillColor = D3DCOLOR_ARGB( 0, 0, 0, 0 );

@@ -101,6 +101,7 @@ public:
 
 	bool getSoulAnimation() { return m_bSoulAnimation; }
 
+	void							printDebugInfo() const;
 protected:
 									Unit( UnitType type );
 	virtual UnitInput				mapKey( UINT nKey ) const;

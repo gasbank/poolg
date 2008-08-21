@@ -1,7 +1,7 @@
 #include "EmptyProjectPCH.h"
 #include "Dialog.h"
 #include "ScriptManager.h"
-
+#include "Utility.h"
 
 Dialog::Dialog(void)
 {
@@ -218,4 +218,12 @@ Dialog* Dialog::createDialogByScript( const char* dialogName )
 	int oneTime = GetScriptManager().readInt( tempBuf );
 
 	return new Dialog( speakArray, speakCount, &region, oneTime?true:false, dialogName );
+}
+
+void Dialog::printDebugInfo() const
+{
+	printf( "Dlg: %-30s spkCount=%d curSpkIdx=%d", getDialogName().c_str(), m_speakCount, m_curSpeakIdx );
+	printf( " region=" ); Utility::printValue( m_region );
+	printf( " onetime=%d talking=%d", m_bOneTime, m_bTalking );
+	printf( " init=%d remove=%d\n", m_bInit, m_bRemoveFlag );
 }

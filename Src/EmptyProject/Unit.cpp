@@ -366,6 +366,13 @@ const char* Unit::getTypeString() const
 	}
 	return 0;
 }
+
+void Unit::printDebugInfo() const
+{
+	printf( "Unit: Type - %s ", getTypeString() );
+	Utility::printValue( getPos() );
+	printf( "\n" );
+}
 //////////////////////////////////////////////////////////////////////////
 //
 //Unit* EpCreateUnit( int tileX, int tileY )

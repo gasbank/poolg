@@ -27,6 +27,8 @@ public:
 	bool getLeastOnetime() { return m_LeastOnetime; }
 	bool isFinished() const { return m_LeastOnetime; }
 
+	void printDebugInfo() const;
+	void printDebugInfoDetailed() const;
 protected:
 	bool m_bActivated;
 	TriggerList m_trigger;

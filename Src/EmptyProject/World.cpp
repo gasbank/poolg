@@ -722,6 +722,14 @@ void World::wannaTalkingEventCheck()
 	}
 }
 
+
+
+void World::printDebugInfo() const
+{
+	EpPrintDebugInfoAll( m_unitSet );
+	EpPrintDebugInfoAll( m_scriptedDialog );
+	EpPrintDebugInfoAll( m_incidents );
+}
 //////////////////////////////////////////////////////////////////////////
 
 Unit* EpGetHero()
@@ -765,10 +773,19 @@ int EpSetAnimTime( void* ptr, double dTime )
 } SCRIPT_CALLABLE_I_PV_D( EpSetAnimTime )
 
 
+int EpCurWorldDebugInfo()
+{
+	GetWorldManager().getCurWorld()->printDebugInfo();
+	return 0;
+} SCRIPT_CALLABLE_I( EpCurWorldDebugInfo )
+
+
+
 START_SCRIPT_FACTORY( World )
 	CREATE_OBJ_COMMAND( EpGetHero )
 	CREATE_OBJ_COMMAND( EpRegisterIncident )
 	CREATE_OBJ_COMMAND( EpGetNode )
 	CREATE_OBJ_COMMAND( EpSetDoAnim )
 	CREATE_OBJ_COMMAND( EpSetAnimTime )
+	CREATE_OBJ_COMMAND( EpCurWorldDebugInfo )
 END_SCRIPT_FACTORY( World )

@@ -62,6 +62,9 @@ namespace eval EpThreadTest {
 					c {
 						EpSetAnimTime [ EpGetNode Needle ] 0
 					}
+					world {
+						EpCurWorldDebugInfo
+					}
 					default {
 						if [string length $data] {
 							puts $::errorInfo

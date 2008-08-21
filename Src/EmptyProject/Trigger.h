@@ -21,6 +21,8 @@ public:
 
 	virtual bool check() = 0;
 	virtual void release() {}
+
+	virtual void printDebugInfo() const { printf( "Debug Info not implemented on Trigger class\n" ); }
 };
 SCRIPT_FACTORY( Trigger )
 

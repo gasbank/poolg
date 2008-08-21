@@ -1,5 +1,7 @@
 #pragma once
 
+#include "TileManager.h"
+
 class Utility
 {
 public:
@@ -16,6 +18,10 @@ public:
 	static void printValue( const D3DXVECTOR3& vec3 )
 	{
 		printf( "(%.2f, %.2f, %.2f)", vec3.x, vec3.y, vec3.z );
+	}
+	static void printValue( const TileRegion& tr )
+	{
+		printf( "(%d,%d)~(%d,%d)", tr.getStart().x, tr.getStart().y, tr.getEnd().x, tr.getEnd().y );
 	}
 	static void printValue( const D3DXMATRIX& mat )
 	{

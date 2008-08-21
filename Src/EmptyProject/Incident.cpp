@@ -97,6 +97,17 @@ void Incident::addAction( Action* action )
 		throw std::runtime_error( "You cannot add any action after the incident activated" );
 }
 
+void Incident::printDebugInfo() const
+{
+	printf("Inc: triggers=%d actions=%d activated=%d infinite=%d leastOnetime=%d\n", m_trigger.size(), m_action.size(), m_bActivated, m_bInfinite, m_LeastOnetime );
+}
+
+void Incident::printDebugInfoDetailed() const
+{
+	printDebugInfo();
+	EpPrintDebugInfoAll( m_trigger );
+	EpPrintDebugInfoAll( m_action );
+}
 //////////////////////////////////////////////////////////////////////////
 
 BlockingActionIncident::BlockingActionIncident( bool infinite )

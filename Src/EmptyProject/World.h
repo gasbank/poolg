@@ -67,6 +67,9 @@ public:
 	const std::tstring& getModelFilePath() const { return m_modelFilePath; }
 	
 	ArnNode*			getNode( const char* nodeName ) const;
+
+	void				printDebugInfo() const;
+
 private:
 						World( const char* worldName, const TCHAR* modelFilePath );
 	void				setupLight();
@@ -110,3 +113,12 @@ private:
 };
 
 SCRIPT_FACTORY( World )
+
+
+template<typename T> void EpPrintDebugInfoAll( T& obj ) {
+	T::const_iterator it = obj.begin();
+	for ( ; it != obj.end(); ++it )
+	{
+		(*it)->printDebugInfo();
+	}
+};

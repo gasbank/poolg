@@ -34,6 +34,8 @@ public:
 	const std::string& getDialogName() const { return m_dialogName; }
 	bool getRemoveFlag() const { return m_bRemoveFlag; }
 	void setRemoveFlag(bool val) { m_bRemoveFlag = val; }
+
+	void printDebugInfo() const;
 private:
 	Dialog(void);
 	Dialog( Speak* speakArray, UINT speakCount, const TileRegion* region, bool bOneTime, const char* dialogName );

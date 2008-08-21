@@ -20,6 +20,7 @@ public:
 	
 	World* getCurWorld() const;
 
+	virtual void printDebugInfo() const { printf( "Debug Info not implemented on Action class\n" ); }
 protected:
 	Action(void);
 

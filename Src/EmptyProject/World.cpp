@@ -685,7 +685,7 @@ void World::battleEventCheck()
 						vRayDir,
 						1 );
 
-					printf( "3rd dist, ray length %f, %f\n", f3rdDist, fRayLength );
+					//printf( "3rd dist, ray length %f, %f\n", f3rdDist, fRayLength );
 
 					if ( f3rdDist < fRayLength )
 						continue;
@@ -738,6 +738,10 @@ void World::wannaTalkingEventCheck()
 
 					// View at hero
 					getCurEnemyUnit()->setViewAt( &getHero()->getPos() );					
+				}
+				else
+				{
+					talkingEnemy->setRotZ( 0.0f );
 				}
 			}
 		}	

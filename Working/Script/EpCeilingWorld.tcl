@@ -25,6 +25,7 @@ namespace eval EpCeilingWorld {
 		set trigger		[ EpCreateUnitPositionWithTraceTrigger $pHeroUnit $npcGetg 0x101 ]
 		set actions		[ EpCreateDialogAction "EpCeilingWorld::GetGDialog" ]
 		lappend actions		[ EpCreateStartIncidentAction [ EpCeilingWorld::Quest2 ] 1 ]
+		lappend actions		[ EpCreateStartIncidentAction [ EpCeilingWorld::Quest3 ] 1 ]
 		
 		set incident	[ EpCreateBlockingActionIncident $trigger 0 1 ]
 
@@ -43,7 +44,6 @@ namespace eval EpCeilingWorld {
 
 		set trigger	 [ EpCreateUnitPositionWithTraceTrigger $pHeroUnit $npcGloop 0x101 ]
 		set actions	 [ EpCreateDialogAction "EpCeilingWorld::GlooPDialog" ]
-		lappend actions  [ EpCreateStartIncidentAction [ EpCeilingWorld::Quest3 ] 1 ]
 
 		set incident	 [ EpCreateBlockingActionIncident $trigger 0 0 ]
 
@@ -67,7 +67,6 @@ namespace eval EpCeilingWorld {
 
 		set trigger	 [ EpCreateUnitPositionWithTraceTrigger $pHeroUnit $npcSetg 0x101 ]
 		set action	 [ EpCreateDialogAction "EpCeilingWorld::SetGDialog" ]
-		lappend actions  [ EpCreateStartIncidentAction [ EpCeilingWorld::Quest1 ] 0 ]
 
 		set incident	 [ EpCreateBlockingActionIncident $trigger $action 1 ]
 

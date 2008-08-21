@@ -25,6 +25,8 @@ namespace eval EpRoomWorld {
 		EpAddActionToIncident $incident $action2
 		EpAddActionToIncident $incident $action3
 
+		EpIncidentSetName	$incident "Heal incident"
+
 		
 		set incCount	[ EpRegisterIncident $incident ]
 		EpOutputDebugString " - Incident count: $incCount\n"
@@ -48,6 +50,8 @@ namespace eval EpRoomWorld {
 			EpAddActionToIncident $incident $act
 		}
 
+		EpIncidentSetName	$incident "Clear incident"
+
 		set incCount	[ EpRegisterIncident $incident ]
 		EpOutputDebugString " - Incident count: $incCount\n"
 	}
@@ -62,6 +66,8 @@ namespace eval EpRoomWorld {
 		set action2		[ EpCreateUnitSpawnAction [createEnemy 28 98 0] ]
 
 		EpAddActionToIncident $incident $action2
+
+		EpIncidentSetName	$incident "Hidden incident"
 
 		
 		set incCount	[ EpRegisterIncident $incident ]
@@ -85,6 +91,8 @@ namespace eval EpRoomWorld {
 		EpAddActionToIncident $incident $action2
 		EpAddActionToIncident $incident $action3
 
+		EpIncidentSetName	$incident "Unclear incident"
+
 		set incCount	[ EpRegisterIncident $incident ]
 		EpOutputDebugString " - Incident count: $incCount\n"
 	}
@@ -97,6 +105,8 @@ namespace eval EpRoomWorld {
 		
 		set incident	[ EpCreateIncident $trigger $action0 0 ]
 		EpAddActionToIncident $incident $action1
+
+		EpIncidentSetName	$incident "TofuMan incident"
 		
 		set incCount	[ EpRegisterIncident $incident ]
 		EpOutputDebugString " - Incident count: $incCount\n"
@@ -112,6 +122,8 @@ namespace eval EpRoomWorld {
 		set incident		[ EpCreateIncident $trigger $action 1 ]
 
 		set action2		[ EpCreateScriptAction "EpSetDoAnim [EpGetNode TofuMan] 1" ]
+
+		EpIncidentSetName	$incident "Switch incident"
 		
 		EpAddActionToIncident $incident $action2
 		
@@ -126,6 +138,8 @@ namespace eval EpRoomWorld {
 		set action		[ EpCreateCameraAction			external Camera 0 ]
 		set incident	[ EpCreateIncident				$trigger $action 0 ]
 
+		EpIncidentSetName	$incident "Camera1 incident"
+
 		set incCount	[ EpRegisterIncident			$incident ]
 		EpOutputDebugString " - Incident count: $incCount\n"
 	}
@@ -137,6 +151,8 @@ namespace eval EpRoomWorld {
 		set action		[ EpCreateCameraAction			attach 0 5000 ]
 		set incident	[ EpCreateIncident				$trigger $action 0 ]
 
+		EpIncidentSetName	$incident "Camera2 incident"
+
 		set incCount	[ EpRegisterIncident			$incident ]
 		EpOutputDebugString " - Incident count: $incCount\n"
 	}
@@ -147,6 +163,8 @@ namespace eval EpRoomWorld {
 		set trigger		[ EpCreateUnitPositionTrigger	$pHeroUnit 55 45 55 45 0x101 ]
 		set action		[ EpCreateControllableAction	$pHeroUnit 1 ]
 		set incident	[ EpCreateIncident				$trigger $action 0 ]
+
+		EpIncidentSetName	$incident "Control incident"
 
 		set incCount	[ EpRegisterIncident			$incident ]
 		EpOutputDebugString " - Incident count: $incCount\n"

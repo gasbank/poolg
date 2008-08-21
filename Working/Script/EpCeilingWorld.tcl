@@ -1,6 +1,6 @@
 namespace eval EpCeilingWorld {
 	set modelFilePath	"CeilingWorld.arn"
-	set dialogNameList [ list introDialog GlooPDialog GetGDialog ]
+	set dialogNameList [ list introDialog GlooPDialog GetGDialog GetGDialog2 ]
 	global world hero npcGetg npcGloop pHeroUnit
 
 	proc registerIncidentInitTalk {} {
@@ -42,7 +42,7 @@ namespace eval EpCeilingWorld {
 
 		set trigger	 [ EpCreateUnitPositionTrigger $pHeroUnit 29 83 31 81 0x101 ]
 		set actions	 [ EpCreateDialogAction "EpCeilingWorld::GlooPDialog" ]
-		#lappend actions  [ EpCreateStartIncidentAndWaitAction "EpCeilingWorld::Quest3" ]
+		lappend actions  [ EpCreateStartIncidentAndWaitAction [ EpCeilingWorld::Quest3 ] ]
 
 		set incident	 [ EpCreateBlockingActionIncident $trigger 0 0 ]
 
@@ -50,9 +50,14 @@ namespace eval EpCeilingWorld {
 			EpAddActionToIncident $incident $act
 		}
 
-		set incCount	[ EpRegisterIncident $incident ]
-		EpOutputDebugString " - Incident count: $incCount\n"
+		## --------------------------------------------
+		## Do not register a incident planned
+		## to be invoked by EpCreateStartIncidentAndWaitAction!!!
+		## --------------------------------------------
+		#set incCount	[ EpRegisterIncident $incident ]
+		#EpOutputDebugString " - Incident count: $incCount\n"
 
+		EpOutputDebugString " - Quest2 Incident returned $incident\n"
 		return $incident
 	}
 
@@ -63,8 +68,15 @@ namespace eval EpCeilingWorld {
 		set action	 [ EpCreateDialogAction "EpCeilingWorld::GetGDialog2" ]
 		set incident	 [ EpCreateBlockingActionIncident $trigger $action 0 ]
 
-		set incCount	[ EpRegisterIncident $incident ]
-		EpOutputDebugString " - Incident count: $incCount\n"
+		## --------------------------------------------
+		## Do not register a incident planned
+		## to be invoked by EpCreateStartIncidentAndWaitAction!!!
+		## --------------------------------------------
+		##set incCount	[ EpRegisterIncident $incident ]
+		##EpOutputDebugString " - Incident count: $incCount\n"
+		
+		EpOutputDebugString " - Quest3 Incident returned $incident\n"
+		return $incident
 	}
 
 	proc init { curWorld } {

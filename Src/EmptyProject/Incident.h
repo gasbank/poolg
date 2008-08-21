@@ -14,6 +14,7 @@ public:
 	virtual ~Incident(void);
 
 	virtual bool update( double dTime, float fElapsedTime );
+	
 
 	void release();
 	
@@ -24,6 +25,7 @@ public:
 	void detachAllActions();
 
 	bool getLeastOnetime() { return m_LeastOnetime; }
+	bool isFinished() const { return m_LeastOnetime; }
 
 protected:
 	bool m_bActivated;
@@ -41,6 +43,7 @@ public:
 	BlockingActionIncident( Trigger* trigger, Action* action, bool infinite );
 
 	virtual bool update( double dTime, float fElapsedTime );
+	//virtual bool isFinished() const { return ( m_curActionIt == m_action.end() ); }
 
 private:
 	ActionList::iterator m_curActionIt;

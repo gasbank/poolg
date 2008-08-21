@@ -620,7 +620,7 @@ Dialog* World::getDialogByName( const char* dialogName )
 		if ( (*it)->getDialogName() == dialogName )
 			return (*it);
 	}
-	return 0;
+	throw std::runtime_error( "Requested dialog is not found on dialog list of this world" );
 }
 
 UINT World::addIncident( Incident* inc )

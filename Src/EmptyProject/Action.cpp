@@ -378,14 +378,18 @@ Action* EpCreateDelayAction( int delayMs )
 //////////////////////////////////////////////////////////////////////////
 
 StartIncidentAndWaitAction::StartIncidentAndWaitAction( Incident* incident )
-: m_incident ( incident )
+: m_incident ( dynamic_cast<BlockingActionIncident*>( incident ) )
 {
+	if ( !m_incident )
+		throw std::runtime_error( "StartIncidentAndWaitAction is only applicable to blocking incidents, i.e. BlockingActionIncident" );
 }
 
 bool StartIncidentAndWaitAction::update( double dTime, float fElapsedTime )
 {
-	IncidentTrigger* trigger = new IncidentTrigger( m_incident );
-	return !trigger->check();
+	//IncidentTrigger* trigger = new IncidentTrigger( m_incident );
+	//return !trigger->check();
+
+	return !m_incident->isFinished();
 }
 
 void StartIncidentAndWaitAction::activate()

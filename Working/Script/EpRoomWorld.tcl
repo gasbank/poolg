@@ -16,7 +16,7 @@ namespace eval EpRoomWorld {
 		variable testEnemy
 			
 		set trigger [ EpCreateUnitPositionTrigger $pHeroUnit 44 81 44 81 0x001 ]
-		set action		[ EpCreateHealAction $pHeroUnit ]
+		set action		[ EpCreateHealAction $pHeroUnit 500 ]
 		set incident	[ EpCreateBlockingActionIncident $trigger $action 2 ]
 
 		set action2		[ EpCreateDialogAction "EpDialogHeal" ]

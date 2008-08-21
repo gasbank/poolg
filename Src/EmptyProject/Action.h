@@ -91,13 +91,14 @@ private:
 class HealAction : public Action
 {
 public:
-	HealAction( Character* targetChar );
+	HealAction( Character* targetChar, int healAmount );
 	virtual ~HealAction();
 
 	virtual void activate();
 
 private:
 	Character* m_targetChar;
+	int m_healAmount;
 };
 
 //////////////////////////////////////////////////////////////////////////

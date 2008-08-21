@@ -146,8 +146,8 @@ Action* EpCreateSoundAction( const char* soundName )
 
 //////////////////////////////////////////////////////////////////////////
 
-HealAction::HealAction( Character* targetChar )
-: m_targetChar ( targetChar )
+HealAction::HealAction( Character* targetChar, int healAmount )
+: m_targetChar ( targetChar ), m_healAmount( healAmount )
 {
 }
 
@@ -159,18 +159,18 @@ void HealAction::activate()
 {
 	Action::activate();
 
-	m_targetChar->heal( 500 );
+	m_targetChar->heal( m_healAmount );
 
 	// HealAction is 'very' instantaneous, so deactivate() is called
 	// immediately after activate().
 	deactivate();
 }
 
-Action* EpCreateHealAction( void* targetChar )
+Action* EpCreateHealAction( void* targetChar, int healAmount )
 {
 	Character* c = reinterpret_cast<Character*>( targetChar );
-	return new HealAction( c );
-}  SCRIPT_CALLABLE_PV_PV( EpCreateHealAction )
+	return new HealAction( c, healAmount );
+}  SCRIPT_CALLABLE_PV_PV_I( EpCreateHealAction )
 
 //////////////////////////////////////////////////////////////////////////
 

@@ -20,7 +20,7 @@ namespace eval EpRoomWorld {
 		set incident	[ EpCreateBlockingActionIncident $trigger $action 2 ]
 
 		set action2		[ EpCreateDialogAction "EpDialogHeal" ]
-		set action3		[ EpCreateTeleportAction $pHeroUnit 53 45 ]
+		set action3		[ EpCreateTeleportAction $pHeroUnit 53 66 ]
 
 		EpAddActionToIncident $incident $action2
 		EpAddActionToIncident $incident $action3
@@ -61,7 +61,7 @@ namespace eval EpRoomWorld {
 					
 		set trigger [ EpCreateUnitPositionTrigger $pHeroUnit 26 98 26 98 0x001 ]
 		set action		[ EpCreateUnitSpawnAction [createEnemy 27 98 0] ]
-		set incident	[ EpCreateIncident $trigger $action 1 ]
+		set incident	[ EpCreateNonblockingActionIncident $trigger $action 1 ]
 
 		set action2		[ EpCreateUnitSpawnAction [createEnemy 28 98 0] ]
 
@@ -81,7 +81,7 @@ namespace eval EpRoomWorld {
 		
 		set trigger		[ EpCreateUnTotalAnnihilationTrigger $world ]
 		set action		[ EpCreateDialogAction "EpDialogReturn" ]
-		set incident		[ EpCreateIncident $trigger $action -1 ]
+		set incident		[ EpCreateNonblockingActionIncident $trigger $action -1 ]
 
 		set trigger2		[ EpCreateUnitPositionTrigger $pHeroUnit 50 33 59 33 0x001 ]
 		set action2		[ EpCreateUnitMoveAction $pHeroUnit "UP" ]
@@ -104,7 +104,7 @@ namespace eval EpRoomWorld {
 		
 		set trigger		[ EpCreateUnitPositionTrigger $TestStObject 50 35 -1 -1 0x101 ]
 		set action		[ EpCreateScriptAction "EpSetDoAnim [EpGetNode Door] 1" ]
-		set incident		[ EpCreateIncident $trigger $action 1 ]
+		set incident		[ EpCreateNonblockingActionIncident $trigger $action 1 ]
 
 		set action2		[ EpCreateScriptAction "EpSetDoAnim [EpGetNode TofuMan] 1" ]
 
@@ -121,7 +121,7 @@ namespace eval EpRoomWorld {
 		
 		set trigger		[ EpCreateUnitPositionTrigger	$pHeroUnit 52 45 52 45 0x101 ]
 		set action		[ EpCreateCameraAction			external Camera 0 ]
-		set incident	[ EpCreateIncident				$trigger $action 0 ]
+		set incident	[ EpCreateNonblockingActionIncident				$trigger $action 0 ]
 
 		EpIncidentSetName	$incident "Camera1 incident"
 
@@ -134,7 +134,7 @@ namespace eval EpRoomWorld {
 		
 		set trigger		[ EpCreateUnitPositionTrigger	$pHeroUnit 54 45 54 45 0x101 ]
 		set action		[ EpCreateCameraAction			attach 0 5000 ]
-		set incident	[ EpCreateIncident				$trigger $action 0 ]
+		set incident	[ EpCreateNonblockingActionIncident				$trigger $action 0 ]
 
 		EpIncidentSetName	$incident "Camera2 incident"
 
@@ -147,7 +147,7 @@ namespace eval EpRoomWorld {
 
 		set trigger		[ EpCreateUnitPositionTrigger	$pHeroUnit 55 45 55 45 0x101 ]
 		set action		[ EpCreateControllableAction	$pHeroUnit 1 ]
-		set incident	[ EpCreateIncident				$trigger $action 0 ]
+		set incident	[ EpCreateNonblockingActionIncident				$trigger $action 0 ]
 
 		EpIncidentSetName	$incident "Control incident"
 
@@ -163,9 +163,9 @@ namespace eval EpRoomWorld {
 		
 		EpOutputDebugString " - [info level 0] called\n"
 		
-		set testEnemy				[createEnemy 27 78 1];
+		set testEnemy				[createEnemy 46 75 1];
 		
-		set pHeroUnit				[createHero 53 45];
+		set pHeroUnit				[createHero 53 66];
 		
 		set pEnemyUnit1				[createEnemy 25 90 1];
 		set pEnemyUnit2				[createEnemy 37 88 1];

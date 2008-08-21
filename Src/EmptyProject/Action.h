@@ -13,23 +13,27 @@ class Action
 {
 public:
 	virtual ~Action(void);
-
-	virtual void activate() = 0;
 	// Action::update() returns the validity of update.
 	// It returns the false when the action is completely done since this
 	// means no need to do more update of the action.
 	// Otherwise, returns true when the action is on the way or not started.
-	virtual bool update( double dTime, float fElapsedTime ) { return false; }
+	virtual bool update( double dTime, float fElapsedTime );
 	virtual void release() {}
 	
 	World* getCurWorld() const;
 
 	virtual void printDebugInfo() const { printf( "Debug Info not implemented on Action class\n" ); }
+	bool isActivated() const { return m_bActivated; }
 protected:
 	Action(void);
 
+	virtual void activate();
+	virtual void deactivate();
+
 private:
 	virtual void onActionFinished() {}
+
+	bool m_bActivated;
 };
 
 SCRIPT_FACTORY( Action )
@@ -42,7 +46,6 @@ public:
 	BattleAction( const Unit* targetUnit, float dist );
 	virtual ~BattleAction(void);
 
-	virtual void activate();
 
 private:
 	const Unit* m_targetUnit;
@@ -121,7 +124,6 @@ public:
 	DelayAction( int delayMs );
 	virtual ~DelayAction() {}
 
-	virtual void activate();
 	virtual bool update( double dTime, float fElapsedTime );
 
 private:
@@ -235,10 +237,8 @@ class StartIncidentAction : public Action
 public:
 	StartIncidentAction( Incident* incident );
 
-	virtual void activate();
 	virtual bool update( double dTime, float fElapsedTime );
-	virtual void release() { EP_SAFE_RELEASE( m_incident ); }
+	virtual void release() { Action::release(); EP_SAFE_RELEASE( m_incident ); }
 private:
 	Incident* m_incident;
-	bool m_bDoIncientUpdate;
 };

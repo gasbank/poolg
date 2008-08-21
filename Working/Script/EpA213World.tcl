@@ -115,7 +115,7 @@ namespace eval EpA213World {
 		lappend actions		[ EpCreateDelayAction			15000 ]
 		lappend actions		[ EpCreateCameraAction			attach GateCamera 1500 ]
 		lappend actions		[ EpCreateControllableAction	$pHeroUnit 1 ]
-		set incident		[ EpCreateBlockingActionIncident $trigger 0 0 ]
+		set incident		[ EpCreateBlockingActionIncident $trigger 0 1 ]
 		foreach act $actions {
 			EpAddActionToIncident $incident $act
 		}

@@ -20,16 +20,13 @@ public:
 	// updates of action or one of triggers are not satisfied.
 	// Returns true when all actions are finished.
 	virtual bool update( double dTime, float fElapsedTime );
-	virtual bool isFinished() const { return m_LeastOnetime; }
+	virtual bool isFinished() const  = 0;
 
 	void release();
 	
 	void addTrigger( Trigger* trigger );
 	void addAction( Action* action );
 	
-	void detachAllTriggers();
-	void detachAllActions();
-
 	bool getLeastOnetime() { return m_LeastOnetime; }
 	
 
@@ -47,21 +44,36 @@ protected:
 	bool checkTrigCountRemained() const { return ( m_trigCount == -1 || m_trigCount > 0 ); }
 	void decreaseTrigCount() { if ( m_trigCount > 0 ) m_trigCount -= 1; }
 	bool isActivated() const { return m_bActivated; }
-
-	bool m_bActivated;
+	
 	TriggerList m_trigger;
 	ActionList m_action;
 	bool m_LeastOnetime;
 
+
+private:
+	std::string m_incidentName;
+	bool m_bActivated;
+	
 	// Indicates the remaining occurrence count of this incident.
 	// 0 means no more trigger testing(and no more action)
 	// and -1 means infinite occurrence incident.
 	int m_trigCount;
+};
 
-private:
-	std::string m_incidentName;
+//////////////////////////////////////////////////////////////////////////
+
+class NonblockingActionIncident : public Incident
+{
+public:
+	NonblockingActionIncident( int trigCount );
+	NonblockingActionIncident( Trigger* trigger, Action* action, int trigCount );
+
+	virtual bool update( double dTime, float fElapsedTime );
+	virtual bool isFinished() const { return m_LeastOnetime; }
 
 };
+
+//////////////////////////////////////////////////////////////////////////
 
 class BlockingActionIncident : public Incident
 {
@@ -70,7 +82,7 @@ public:
 	BlockingActionIncident( Trigger* trigger, Action* action, int trigCount );
 
 	virtual bool update( double dTime, float fElapsedTime );
-	virtual bool isFinished() const { return ( m_LeastOnetime && !m_bActivated && m_curActionIt == m_action.end() ); }
+	virtual bool isFinished() const { return ( m_LeastOnetime && !isActivated() && m_curActionIt == m_action.end() ); }
 protected:
 	virtual void activate();
 private:

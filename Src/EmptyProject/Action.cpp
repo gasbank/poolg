@@ -14,6 +14,7 @@
 #include "Incident.h"
 
 Action::Action(void)
+: m_bActivated( false )
 {
 }
 
@@ -26,6 +27,27 @@ World* Action::getCurWorld() const
 	return GetWorldManager().getCurWorld();
 }
 
+void Action::activate()
+{
+	if ( isActivated() )
+		throw std::runtime_error( "Action::activate() is called after prior activation" );
+	m_bActivated = true;
+}
+
+void Action::deactivate()
+{
+	if ( !isActivated() )
+		throw std::runtime_error( "Action::deactivate() is called during not activated state" );
+	m_bActivated = false;
+}
+
+bool Action::update( double dTime, float fElapsedTime )
+{
+	if ( !isActivated() )
+		activate();
+	return false;
+}
+
 //////////////////////////////////////////////////////////////////////////
 
 BattleAction::BattleAction( const Unit* targetUnit, float dist )
@@ -36,10 +58,6 @@ BattleAction::BattleAction( const Unit* targetUnit, float dist )
 BattleAction::~BattleAction( void )
 {
 
-}
-void BattleAction::activate()
-{
-	// Do one-time init of this action
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -57,15 +75,20 @@ DialogAction::~DialogAction( void )
 
 void DialogAction::activate()
 {
+	Action::activate();
+
 	assert ( GetWorldManager().getCurWorld()->getCurDialog() == 0 );
 	m_dialog = GetWorldManager().getCurWorld()->startDialog( m_dialogName.c_str() );
 }
 
 bool DialogAction::update( double dTime, float fElapsedTime )
 {
+	Action::update( dTime, fElapsedTime );
+
 	if ( m_dialog && !m_dialog->isTalking() )
 	{
 		onActionFinished();
+		deactivate();
 		return false;
 	}
 	return true;
@@ -94,6 +117,8 @@ SoundAction::~SoundAction( void )
 
 void SoundAction::activate()
 {
+	Action::activate();
+
 	if ( m_soundName == "Start Battle" )
 	{
 		GetAudioState().bBGMFade = true;
@@ -106,6 +131,9 @@ void SoundAction::activate()
 		GetAudioState().bBGMFade = false;
 		GetAudioState().bMusicFade = true;
 	}
+	// SoundAction is 'very' instantaneous, so deactivate() is called
+	// immediately after activate().
+	deactivate();
 }
 
 Action* EpCreateSoundAction( const char* soundName )
@@ -126,7 +154,13 @@ HealAction::~HealAction()
 
 void HealAction::activate()
 {
-	m_targetChar->heal( 9999 );
+	Action::activate();
+
+	m_targetChar->heal( 500 );
+
+	// HealAction is 'very' instantaneous, so deactivate() is called
+	// immediately after activate().
+	deactivate();
 }
 
 Action* EpCreateHealAction( void* targetChar )
@@ -149,8 +183,15 @@ UnitSpawnAction::~UnitSpawnAction()
 
 void UnitSpawnAction::activate()
 {
+	Action::activate();
+
 	getCurWorld()->addUnit( m_createUnit );
 	m_createUnit = 0; // Unit instance ownership moved to the world!
+
+	// UnitSpawnAction is 'very' instantaneous, so deactivate() is called
+	// immediately after activate().
+	deactivate();
+
 }
 
 Action* EpCreateUnitSpawnAction( void* createUnit )
@@ -185,7 +226,13 @@ Action* EpCreateAction( ActionType at, ... )
 
 void ScriptAction::activate()
 {
+	Action::activate();
+
 	GetScriptManager().execute( m_scriptCommand.c_str() );
+
+	// ScriptAction is 'very' instantaneous, so deactivate() is called
+	// immediately after activate().
+	deactivate();
 }
 
 Action* EpCreateScriptAction( const char* scriptCommand )
@@ -208,6 +255,8 @@ UnitMoveAction::~UnitMoveAction()
 
 void UnitMoveAction::activate()
 {
+	Action::activate();
+
 	int i = 4;
 
 	if ( m_input == "LEFT" )
@@ -225,11 +274,18 @@ void UnitMoveAction::activate()
 
 bool UnitMoveAction::update( double dTime, float fElapsedTime )
 {
+	Action::update( dTime, fElapsedTime );
+
 	m_activateElapsedTime += fElapsedTime;
 	if ( m_activateElapsedTime > 2.0f )
+	{
+		deactivate();
 		return false;
+	}
 	else
+	{
 		return true;
+	}
 }
 Action* EpCreateUnitMoveAction( void* targetUnit, const char* input )
 {
@@ -241,6 +297,8 @@ Action* EpCreateUnitMoveAction( void* targetUnit, const char* input )
 
 void FadeAction::activate()
 {
+	Action::activate();
+
 	GetG().m_EpLight.setFadeDuration( m_fDuration );
 	if ( m_iType == 0 )
 		GetG().m_EpLight.fadeInLight();
@@ -250,7 +308,16 @@ void FadeAction::activate()
 
 bool FadeAction::update( double dTime, float fElapsedTime )
 {
-	return GetG().m_EpLight.isInFading();
+	Action::update( dTime, fElapsedTime );
+
+	bool actionInProgress = GetG().m_EpLight.isInFading();
+	if ( actionInProgress )
+		return true;
+	else
+	{
+		deactivate();
+		return false;
+	}
 }
 
 Action* EpCreateFadeAction( const char* type, int durationMs )
@@ -276,8 +343,14 @@ TeleportAction::~TeleportAction()
 
 void TeleportAction::activate()
 {
+	Action::activate();
+
 	m_targetUnit->setTileBufferPos( m_tileX, m_tileY );
 	m_targetUnit->setTilePos( m_tileX, m_tileY );
+
+	// TeleportAction is 'very' instantaneous, so deactivate() is called
+	// immediately after activate().
+	deactivate();
 }
 
 Action* EpCreateTeleportAction( void* targetUnit, int x, int y )
@@ -304,6 +377,8 @@ CameraAction::CameraAction( int type, int duration )
 
 void CameraAction::activate()
 {
+	Action::activate();
+
 	GetG().m_camera.setSmoothCameraDuration( (float)m_duration / 1000.0f );
 
 	switch ( m_type )
@@ -317,6 +392,10 @@ void CameraAction::activate()
 		GetG().m_camera.begin( CAMERA_EXTERNAL );
 		break;
 	}
+
+	// CameraAction is 'very' instantaneous, so deactivate() is called
+	// immediately after activate().
+	deactivate();
 }
 
 Action* EpCreateCameraAction( const char* type, const char* extCamName, int durationMs  )
@@ -344,7 +423,13 @@ ControllableAction::ControllableAction( Character* c, bool controllable )
 
 void ControllableAction::activate()
 {
+	Action::activate();
+
 	m_c->setControllable( m_bControllable );
+
+	// ControllableAction is 'very' instantaneous, so deactivate() is called
+	// immediately after activate().
+	deactivate();
 }
 
 Action* EpCreateControllableAction( void* target, int controllable )
@@ -358,14 +443,17 @@ Action* EpCreateControllableAction( void* target, int controllable )
 DelayAction::DelayAction( int delayMs )
 : m_delayMs( delayMs ), m_activateElapsedTime( 0 )
 {}
-void DelayAction::activate()
-{}
 
 bool DelayAction::update( double dTime, float fElapsedTime )
 {
+	Action::update( dTime, fElapsedTime );
+
 	m_activateElapsedTime += fElapsedTime;
 	if ( m_activateElapsedTime > m_delayMs/1000.0f )
+	{
+		deactivate();
 		return false;
+	}
 	else
 		return true;
 }
@@ -379,7 +467,6 @@ Action* EpCreateDelayAction( int delayMs )
 
 StartIncidentAction::StartIncidentAction( Incident* incident )
 : m_incident ( dynamic_cast<BlockingActionIncident*>( incident ) )
-, m_bDoIncientUpdate( false )
 {
 	if ( !m_incident )
 		throw std::runtime_error( "StartIncidentAndWaitAction is only applicable to blocking incidents, i.e. BlockingActionIncident" );
@@ -387,23 +474,20 @@ StartIncidentAction::StartIncidentAction( Incident* incident )
 
 bool StartIncidentAction::update( double dTime, float fElapsedTime )
 {
-	if ( m_bDoIncientUpdate )
+	Action::update( dTime, fElapsedTime );
+
+	if ( isActivated() )
 	{
 		// Incident::update() returns true when all actions are finished.
 		// Action::update() returns true when the update is valid which means this update is needed.
 		bool allActionsFinished = m_incident->update( dTime, fElapsedTime );
 		if ( allActionsFinished )
 		{
-			m_bDoIncientUpdate = false;
+			deactivate();
 			return false;
 		}
 	}
 	return true;
-}
-
-void StartIncidentAction::activate()
-{
-	m_bDoIncientUpdate = true;
 }
 
 Action* EpCreateStartIncidentAction( void* inc )

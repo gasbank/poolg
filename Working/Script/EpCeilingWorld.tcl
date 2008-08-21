@@ -2,6 +2,7 @@ namespace eval EpCeilingWorld {
 	set modelFilePath	"CeilingWorld.arn"
 	set dialogNameList [ list introDialog GlooPDialog GetGDialog SetGDialog ]
 	global world hero npcGetg npcGloop pHeroUnit npcSetg
+	variable startPos { 30 77 }
 
 	proc registerIncidentInitTalk {} {
 		global world hero npcGetg npcGloop pHeroUnit
@@ -83,12 +84,11 @@ namespace eval EpCeilingWorld {
 	}
 
 	proc init { curWorld } {
-		global world hero npcGetg npcGloop npcSetg
-		global pHeroUnit
+		global world hero npcGetg npcGloop npcSetg pHeroUnit startPos
 		EpOutputDebugString " - [info level 0] called / curWorld: $curWorld\n"
 		set world					$curWorld;
 		
-		set pHeroUnit				[ createHero 30 77 ];
+		set pHeroUnit				[ createHero $startPos ];
 		                                      # Health Will Coding Defence Sense Immunity
 		EpCharacterSetStat			$pHeroUnit    7     5     7       5      5      5
 		EpCharacterSetCurHp			$pHeroUnit 10

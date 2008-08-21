@@ -127,6 +127,10 @@ HRESULT CreditState::frameRender( IDirect3DDevice9* pd3dDevice, double fTime, fl
 		rc.top += 40*2;
 		m_d3dxFontBig->DrawTextW( 0, L"Min Seok Baek", -1, &rc, DT_NOCLIP | DT_CENTER | DT_VCENTER, m_textColor );
 	}
+	else if ( fStateTime < s_period * 5)
+	{
+		m_d3dxFont->DrawTextW( 0, L"2008 PoolC Game Project", -1, &rc, DT_NOCLIP | DT_CENTER | DT_VCENTER, m_textColor );
+	}
 
 	pd3dDevice->SetRenderState( D3DRS_LIGHTING, TRUE );
 	D3DXMATRIX mTrans, mScale, mRot;
@@ -159,10 +163,6 @@ HRESULT CreditState::frameMove( double fTime, float fElapsedTime )
 	if ( m_textMatAlpha < 0 )
 		m_textMatAlpha = 0;
 
-	if ( fStateTime >= s_period * 4)
-	{
-		TopStateManager::getSingleton().setNextState( GAME_TOP_STATE_PLAY );
-	}
 	return S_OK;
 }
 
@@ -172,7 +172,7 @@ HRESULT CreditState::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 	{
 		if ( wParam == VK_F4)
 		{
-			TopStateManager::getSingleton().setNextState( GAME_TOP_STATE_PLAY );
+			//TopStateManager::getSingleton().setNextState( GAME_TOP_STATE_PLAY );
 		}
 	}
 

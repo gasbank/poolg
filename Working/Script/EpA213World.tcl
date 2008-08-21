@@ -2,6 +2,7 @@ namespace eval EpA213World {
 	set modelFilePath	"A213World.arn"
 	set dialogNameList [ list  ]
 	variable pHeroUnit
+	variable gatePos { 14 66 }
 	
 	proc init { curWorld } {
 		variable world
@@ -13,10 +14,11 @@ namespace eval EpA213World {
 
 	proc enter {} {
 		variable pHeroUnit
+		variable gatePos
 		
 		EpOutputDebugString " - [info level 0] called\n"
 		
-		set pHeroUnit				[ createHero 14 66 ];
+		set pHeroUnit				[ createHero $gatePos ];
 		set pEnemyUnit1				[ createEnemy 81 70 ];
 		set pEnemyUnit2				[ createEnemy 82 60 ];
 		set pEnemyUnit3				[ createEnemy 64 64 ];

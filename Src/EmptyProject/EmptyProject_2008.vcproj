@@ -247,6 +247,7 @@
 				AdditionalLibraryDirectories="../Aran/lib;../DXUT/Core/Release;../DXUT/Optional/Release;../tcl/lib"
 				GenerateManifest="false"
 				DelayLoadDLLs=""
+				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"

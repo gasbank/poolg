@@ -221,8 +221,10 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 	Sprite* sprite = g_spriteManager->registerSprite( "GUI", "Images/UI.png" );
 	sprite->registerRect( "BlueCircle", 0, 0, 127, 127 );
 
+	/*
 	g_dr = sprite->drawRequest( "BlueCircle", 0, 0, D3DCOLOR_RGBA( 255, 255, 255, 255 ) );
 	g_dr2 = sprite->drawRequestXformable( "BlueCircle" );
+	*/
 
 	return S_OK;
 }
@@ -272,7 +274,7 @@ void CALLBACK OnFrameMove( double fTime, float fElapsedTime, void* pUserContext 
 	HRESULT hr;
 
 	
-	if (g_dr)
+	if ( g_dr )
 	{
 		if (g_dr->srcRect.right < 50)
 		{
@@ -284,12 +286,15 @@ void CALLBACK OnFrameMove( double fTime, float fElapsedTime, void* pUserContext 
 		}
 	}
 
+	if ( g_dr2 )
+	{
+		D3DXMATRIX mRotX, mRotZ;
+		D3DXMatrixRotationX( &mRotX, (float)(fTime / 3.0 * D3DX_PI) );
+		D3DXMatrixRotationZ( &mRotZ, D3DXToRadian( 0 ) );
+		g_dr2->xform = mRotX * mRotZ;
 
-	D3DXMATRIX mRotX, mRotZ;
-	D3DXMatrixRotationX( &mRotX, (float)(fTime / 3.0 * D3DX_PI) );
-	D3DXMatrixRotationZ( &mRotZ, D3DXToRadian( 0 ) );
-	g_dr2->xform = mRotX * mRotZ;
-
+	}
+	
 	UNREFERENCED_PARAMETER( hr );
 
 	GetWorldManager().changeToNextWorldIfExist();
@@ -384,7 +389,7 @@ void renderDebugText()
 	D3DXCOLOR textColor = D3DXCOLOR( 1.0f, 0.0f, 0.0f, 1.0f );
 	g_pFont->DrawTextW( 0, g_debugBuffer.c_str(), -1, &rc, DT_NOCLIP | DT_RIGHT, textColor );
 
-	g_debugBuffer.clear();
+	
 }
 
 void renderFixedElements( double fTime, float fElapsedTime )
@@ -393,7 +398,12 @@ void renderFixedElements( double fTime, float fElapsedTime )
 	DXUTGetD3D9Device()->SetTransform(D3DTS_VIEW, &GetG().g_fixedViewMat);
 	DXUTGetD3D9Device()->SetTransform(D3DTS_PROJECTION, &GetG().g_orthoProjMat);
 
+#ifdef DEBUG
 	renderDebugText();
+#endif
+
+	g_debugBuffer.clear();
+
 }
 
 HRESULT renderTileGrid()

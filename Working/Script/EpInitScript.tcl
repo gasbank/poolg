@@ -5,7 +5,7 @@
 #----------------------------------------------------------------------------------#
 
 set EpWorldList [ list EpCeilingWorld EpRoomWorld EpA213World EpTestStage ]
-set EpStartWorldName EpA213World
+set EpStartWorldName EpRoomWorld
 
 proc EpInitApp {} {
 	# Screen Resolution
@@ -30,9 +30,9 @@ proc EpInitGame {} {
 
 # Common Ep functions helpers
 
-proc createHero { tileX tileY } {
+proc createHero { tilePos } {
 	set curWorld [ EpGetCurWorld ];
-	set unit [ EpCreateHero $tileX $tileY ];
+	set unit [ EpCreateHero $tilePos ];
 	EpRegisterToWorld $curWorld $unit
 	return $unit
 }

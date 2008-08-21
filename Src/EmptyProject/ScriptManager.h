@@ -28,6 +28,8 @@ public:
 	bool readCharPtrList( const char* variableName, ConstCharList& strList );
 
 	void initScriptBindings();
+
+	void readTwoIntObj( Tcl_Obj* obj, int& v1, int& v2 );
 private:
 	
 
@@ -42,7 +44,7 @@ inline ScriptManager& GetScriptManager() { return ScriptManager::getSingleton();
 enum ArgumentType
 {						// Equivalent C type
 
-	AT_V	= 0,		// void                  ==used only at return type==
+	AT_V	= 0,		// void
 	AT_I	= 1,		// signed int or signed long
 	AT_PC	= 2,		// const char*
 	AT_D	= 3,		// double
@@ -125,6 +127,7 @@ static const DWORD _trait_PV_PV_I_I		= AT_PV | (AT_PV << 4) | (AT_I << 8) | (AT_
 static const DWORD _trait_PV_PV_I_I_I	= AT_PV | (AT_PV << 4) | (AT_I << 8) | (AT_I << 12) | (AT_I << 16);
 static const DWORD _trait_PV_PV_I_I_I_I	= AT_PV | (AT_PV << 4) | (AT_I << 8) | (AT_I << 12) | (AT_I << 16) | (AT_I << 20);
 static const DWORD _trait_PV_PV_I_I_I_I_I	= AT_PV | (AT_PV << 4) | (AT_I << 8) | (AT_I << 12) | (AT_I << 16) | (AT_I << 20)| (AT_I << 24);
+static const DWORD _trait_PV_OBJ		= AT_PV | (AT_OBJ << 4);
 static const DWORD _trait_D_PV			= AT_D | (AT_PV << 4);
 static const DWORD _trait_PV_I_I_I_I_I_I= AT_I | (AT_PV << 4) | (AT_I << 8) | (AT_I << 12) | (AT_I << 16) | (AT_I << 20) | (AT_I << 24) | (AT_I << 28);
 static const DWORD _trait_OBJ_PV		= AT_OBJ | (AT_PV << 4);
@@ -350,6 +353,15 @@ static const DWORD _trait_OBJ_PV		= AT_OBJ | (AT_PV << 4);
 	}																			\
 	SCRIPT_CALLABLE_END(funcName, PV_PV_I_I_I_I_I)
 
+
+#define SCRIPT_CALLABLE_PV_OBJ(funcName)										\
+	void _wrap_##funcName(ScriptArgumentList& args)								\
+	{																			\
+		args[0].pv = funcName(args[1].obj);										\
+	}																			\
+	SCRIPT_CALLABLE_END(funcName, PV_OBJ)
+
+//////////////////////////////////////////////////////////////////////////
 
 #define CREATE_OBJ_COMMAND_ENGINE(funcName)											\
 	Tcl_CreateObjCommand(GetScriptManager().getInterp(), #funcName, _tcl_wrap_##funcName, (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL);

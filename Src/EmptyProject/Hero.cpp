@@ -59,13 +59,15 @@ LRESULT Hero::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 	return Character::handleMessages( hWnd, uMsg, wParam, lParam );
 }
 
-Unit* EpCreateHero( int tileX, int tileY )
+Unit* EpCreateHero( Tcl_Obj* tilePos )
 {
 	LPD3DXMESH d3dxMesh;
 	D3DXCreateTeapot( GetG().m_dev, &d3dxMesh, 0 );
+	int tileX = 0, tileY = 0;
+	GetScriptManager().readTwoIntObj( tilePos, tileX, tileY );
 	return Hero::createHero( d3dxMesh, tileX, tileY, 0 );
 
-} SCRIPT_CALLABLE_PV_I_I( EpCreateHero )
+} SCRIPT_CALLABLE_PV_OBJ( EpCreateHero )
 
 START_SCRIPT_FACTORY(Hero)
 	CREATE_OBJ_COMMAND( EpCreateHero )

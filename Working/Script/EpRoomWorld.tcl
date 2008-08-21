@@ -1,7 +1,9 @@
 namespace eval EpRoomWorld {
 	set modelFilePath	"RoomWorld.arn"
 	set dialogNameList [ list  ]
-	variable world testEnemy pHeroUnit pTestEnemyUnit
+	variable world
+	variable pHeroUnit
+	variable radiatorStartPos { 26 74 }
 	
 	proc init { curWorld } {
 		variable world
@@ -160,12 +162,13 @@ namespace eval EpRoomWorld {
 		variable pHeroUnit
 		variable pTestEnemyUnit
 		variable TestStObject
+		variable radiatorStartPos
 		
 		EpOutputDebugString " - [info level 0] called\n"
 		
 		set testEnemy				[createEnemy 46 75 1];
 		
-		set pHeroUnit				[createHero 53 66];
+		set pHeroUnit				[createHero $radiatorStartPos];
 		
 		set pEnemyUnit1				[createEnemy 25 90 1];
 		set pEnemyUnit2				[createEnemy 37 88 1];

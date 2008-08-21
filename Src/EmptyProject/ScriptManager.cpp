@@ -136,8 +136,21 @@ bool ScriptManager::readCharPtrList( const char* variableName, ConstCharList& st
 	return true;
 }
 
-#define INIT_BINDING(className) _script_factory_##className::init()
+void ScriptManager::readTwoIntObj( Tcl_Obj* obj, int& v1, int& v2 )
+{
+	int objLength = 0;
+	Tcl_ListObjLength( m_interp, obj, &objLength );
+	if ( objLength != 2 )
+		throw std::runtime_error( "Tcl_Obj* parse error" );
+	
+	Tcl_Obj* elemObj;
+	Tcl_ListObjIndex( m_interp, obj, 0, &elemObj );
+	Tcl_GetIntFromObj( m_interp, elemObj, &v1 );
+	Tcl_ListObjIndex( m_interp, obj, 1, &elemObj );
+	Tcl_GetIntFromObj( m_interp, elemObj, &v2 );
+}
 
+#define INIT_BINDING(className) _script_factory_##className::init()
 void ScriptManager::initScriptBindings()
 {
 	INIT_BINDING( WorldManager );
@@ -153,6 +166,7 @@ void ScriptManager::initScriptBindings()
 	INIT_BINDING( Trigger );
 	INIT_BINDING( StructureObject );
 }
+#undef INIT_BINDING
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -278,6 +292,9 @@ void ParseTclArgumentByTrait( DWORD trait, Tcl_Interp* interp, int objc, Tcl_Obj
 				{
 					throw std::runtime_error("Double argument access failed");
 				}
+				break;
+			case AT_OBJ:
+				sa.obj = objv[i];
 				break;
 			default:
 				throw std::runtime_error("Trait value incorrect");

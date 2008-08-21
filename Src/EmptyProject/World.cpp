@@ -356,7 +356,7 @@ HRESULT World::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 			else
 			{
 				rCamera.setAttachPos( &vHeroPos );
-				rCamera.setSmoothCameraDuration( 3.0f );
+				rCamera.setSmoothCameraDuration( 1.0f );
 				rCamera.begin( CAMERA_SMOOTH_ATTACH );
 
 			}

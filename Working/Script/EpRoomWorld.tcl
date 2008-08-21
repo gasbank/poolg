@@ -192,6 +192,7 @@ namespace eval EpRoomWorld {
 		set pEnemyUnit8				[createEnemy 42 44 1];
 		set pNPCUnit1				[createEnemy 47 65 1];
 		set pTestEnemyUnit			[createEnemy 55 40 1];
+		set testEnemy				[createEnemy 47 45 1];
 
 		set TestStObject			[createStructureObject 50 40];
 		EpUnitSetArnMesh			$TestStObject "PushableBox"
@@ -274,8 +275,6 @@ namespace eval EpRoomWorld {
 		#registerIncidentUnClear
 		#Incident_TofuManEnter
 		registerIncidentSwitch
-		registerIncidentCamera
-		registerIncidentCamera2
 		registerIncidentControl
 		
 		# Warp Positions -------------------------------------------------------

@@ -329,7 +329,7 @@ void EpCamera::beginShoulderLookCamera( const D3DXVECTOR3* pvMePos, const D3DXVE
 
 	// 자, 이제 카메라의 목적 위치를 구하였다. 이동시켜보자.
 	setDesViewParams( &vDesEye, &vDesLookAt, &vDesUp );
-	setSmoothCameraDuration( 3.0f );
+	setSmoothCameraDuration( 1.0f );
 	begin( CAMERA_SMOOTH );
 }
 

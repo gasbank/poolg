@@ -317,9 +317,10 @@ HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 			}
 			return S_OK;
 		}
-		/*자신이 죽었을 시 어떠한 키로도 반응하지 않는다.*/
-		else if (getHero()->getCurHp() <= 0)
+		/*자신이 죽었을 시 어떠한 키로도 반응하지 않는다. 메롱 */
+		else if (getHero()->getCurHp() <= 0 && !getHero()->getSoulAnimation() )
 		{
+			GetTopStateManager().setNextState( GAME_TOP_STATE_CREDIT );
 			return S_OK;
 		}
 		/*자신의 차례가 아닐 때에도 반응하지 않는다.*/

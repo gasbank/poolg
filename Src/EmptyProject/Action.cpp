@@ -377,30 +377,32 @@ Action* EpCreateDelayAction( int delayMs )
 
 //////////////////////////////////////////////////////////////////////////
 
-StartIncidentAndWaitAction::StartIncidentAndWaitAction( Incident* incident )
-: m_incident ( dynamic_cast<BlockingActionIncident*>( incident ) )
+StartIncidentAction::StartIncidentAction( Incident* incident, bool wait )
+: m_incident ( dynamic_cast<BlockingActionIncident*>( incident ) ), m_wait ( wait )
 {
 	if ( !m_incident )
 		throw std::runtime_error( "StartIncidentAndWaitAction is only applicable to blocking incidents, i.e. BlockingActionIncident" );
 }
 
-bool StartIncidentAndWaitAction::update( double dTime, float fElapsedTime )
+bool StartIncidentAction::update( double dTime, float fElapsedTime )
 {
 	//IncidentTrigger* trigger = new IncidentTrigger( m_incident );
 	//return !trigger->check();
-
-	return !m_incident->isFinished();
+	if ( m_wait )
+		return !m_incident->isFinished();
+	else
+		return false;
 }
 
-void StartIncidentAndWaitAction::activate()
+void StartIncidentAction::activate()
 {
 	getCurWorld()->addIncident( m_incident );
 }
 
-Action* EpCreateStartIncidentAndWaitAction( void* inc )
+Action* EpCreateStartIncidentAction( void* inc, int i )
 {
-	return new StartIncidentAndWaitAction( /*reinterpret_cast<Incident*>( inc )*/ (Incident*)inc );
-} SCRIPT_CALLABLE_PV_PV( EpCreateStartIncidentAndWaitAction )
+	return new StartIncidentAction( /*reinterpret_cast<Incident*>( inc )*/ (Incident*)inc, i? true : false );
+} SCRIPT_CALLABLE_PV_PV_I( EpCreateStartIncidentAction )
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -416,5 +418,5 @@ START_SCRIPT_FACTORY( Action )
 	CREATE_OBJ_COMMAND( EpCreateCameraAction )
 	CREATE_OBJ_COMMAND( EpCreateControllableAction )
 	CREATE_OBJ_COMMAND( EpCreateDelayAction )
-	CREATE_OBJ_COMMAND( EpCreateStartIncidentAndWaitAction )
+	CREATE_OBJ_COMMAND( EpCreateStartIncidentAction )
 END_SCRIPT_FACTORY( Action )

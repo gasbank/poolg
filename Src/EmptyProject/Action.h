@@ -226,13 +226,14 @@ private:
 
 //////////////////////////////////////////////////////////////////////////
 
-class StartIncidentAndWaitAction : public Action
+class StartIncidentAction : public Action
 {
 public:
-	StartIncidentAndWaitAction( Incident* incident );
+	StartIncidentAction( Incident* incident, bool wait );
 
 	virtual void activate();
 	virtual bool update( double dTime, float fElapsedTime );
 private:
 	Incident* m_incident;
+	bool m_wait;
 };

@@ -8,6 +8,10 @@ public:
 
 	static void rotateAboutAxis( D3DXVECTOR3* vOut, D3DXVECTOR3* axis, float rad );
 	static float radBetweenVectors( const D3DXVECTOR3* v1, const D3DXVECTOR3* v2 );
+	static bool FullTraverseExhaustiveRayTesting( 
+		ArnNode* node, const D3DXVECTOR3& rayStartPos, const D3DXVECTOR3& rayDir, float distMin );
+	static float FullTraverseExhaustiveRayTesting( 
+		ArnNode* node, const D3DXVECTOR3& rayStartPos, const D3DXVECTOR3& rayDir );
 
 	static void printValue( const D3DXVECTOR3& vec3 )
 	{

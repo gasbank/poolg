@@ -2,6 +2,10 @@
 #include "EpCamera.h"
 #include "Utility.h"
 
+#include "WorldManager.h"
+#include "World.h"
+#include "ArnNode.h"
+
 
 EpCamera::EpCamera(void)
 {
@@ -33,6 +37,8 @@ void EpCamera::frameMove( FLOAT fElapsedTime )
 		updateAttachCamera();
 		break;
 	}
+
+	//printf("Eye, At %f %f %f, %f %f %f \n", m_vEye.x, m_vEye.y, m_vEye.z, m_vLookAt.x, m_vLookAt.y, m_vLookAt.z );
 
 	if ( m_bViewParamsDirty && !m_bCamManualMovement )
 	{
@@ -77,7 +83,6 @@ void EpCamera::setViewParamsWithUp( D3DXVECTOR3* pvEyePt, D3DXVECTOR3* pvLookatP
 	m_vDefaultEye = m_vEye = *pvEyePt;
 	m_vDefaultLookAt = m_vLookAt = *pvLookatPt;
 	m_vUp = vUp;
-
 
 	// Calc the view matrix
 	D3DXMatrixLookAtLH( &m_mView, pvEyePt, pvLookatPt, &vUp );
@@ -252,11 +257,13 @@ void EpCamera::updateSmoothAttachCamera( float fElapsedTime )
 
 		m_vDesLookAt.x = m_vPos->x;
 		m_vDesLookAt.y = m_vPos->y;
-		m_vDesLookAt.z = m_vPos->z;
+		m_vDesLookAt.z = m_vPos->z - 4.0f;
 
 		m_vDesUp.x = 0.0f;
 		m_vDesUp.y = 1.0f;
 		m_vDesUp.z = 0.0f;
+
+		pulledEye( &m_vDesEye, &m_vDesLookAt, &m_vDesEye );
 	}
 	else
 	{
@@ -266,11 +273,13 @@ void EpCamera::updateSmoothAttachCamera( float fElapsedTime )
 
 		m_vLookAt.x = m_vPos->x;
 		m_vLookAt.y = m_vPos->y;
-		m_vLookAt.z = m_vPos->z;
+		m_vLookAt.z = m_vPos->z - 4.0f;
 
 		m_vUp.x = 0.0f;
 		m_vUp.y = 1.0f;
 		m_vUp.z = 0.0f;
+
+		pulledEye( &m_vEye, &m_vLookAt, &m_vEye );
 	}
 
 	// And move to the destination gradually
@@ -313,6 +322,9 @@ void EpCamera::beginShoulderLookCamera( const D3DXVECTOR3* pvMePos, const D3DXVE
 	vDesEye.x += vHeroPos.x;
 	vDesEye.y += vHeroPos.y;
 
+	// 장애물에 가리지 않도록 한다.
+	pulledEye( &m_vDesEye, &m_vDesLookAt, &m_vDesEye );
+
 	// 자, 이제 카메라의 목적 위치를 구하였다. 이동시켜보자.
 	setDesViewParams( &vDesEye, &vDesLookAt, &vDesUp );
 	setSmoothCameraDuration( 3.0f );
@@ -332,4 +344,24 @@ void EpCamera::updateAttachCamera()
 	m_vUp.z = 0.0f;
 
 	m_bViewParamsDirty = true;
+}
+
+void EpCamera::pulledEye( D3DXVECTOR3* vPulledEye, D3DXVECTOR3* vLookAt, D3DXVECTOR3* vEye )
+{
+	ArnNode* arnNode = GetWorldManager().getCurWorld()->getArnSceneGraphPt()->getSceneRoot();
+	D3DXVECTOR3 vRayDir = *vEye - *vLookAt;
+	D3DXVECTOR3 vNormRayDir;
+	D3DXVec3Normalize( &vNormRayDir, &vRayDir );
+	float camDist = D3DXVec3Length( &vRayDir );
+	float obsDist = Utility::FullTraverseExhaustiveRayTesting( arnNode, *vLookAt, vNormRayDir );
+
+	if ( camDist <= obsDist )
+		*vPulledEye = *vEye;
+	else
+	{
+		vNormRayDir *= obsDist;
+		*vPulledEye = *vLookAt + vNormRayDir;
+	}
+
+	printf( "camDist, obsDist %f %f \n", camDist, obsDist );
 }

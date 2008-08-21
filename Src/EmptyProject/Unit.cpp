@@ -271,89 +271,6 @@ void Unit::forcedMoveTest()
 	}
 }
 
-float MeshRayClosestIntersectDist( LPD3DXMESH mesh, const D3DXVECTOR3& rayStartPos, const D3DXVECTOR3& rayDir )
-{
-	HRESULT hr;
-	BOOL hit;
-	DWORD hitFaceIndex;
-	float hitU, hitV;
-	float hitDist;
-
-	// Get intersection information
-	V( D3DXIntersect( mesh, &rayStartPos, &rayDir, &hit,  &hitFaceIndex, &hitU, &hitV, &hitDist, 0, 0 ) );
-
-	// If there is collision between ray and face
-	if ( hit )
-	{
-		//printf( "Ray Testing Hit! Dist: %.2f\n", hitDist );
-		return hitDist;
-	}
-	else
-	{
-		//printf( "Ray Testing Not Hit\n", hitDist );
-		return FLOAT_POS_INF;
-	}
-}
-
-// If a ray intersects a triangle within distMin, true is returned.
-// Otherwise false is returned.
-bool FullTraverseExhaustiveRayTesting( ArnNode* node, const D3DXVECTOR3& rayStartPos, const D3DXVECTOR3& rayDir, float distMin )
-{
-	if ( node->getType() == NDT_RT_MESH )
-	{
-		ArnMesh* mesh = static_cast<ArnMesh*>( node );
-		float dist = 0;
-		const D3DXMATRIX& meshXform = mesh->getFinalLocalXform();
-		D3DXVECTOR3 relativeRayStartPos = DX_CONSTS::D3DXVEC3_ZERO;
-		D3DXVECTOR3 relativeRayDir = DX_CONSTS::D3DXVEC3_ZERO;
-
-		if ( mesh->getIpoName().length() == 0 )
-		{
-			relativeRayStartPos = rayStartPos - mesh->getLocalXform_Trans();
-			dist = MeshRayClosestIntersectDist( mesh->getD3DXMesh(), relativeRayStartPos, rayDir );
-		}
-		else
-		{
-			D3DXMATRIX meshXformInv;
-			D3DXVECTOR3 vScale, vTrans;
-			D3DXQUATERNION qRot;
-			D3DXMatrixInverse( &meshXformInv, 0, &meshXform );
-			D3DXMatrixDecompose( &vScale, &qRot, &vTrans, &meshXformInv );
-			D3DXMATRIX mRot;
-			D3DXMatrixRotationQuaternion( &mRot, &qRot );
-			D3DXVec3TransformCoord( &relativeRayStartPos, &rayStartPos, &meshXformInv );
-			D3DXVec3TransformCoord( &relativeRayDir, &rayDir, &mRot );
-			dist = MeshRayClosestIntersectDist( mesh->getD3DXMesh(), relativeRayStartPos, relativeRayDir );
-		}
-		
-		if ( dist <= distMin )
-		{
-			/*printf( " -------------------------------------------------------------\n" );
-			printf( " Ray dist is less than distMin!\n" );
-			printf( " rayStartPos = " );			Utility::printValue( rayStartPos ); printf("\n");
-			printf( " relativeRayStartPos = " );	Utility::printValue( relativeRayStartPos ); printf("\n");
-			printf( " rayDir = " );					Utility::printValue( rayDir ); printf("\n");
-			printf( " relativeRayDir = " );			Utility::printValue( relativeRayDir ); printf("\n");
-			printf( " meshXform = \n" );			Utility::printValue( meshXform ); printf("\n");*/
-			return true;
-		}
-		else
-			return false;
-	}
-	else
-	{
-		UINT i;
-		const UINT childCount = node->getNodeCount();
-		for ( i = 0; i < childCount; ++i )
-		{
-			bool ret = FullTraverseExhaustiveRayTesting( node->getNodeAt( i ), rayStartPos, rayDir, distMin );
-			if ( ret )
-				return true;
-		}
-	}
-	return false;
-}
-
 HRESULT Unit::rayTesting( UnitInput mappedKey )
 {
 	HRESULT hr = S_OK;
@@ -364,7 +281,7 @@ HRESULT Unit::rayTesting( UnitInput mappedKey )
 	float dirArray[4][3] = { { 0.0f, 1.0f, 0.0f }, { 0.0f, -1.0f, 0.0f }, { -1.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f } };
 	D3DXVECTOR3 rayDir( dirArray[mappedKey][0], dirArray[mappedKey][1], dirArray[mappedKey][2] );
 
-	bool intersected = FullTraverseExhaustiveRayTesting( ws->getArnSceneGraphPt()->getSceneRoot(), rayStartPos, rayDir, (float)s_tileSize );
+	bool intersected = Utility::FullTraverseExhaustiveRayTesting( ws->getArnSceneGraphPt()->getSceneRoot(), rayStartPos, rayDir, (float)s_tileSize );
 	m_bMovable = !intersected;
 
 	return hr;

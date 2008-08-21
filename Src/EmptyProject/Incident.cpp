@@ -6,13 +6,13 @@
 #include "World.h"
 
 
-Incident::Incident( bool infinite )
-: m_bActivated( false ), m_bInfinite( infinite ), m_LeastOnetime( false )
+Incident::Incident( int trigCount )
+: m_bActivated( false ), m_trigCount( trigCount ), m_LeastOnetime( false )
 {
 }
 
-Incident::Incident( Trigger* trigger, Action* action, bool infinite )
-: m_bActivated( false ), m_bInfinite( infinite ), m_LeastOnetime( false )
+Incident::Incident( Trigger* trigger, Action* action, int trigCount )
+: m_bActivated( false ), m_trigCount( trigCount ), m_LeastOnetime( false )
 {
 	addTrigger( trigger );
 	addAction( action );
@@ -26,7 +26,7 @@ bool Incident::update( double dTime, float fElapsedTime )
 {
 	int i = 0;
 
-	if ( !m_bActivated )
+	if ( !m_bActivated && checkTrigCountRemained())
 	{
 		TriggerList::iterator itTrig = m_trigger.begin();
 		for( ; itTrig != m_trigger.end(); itTrig++ )
@@ -54,11 +54,14 @@ bool Incident::update( double dTime, float fElapsedTime )
 		ActionList::iterator itAct = m_action.begin();
 		for( ; itAct != m_action.end(); ++itAct )
 		{
-			if( m_bInfinite && !(*itAct)->update( dTime, fElapsedTime ) )
+			if( checkTrigCountRemained() && !(*itAct)->update( dTime, fElapsedTime ) )
 				i++;
 		}
 		if ( i == (int) m_action.size() )
+		{
 			m_bActivated = false;
+			decreaseTrigCount();
+		}
 	}
 
 	return true;
@@ -99,7 +102,7 @@ void Incident::addAction( Action* action )
 
 void Incident::printDebugInfo() const
 {
-	printf("Inc: %-30s #trig=%d #act=%d activated=%d infinite=%d leastOnetime=%d\n", getName(), m_trigger.size(), m_action.size(), m_bActivated, m_bInfinite, m_LeastOnetime );
+	printf("Inc: %-30s #trig=%d #act=%d activated=%d trigCount=%d leastOnetime=%d\n", getName(), m_trigger.size(), m_action.size(), m_bActivated, m_trigCount, m_LeastOnetime );
 }
 
 void Incident::printDebugInfoDetailed() const
@@ -108,82 +111,112 @@ void Incident::printDebugInfoDetailed() const
 	EpPrintDebugInfoAll( m_trigger );
 	EpPrintDebugInfoAll( m_action );
 }
+
+void Incident::activate()
+{
+	if ( isActivated() )
+		throw std::runtime_error( "activate() is called after prior activation" );
+	m_bActivated = true;
+}
+
+void Incident::deactivate()
+{
+	if ( !isActivated() )
+		throw std::runtime_error( "deactivate() is called during not activated state" );
+	m_bActivated = false;
+}
 //////////////////////////////////////////////////////////////////////////
 
-BlockingActionIncident::BlockingActionIncident( bool infinite )
-: Incident( infinite )
+BlockingActionIncident::BlockingActionIncident( int trigCount )
+: Incident( trigCount )
 {
 }
 
-BlockingActionIncident::BlockingActionIncident( Trigger* trigger, Action* action, bool infinite )
-: Incident( trigger, action, infinite )
+BlockingActionIncident::BlockingActionIncident( Trigger* trigger, Action* action, int trigCount )
+: Incident( trigger, action, trigCount )
 {
 }
 
 bool BlockingActionIncident::update( double dTime, float fElapsedTime )
 {
-	int i = 0;
-	if ( !m_bActivated )
+	assert( m_trigger.size() );
+	assert( m_action.size() );
+
+	if ( !checkTrigCountRemained() )
+		return false;
+
+	
+	if ( !isActivated() )
 	{
+		// The first action is not triggered yet.
+		// Check each condition of triggers.
+		int satisCount = 0;
 		TriggerList::iterator itTrig = m_trigger.begin();
 		for( ; itTrig != m_trigger.end(); itTrig++ )
 		{
 			if ( (*itTrig)->check() )
-				i++;
-		}
-	}
-	
-	if ( i == (int) m_trigger.size() )
-	{
-		assert( m_bActivated == false );
-		
-		// Should be called one time
-		m_bActivated = true;
-		m_curActionIt = m_action.begin();
-		(*m_curActionIt)->activate();
-	}
-
-	if ( m_bActivated && ( m_curActionIt != m_action.end() ) )
-	{
-		if ( (*m_curActionIt)->update( dTime, fElapsedTime ) == false )
-		{
-			++m_curActionIt;
-			if ( m_curActionIt == m_action.end() )
 			{
-				m_LeastOnetime = true;
+				satisCount++;
 			}
 			else
-				(*m_curActionIt)->activate();
+			{
+				// One of the trigger conditions is not satisfied. Do nothing.
+				return false;
+			}
 		}
+
+		// All triggers satisfy its condition.
+		assert( satisCount == (int) m_trigger.size() );
+		activate();
 		
 	}
-	return true;
+	
+	bool curActionInProgress = (*m_curActionIt)->update( dTime, fElapsedTime );
+	if ( !curActionInProgress )
+	{
+		// Current action is finished. Try to activate next action if valid.
+		++m_curActionIt;
+		if ( m_curActionIt == m_action.end() )
+		{
+			m_LeastOnetime = true;
+			deactivate();
+			decreaseTrigCount();
+			// All actions are finished.
+			return true;
+		}
+		else
+			(*m_curActionIt)->activate();
+	}
+
+	// Some actions remained to be updated.
+	return false;
 }
 
+void BlockingActionIncident::activate()
+{
+	Incident::activate();
+
+	m_bActivated = true;
+	m_curActionIt = m_action.begin();
+	(*m_curActionIt)->activate();
+}
 
 
 
 //////////////////////////////////////////////////////////////////////////
 
-Incident* EpCreateIncident( void* pv1, void* pv2, int b )
+Incident* EpCreateIncident( void* pv1, void* pv2, int trigCount )
 {
 	Trigger* trig = reinterpret_cast<Trigger*>( pv1 );
 	Action* act = reinterpret_cast<Action*>( pv2 );
-
-	bool infinite;
-	if ( b == 0 )
-		infinite = false;
-	else
-		infinite = true;
-
-	return new Incident( trig, act, infinite );
+	return new Incident( trig, act, trigCount );
 } SCRIPT_CALLABLE_PV_PV_PV_I( EpCreateIncident )
 
-Incident* EpCreateBlockingActionIncident( void* pv1, void* pv2, int b )
+Incident* EpCreateBlockingActionIncident( void* pv1, void* pv2, int trigCount )
 {
 	Trigger* trig = reinterpret_cast<Trigger*>( pv1 );
 	Action* act = reinterpret_cast<Action*>( pv2 );
-	return new BlockingActionIncident( trig, act, b?true:false );
+	return new BlockingActionIncident( trig, act, trigCount );
 } SCRIPT_CALLABLE_PV_PV_PV_I( EpCreateBlockingActionIncident )
 
 int EpAddTriggerToIncident( void* pv1, void* pv2 )

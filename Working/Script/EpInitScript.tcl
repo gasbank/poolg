@@ -55,7 +55,9 @@ proc createEnemy { tileX tileY { registerWorld 1 } } {
 proc createWarpPosition { nextWorldName tx0 ty0 { tx1 -1 } { ty1 -1 } } {
 	set trigger		[ EpCreateUnitPositionTrigger [ EpGetHero ] $tx0 $ty0 $tx1 $ty1 0x001 ]
 	set action		[ EpCreateScriptAction "EpChangeWorld $nextWorldName" ]
-	set incident	[ EpCreateIncident $trigger $action 0 ]
+	set incident	[ EpCreateIncident $trigger $action 1 ]
+	
+	EpIncidentSetName $incident "Warp to $nextWorldName"
 	
 	set incCount	[ EpRegisterIncident $incident ]
 	EpOutputDebugString " - Incident count: $incCount\n"

@@ -377,8 +377,9 @@ Action* EpCreateDelayAction( int delayMs )
 
 //////////////////////////////////////////////////////////////////////////
 
-StartIncidentAction::StartIncidentAction( Incident* incident, bool wait )
-: m_incident ( dynamic_cast<BlockingActionIncident*>( incident ) ), m_wait ( wait )
+StartIncidentAction::StartIncidentAction( Incident* incident )
+: m_incident ( dynamic_cast<BlockingActionIncident*>( incident ) )
+, m_bDoIncientUpdate( false )
 {
 	if ( !m_incident )
 		throw std::runtime_error( "StartIncidentAndWaitAction is only applicable to blocking incidents, i.e. BlockingActionIncident" );
@@ -386,23 +387,29 @@ StartIncidentAction::StartIncidentAction( Incident* incident, bool wait )
 
 bool StartIncidentAction::update( double dTime, float fElapsedTime )
 {
-	//IncidentTrigger* trigger = new IncidentTrigger( m_incident );
-	//return !trigger->check();
-	if ( m_wait )
-		return !m_incident->isFinished();
-	else
-		return false;
+	if ( m_bDoIncientUpdate )
+	{
+		// Incident::update() returns true when all actions are finished.
+		// Action::update() returns true when the update is valid which means this update is needed.
+		bool allActionsFinished = m_incident->update( dTime, fElapsedTime );
+		if ( allActionsFinished )
+		{
+			m_bDoIncientUpdate = false;
+			return false;
+		}
+	}
+	return true;
 }
 
 void StartIncidentAction::activate()
 {
-	getCurWorld()->addIncident( m_incident );
+	m_bDoIncientUpdate = true;
 }
 
-Action* EpCreateStartIncidentAction( void* inc, int i )
+Action* EpCreateStartIncidentAction( void* inc )
 {
-	return new StartIncidentAction( /*reinterpret_cast<Incident*>( inc )*/ (Incident*)inc, i? true : false );
-} SCRIPT_CALLABLE_PV_PV_I( EpCreateStartIncidentAction )
+	return new StartIncidentAction( (Incident*)inc );
+} SCRIPT_CALLABLE_PV_PV( EpCreateStartIncidentAction )
 
 //////////////////////////////////////////////////////////////////////////
 

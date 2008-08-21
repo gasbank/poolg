@@ -17,7 +17,7 @@ namespace eval EpRoomWorld {
 			
 		set trigger [ EpCreateUnitPositionTrigger $pHeroUnit 44 81 44 81 0x001 ]
 		set action		[ EpCreateHealAction $pHeroUnit ]
-		set incident	[ EpCreateBlockingActionIncident $trigger $action 1 ]
+		set incident	[ EpCreateBlockingActionIncident $trigger $action 2 ]
 
 		set action2		[ EpCreateDialogAction "EpDialogHeal" ]
 		set action3		[ EpCreateTeleportAction $pHeroUnit 53 45 ]
@@ -38,7 +38,7 @@ namespace eval EpRoomWorld {
 		
 		set trigger		[ EpCreateTotalAnnihilationTrigger $world ]
 		set actions		[ EpCreateFadeAction out 3500 ]
-		set incident	[ EpCreateBlockingActionIncident $trigger 0 0 ]
+		set incident	[ EpCreateBlockingActionIncident $trigger 0 1 ]
 
 		lappend actions		[ EpCreateTeleportAction $pHeroUnit 53 45 ]
 		lappend actions		[ EpCreateFadeAction in 3000 ]
@@ -61,7 +61,7 @@ namespace eval EpRoomWorld {
 					
 		set trigger [ EpCreateUnitPositionTrigger $pHeroUnit 26 98 26 98 0x001 ]
 		set action		[ EpCreateUnitSpawnAction [createEnemy 27 98 0] ]
-		set incident	[ EpCreateIncident $trigger $action 0 ]
+		set incident	[ EpCreateIncident $trigger $action 1 ]
 
 		set action2		[ EpCreateUnitSpawnAction [createEnemy 28 98 0] ]
 
@@ -81,7 +81,7 @@ namespace eval EpRoomWorld {
 		
 		set trigger		[ EpCreateUnTotalAnnihilationTrigger $world ]
 		set action		[ EpCreateDialogAction "EpDialogReturn" ]
-		set incident		[ EpCreateIncident $trigger $action 1 ]
+		set incident		[ EpCreateIncident $trigger $action -1 ]
 
 		set trigger2		[ EpCreateUnitPositionTrigger $pHeroUnit 50 33 59 33 0x001 ]
 		set action2		[ EpCreateUnitMoveAction $pHeroUnit "UP" ]
@@ -97,21 +97,6 @@ namespace eval EpRoomWorld {
 		EpOutputDebugString " - Incident count: $incCount\n"
 	}
 	
-	proc Incident_TofuManEnter {} {
-		variable pHeroUnit
-		set trigger		[ EpCreateUnitPositionTrigger $pHeroUnit 50 42 59 42 0x001 ]
-		set action0		[ EpCreateScriptAction "EpSetDoAnim [EpGetNode Door] 1" ]
-		set action1		[ EpCreateScriptAction "EpSetDoAnim [EpGetNode TofuMan] 1" ]
-		
-		set incident	[ EpCreateIncident $trigger $action0 0 ]
-		EpAddActionToIncident $incident $action1
-
-		EpIncidentSetName	$incident "TofuMan incident"
-		
-		set incCount	[ EpRegisterIncident $incident ]
-		EpOutputDebugString " - Incident count: $incCount\n"
-	}
-
 	proc registerIncidentSwitch {} {
 		variable world
 		variable TestStObject

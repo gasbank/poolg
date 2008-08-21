@@ -9,7 +9,9 @@ namespace eval EpCeilingWorld {
 		set trigger		[ EpCreateUnitPositionTrigger $pHeroUnit 30 77 30 77 0x100 ]
 		set actions		[ EpCreateDialogAction "EpCeilingWorld::introDialog" ]
 				
-		set incident	[ EpCreateBlockingActionIncident $trigger 0 0 ]
+		set incident	[ EpCreateBlockingActionIncident $trigger 0 1 ]
+		
+		EpIncidentSetName $incident "Init Talk"
 		
 		foreach act $actions {
 			EpAddActionToIncident $incident $act
@@ -22,12 +24,12 @@ namespace eval EpCeilingWorld {
 	proc Quest1 {} {
 		global world hero npcGetg npcGloop pHeroUnit
 	
-		set trigger		[ EpCreateUnitPositionWithTraceTrigger $pHeroUnit $npcGetg 0x101 ]
+		set trigger		[ EpCreateUnitPositionWithTraceTrigger $pHeroUnit $npcGetg 0x001 ]
 		set actions		[ EpCreateDialogAction "EpCeilingWorld::GetGDialog" ]
-		lappend actions		[ EpCreateStartIncidentAction [ EpCeilingWorld::Quest2 ] 1 ]
-		lappend actions		[ EpCreateStartIncidentAction [ EpCeilingWorld::Quest3 ] 1 ]
+		lappend actions		[ EpCreateStartIncidentAction [ EpCeilingWorld::Quest2 ] ]
+		lappend actions		[ EpCreateStartIncidentAction [ EpCeilingWorld::Quest3 ] ]
 		
-		set incident	[ EpCreateBlockingActionIncident $trigger 0 1 ]
+		set incident	[ EpCreateBlockingActionIncident $trigger 0 -1 ]
 
 		foreach act $actions {
 			EpAddActionToIncident $incident $act
@@ -42,11 +44,11 @@ namespace eval EpCeilingWorld {
 	proc Quest2 {} {
 		global world hero npcGetg npcGloop pHeroUnit
 
-		set trigger	 [ EpCreateUnitPositionWithTraceTrigger $pHeroUnit $npcGloop 0x101 ]
+		set trigger	 [ EpCreateUnitPositionWithTraceTrigger $pHeroUnit $npcGloop 0x001 ]
 		set actions	 [ EpCreateDialogAction "EpCeilingWorld::GlooPDialog" ]
 
-		set incident	 [ EpCreateBlockingActionIncident $trigger 0 0 ]
-
+		set incident	 [ EpCreateBlockingActionIncident $trigger 0 -1 ]
+		EpIncidentSetName	$incident "Quest2 incident"
 		foreach act $actions {
 			EpAddActionToIncident $incident $act
 		}
@@ -65,11 +67,10 @@ namespace eval EpCeilingWorld {
 	proc Quest3 {} {
 		global world hero npcGetg npcGloop pHeroUnit npcSetg
 
-		set trigger	 [ EpCreateUnitPositionWithTraceTrigger $pHeroUnit $npcSetg 0x101 ]
+		set trigger	 [ EpCreateUnitPositionWithTraceTrigger $pHeroUnit $npcSetg 0x001 ]
 		set action	 [ EpCreateDialogAction "EpCeilingWorld::SetGDialog" ]
-
-		set incident	 [ EpCreateBlockingActionIncident $trigger $action 1 ]
-
+		set incident	 [ EpCreateBlockingActionIncident $trigger $action -1 ]
+		EpIncidentSetName	$incident "Quest3 incident"
 		## --------------------------------------------
 		## Do not register a incident planned
 		## to be invoked by EpCreateStartIncidentAndWaitAction!!!

@@ -122,121 +122,8 @@ bool Incident::update( double dTime, float fElapsedTime )
 	// All triggers are satisfied.
 	return true;
 }
-//////////////////////////////////////////////////////////////////////////
-
-
-NonblockingActionIncident::NonblockingActionIncident( int trigCount )
-: Incident( trigCount )
-{
-}
-
-NonblockingActionIncident::NonblockingActionIncident( Trigger* trigger, Action* action, int trigCount )
-: Incident( trigger, action, trigCount )
-{
-}
-
-bool NonblockingActionIncident::update( double dTime, float fElapsedTime )
-{
-	if ( Incident::update( dTime, fElapsedTime ) == false )
-		return false;
-
-	assert( isActivated() );
-
-	ActionList::iterator itAct = m_action.begin();
-
-	UINT finishedActionCount = 0;
-	for( ; itAct != m_action.end(); ++itAct )
-	{
-		bool updateIsNeededNextTime = (*itAct)->update( dTime, fElapsedTime );
-		if( !updateIsNeededNextTime )
-		{
-			// Current action is finished.
-			finishedActionCount++;
-		}
-	}
-	if ( finishedActionCount == m_action.size() )
-	{
-		deactivate();
-		decreaseTrigCount();
-		return true;
-	}
-	return false;
-}
 
 //////////////////////////////////////////////////////////////////////////
-
-BlockingActionIncident::BlockingActionIncident( int trigCount )
-: Incident( trigCount )
-{
-}
-
-BlockingActionIncident::BlockingActionIncident( Trigger* trigger, Action* action, int trigCount )
-: Incident( trigger, action, trigCount )
-{
-}
-
-void BlockingActionIncident::activate()
-{
-	Incident::activate();
-
-	m_curActionIt = m_action.begin();
-}
-bool BlockingActionIncident::update( double dTime, float fElapsedTime )
-{
-	if ( Incident::update( dTime, fElapsedTime ) == false )
-		return false;
-
-	assert( isActivated() );
-	
-	Action* curAction = (*m_curActionIt);
-	bool curActionInProgress = curAction->update( dTime, fElapsedTime );
-	if ( !curActionInProgress )
-	{
-		// Current action is finished. Try to activate next action if valid.
-		++m_curActionIt;
-		if ( m_curActionIt == m_action.end() )
-		{
-			m_LeastOnetime = true;
-			deactivate();
-			decreaseTrigCount();
-			// All actions are finished.
-			return true;
-		}
-		else
-		{
-			// m_curActionIt points to next action.
-			if ( (*m_curActionIt)->isActivated() )
-			{
-				throw std::runtime_error( "Action planned to be invoked by Incident is already activated.\
-										  You should deactivate the action when it is finished." );
-			}
-		}
-	}
-
-	// Some actions remained to be updated.
-	return false;
-}
-
-
-
-
-//////////////////////////////////////////////////////////////////////////
-
-Incident* EpCreateNonblockingActionIncident( void* pv1, void* pv2, int trigCount )
-{
-	OutputDebugString( _T(" - EpWarn: NonblockingActionIncident with triggering count 0 is created.\n" ) );
-	Trigger* trig = reinterpret_cast<Trigger*>( pv1 );
-	Action* act = reinterpret_cast<Action*>( pv2 );
-	return new NonblockingActionIncident( trig, act, trigCount );
-} SCRIPT_CALLABLE_PV_PV_PV_I( EpCreateNonblockingActionIncident )
-
-Incident* EpCreateBlockingActionIncident( void* pv1, void* pv2, int trigCount )
-{
-	OutputDebugString( _T(" - EpWarn: BlockingActionIncident with triggering count 0 is created.\n" ) );
-	Trigger* trig = reinterpret_cast<Trigger*>( pv1 );
-	Action* act = reinterpret_cast<Action*>( pv2 );
-	return new BlockingActionIncident( trig, act, trigCount );
-} SCRIPT_CALLABLE_PV_PV_PV_I( EpCreateBlockingActionIncident )
 
 int EpAddTriggerToIncident( void* pv1, void* pv2 )
 {
@@ -265,12 +152,7 @@ int EpIncidentSetName( void* pv1, const char* pv2 )
 
 
 START_SCRIPT_FACTORY( Incident )
-	CREATE_OBJ_COMMAND( EpCreateNonblockingActionIncident )
 	CREATE_OBJ_COMMAND( EpIncidentSetName )
-	CREATE_OBJ_COMMAND( EpCreateBlockingActionIncident )
 	CREATE_OBJ_COMMAND( EpAddTriggerToIncident )
 	CREATE_OBJ_COMMAND( EpAddActionToIncident )
 END_SCRIPT_FACTORY( Incident )
-
-//////////////////////////////////////////////////////////////////////////
-

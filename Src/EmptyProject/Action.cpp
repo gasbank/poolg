@@ -12,6 +12,9 @@
 #include "ArnSceneGraph.h"
 #include "ArnCamera.h"
 #include "Incident.h"
+#include "BlockingActionIncident.h"
+#include "NonblockingActionIncident.h"
+
 
 Action::Action(void)
 : m_bActivated( false )

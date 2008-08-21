@@ -7,6 +7,8 @@
 #include "Enemy.h"
 #include "World.h"
 #include "Incident.h"
+#include "NonblockingActionIncident.h"
+#include "BlockingActionIncident.h"
 #include "Trigger.h"
 #include "Action.h"
 #include "StructureObject.h"
@@ -145,6 +147,8 @@ void ScriptManager::initScriptBindings()
 	INIT_BINDING( Hero );
 	INIT_BINDING( Enemy );
 	INIT_BINDING( Incident );
+	INIT_BINDING( NonblockingActionIncident );
+	INIT_BINDING( BlockingActionIncident );
 	INIT_BINDING( Action );
 	INIT_BINDING( Trigger );
 	INIT_BINDING( StructureObject );

@@ -184,11 +184,72 @@ Trigger* EpCreateIncidentTrigger( void* incident )
 
 //////////////////////////////////////////////////////////////////////////
 
+UnitPositionWithTraceTrigger::UnitPositionWithTraceTrigger( Unit* unitA, Unit* unitB, UnitPositionTriggerType type )
+{
+	m_unitA		= unitA;
+	m_unitB		= unitB;
+	m_type		= type;
+
+	reload();
+}
+
+
+bool UnitPositionWithTraceTrigger::check()
+{
+	reload();
+
+	bool checkResult = m_region.isExist( m_unitA->getTilePos() );
+	bool retValue = false;
+
+	if ( m_type & UPTT_ENTER )
+	{
+		if ( !m_lastCheckResult && checkResult )
+			retValue =  true;
+	}
+	if ( m_type & UPTT_LEAVE )
+	{
+		if ( m_lastCheckResult && !checkResult )
+			retValue =  true;
+	}
+	if ( m_type & UPTT_STAY)
+	{
+		if ( m_lastCheckResult && checkResult )
+			retValue =  true;
+	}
+
+	m_lastCheckResult = checkResult;
+	return retValue;
+}
+
+void UnitPositionWithTraceTrigger::reload()
+{
+	Point2Uint start, end;
+	
+	start.x = m_unitB->getTilePos().x - 1;
+	start.y = m_unitB->getTilePos().y - 1;
+	end.x = m_unitB->getTilePos().x + 1;
+	end.y = m_unitB->getTilePos().y + 1;
+	
+	m_region.setStart( start );
+	m_region.setEnd( end );
+}
+
+Trigger* EpCreateUnitPositionWithTraceTrigger( void* unitA, void* unitB, int type )
+{
+	Unit* uA = reinterpret_cast<Character*>( unitA );
+	Unit* uB = reinterpret_cast<Character*>( unitB );
+	
+	return new UnitPositionWithTraceTrigger( uA, uB, (UnitPositionTriggerType)type );
+} SCRIPT_CALLABLE_PV_PV_PV_I( EpCreateUnitPositionWithTraceTrigger )
+
+//////////////////////////////////////////////////////////////////////////
+
 START_SCRIPT_FACTORY( Trigger )
 	CREATE_OBJ_COMMAND( EpCreateCharHpTrigger )
 	CREATE_OBJ_COMMAND( EpCreateUnitPositionTrigger )
 	CREATE_OBJ_COMMAND( EpCreateTotalAnnihilationTrigger )
 	CREATE_OBJ_COMMAND( EpCreateUnTotalAnnihilationTrigger )
 	CREATE_OBJ_COMMAND( EpCreateIncidentTrigger )
+	CREATE_OBJ_COMMAND( EpCreateUnitPositionWithTraceTrigger )
 END_SCRIPT_FACTORY( Trigger )
 

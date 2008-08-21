@@ -96,3 +96,22 @@ public:
 private:
 	Incident* m_incident;
 };
+
+//////////////////////////////////////////////////////////////////////////
+
+class UnitPositionWithTraceTrigger : public Trigger
+{
+public:
+	UnitPositionWithTraceTrigger( Unit* unitA, Unit* unitB, UnitPositionTriggerType type );
+	virtual ~UnitPositionWithTraceTrigger() {}
+
+	virtual bool check();
+	void reload();
+
+private:
+	Unit* m_unitA;
+	Unit* m_unitB;
+	TileRegion m_region;
+	bool m_lastCheckResult;
+	UnitPositionTriggerType m_type;
+};

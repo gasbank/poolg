@@ -22,10 +22,9 @@ namespace eval EpCeilingWorld {
 	proc Quest1 {} {
 		global world hero npcGetg npcGloop pHeroUnit
 	
-		set trigger		[ EpCreateUnitPositionTrigger $pHeroUnit 33 80 35 78 0x101 ]
+		set trigger		[ EpCreateUnitPositionWithTraceTrigger $pHeroUnit $npcGetg 0x101 ]
 		set actions		[ EpCreateDialogAction "EpCeilingWorld::GetGDialog" ]
 		lappend actions		[ EpCreateStartIncidentAndWaitAction [ EpCeilingWorld::Quest2 ] ]
-		#lappend actions		[ EpCreateDialogAction "EpCeilingWorld::GetGDialog2" ]
 		
 		set incident	[ EpCreateBlockingActionIncident $trigger 0 0 ]
 
@@ -40,7 +39,7 @@ namespace eval EpCeilingWorld {
 	proc Quest2 {} {
 		global world hero npcGetg npcGloop pHeroUnit
 
-		set trigger	 [ EpCreateUnitPositionTrigger $pHeroUnit 29 83 31 81 0x101 ]
+		set trigger	 [ EpCreateUnitPositionWithTraceTrigger $pHeroUnit $npcGloop 0x101 ]
 		set actions	 [ EpCreateDialogAction "EpCeilingWorld::GlooPDialog" ]
 		lappend actions  [ EpCreateStartIncidentAndWaitAction [ EpCeilingWorld::Quest3 ] ]
 
@@ -64,7 +63,7 @@ namespace eval EpCeilingWorld {
 	proc Quest3 {} {
 		global world hero npcGetg npcGloop pHeroUnit
 
-		set trigger	 [ EpCreateUnitPositionTrigger $pHeroUnit 33 80 35 78 0x101 ]
+		set trigger	 [ EpCreateUnitPositionWithTraceTrigger $pHeroUnit $npcGetg 0x101 ]
 		set action	 [ EpCreateDialogAction "EpCeilingWorld::GetGDialog2" ]
 		set incident	 [ EpCreateBlockingActionIncident $trigger $action 0 ]
 

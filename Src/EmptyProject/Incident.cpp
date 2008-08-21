@@ -7,12 +7,12 @@
 
 
 Incident::Incident( bool infinite )
-: m_bActivated( false ), m_bInfinite( infinite )
+: m_bActivated( false ), m_bInfinite( infinite ), m_LeastOnetime( false )
 {
 }
 
 Incident::Incident( Trigger* trigger, Action* action, bool infinite )
-: m_bActivated( false ), m_bInfinite( infinite )
+: m_bActivated( false ), m_bInfinite( infinite ), m_LeastOnetime( false )
 {
 	addTrigger( trigger );
 	addAction( action );
@@ -42,6 +42,7 @@ bool Incident::update( double dTime, float fElapsedTime )
 				(*itAct)->activate();
 				
 			}
+			m_LeastOnetime = true;
 			m_bActivated = true;
 		}
 	}
@@ -137,7 +138,9 @@ bool BlockingActionIncident::update( double dTime, float fElapsedTime )
 		{
 			++m_curActionIt;
 			if ( m_curActionIt == m_action.end() )
-				return false;
+			{
+				m_LeastOnetime = true;
+			}
 			else
 				(*m_curActionIt)->activate();
 		}

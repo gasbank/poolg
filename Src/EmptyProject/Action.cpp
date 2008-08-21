@@ -11,6 +11,7 @@
 #include "Dialog.h"
 #include "ArnSceneGraph.h"
 #include "ArnCamera.h"
+#include "Incident.h"
 
 Action::Action(void)
 {
@@ -354,7 +355,6 @@ Action* EpCreateControllableAction( void* target, int controllable )
 
 //////////////////////////////////////////////////////////////////////////
 
-
 DelayAction::DelayAction( int delayMs )
 : m_delayMs( delayMs ), m_activateElapsedTime( 0 )
 {}
@@ -375,6 +375,28 @@ Action* EpCreateDelayAction( int delayMs )
 	return new DelayAction( delayMs );
 } SCRIPT_CALLABLE_PV_I( EpCreateDelayAction )
 
+//////////////////////////////////////////////////////////////////////////
+
+StartIncidentAndWaitAction::StartIncidentAndWaitAction( Incident* incident )
+: m_incident ( incident )
+{
+}
+
+bool StartIncidentAndWaitAction::update( double dTime, float fElapsedTime )
+{
+	IncidentTrigger* trigger = new IncidentTrigger( m_incident );
+	return !trigger->check();
+}
+
+void StartIncidentAndWaitAction::activate()
+{
+	getCurWorld()->addIncident( m_incident );
+}
+
+Action* EpCreateStartIncidentAndWaitAction( void* inc )
+{
+	return new StartIncidentAndWaitAction( /*reinterpret_cast<Incident*>( inc )*/ (Incident*)inc );
+} SCRIPT_CALLABLE_PV_PV( EpCreateStartIncidentAndWaitAction )
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -390,5 +412,5 @@ START_SCRIPT_FACTORY( Action )
 	CREATE_OBJ_COMMAND( EpCreateCameraAction )
 	CREATE_OBJ_COMMAND( EpCreateControllableAction )
 	CREATE_OBJ_COMMAND( EpCreateDelayAction )
+	CREATE_OBJ_COMMAND( EpCreateStartIncidentAndWaitAction )
 END_SCRIPT_FACTORY( Action )
-

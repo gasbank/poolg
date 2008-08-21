@@ -83,3 +83,16 @@ public:
 private:
 	UnitSet* m_pUs;
 };
+
+//////////////////////////////////////////////////////////////////////////
+
+class IncidentTrigger : public Trigger
+{
+public:
+	IncidentTrigger( Incident* incident );
+	virtual ~IncidentTrigger();
+	virtual bool check();
+
+private:
+	Incident* m_incident;
+};

@@ -23,11 +23,14 @@ public:
 	void detachAllTriggers();
 	void detachAllActions();
 
+	bool getLeastOnetime() { return m_LeastOnetime; }
+
 protected:
 	bool m_bActivated;
 	TriggerList m_trigger;
 	ActionList m_action;
 	bool m_bInfinite;
+	bool m_LeastOnetime;
 
 };
 

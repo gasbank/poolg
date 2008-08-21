@@ -160,9 +160,35 @@ Trigger* EpCreateUnTotalAnnihilationTrigger( void* pWorld )
 
 //////////////////////////////////////////////////////////////////////////
 
+IncidentTrigger::IncidentTrigger( Incident* incident )
+: m_incident( incident )
+{
+}
+
+IncidentTrigger::~IncidentTrigger()
+{
+}
+
+bool IncidentTrigger::check()
+{
+	if ( m_incident->getLeastOnetime() )
+		return true;
+	else
+		return false;
+}
+
+Trigger* EpCreateIncidentTrigger( void* incident )
+{
+	return new IncidentTrigger( reinterpret_cast<Incident*>( incident ) );
+} SCRIPT_CALLABLE_PV_PV( EpCreateIncidentTrigger )
+
+//////////////////////////////////////////////////////////////////////////
+
 START_SCRIPT_FACTORY( Trigger )
 	CREATE_OBJ_COMMAND( EpCreateCharHpTrigger )
 	CREATE_OBJ_COMMAND( EpCreateUnitPositionTrigger )
 	CREATE_OBJ_COMMAND( EpCreateTotalAnnihilationTrigger )
 	CREATE_OBJ_COMMAND( EpCreateUnTotalAnnihilationTrigger )
+	CREATE_OBJ_COMMAND( EpCreateIncidentTrigger )
 END_SCRIPT_FACTORY( Trigger )
+

@@ -1,5 +1,6 @@
 #pragma once
 #include "TileManager.h"
+#include "Incident.h"
 
 class World;
 class Enemy;
@@ -220,4 +221,17 @@ public:
 private:
 	Character* m_c;
 	bool m_bControllable;
+};
+
+//////////////////////////////////////////////////////////////////////////
+
+class StartIncidentAndWaitAction : public Action
+{
+public:
+	StartIncidentAndWaitAction( Incident* incident );
+
+	virtual void activate();
+	virtual bool update( double dTime, float fElapsedTime );
+private:
+	Incident* m_incident;
 };

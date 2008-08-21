@@ -19,14 +19,14 @@ namespace eval EpCeilingWorld {
 		EpOutputDebugString " - Incident count: $incCount\n"
 	}
 
-	proc QuestTalk {} {
+	proc Quest1 {} {
 		global world hero npcGetg npcGloop pHeroUnit
 	
 		set trigger		[ EpCreateUnitPositionTrigger $pHeroUnit 33 80 35 78 0x101 ]
 		set actions		[ EpCreateDialogAction "EpCeilingWorld::GetGDialog" ]
-		lappend actions		[ EpCreateScriptAction "EpCeilingWorld::Quest" ]
+		lappend actions		[ EpCreateStartIncidentAndWaitAction [ EpCeilingWorld::Quest2 ] ]
 		#lappend actions		[ EpCreateDialogAction "EpCeilingWorld::GetGDialog2" ]
-				
+		
 		set incident	[ EpCreateBlockingActionIncident $trigger 0 0 ]
 
 		foreach act $actions {
@@ -37,14 +37,33 @@ namespace eval EpCeilingWorld {
 		EpOutputDebugString " - Incident count: $incCount\n"
 	}
 
-	proc Quest {} {
+	proc Quest2 {} {
 		global world hero npcGetg npcGloop pHeroUnit
 
-		set questtrigger	 [ EpCreateUnitPositionTrigger $pHeroUnit 29 83 31 81 0x101 ]
-		set questaction		 [ EpCreateDialogAction "EpCeilingWorld::GlooPDialog" ]
-		set questincident	 [ EpCreateBlockingActionIncident $questtrigger $questaction 0 ]
+		set trigger	 [ EpCreateUnitPositionTrigger $pHeroUnit 29 83 31 81 0x101 ]
+		set actions	 [ EpCreateDialogAction "EpCeilingWorld::GlooPDialog" ]
+		#lappend actions  [ EpCreateStartIncidentAndWaitAction "EpCeilingWorld::Quest3" ]
 
-		set incCount	[ EpRegisterIncident $questincident ]
+		set incident	 [ EpCreateBlockingActionIncident $trigger 0 0 ]
+
+		foreach act $actions {
+			EpAddActionToIncident $incident $act
+		}
+
+		set incCount	[ EpRegisterIncident $incident ]
+		EpOutputDebugString " - Incident count: $incCount\n"
+
+		return $incident
+	}
+
+	proc Quest3 {} {
+		global world hero npcGetg npcGloop pHeroUnit
+
+		set trigger	 [ EpCreateUnitPositionTrigger $pHeroUnit 33 80 35 78 0x101 ]
+		set action	 [ EpCreateDialogAction "EpCeilingWorld::GetGDialog2" ]
+		set incident	 [ EpCreateBlockingActionIncident $trigger $action 0 ]
+
+		set incCount	[ EpRegisterIncident $incident ]
 		EpOutputDebugString " - Incident count: $incCount\n"
 	}
 
@@ -82,7 +101,7 @@ namespace eval EpCeilingWorld {
 
 
 		registerIncidentInitTalk
-		QuestTalk
+		Quest1
 			
 		createWarpPosition			"EpRoomWorld" 25 82
 	}
@@ -130,7 +149,7 @@ namespace eval EpCeilingWorld {
 			$player		"뭐하는 녀석인가?"\
 			$npc		"KKK라고 불리는 사람이 그린 고양이라고 하던데...."\
 			$player		"그림이 돌아다닐리가 없잖아"\
-			$npc		"어쩌겠나. 08 프로젝트 팀에게 문의를 하시게"\
+			$npc		"GetG에게 다시 물어보시게"\
 		];	
 	}
 
@@ -147,7 +166,7 @@ namespace eval EpCeilingWorld {
 			$player		"그것은 코딩의 기초가 아닌가"\
 			$npc		"하지만 이건 C에선 지원하지 않지"\
 			$player		"도대체 왜 아직도 C를 쓰는지 모르겠어"\
-			$npc		"어쩌겠나. 08 프로젝트 팀에게 문의를 하시게"\
+			$npc		"GlooP에게 물어보시게"\
 		];	
 	}
 
@@ -160,7 +179,8 @@ namespace eval EpCeilingWorld {
 		set npc "GetG"
 	
 		set dialog [ list\
-			$npc		"빠르군"\
+			$npc		"SetG에게 물어보시게"\
+			$player		"어쩌라구요♡"\
 		];	
 	}
 

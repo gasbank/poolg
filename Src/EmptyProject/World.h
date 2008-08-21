@@ -37,6 +37,8 @@ public:
 	UINT				addIncident( Incident* inc );
 	UINT				addDialog( Dialog* dlg ) { m_scriptedDialog.push_back( dlg ); return m_scriptedDialog.size(); }
 
+	Incident*			getIncident( UINT idx ) const;
+
 	UnitSet::iterator	removeUnit( Unit* pUnit );
 	
 	void				setCurEnemy( Character* enemy ) { m_curEnemyUnit = enemy; }
@@ -69,7 +71,7 @@ public:
 	ArnNode*			getNode( const char* nodeName ) const;
 
 	void				printDebugInfo() const;
-
+	void				printDebugInfoOfIncident( UINT index ) const;
 private:
 						World( const char* worldName, const TCHAR* modelFilePath );
 	void				setupLight();

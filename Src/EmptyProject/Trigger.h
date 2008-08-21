@@ -35,6 +35,7 @@ public:
 	virtual ~UnitPositionTrigger() {}
 
 	virtual bool check();
+	virtual void printDebugInfo() const;
 
 private:
 	Unit* m_unit;

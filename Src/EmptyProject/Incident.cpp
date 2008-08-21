@@ -99,7 +99,7 @@ void Incident::addAction( Action* action )
 
 void Incident::printDebugInfo() const
 {
-	printf("Inc: %-30s triggers=%d actions=%d activated=%d infinite=%d leastOnetime=%d\n", getName(), m_trigger.size(), m_action.size(), m_bActivated, m_bInfinite, m_LeastOnetime );
+	printf("Inc: %-30s #trig=%d #act=%d activated=%d infinite=%d leastOnetime=%d\n", getName(), m_trigger.size(), m_action.size(), m_bActivated, m_bInfinite, m_LeastOnetime );
 }
 
 void Incident::printDebugInfoDetailed() const

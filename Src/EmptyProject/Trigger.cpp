@@ -8,6 +8,7 @@
 #include "Action.h"
 #include "ScriptManager.h"
 #include "Unit.h"
+#include "Utility.h"
 
 Trigger::Trigger(void)
 {
@@ -52,6 +53,13 @@ bool UnitPositionTrigger::check()
 	return retValue;
 }
 
+void UnitPositionTrigger::printDebugInfo() const
+{
+	printf( "UnitPositionTrigger:\n" );
+	m_unit->printDebugInfo();
+	printf( "lastcheck=%d trigType=0x%x region=", m_lastCheckResult, m_type ); Utility::printValue( *m_region );
+	printf( "\n" );
+}
 Trigger* EpCreateUnitPositionTrigger( void* unit, int x0, int y0, int x1, int y1, int type )
 {
 	Unit* u = reinterpret_cast<Character*>( unit );

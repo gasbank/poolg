@@ -730,6 +730,25 @@ void World::printDebugInfo() const
 	EpPrintDebugInfoAll( m_scriptedDialog );
 	EpPrintDebugInfoAll( m_incidents );
 }
+
+void World::printDebugInfoOfIncident( UINT index ) const
+{
+	const Incident* inc = getIncident( index );
+	inc->printDebugInfoDetailed();
+}
+
+Incident* World::getIncident( UINT idx ) const
+{
+	assert( idx >= 0 && idx < m_incidents.size() );
+
+	IncidentList::const_iterator it = m_incidents.begin();
+	while ( idx )
+	{
+		++it;
+		--idx;
+	}
+	return (*it);
+}
 //////////////////////////////////////////////////////////////////////////
 
 Unit* EpGetHero()
@@ -779,6 +798,11 @@ int EpCurWorldDebugInfo()
 	return 0;
 } SCRIPT_CALLABLE_I( EpCurWorldDebugInfo )
 
+int EpCurWorldDebugInfoOfIncident( int idx )
+{
+	GetWorldManager().getCurWorld()->printDebugInfoOfIncident( (UINT)idx );
+	return 0;
+} SCRIPT_CALLABLE_I_I( EpCurWorldDebugInfoOfIncident )
 
 
 START_SCRIPT_FACTORY( World )
@@ -788,4 +812,5 @@ START_SCRIPT_FACTORY( World )
 	CREATE_OBJ_COMMAND( EpSetDoAnim )
 	CREATE_OBJ_COMMAND( EpSetAnimTime )
 	CREATE_OBJ_COMMAND( EpCurWorldDebugInfo )
+	CREATE_OBJ_COMMAND( EpCurWorldDebugInfoOfIncident )
 END_SCRIPT_FACTORY( World )

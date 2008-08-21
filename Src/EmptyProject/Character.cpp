@@ -33,7 +33,7 @@ void Character::doNormalAttack( int type, Character* enemy )
 	Unit* missile = Unit::createUnit(mesh, 0, 0, 0);
 
 	missile->setDynamicMotion(DynamicMotion::createDMfireUniformly
-		(missile, this->getPos(), fireDir, dist, 4.0f ));
+		(missile, this->getPos(), fireDir, dist, 40.0f ));
 
 	SkillObject* so = SkillObject::createSOnormalAttack(this, enemy, missile);
 	m_skillObjectList.push_back(so);

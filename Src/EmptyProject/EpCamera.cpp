@@ -363,5 +363,5 @@ void EpCamera::pulledEye( D3DXVECTOR3* vPulledEye, D3DXVECTOR3* vLookAt, D3DXVEC
 		*vPulledEye = *vLookAt + vNormRayDir;
 	}
 
-	printf( "camDist, obsDist %f %f \n", camDist, obsDist );
+	//printf( "camDist, obsDist %f %f \n", camDist, obsDist );
 }

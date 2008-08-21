@@ -88,5 +88,5 @@ namespace eval EpThreadTest {
 	
 	# enter the tcl event loop
 	
-	#vwait __forever__
+	vwait __forever__
 }

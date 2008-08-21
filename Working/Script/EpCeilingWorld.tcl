@@ -1,7 +1,7 @@
 namespace eval EpCeilingWorld {
 	set modelFilePath	"CeilingWorld.arn"
-	set dialogNameList [ list introDialog GlooPDialog GetGDialog GetGDialog2 ]
-	global world hero npcGetg npcGloop pHeroUnit
+	set dialogNameList [ list introDialog GlooPDialog GetGDialog SetGDialog ]
+	global world hero npcGetg npcGloop pHeroUnit npcSetg
 
 	proc registerIncidentInitTalk {} {
 		global world hero npcGetg npcGloop pHeroUnit
@@ -26,7 +26,7 @@ namespace eval EpCeilingWorld {
 		set actions		[ EpCreateDialogAction "EpCeilingWorld::GetGDialog" ]
 		lappend actions		[ EpCreateStartIncidentAndWaitAction [ EpCeilingWorld::Quest2 ] ]
 		
-		set incident	[ EpCreateBlockingActionIncident $trigger 0 0 ]
+		set incident	[ EpCreateBlockingActionIncident $trigger 0 1 ]
 
 		foreach act $actions {
 			EpAddActionToIncident $incident $act
@@ -63,11 +63,13 @@ namespace eval EpCeilingWorld {
 	}
 
 	proc Quest3 {} {
-		global world hero npcGetg npcGloop pHeroUnit
+		global world hero npcGetg npcGloop pHeroUnit npcSetg
 
-		set trigger	 [ EpCreateUnitPositionWithTraceTrigger $pHeroUnit $npcGetg 0x101 ]
-		set action	 [ EpCreateDialogAction "EpCeilingWorld::GetGDialog2" ]
-		set incident	 [ EpCreateBlockingActionIncident $trigger $action 0 ]
+		set trigger	 [ EpCreateUnitPositionWithTraceTrigger $pHeroUnit $npcSetg 0x101 ]
+		set action	 [ EpCreateDialogAction "EpCeilingWorld::SetGDialog" ]
+		lappend actions  [ EpCreateStartIncidentAndWaitAction [ EpCeilingWorld::Quest1 ] ]
+
+		set incident	 [ EpCreateBlockingActionIncident $trigger $action 1 ]
 
 		## --------------------------------------------
 		## Do not register a incident planned
@@ -81,7 +83,7 @@ namespace eval EpCeilingWorld {
 	}
 
 	proc init { curWorld } {
-		global world hero npcGetg npcGloop
+		global world hero npcGetg npcGloop npcSetg
 		global pHeroUnit
 		EpOutputDebugString " - [info level 0] called / curWorld: $curWorld\n"
 		set world					$curWorld;
@@ -111,6 +113,13 @@ namespace eval EpCeilingWorld {
 		EpCharacterSetCurHp			$npcGloop -1
 		EpEnemySetTalkable			$npcGloop 1
 		EpUnitSetArnMesh			$npcGloop "PoolGModel"
+
+		set npcSetg					[ createEnemy 30 72 ];
+		EpUnitSetColor				$npcSetg 128 128 0
+		EpCharacterSetStat			$npcSetg 4 1 3 1 1 1
+		EpCharacterSetCurHp			$npcSetg -1
+		EpEnemySetTalkable			$npcSetg 1
+		EpUnitSetArnMesh			$npcSetg "PoolGModel"
 
 
 		registerIncidentInitTalk
@@ -162,7 +171,7 @@ namespace eval EpCeilingWorld {
 			$player		"뭐하는 녀석인가?"\
 			$npc		"KKK라고 불리는 사람이 그린 고양이라고 하던데...."\
 			$player		"그림이 돌아다닐리가 없잖아"\
-			$npc		"GetG에게 다시 물어보시게"\
+			$npc		"SetG에게 물어보시게"\
 		];	
 	}
 
@@ -183,16 +192,16 @@ namespace eval EpCeilingWorld {
 		];	
 	}
 
-	namespace eval GetGDialog2 {
+	namespace eval SetGDialog {
 	
 		set region [ list 0 0 0 0 ]; ;# left, top, right, bottom
 		set oneTime 0;
 	
 		set player "PoolG"
-		set npc "GetG"
+		set npc "SetG"
 	
 		set dialog [ list\
-			$npc		"SetG에게 물어보시게"\
+			$npc		"안녕"\
 			$player		"어쩌라구요♡"\
 		];	
 	}

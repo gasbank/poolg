@@ -88,3 +88,19 @@ public:
 	}
 	virtual void useSkill( BattleState* battleState );
 };
+
+class MultiThread : public Skill
+{
+public:
+	MultiThread()
+	{
+		m_skillName = L"MultiThread";
+		m_description =
+			L"[MultiThread]\n"
+			L"여러 개의 쓰레드를 생성하여 상대방을\n"
+			L"병렬적으로 공격합니다.\n";
+		m_csEssentials = 10;
+	}
+	virtual void useSkill( BattleState* battleState );
+};
+

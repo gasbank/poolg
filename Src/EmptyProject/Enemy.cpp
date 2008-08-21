@@ -7,6 +7,7 @@
 #include "PlayState.h"
 #include "ArnSceneGraph.h"
 #include "ArnMesh.h"
+#include "Skill.h"
 
 Enemy::Enemy()
 : Character( UT_ENEMY )
@@ -14,6 +15,7 @@ Enemy::Enemy()
 	m_bRandomWalkable	= false;
 	m_bTalkable			= false;
 	m_iFightRange		= 3;
+	m_skillSet			= new SkillSet();
 }
 
 Enemy::~Enemy(void)

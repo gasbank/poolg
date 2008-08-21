@@ -2,10 +2,10 @@
 #include "Unit.h"
 #include "TileManager.h"
 
-class AttackObject;
-class Trigger;
 
-typedef std::list<AttackObject*> AttackObjectList;
+class SkillSet;
+class SkillObject;
+class Trigger;
 
 struct Stat
 {
@@ -27,13 +27,15 @@ public:
 	virtual void						pushUnitInFront( UnitInput dir );
 
 	/*스킬 함수*/
-	void								attack( int type, Character* enemy );
-	void								throwHealBall();
-	void								csBurn();
-	void								meditation();
+	void doNormalAttack(int type, Character* enemy);
+	void doHeal();
+	void doCsBurn();
+	void doMeditation();
+	void doMultiThread(int frequency, Character* enemy);
 
-	void								recoverCs();
-	void								heal( int point );
+
+	void recoverCs();
+	void heal (int point);
 
 	
 
@@ -61,21 +63,27 @@ public:
 	void								setStat( int statHealth, int statWill, int statCoding, int statDef, int statSen, int statImmu );
 
 	void								setControllable(bool bCtrl)		{ m_bControllable = bCtrl; }
+
+	SkillSet* getSkillSet () const { return m_skillSet; }
+	
 	
 protected:
 										Character( UnitType type );
+	SkillSet*				m_skillSet;
 
 private:
 	void								boundaryTesting( UnitInput );
-	AttackObjectList					m_attackObjectList;
 
-	bool								m_bMoving;
-	float								m_fMovingTime;
-	int									m_maxHp;
-	int									m_curHp;
-	int									m_maxCs;
-	int									m_curCs;
-	float								m_moveDuration; // A time needed to move one time(tile) in seconds
+	typedef std::list<SkillObject*> SkillObjectList;
+	SkillObjectList m_skillObjectList;
+
+	bool					m_bMoving;
+	float					m_fMovingTime;
+	int						m_maxHp;
+	int						m_curHp;
+	int						m_maxCs;
+	int						m_curCs;
+	float					m_moveDuration; // A time needed to move one time(tile) in seconds
 	
 	int									m_attack;		// 일반 공격 스킬에 영향
 	int									m_intelligence; // 힐링 등의 스킬에 영향
@@ -89,6 +97,8 @@ private:
 	Stat								m_stat;
 
 	bool								m_bControllable;
+
+	
 };
 
 

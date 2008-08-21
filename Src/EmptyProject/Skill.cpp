@@ -145,14 +145,14 @@ void NormalAttack::useSkill(BattleState *bs)
 	{
 		bs->pushBattleLog("스피릿이 부족합니다.");
 		bs->pushBattleLog("기술은 취소되며 코딩스피릿 번이 일어납니다.");
-		m_hero->csBurn();
+		m_hero->doCsBurn();
 		return;
 	}
 
 	m_hero->setCurCs (curCs - m_csEssentials);
 
 	bs->pushBattleLog("일반 공격을 사용하였습니다.");
-	m_hero->attack(0, m_enemy);
+	m_hero->doNormalAttack(0, m_enemy);
 
 }
 
@@ -163,7 +163,7 @@ void Heal::useSkill(BattleState *bs)
 	{
 		bs->pushBattleLog("스피릿이 부족합니다.");
 		bs->pushBattleLog("기술은 취소되며 코딩스피릿 번이 일어납니다.");
-		m_hero->csBurn();
+		m_hero->doCsBurn();
 		return;
 	}
 
@@ -171,11 +171,28 @@ void Heal::useSkill(BattleState *bs)
 
 
 	bs->pushBattleLog("힐링을 사용하였습니다.");
-	m_hero->throwHealBall();
+	m_hero->doHeal();
 }
 
 void Meditation::useSkill(BattleState *bs)
 {
 	bs->pushBattleLog("메디테이션을 사용하였습니다.");
-	m_hero->meditation();
+	m_hero->doMeditation();
+}
+
+void MultiThread::useSkill(BattleState *bs)
+{
+	int curCs = m_hero->getCurCs();
+	if (curCs < m_csEssentials)
+	{
+		bs->pushBattleLog("스피릿이 부족합니다.");
+		bs->pushBattleLog("기술은 취소되며 코딩스피릿 번이 일어납니다.");
+		m_hero->doCsBurn();
+		return;
+	}
+	
+	m_hero->setCurCs (curCs - m_csEssentials);
+
+	bs->pushBattleLog("멀티쓰레드를 사용하였습니다.");
+	m_hero->doMultiThread(3, m_enemy);
 }

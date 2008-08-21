@@ -120,15 +120,6 @@ BattleState::BattleState()
 	D3DXCreateFont(m_pDev, 15, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblSkillDescription);
 
 
-	/*스킬 초기화 부분*/
-	
-	m_skillSet = new SkillSet();
-	m_skillSet->setBattleState(this);
-
-	m_skillSet->setSkill (SL_FIRST, (Skill*) new NormalAttack());
-	m_skillSet->setSkill (SL_SECOND, (Skill*) new Heal());
-	m_skillSet->setSkill (SL_FIFTH, (Skill*) new Meditation());
-
 	m_noneSkillSelectedCount = 0;
 
 	m_curTurnType = TT_NATURAL;
@@ -162,7 +153,9 @@ HRESULT BattleState::enter()
 	m_mpIllusionPlayer.setRate((float)getHero()->getCurCs());
 
 	/*스킬 대상 설정*/
-	m_skillSet->setCharacter (getHero(), getEnemy());
+	SkillSet* skillSet = getHero()->getSkillSet();
+	skillSet->setCharacter (getHero(), getEnemy());
+	skillSet->setBattleState(this);
 	m_noneSkillSelectedCount = 0;
 	m_SkillContentBox.setOff();
 
@@ -335,14 +328,16 @@ HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 			return S_OK;
 		}
 
+		SkillSet* skillSet = this->getHero()->getSkillSet();
+
 		/*화살표에 따라 기술 분기*/
 		if (wParam == VK_UP)
 		{
-			m_skillSet->moveSkillLocation('u');
+			skillSet->moveSkillLocation('u');
 		}
 		if (wParam == VK_DOWN)
 		{
-			m_skillSet->moveSkillLocation('d');
+			skillSet->moveSkillLocation('d');
 		}
 		if (wParam == VK_LEFT)
 		{
@@ -355,7 +350,7 @@ HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 		if (wParam == VK_RETURN)
 		{
 			m_curTurnType = TT_NATURAL;
-			if (!(this->m_skillSet->useSkill()))
+			if (!(skillSet->useSkill()))
 			{
 				/*이부분에 스킬이 없습니다 라는 다이얼로그를 추가할수도.*/
 				switch (m_noneSkillSelectedCount)
@@ -467,7 +462,6 @@ HRESULT BattleState::release ()
 
 	m_innerFire.release();
 
-	//delete m_skillSet;
 	
 	SAFE_RELEASE( m_lblHYnamL );
 	SAFE_RELEASE( m_lblREB );
@@ -535,43 +529,45 @@ void BattleState::renderFixedText(int scrWidth, int scrHeight)
 	rc.top = scrHeight - 190;
 	rc.left = scrWidth - 110;
 
-	StringCchPrintf(textBuffer, 512, (STRSAFE_LPCWSTR)m_skillSet->getSkillName(SL_FIRST).c_str());
+	SkillSet* skillSet = getHero()->getSkillSet();
+
+	StringCchPrintf(textBuffer, 512, (STRSAFE_LPCWSTR)skillSet->getSkillName(SL_FIRST).c_str());
 	m_lblSkill->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 	rc.top += skillLineInterval;
-	StringCchPrintf(textBuffer, 512, (STRSAFE_LPCWSTR)m_skillSet->getSkillName(SL_SECOND).c_str());
+	StringCchPrintf(textBuffer, 512, (STRSAFE_LPCWSTR)skillSet->getSkillName(SL_SECOND).c_str());
 	m_lblSkill->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 	rc.top += skillLineInterval;
-	StringCchPrintf(textBuffer, 512, (STRSAFE_LPCWSTR)m_skillSet->getSkillName(SL_THIRD).c_str());
+	StringCchPrintf(textBuffer, 512, (STRSAFE_LPCWSTR)skillSet->getSkillName(SL_THIRD).c_str());
 	m_lblSkill->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 	rc.top += skillLineInterval;
-	StringCchPrintf(textBuffer, 512, (STRSAFE_LPCWSTR)m_skillSet->getSkillName(SL_FOURTH).c_str());
+	StringCchPrintf(textBuffer, 512, (STRSAFE_LPCWSTR)skillSet->getSkillName(SL_FOURTH).c_str());
 	m_lblSkill->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 	rc.top += skillLineInterval;
-	StringCchPrintf(textBuffer, 512, (STRSAFE_LPCWSTR)m_skillSet->getSkillName(SL_FIFTH).c_str());
+	StringCchPrintf(textBuffer, 512, (STRSAFE_LPCWSTR)skillSet->getSkillName(SL_FIFTH).c_str());
 	m_lblSkill->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 
 	/*스킬 라벨 그리기*/
-	switch (m_skillSet->getSkillLocation())
+	switch (skillSet->getSkillLocation())
 	{
 	case SL_FIRST:
 		rc.top = scrHeight - 190;
-		StringCchPrintf(textBuffer, 512, (STRSAFE_LPCWSTR)m_skillSet->getSkillName(SL_FIRST).c_str());
+		StringCchPrintf(textBuffer, 512, (STRSAFE_LPCWSTR)skillSet->getSkillName(SL_FIRST).c_str());
 		break;
 	case SL_SECOND:
 		rc.top = scrHeight - 190 + skillLineInterval;
-		StringCchPrintf(textBuffer, 512, (STRSAFE_LPCWSTR)m_skillSet->getSkillName(SL_SECOND).c_str());
+		StringCchPrintf(textBuffer, 512, (STRSAFE_LPCWSTR)skillSet->getSkillName(SL_SECOND).c_str());
 		break;
 	case SL_THIRD:
 		rc.top = scrHeight - 190 + skillLineInterval*2;
-		StringCchPrintf(textBuffer, 512, (STRSAFE_LPCWSTR)m_skillSet->getSkillName(SL_THIRD).c_str());
+		StringCchPrintf(textBuffer, 512, (STRSAFE_LPCWSTR)skillSet->getSkillName(SL_THIRD).c_str());
 		break;
 	case SL_FOURTH:
 		rc.top = scrHeight - 190 + skillLineInterval*3;
-		StringCchPrintf(textBuffer, 512, (STRSAFE_LPCWSTR)m_skillSet->getSkillName(SL_FOURTH).c_str());
+		StringCchPrintf(textBuffer, 512, (STRSAFE_LPCWSTR)skillSet->getSkillName(SL_FOURTH).c_str());
 		break;
 	case SL_FIFTH:
 		rc.top = scrHeight - 190 + skillLineInterval*4;
-		StringCchPrintf(textBuffer, 512, (STRSAFE_LPCWSTR)m_skillSet->getSkillName(SL_FIFTH).c_str());
+		StringCchPrintf(textBuffer, 512, (STRSAFE_LPCWSTR)skillSet->getSkillName(SL_FIFTH).c_str());
 		break;
 	}
 	m_lblSkill->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 0.0f, 1.0f, 1.0f ) );
@@ -580,22 +576,22 @@ void BattleState::renderFixedText(int scrWidth, int scrHeight)
 	rc.top = scrHeight - 190;
 	rc.left = scrWidth - 410;
 
-	switch (m_skillSet->getSkillLocation())
+	switch (skillSet->getSkillLocation())
 	{
 	case SL_FIRST:
-		StringCchPrintf(textBuffer, 512, (STRSAFE_LPCWSTR)m_skillSet->getDescription(SL_FIRST).c_str());
+		StringCchPrintf(textBuffer, 512, (STRSAFE_LPCWSTR)skillSet->getDescription(SL_FIRST).c_str());
 		break;
 	case SL_SECOND:
-		StringCchPrintf(textBuffer, 512, (STRSAFE_LPCWSTR)m_skillSet->getDescription(SL_SECOND).c_str());
+		StringCchPrintf(textBuffer, 512, (STRSAFE_LPCWSTR)skillSet->getDescription(SL_SECOND).c_str());
 		break;
 	case SL_THIRD:
-		StringCchPrintf(textBuffer, 512, (STRSAFE_LPCWSTR)m_skillSet->getDescription(SL_THIRD).c_str());
+		StringCchPrintf(textBuffer, 512, (STRSAFE_LPCWSTR)skillSet->getDescription(SL_THIRD).c_str());
 		break;
 	case SL_FOURTH:
-		StringCchPrintf(textBuffer, 512, (STRSAFE_LPCWSTR)m_skillSet->getDescription(SL_FOURTH).c_str());
+		StringCchPrintf(textBuffer, 512, (STRSAFE_LPCWSTR)skillSet->getDescription(SL_FOURTH).c_str());
 		break;
 	case SL_FIFTH:
-		StringCchPrintf(textBuffer, 512, (STRSAFE_LPCWSTR)m_skillSet->getDescription(SL_FIFTH).c_str());
+		StringCchPrintf(textBuffer, 512, (STRSAFE_LPCWSTR)skillSet->getDescription(SL_FIFTH).c_str());
 		break;
 	}
 
@@ -623,7 +619,7 @@ void BattleState::passTurn()
 
 void BattleState::doComputerAction()
 {
-	getEnemy()->attack(0, getHero());
+	getEnemy()->doNormalAttack(0, getHero());
 }
 
 Character* BattleState::getHero()

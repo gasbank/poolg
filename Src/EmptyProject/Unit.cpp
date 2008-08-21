@@ -115,7 +115,8 @@ LRESULT Unit::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 bool Unit::frameMove( float fElapsedTime )
 {	
 	if (m_dm != NULL)
-		m_dm->frameMove ( fElapsedTime );
+		if(!m_dm->frameMove ( fElapsedTime ))
+			return false;
 
 	updateLocalXform();
 	if ( m_bForcedMove )

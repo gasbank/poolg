@@ -1,6 +1,5 @@
 #include "EmptyProjectPCH.h"
 #include "Character.h"
-#include "AttackObject.h"
 #include "ScriptManager.h"
 #include "TileManager.h"
 #include "TopStateManager.h"
@@ -12,42 +11,98 @@
 #include <time.h>
 #include "Trigger.h"
 #include "StructureObject.h"
+#include "SkillObject.h"
+#include "DynamicMotion.h"
+#include "Skill.h"
 #include "Utility.h"
 
 extern TileManager tileManager;
 
 
-void Character::attack( int type, Character* enemy )
+void Character::doNormalAttack( int type, Character* enemy )
 {
 	D3DXVECTOR3 fireDir = enemy->getPos() - getPos();
 	float dist = D3DXVec3Length( &fireDir );
 
 	D3DXVec3Normalize( &fireDir, &fireDir );
-	AttackObject* ao = BallAttackObject::createBallAttackObject( enemy, getPos(), fireDir, dist );
-	BallAttackObject* bao = (BallAttackObject*)ao;
-	/*일반공격 데미지 계산*/
-	int damage = m_stat.coding + 10 - enemy->getStat().def;
-	bao->setDamage (damage);
-	m_attackObjectList.push_back(ao);
+
+
+
+	LPD3DXMESH mesh;
+	D3DXCreateSphere( GetG().m_dev, 0.3f, 16, 16, &mesh, 0 );
+	Unit* missile = Unit::createUnit(mesh, 0, 0, 0);
+
+	missile->setDynamicMotion(DynamicMotion::createDMfireUniformly
+		(missile, this->getPos(), fireDir, dist, 4.0f ));
+
+	SkillObject* so = SkillObject::createSOnormalAttack(this, enemy, missile);
+	m_skillObjectList.push_back(so);
+
 }
 
-void Character::throwHealBall ()
+void Character::doHeal ()
 {
-	AttackObject* ao = HealObject::createHealObject (this);
-	m_attackObjectList.push_back(ao);
+	LPD3DXMESH mesh;
+	D3DXCreateSphere( GetG().m_dev, 0.3f, 16, 16, &mesh, 0);
+	Unit* healBall = Unit::createUnit(mesh, 0, 0, 0);
+
+	healBall->setDynamicMotion(DynamicMotion::createDMspinAround
+		(healBall, this->getPos(), 5, 0.03f, 10));
+
+	SkillObject* so = SkillObject::createSOheal(this, healBall);
+	m_skillObjectList.push_back(so);
 }
 
-void Character::csBurn ()
+void Character::doCsBurn ()
 {
-	AttackObject* ao = CsBurnObject::createCsBurnObject(this);
-	m_attackObjectList.push_back(ao);
+	LPD3DXMESH mesh;
+	D3DXCreateBox(GetG().m_dev, 5, 5, 0.5f, &mesh, 0);
+	Unit* effectObj = Unit::createUnit(mesh, 0, 0, 0);
+
+	effectObj->setDynamicMotion(DynamicMotion::createDMspinAround
+		(effectObj, this->getPos(), 5, 0.03f, 50));
+
+	SkillObject* so = SkillObject::createSOcsBurn(this, effectObj);
+	m_skillObjectList.push_back(so);
 }
 
-void Character::meditation ()
+void Character::doMeditation ()
 {
-	AttackObject* ao = MeditationObject::createMeditationObject(this);
-	m_attackObjectList.push_back(ao);
+	LPD3DXMESH mesh;
+	D3DXCreateSphere( GetG().m_dev, 0.7f, 16, 16, &mesh, 0);
+	Unit* healBall = Unit::createUnit(mesh, 0, 0, 0);
+
+	healBall->setDynamicMotion(DynamicMotion::createDMspinAround
+		(healBall, this->getPos(), 5, 0.03f, 2));
+
+	SkillObject* so = SkillObject::createSOmeditation(this, healBall);
+	m_skillObjectList.push_back(so);
 }
+
+void Character::doMultiThread (int frequency, Character* enemy)
+{
+	D3DXVECTOR3 fireDir = enemy->getPos() - getPos();
+	float dist = D3DXVec3Length( &fireDir );
+
+	D3DXVec3Normalize( &fireDir, &fireDir );
+
+
+
+	for (int i=frequency-1; i >= 0; i--)
+	{
+		LPD3DXMESH mesh;
+		D3DXCreateBox( GetG().m_dev, 0.5f, 8, 0.5f, &mesh, 0);
+		Unit* effectObj = Unit::createUnit(mesh, 0, 0, 0);
+
+		effectObj->setDynamicMotion(DynamicMotion::createDMfireUniformly
+		(effectObj, this->getPos(), fireDir, dist, 4.0f ));
+
+		SkillObject* so = SkillObject::createSOmtBullet(this, enemy, effectObj, i, frequency);
+		m_skillObjectList.push_back(so);
+	}
+}
+
+
 
 
 void Character::recoverCs()
@@ -80,12 +135,16 @@ Unit* Character::createCharacter( LPD3DXMESH mesh, int tileX, int tileY, float p
 
 Character::~Character()
 {
-	AttackObjectList::iterator it = m_attackObjectList.begin();
-	for ( ; it != m_attackObjectList.end(); ++it )
+
+	
+	SkillObjectList::iterator it = m_skillObjectList.begin();
+	for ( ; it != m_skillObjectList.end(); ++it)
 	{
-		EP_SAFE_RELEASE(*it);
+		SAFE_DELETE(*it);
 	}
-	m_attackObjectList.clear();
+
+	m_skillObjectList.clear();
+	delete m_skillSet;
 }
 
 bool Character::frameMove( float fElapsedTime )
@@ -159,15 +218,14 @@ bool Character::frameMove( float fElapsedTime )
 		}
 	}
 
-
-	AttackObjectList::iterator it = m_attackObjectList.begin();
-	for ( ; it != m_attackObjectList.end(); )
+	SkillObjectList::iterator it = m_skillObjectList.begin();
+	for ( ; it != m_skillObjectList.end() ; )
 	{
 		bool ret = (*it)->frameMove( fElapsedTime );
 		if (!ret)
 		{
-			EP_SAFE_RELEASE( *it );
-			it = m_attackObjectList.erase( it );
+			SAFE_DELETE(*it);
+			it = m_skillObjectList.erase( it );
 		}
 		else
 			++it;
@@ -197,14 +255,13 @@ bool Character::frameMove( float fElapsedTime )
 
 HRESULT Character::frameRender()
 {
-	AttackObjectList::iterator it = m_attackObjectList.begin();
-	for ( ; it != m_attackObjectList.end(); ++it )
+	SkillObjectList::iterator it = m_skillObjectList.begin();
+	for ( ; it != m_skillObjectList.end(); ++it )
 	{
 		(*it)->frameRender();
 	}
 	Unit::frameRender();
 	return S_OK;
-
 }
 
 LRESULT Character::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
@@ -263,6 +320,7 @@ Character::Character( UnitType type )
 	
 	// Initialize random number
 	srand ( (unsigned)time(NULL) );
+	m_skillSet = new SkillSet();
 }
 
 void Character::setCurHp( int curHp )

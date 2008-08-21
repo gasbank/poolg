@@ -6,10 +6,12 @@
 #include "TopStateManager.h"
 #include "PlayState.h"
 #include "ArnMesh.h"
+#include "Skill.h"
 
 Hero::Hero(void)
 : Character( UT_HERO )
 {
+	m_skillSet = new SkillSet();
 }
 
 Hero::~Hero(void)
@@ -28,6 +30,15 @@ Unit* Hero::createHero( LPD3DXMESH mesh, int tileX, int tileY, float posZ )
 	ArnSceneGraph* charSceneGraph = ps->getCharacterSceneGraph();
 	ArnMesh* arnMesh = static_cast<ArnMesh*>(charSceneGraph->getSceneRoot()->getNodeByName( "PoolGModel" ));
 	u->setArnMesh( arnMesh );
+
+
+	SkillSet* skillSet = u->getSkillSet();
+
+	skillSet->setSkill (SL_FIRST, (Skill*) new NormalAttack());
+	skillSet->setSkill (SL_SECOND, (Skill*) new Heal());
+	skillSet->setSkill (SL_FOURTH, (Skill*) new MultiThread());
+	skillSet->setSkill (SL_FIFTH, (Skill*) new Meditation());
+
 
 	return u;
 }

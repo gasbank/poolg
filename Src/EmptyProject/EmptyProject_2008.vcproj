@@ -681,14 +681,6 @@
 			Name="Unit"
 			>
 			<File
-				RelativePath=".\AttackObject.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\AttackObject.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Character.cpp"
 				>
 			</File>

@@ -87,7 +87,5 @@ private:
 
 	InnerFire		m_innerFire;
 
-	SkillSet*		m_skillSet;
-	
 	int				m_noneSkillSelectedCount;
 };

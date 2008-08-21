@@ -74,7 +74,10 @@ bool SOnormalAttack::frameMove (float fElapsedTime)
 		int damage = m_user->getStat().coding - m_target->getStat().def + 20;
 
 		m_target->damage(damage);
-		//m_target->addMoveImpulse( -m_fireDir/2 ); // Attacked unit shows startled shake
+
+		D3DXVECTOR3 posDiff = m_target->getPos() - m_user->getPos();
+		D3DXVec3Normalize( &posDiff, &posDiff );
+		m_target->addMoveImpulse( posDiff / 3 ); // Attacked unit shows startled shake
 
 		char stringBuffer[20];
 		_itoa_s (damage, stringBuffer, 10);

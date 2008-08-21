@@ -602,7 +602,6 @@ int EpOutputDebugString( const char* msg )
 
 
 
-//unsigned int __stdcall EpConsoleThreadMain( ClientData cd )
 void EpConsoleThreadMain( void* cd )
 {
 	//printf( "xx ^________^ xx" );
@@ -616,10 +615,11 @@ void EpConsoleThreadMain( void* cd )
 
 	SetEvent( g_scriptBindingFinishedEvent );
 
+#ifdef DEBUG
 	if ( Tcl_EvalFile( g_consoleInterp, "Script/EpThreadTest.tcl" ) != TCL_OK )
 		ScriptManager::throwScriptErrorWithMessage( g_consoleInterp );
+#endif
 
-	//return 0;
 }
 
 
@@ -681,10 +681,6 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 	g_wm = new WorldManager();
 
 	uintptr_t t = _beginthread( EpConsoleThreadMain, 0, 0 );
-
-	/*Tcl_ThreadId ttid;
-	if ( Tcl_CreateThread( &ttid, EpConsoleThreadMain, 0, TCL_THREAD_STACK_DEFAULT, 0 ) != TCL_OK )
-		throw std::runtime_error( "Check your Tcl library to support thread" );*/
 
 	g_scriptBindingFinishedEvent = CreateEvent( NULL , TRUE , FALSE , NULL );  
 	ResetEvent( g_scriptBindingFinishedEvent ); 

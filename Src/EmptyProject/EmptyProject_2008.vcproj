@@ -241,7 +241,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/IGNORE:4089"
-				AdditionalDependencies="Aran_Release.lib tcl85.lib dxerr.lib dxguid.lib d3dx9.lib d3dx10.lib d3d9.lib d3d10.lib winmm.lib comctl32.lib"
+				AdditionalDependencies="Aran_Release.lib tcl85t.lib DXUT.lib dxerr.lib dxguid.lib d3dx9.lib d3dx10.lib d3d9.lib d3d10.lib winmm.lib comctl32.lib"
 				OutputFile="$(OutDir)/EmptyProject_Release.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="../Aran/lib;../DXUT/Core/Release;../DXUT/Optional/Release;../tcl/lib"

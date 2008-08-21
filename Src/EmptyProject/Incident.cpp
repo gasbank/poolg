@@ -99,7 +99,7 @@ void Incident::addAction( Action* action )
 
 void Incident::printDebugInfo() const
 {
-	printf("Inc: triggers=%d actions=%d activated=%d infinite=%d leastOnetime=%d\n", m_trigger.size(), m_action.size(), m_bActivated, m_bInfinite, m_LeastOnetime );
+	printf("Inc: %-30s triggers=%d actions=%d activated=%d infinite=%d leastOnetime=%d\n", getName(), m_trigger.size(), m_action.size(), m_bActivated, m_bInfinite, m_LeastOnetime );
 }
 
 void Incident::printDebugInfoDetailed() const
@@ -204,8 +204,17 @@ int EpAddActionToIncident( void* pv1, void* pv2 )
 	return 0;
 } SCRIPT_CALLABLE_I_PV_PV( EpAddActionToIncident )
 
+int EpIncidentSetName( void* pv1, const char* pv2 )
+{
+	Incident* inci = reinterpret_cast<Incident*>( pv1 );
+	inci->setName( pv2 );
+	return 0;
+} SCRIPT_CALLABLE_I_PV_PC( EpIncidentSetName )
+
+
 START_SCRIPT_FACTORY( Incident )
 	CREATE_OBJ_COMMAND( EpCreateIncident )
+	CREATE_OBJ_COMMAND( EpIncidentSetName )
 	CREATE_OBJ_COMMAND( EpCreateBlockingActionIncident )
 	CREATE_OBJ_COMMAND( EpAddTriggerToIncident )
 	CREATE_OBJ_COMMAND( EpAddActionToIncident )

@@ -27,14 +27,21 @@ public:
 	bool getLeastOnetime() { return m_LeastOnetime; }
 	bool isFinished() const { return m_LeastOnetime; }
 
+	void setName( const char* name ) { m_incidentName = name; }
+	const char* getName() const { return m_incidentName.c_str(); }
+
 	void printDebugInfo() const;
 	void printDebugInfoDetailed() const;
+
 protected:
 	bool m_bActivated;
 	TriggerList m_trigger;
 	ActionList m_action;
 	bool m_bInfinite;
 	bool m_LeastOnetime;
+
+private:
+	std::string m_incidentName;
 
 };
 

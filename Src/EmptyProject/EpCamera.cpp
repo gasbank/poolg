@@ -322,8 +322,10 @@ void EpCamera::beginShoulderLookCamera( const D3DXVECTOR3* pvMePos, const D3DXVE
 	vDesEye.x += vHeroPos.x;
 	vDesEye.y += vHeroPos.y;
 
+	vDesLookAt.z -= 1.0f;
+
 	// 장애물에 가리지 않도록 한다.
-	pulledEye( &m_vDesEye, &m_vDesLookAt, &m_vDesEye );
+	pulledEye( &vDesEye, &vDesLookAt, &vDesEye );
 
 	// 자, 이제 카메라의 목적 위치를 구하였다. 이동시켜보자.
 	setDesViewParams( &vDesEye, &vDesLookAt, &vDesUp );
@@ -353,7 +355,7 @@ void EpCamera::pulledEye( D3DXVECTOR3* vPulledEye, D3DXVECTOR3* vLookAt, D3DXVEC
 	D3DXVECTOR3 vNormRayDir;
 	D3DXVec3Normalize( &vNormRayDir, &vRayDir );
 	float camDist = D3DXVec3Length( &vRayDir );
-	float obsDist = Utility::FullTraverseExhaustiveRayTesting( arnNode, *vLookAt, vNormRayDir );
+	float obsDist = Utility::FullTraverseExhaustiveRayTesting( arnNode, *vLookAt, vNormRayDir, 1 );
 
 	if ( camDist <= obsDist )
 		*vPulledEye = *vEye;

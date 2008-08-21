@@ -1,6 +1,7 @@
 #include "EmptyProjectPCH.h"
 #include "Utility.h"
 #include "ArnMesh.h"
+#include <Algorithm>
 
 Utility::Utility(void)
 {
@@ -72,16 +73,41 @@ float MeshRayClosestIntersectDist( LPD3DXMESH mesh, const D3DXVECTOR3& rayStartP
 bool Utility::FullTraverseExhaustiveRayTesting( 
 	ArnNode* node, const D3DXVECTOR3& rayStartPos, const D3DXVECTOR3& rayDir, float distMin )
 {
-	float dist = FullTraverseExhaustiveRayTesting( node, rayStartPos, rayDir );
+	float dist = FullTraverseExhaustiveRayTesting( node, rayStartPos, rayDir, 1 );
 	if ( dist < distMin )
 		return true;
 	else
 		return false;
 }
 
-// return distance to the closest mesh
+// return distance to the nth closest mesh
 float Utility::FullTraverseExhaustiveRayTesting( 
+	ArnNode* node, const D3DXVECTOR3& rayStartPos, const D3DXVECTOR3& rayDir, int nth )
+{
+	int count;
+	float nthClosestDist;
+	FullTraverseExhaustiveRayTesting( node, rayStartPos, rayDir, nth, &nthClosestDist, &count );
+	return nthClosestDist;
+}
+
+// return the number of intersected meshes
+int	Utility::FullTraverseExhaustiveRayTesting( 
 	ArnNode* node, const D3DXVECTOR3& rayStartPos, const D3DXVECTOR3& rayDir )
+{
+	int count;
+	float nthClosestDist;
+	FullTraverseExhaustiveRayTesting( node, rayStartPos, rayDir, 1, &nthClosestDist, &count );
+	return count;
+}
+
+void Utility::FullTraverseExhaustiveRayTesting( 
+	ArnNode* node, 
+	const D3DXVECTOR3& rayStartPos, 
+	const D3DXVECTOR3& rayDir,
+	int nth, 
+	float* pNthClosestDist, 
+	int* pIntersectedMeshCount
+	)
 {
 	if ( node->getType() == NDT_RT_MESH )
 	{
@@ -110,20 +136,36 @@ float Utility::FullTraverseExhaustiveRayTesting(
 			dist = MeshRayClosestIntersectDist( mesh->getD3DXMesh(), relativeRayStartPos, relativeRayDir );
 		}
 
-		return dist;
+		if ( dist == FLOAT_POS_INF )
+			*pIntersectedMeshCount = 0;
+		else
+			*pIntersectedMeshCount = 1;
+		*pNthClosestDist = dist;
 	}
 	else
 	{
 		UINT i;
 		const UINT childCount = node->getNodeCount();
-		float dist = 999999;
+		std::vector<float> distVector;
+		distVector.push_back( FLOAT_POS_INF );
 		for ( i = 0; i < childCount; ++i )
 		{
 			float newDist = FullTraverseExhaustiveRayTesting( 
-				node->getNodeAt( i ), rayStartPos, rayDir );
-			if ( newDist < dist )
-				dist = newDist;
+				node->getNodeAt( i ), rayStartPos, rayDir, 1 );
+			distVector.push_back( newDist );
 		}
-		return dist;
+		sort( distVector.begin(), distVector.end() );
+
+		*pIntersectedMeshCount = distVector.size() - 1;
+		*pNthClosestDist = distVector[--nth];
 	}
 }
+
+//int Utility::intersectionsBetweenTwoPosition( 
+//	const D3DXVECTOR3* v1, const D3DXVECTOR3* v2, ArnNode* arnNode )
+//{
+//	D3DXVECTOR3 vStartPos( *v1 );
+//	D3DXVECTOR3 vRayDir = *v2 - *v1;
+//	D3DXVec3Normalize( &vRayDir, &vRayDir );
+//	return FullTraverseExhaustiveRayTesting( arnNode, vStartPos, vRayDir );
+//}

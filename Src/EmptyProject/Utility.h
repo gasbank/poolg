@@ -10,10 +10,33 @@ public:
 
 	static void rotateAboutAxis( D3DXVECTOR3* vOut, D3DXVECTOR3* axis, float rad );
 	static float radBetweenVectors( const D3DXVECTOR3* v1, const D3DXVECTOR3* v2 );
+
+	// If a ray intersects a triangle within distMin, true is returned.
+	// Otherwise false is returned.
 	static bool FullTraverseExhaustiveRayTesting( 
 		ArnNode* node, const D3DXVECTOR3& rayStartPos, const D3DXVECTOR3& rayDir, float distMin );
+	
+	// Return distance to the nth closest mesh
 	static float FullTraverseExhaustiveRayTesting( 
+		ArnNode* node, const D3DXVECTOR3& rayStartPos, const D3DXVECTOR3& rayDir, int nth );
+
+	// return the number of intersected meshes
+	static int	FullTraverseExhaustiveRayTesting( 
 		ArnNode* node, const D3DXVECTOR3& rayStartPos, const D3DXVECTOR3& rayDir );
+
+	// Ultimate version of FullTraverseExhaustiveRayTesting
+	static void Utility::FullTraverseExhaustiveRayTesting( 
+		ArnNode* node, 
+		const D3DXVECTOR3& rayStartPos, 
+		const D3DXVECTOR3& rayDir,
+		int nth, 
+		float* pNthClosestDist, 
+		int* pIntersectedMeshCount
+		);
+
+	//// Return the number of intersected meshes between two position
+	//static int intersectionsBetweenTwoPosition( 
+	//	const D3DXVECTOR3* v1, const D3DXVECTOR3* v2, ArnNode* arnNode );
 
 	static void printValue( const D3DXVECTOR3& vec3 )
 	{

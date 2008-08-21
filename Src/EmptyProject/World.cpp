@@ -10,6 +10,7 @@
 #include "Dialog.h"
 #include "Incident.h"
 #include "Sound.h"
+#include "Utility.h"
 // Aran Includes
 #include "ArnMesh.h"
 #include "ArnCamera.h"
@@ -667,8 +668,29 @@ void World::battleEventCheck()
 			Enemy* oppCharacter = dynamic_cast<Enemy*>( *it );
 			if ( oppCharacter != NULL && oppCharacter->isTalkable() == false && !oppCharacter->getRemoveFlag() )
 			{
-				if ( isInEventArea( getHeroUnit() , oppCharacter ) == true )
+				if ( isInEventArea( getHeroUnit() , oppCharacter ) == true)
 				{
+					//////////////////////////////////////////////////////////////////////////
+					// Check whether there is obstacle between hero and enemy.
+					// Shoot ray from hero to enemy, and if distance to the third instersected
+					// mesh is shorter than distance between hero and enemy, then there exists
+					// at least one obstacle.
+					D3DXVECTOR3 vStartPos( getHero()->getPos() );
+					D3DXVECTOR3 vRayDir = oppCharacter->getPos() - getHero()->getPos();
+					float fRayLength = D3DXVec3Length( &vRayDir );
+					D3DXVec3Normalize( &vRayDir, &vRayDir );
+					float f3rdDist = Utility::FullTraverseExhaustiveRayTesting(
+						getArnSceneGraphPt()->getSceneRoot(),
+						vStartPos,
+						vRayDir,
+						1 );
+
+					printf( "3rd dist, ray length %f, %f\n", f3rdDist, fRayLength );
+
+					if ( f3rdDist < fRayLength )
+						continue;
+					//////////////////////////////////////////////////////////////////////////
+
 					setCurEnemy( oppCharacter );
 					
 					// No more move!

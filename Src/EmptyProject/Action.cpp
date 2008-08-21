@@ -428,8 +428,9 @@ void ControllableAction::activate()
 {
 	Action::activate();
 
+	m_c->clearKey();
 	m_c->setControllable( m_bControllable );
-
+	
 	// ControllableAction is 'very' instantaneous, so deactivate() is called
 	// immediately after activate().
 	deactivate();

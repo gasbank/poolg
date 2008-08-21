@@ -59,7 +59,9 @@ bool BlockingActionIncident::update( double dTime, float fElapsedTime )
 
 Incident* EpCreateBlockingActionIncident( void* pv1, void* pv2, int trigCount )
 {
-	OutputDebugString( _T(" - EpWarn: BlockingActionIncident with triggering count 0 is created.\n" ) );
+	if ( trigCount == 0 )
+		OutputDebugString( _T(" - EpWarn: BlockingActionIncident with triggering count 0 is created.\n" ) );
+
 	Trigger* trig = reinterpret_cast<Trigger*>( pv1 );
 	Action* act = reinterpret_cast<Action*>( pv2 );
 	return new BlockingActionIncident( trig, act, trigCount );

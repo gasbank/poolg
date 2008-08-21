@@ -123,7 +123,7 @@ namespace eval EpRoomWorld {
 		
 		set trigger		[ EpCreateUnitPositionTrigger	$pHeroUnit 52 45 52 45 0x101 ]
 		set action		[ EpCreateCameraAction			external Camera 0 ]
-		set incident	[ EpCreateNonblockingActionIncident				$trigger $action 0 ]
+		set incident	[ EpCreateNonblockingActionIncident				$trigger $action 1 ]
 
 		EpIncidentSetName	$incident "Camera1 incident"
 
@@ -136,7 +136,7 @@ namespace eval EpRoomWorld {
 		
 		set trigger		[ EpCreateUnitPositionTrigger	$pHeroUnit 54 45 54 45 0x101 ]
 		set action		[ EpCreateCameraAction			attach 0 5000 ]
-		set incident	[ EpCreateNonblockingActionIncident				$trigger $action 0 ]
+		set incident	[ EpCreateNonblockingActionIncident				$trigger $action 1 ]
 
 		EpIncidentSetName	$incident "Camera2 incident"
 
@@ -149,7 +149,7 @@ namespace eval EpRoomWorld {
 
 		set trigger		[ EpCreateUnitPositionTrigger	$pHeroUnit 55 45 55 45 0x101 ]
 		set action		[ EpCreateControllableAction	$pHeroUnit 1 ]
-		set incident	[ EpCreateNonblockingActionIncident				$trigger $action 0 ]
+		set incident	[ EpCreateNonblockingActionIncident				$trigger $action 1 ]
 
 		EpIncidentSetName	$incident "Control incident"
 
@@ -266,7 +266,7 @@ namespace eval EpRoomWorld {
 		registerIncidentControl
 		
 		# Warp Positions -------------------------------------------------------
-		createWarpPosition			"EpA213World" 49 28 61 30
+		createWarpPosition			"EpA213World" GO 49 28 61 30
 	}
 	
 	proc leave {} {

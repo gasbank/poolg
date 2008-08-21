@@ -84,7 +84,9 @@ namespace eval EpCeilingWorld {
 	}
 
 	proc init { curWorld } {
-		global world hero npcGetg npcGloop npcSetg pHeroUnit startPos
+		global world hero npcGetg npcGloop npcSetg pHeroUnit
+		variable startPos
+		
 		EpOutputDebugString " - [info level 0] called / curWorld: $curWorld\n"
 		set world					$curWorld;
 		
@@ -125,7 +127,7 @@ namespace eval EpCeilingWorld {
 		registerIncidentInitTalk
 		Quest1
 			
-		createWarpPosition			"EpRoomWorld" 25 82
+		createWarpPosition			"EpRoomWorld" STOP 25 82
 	}
 
 	proc enter {} {

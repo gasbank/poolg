@@ -423,7 +423,7 @@ HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 					m_battleLog.push_back(std::string("일부 스킬들은 연속기로 쓸 수 있습니다."));
 					break;
 				case 22:
-					m_battleLog.push_back( std::string( "OOO군은 무려 EP를 지우고, DXUT에 오타를 가하는 등..." ));
+					m_battleLog.push_back( std::string( "OOO군은 무려 EP를 지우고, DXUT에 오타를 가하는 등의 음해를 가했습니다." ));
 				default:
 					m_battleLog.push_back(std::string("훗, 더 이상의 자세한 팁은 생략한다."));;
 					break;
@@ -622,7 +622,7 @@ void BattleState::passTurn()
 
 void BattleState::doComputerAction()
 {
-	getEnemy()->doGoto(getHero());
+	getEnemy()->doNormalAttack(0, getHero());
 }
 
 Character* BattleState::getHero()

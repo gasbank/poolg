@@ -77,10 +77,17 @@ private:
 
 	bool					m_bMoving;
 	float					m_fMovingTime;
+
+	//Ω∫≈».
 	int						m_maxHp;
 	int						m_curHp;
 	int						m_maxCs;
 	int						m_curCs;
+	int						m_maxExp;
+	int						m_curExp;
+	int						m_level;
+
+
 	float					m_moveDuration; // A time needed to move one time(tile) in seconds
 	
 	

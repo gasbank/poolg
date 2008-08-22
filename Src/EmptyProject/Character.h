@@ -46,6 +46,8 @@ public:
 	void								setCurCs( int curCs );
 	int									getCurCs() const			{ return m_curCs; }
 	int									getMaxCs() const			{ return m_maxCs; }
+	int									gainExp (int expPoint);
+	void								levelUp ();
 	void								damage( int point );
 	bool								getMoving() const			{ return m_bMoving; }
 	const Stat&							getStat() const				{ return m_stat; }
@@ -85,6 +87,7 @@ private:
 	int						m_curCs;
 	int						m_maxExp;
 	int						m_curExp;
+	int						m_levelGap;
 	int						m_level;
 
 

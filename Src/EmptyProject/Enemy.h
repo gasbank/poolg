@@ -27,6 +27,7 @@ private:
 	bool						m_bRandomWalkable;
 	bool						m_bTalkable;
 	int							m_iFightRange;
+	int							m_expReward;
 };
 
 

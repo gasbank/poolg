@@ -36,8 +36,11 @@ Unit* Hero::createHero( LPD3DXMESH mesh, int tileX, int tileY, float posZ )
 
 	skillSet->setSkill (SL_FIRST, (Skill*) new NormalAttack());
 	skillSet->setSkill (SL_SECOND, (Skill*) new Heal());
+	skillSet->setSkill (SL_THIRD, (Skill*) new Goto());
 	skillSet->setSkill (SL_FOURTH, (Skill*) new MultiThread());
 	skillSet->setSkill (SL_FIFTH, (Skill*) new Meditation());
+
+	skillSet->setSkill (SL_FIFTH, NULL);
 
 
 	return u;

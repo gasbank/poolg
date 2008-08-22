@@ -88,7 +88,7 @@ public:
 	UnitType						getType() const							{ return m_type; }
 	const char*						getTypeString() const;
 	World*							getCurWorld() const						{ return GetWorldManager().getCurWorld(); }
-	void							setDynamicMotion( DynamicMotion* dm )	{ m_dm = dm; }
+	void							setDynamicMotion( DynamicMotion* dm );
 	void							setForcedMove( int i );
 	void							forcedMoveTest();
 	void							setArnMesh( ArnMesh* arnMesh )			{ assert( arnMesh ); m_arnMesh = arnMesh; }
@@ -98,6 +98,8 @@ public:
 	bool							isForcedMove() const					{ return m_bForcedMove; }
 	void							startSoulAnimation( float duration, float height );
 	void							setViewAt( const D3DXVECTOR3* at );
+
+	void							setVisible (bool choice);
 
 	bool getSoulAnimation() { return m_bSoulAnimation; }
 
@@ -117,7 +119,8 @@ protected:
 	LPDIRECT3DTEXTURE9				m_d3dTex;
 	static Unit*					createUnit( LPD3DXMESH mesh, int tileX = 0, int tileY = 0, float posZ = 0 );
 
-	
+	DynamicMotion*					m_dm;
+
 
 private:
 
@@ -142,7 +145,6 @@ private:
 	bool							m_removeFlag;
 	bool							m_bForcedMove;
 	
-	DynamicMotion*					m_dm;
 	
 	
 

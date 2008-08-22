@@ -104,3 +104,18 @@ public:
 	virtual void useSkill( BattleState* battleState );
 };
 
+class Goto : public Skill
+{
+public:
+	Goto()
+	{
+		m_skillName = L"Goto";
+		m_description =
+			L"[Goto]\n"
+			L"상대방에게 맹렬히 돌진하여 피해를\n"
+			L"입힙니다.\n";
+		m_csEssentials = 8;
+	}
+	virtual void useSkill( BattleState* battleState );
+};
+

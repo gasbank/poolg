@@ -15,6 +15,7 @@ public:
 	static SkillObject* createSOmeditation (Character* usedr, Unit* effectObject);
 	static SkillObject* createSOcsBurn (Character* target, Unit* effectObject);
 	static SkillObject* createSOmtBullet (Character* user, Character* target, Unit* effectObject, int leftNumber, int maxNumber);
+	static SkillObject* createSOgoto (Character* user, Character* target, Unit* effectObject);
 
 
 protected:
@@ -102,4 +103,23 @@ protected:
 
 private:
 	SOmtBullet (Character* user, Character* target, Unit* effectObject, int leftNumber, int maxNumber);
+};
+
+class SOgoto : public SkillObject
+{
+public:
+	~SOgoto();
+	virtual bool frameMove ( float fElapsedTime );
+
+	friend class SkillObject;
+
+protected:
+	Character* m_user;
+	Character* m_target;
+	Unit* m_illusion;
+	int m_phase;
+	D3DXVECTOR3 m_originPoint;
+
+private:
+	SOgoto (Character* user, Character* target, Unit* effectObject);
 };

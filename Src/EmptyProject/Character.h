@@ -32,6 +32,7 @@ public:
 	void doCsBurn();
 	void doMeditation();
 	void doMultiThread(int frequency, Character* enemy);
+	void doGoto(Character* enemy);
 
 
 	void recoverCs();

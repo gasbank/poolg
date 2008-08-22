@@ -196,3 +196,20 @@ void MultiThread::useSkill(BattleState *bs)
 	bs->pushBattleLog("멀티쓰레드를 사용하였습니다.");
 	m_hero->doMultiThread(3, m_enemy);
 }
+
+void Goto::useSkill(BattleState *bs)
+{
+	int curCs = m_hero->getCurCs();
+	if (curCs < m_csEssentials)
+	{
+		bs->pushBattleLog("스피릿이 부족합니다.");
+		bs->pushBattleLog("기술은 취소되며 코딩스피릿 번이 일어납니다.");
+		m_hero->doCsBurn();
+		return;
+	}
+	
+	m_hero->setCurCs (curCs - m_csEssentials);
+
+	bs->pushBattleLog("멀티쓰레드를 사용하였습니다.");
+	m_hero->doGoto (m_enemy);
+}

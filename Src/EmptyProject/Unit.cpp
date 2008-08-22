@@ -349,6 +349,18 @@ void Unit::setViewAt( const D3DXVECTOR3* at )
 	setRotZ( rad );
 }
 
+void Unit::setVisible (bool choice)
+{
+	if (choice == false)
+	{
+		this->setScaleX(0);
+		this->setScaleY(0);
+		this->setScaleZ(0);
+	}
+
+	updateLocalXform();
+}
+
 const char* Unit::getTypeString() const
 {
 #define CASE_ENUM_TO_STRING(x) case x: return #x
@@ -365,6 +377,13 @@ const char* Unit::getTypeString() const
 		_ASSERTE( !"Type string is not found" );
 	}
 	return 0;
+}
+
+void Unit::setDynamicMotion( DynamicMotion* dm )
+{
+	if (m_dm != NULL)
+		delete m_dm;
+	m_dm = dm;
 }
 
 void Unit::printDebugInfo() const

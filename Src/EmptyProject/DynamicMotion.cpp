@@ -18,6 +18,12 @@ DynamicMotion* DynamicMotion::createDMspinAround (Unit* target, const D3DXVECTOR
 	return dm;
 }
 
+DynamicMotion* DynamicMotion::createDMpuff (Unit* target, const D3DXVECTOR3& initPos, float puffRate, float puffSpeed)
+{
+	DynamicMotion* dm = new DMpuff (target, initPos, puffRate, puffSpeed);
+	return dm;
+}
+
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -28,7 +34,7 @@ bool DMfireUniformly::frameMove(float fElapsedTime)
 	D3DXVECTOR3 vMoved = m_initPos - newPos;
 	
 	float distToInitPos = D3DXVec3Length( &vMoved );
-	m_target->setRotY(distToInitPos);
+//	m_target->setRotY(distToInitPos);
 	if ( distToInitPos > m_retainDist )
 	{
 		return false;
@@ -99,6 +105,42 @@ DMspinAround::DMspinAround ( Unit* target, const D3DXVECTOR3& fireDest, float ra
 	//m_fireDest = target->getPos ();
 
 	target->setPos( newPos );
+}
+
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+bool DMpuff::frameMove(float fElapsedTime)
+{
+	m_scaleX += m_puffSpeed;
+	m_scaleY += m_puffSpeed;
+	m_scaleZ += m_puffSpeed;
+
+	m_target->setScaleX(m_scaleX);
+	m_target->setScaleY(m_scaleY);
+	m_target->setScaleZ(m_scaleZ);
+
+	if ( m_scaleX > m_puffRate )
+	{
+		// Hit to the target!
+		return false;
+	}
+
+	return true;
+}
+
+DMpuff::DMpuff (Unit* target, const D3DXVECTOR3& initPos, float puffRate, float puffSpeed)
+{
+	m_target = target;
+	m_puffRate = puffRate;
+	m_puffSpeed = puffSpeed;
+
+	m_target->setPos (initPos);
+	m_scaleX = 1;
+	m_scaleY = 1;
+	m_scaleZ = 1;
 }
 
 

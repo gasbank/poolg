@@ -103,6 +103,20 @@ void Character::doMultiThread (int frequency, Character* enemy)
 }
 
 
+void Character::doGoto (Character* enemy)
+{
+	LPD3DXMESH mesh;
+	D3DXCreateSphere( GetG().m_dev, 0.3f, 16, 16, &mesh, 0);
+	Unit* effectObj = Unit::createUnit(mesh, 0, 0, 0);
+
+	effectObj->setDynamicMotion(DynamicMotion::createDMpuff
+		(effectObj, enemy->getPos(), 25, 0.2f));
+
+	SkillObject* so = SkillObject::createSOgoto(this, enemy, effectObj);
+	m_skillObjectList.push_back(so);
+}
+
+
 
 
 void Character::recoverCs()
@@ -149,6 +163,10 @@ Character::~Character()
 
 bool Character::frameMove( float fElapsedTime )
 {
+	if (m_dm != NULL)
+		if(!m_dm->frameMove ( fElapsedTime ))
+			return false;
+
 	if (m_bMoving == false)
 	{
 		m_fMovingTime = 0;

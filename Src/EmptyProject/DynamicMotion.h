@@ -9,6 +9,7 @@ public:
 
 	static DynamicMotion* createDMfireUniformly ( Unit* target, const D3DXVECTOR3& initPos, const D3DXVECTOR3& fireDir, float retainDist, float velocity );
 	static DynamicMotion* createDMspinAround (Unit* target, const D3DXVECTOR3& fireDest, float radius, float radiusVelocity, float angularVelocity);
+	static DynamicMotion* createDMpuff (Unit* target, const D3DXVECTOR3& initPos, float puffRate, float puffSpeed);
 
 
 protected:
@@ -47,4 +48,20 @@ private:
 	float m_radiusVelocity;
 	float m_angle;
 	float m_angularVelocity;
+};
+
+class DMpuff : public DynamicMotion
+{
+public:
+	virtual bool frameMove( float fElapsedTime);
+	
+	friend class DynamicMotion;
+
+private:
+	DMpuff (Unit* target, const D3DXVECTOR3& initPos, float puffRate, float puffSpeed);
+	float m_puffRate;
+	float m_puffSpeed;
+	float m_scaleX;
+	float m_scaleY;
+	float m_scaleZ;
 };

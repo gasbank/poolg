@@ -13,6 +13,13 @@ public:
 	virtual HRESULT				frameRender();
 	virtual bool				frameMove( float fElapsedTime );
 	virtual LRESULT				handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
+	int							gainExp (int expPoint);
+	void						levelUp ();
+
+	int						m_maxExp;
+	int						m_curExp;
+	int						m_expGap;
+	int						m_level;
 
 	//virtual void pushUnitInFront( UnitInput dir );
 

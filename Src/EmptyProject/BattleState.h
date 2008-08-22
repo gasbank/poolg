@@ -88,4 +88,5 @@ private:
 	InnerFire		m_innerFire;
 
 	int				m_noneSkillSelectedCount;
+	bool			m_levelProgress;
 };

@@ -12,6 +12,10 @@ Hero::Hero(void)
 : Character( UT_HERO )
 {
 	m_skillSet = new SkillSet();
+	m_curExp = 0;
+	m_maxExp = 6;
+	m_expGap = 3;
+	m_level = 1;
 }
 
 Hero::~Hero(void)
@@ -42,6 +46,35 @@ Unit* Hero::createHero( LPD3DXMESH mesh, int tileX, int tileY, float posZ )
 
 	return u;
 }
+
+void Hero::levelUp()
+{
+	m_curExp = 0;
+	m_maxExp += m_expGap;
+	m_level++;
+}
+
+int Hero::gainExp( int expPoint )
+{
+
+	if ( m_maxExp < m_curExp + expPoint ) 
+	{
+		int retExp = m_curExp + expPoint - m_maxExp;
+		m_curExp = m_maxExp;
+		return retExp;
+	}
+	else if (m_maxExp == m_curExp + expPoint)
+	{
+		m_curExp = m_maxExp;
+		return -1;
+	}
+	else
+	{
+		m_curExp += expPoint;
+		return 0;
+	}
+}
+
 
 HRESULT Hero::frameRender()
 {

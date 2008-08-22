@@ -19,6 +19,7 @@ public:
 	bool						isTalkable() const							{ return m_bTalkable; }
 	void						setFightRange( int i )						{ m_iFightRange = i; }
 	int							getFightRange() const						{ return m_iFightRange; }
+	int							getExpReward() const						{ return m_expReward; }
 
 private:
 								Enemy();

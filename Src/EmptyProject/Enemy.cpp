@@ -16,6 +16,7 @@ Enemy::Enemy()
 	m_bTalkable			= false;
 	m_iFightRange		= 3;
 	m_skillSet			= new SkillSet();
+	m_expReward			= 10;
 }
 
 Enemy::~Enemy(void)

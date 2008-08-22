@@ -7,6 +7,7 @@ class SkillSet;
 class SkillObject;
 class Trigger;
 
+//고정적 스탯. 레벨 업 시만 오르는.(simon ornen)
 struct Stat
 {
 	int health, will, coding, def, sense, immunity;
@@ -46,8 +47,7 @@ public:
 	void								setCurCs( int curCs );
 	int									getCurCs() const			{ return m_curCs; }
 	int									getMaxCs() const			{ return m_maxCs; }
-	int									gainExp (int expPoint);
-	void								levelUp ();
+
 	void								damage( int point );
 	bool								getMoving() const			{ return m_bMoving; }
 	const Stat&							getStat() const				{ return m_stat; }
@@ -80,15 +80,13 @@ private:
 	bool					m_bMoving;
 	float					m_fMovingTime;
 
-	//스탯.
+	//유동적 스탯.
 	int						m_maxHp;
 	int						m_curHp;
 	int						m_maxCs;
 	int						m_curCs;
-	int						m_maxExp;
-	int						m_curExp;
-	int						m_levelGap;
-	int						m_level;
+
+
 
 
 	float					m_moveDuration; // A time needed to move one time(tile) in seconds

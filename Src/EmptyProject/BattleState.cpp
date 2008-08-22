@@ -8,6 +8,8 @@
 #include "Skill.h"
 #include "Sound.h"
 #include "TileManager.h"
+#include "Hero.h"
+#include "Enemy.h"
 
 BattleState::BattleState()
 {
@@ -157,6 +159,7 @@ HRESULT BattleState::enter()
 	skillSet->setCharacter (getHero(), getEnemy());
 	skillSet->setBattleState(this);
 	m_noneSkillSelectedCount = 0;
+	m_levelProgress = false;
 	m_SkillContentBox.setOff();
 
 	setupCamera();
@@ -309,12 +312,25 @@ HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 		/*죽었을 시 enter 키를 입력하면 대상 파괴, 아니면 다른 키 안 받고 메시지 핸들링 종료*/
 		if ( getEnemy()->getCurHp() <= 0 && !getEnemy()->getSoulAnimation() )
 		{
-
 			if (wParam == VK_RETURN)
 			{
-				GetWorldStateManager().setNextState(GAME_WORLD_STATE_FIELD);
-				getEnemy()->setRemoveFlag( true ); // Should be deleted before next frame update
-				return S_OK;
+
+				if (m_levelProgress == true)
+				{
+					GetWorldStateManager().setNextState(GAME_WORLD_STATE_FIELD);
+					getEnemy()->setRemoveFlag( true ); // Should be deleted before next frame update
+					return S_OK;
+				}
+				/*
+				Hero* hero = ( Hero* )getHero();
+				int expReward = ( ( Enemy* )getEnemy() )->getExpReward();
+
+				int remainExp = hero->gainExp( expReward );
+				if ( remainExp == 0)
+				{
+					m_levelProgress = true;
+				}*/
+				m_levelProgress = true;
 			}
 			return S_OK;
 		}

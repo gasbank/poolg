@@ -365,33 +365,6 @@ void Character::setCurCs( int curCs )
 		m_curCs = curCs;
 }
 
-void Character::levelUp()
-{
-	m_curExp = 0;
-	m_maxExp += m_levelGap;
-	m_level++;
-}
-
-int Character::gainExp( int expPoint )
-{
-
-	if ( m_maxExp < m_curExp + expPoint ) 
-	{
-		int retExp = m_curExp + expPoint - m_maxExp;
-		m_curExp = m_maxExp;
-		return retExp;
-	}
-	else if (m_maxExp == m_curExp + expPoint)
-	{
-		m_curExp = m_maxExp;
-		return -1;
-	}
-	else
-	{
-		m_curExp += expPoint;
-		return 0;
-	}
-}
 
 /*void Character::setMaxAndCurHp( int maxHp, int curHp )
 {

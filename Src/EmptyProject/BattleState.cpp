@@ -231,8 +231,8 @@ HRESULT BattleState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, flo
 	pd3dDevice->SetTransform(D3DTS_VIEW, GetG().m_camera.GetViewMatrix());
 	pd3dDevice->SetTransform(D3DTS_PROJECTION, GetG().m_camera.GetProjMatrix());
 
-	/*if (this->m_curTurnType == TT_PLAYER)
-		m_innerFire.draw();*/
+	if (this->m_curTurnType == TT_PLAYER)
+		m_innerFire.draw();
 
 	renderFixedText(GetG().m_scrWidth, GetG().m_scrHeight);
 

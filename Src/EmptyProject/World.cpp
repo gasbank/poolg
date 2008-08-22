@@ -11,6 +11,7 @@
 #include "Incident.h"
 #include "Sound.h"
 #include "Utility.h"
+#include "Hero.h"
 // Aran Includes
 #include "ArnMesh.h"
 #include "ArnCamera.h"
@@ -405,12 +406,10 @@ void World::setupLight()
 UINT World::addUnit( Unit* u )
 {
 	m_unitSet.insert(u);
-	// TODO controllable means it is hero?
 	if ( u->getType() == UT_HERO )
 	{
 		/*주인공 유닛 설정*/
 		m_heroUnit = dynamic_cast<Character*>( u );
-
 	}
 
 	return m_unitSet.size();
@@ -771,6 +770,20 @@ Incident* World::getIncident( UINT idx ) const
 	}
 	return (*it);
 }
+
+// Delete hero pointer from UnitSet of this world and return hero's pointer.
+Hero* World::pullOutHero()
+{
+	UnitSet::iterator it;
+	for ( it = m_unitSet.begin(); it != m_unitSet.end(); it++ )
+	{
+		if ( *it == m_heroUnit )
+			m_unitSet.erase( it );
+	}
+	assert( m_heroUnit );
+	return static_cast<Hero*>(getHero());
+}
+
 //////////////////////////////////////////////////////////////////////////
 
 Unit* EpGetHero()
@@ -778,6 +791,14 @@ Unit* EpGetHero()
 	return GetWorldManager().getCurWorld()->getHero();
 
 } SCRIPT_CALLABLE_PV( EpGetHero )
+
+int EpHasHero()
+{
+	if ( GetWorldManager().getCurWorld()->getHero() == NULL )
+		return 0;
+	else
+		return 1;
+} SCRIPT_CALLABLE_I( EpHasHero )
 
 int EpRegisterIncident( void* ptr )
 {
@@ -829,6 +850,7 @@ int EpCurWorldDebugInfoOfIncident( int idx )
 
 START_SCRIPT_FACTORY( World )
 	CREATE_OBJ_COMMAND( EpGetHero )
+	CREATE_OBJ_COMMAND( EpHasHero )
 	CREATE_OBJ_COMMAND( EpRegisterIncident )
 	CREATE_OBJ_COMMAND( EpGetNode )
 	CREATE_OBJ_COMMAND( EpSetDoAnim )

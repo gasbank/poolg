@@ -14,6 +14,7 @@
 #include "Incident.h"
 #include "BlockingActionIncident.h"
 #include "NonblockingActionIncident.h"
+#include "EpLight.h"
 
 
 Action::Action(void)
@@ -302,18 +303,18 @@ void FadeAction::activate()
 {
 	Action::activate();
 
-	GetG().m_EpLight.setFadeDuration( m_fDuration );
+	GetEpLight().setFadeDuration( m_fDuration );
 	if ( m_iType == 0 )
-		GetG().m_EpLight.fadeInLight();
+		GetEpLight().fadeInLight();
 	else if ( m_iType == 1 )
-		GetG().m_EpLight.fadeOutLight();
+		GetEpLight().fadeOutLight();
 }
 
 bool FadeAction::update( double dTime, float fElapsedTime )
 {
 	Action::update( dTime, fElapsedTime );
 
-	bool actionInProgress = GetG().m_EpLight.isInFading();
+	bool actionInProgress = GetEpLight().isInFading();
 	if ( actionInProgress )
 		return true;
 	else
@@ -501,6 +502,44 @@ Action* EpCreateStartIncidentAction( void* inc )
 
 //////////////////////////////////////////////////////////////////////////
 
+FlickerAction::FlickerAction( float durationms, float fadeDu, D3DXCOLOR& color )
+{
+	m_durationms = durationms;
+	m_color = color;
+	m_fadeDuration = fadeDu;
+}
+
+bool FlickerAction::update( double dTime, float fElapsedTime )
+{
+	Action::update( dTime, fElapsedTime );
+
+	return GetEpLight().isFlicker();
+}
+
+void FlickerAction::activate()
+{
+	Action::activate();
+
+	GetEpLight().setFlickerColor( m_color );
+	GetEpLight().setFadeDuration( m_fadeDuration );
+	GetEpLight().flicker( m_durationms );
+}
+
+void FlickerAction::deactivate()
+{
+	Action::deactivate();
+
+	GetEpLight().stopFlicker();
+}
+
+Action* EpCreateFlickerAction( int duration, int fadeDuration, int r, int g, int b )
+{
+	D3DXCOLOR color( r / 255.0f, g / 255.0f, b / 255.0f, 1.0f );
+	return new FlickerAction( duration / 1000.0f, fadeDuration / 1000.0f, color );
+} SCRIPT_CALLABLE_PV_I_I_I_I_I( EpCreateFlickerAction )
+
+//////////////////////////////////////////////////////////////////////////
+
 START_SCRIPT_FACTORY( Action )
 	CREATE_OBJ_COMMAND( EpCreateDialogAction )
 	CREATE_OBJ_COMMAND( EpCreateSoundAction )
@@ -514,4 +553,6 @@ START_SCRIPT_FACTORY( Action )
 	CREATE_OBJ_COMMAND( EpCreateControllableAction )
 	CREATE_OBJ_COMMAND( EpCreateDelayAction )
 	CREATE_OBJ_COMMAND( EpCreateStartIncidentAction )
+	CREATE_OBJ_COMMAND( EpCreateFlickerAction )
 END_SCRIPT_FACTORY( Action )
+

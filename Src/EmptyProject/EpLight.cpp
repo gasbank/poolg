@@ -2,6 +2,9 @@
 #include "EpLight.h"
 #include "TopStateManager.h"
 #include "World.h"
+#include "ScriptManager.h"
+
+IMPLEMENT_SINGLETON( EpLight )
 
 EpLight::EpLight(void)
 {
@@ -12,6 +15,7 @@ EpLight::EpLight(void)
 	m_eLightState = LIGHT_NORMAL;
 	m_fBrightness = 1.0f;
 	m_bInFading = false;
+	m_bIsFlicker = false;
 
 	D3DXVECTOR3 dir( 0.0f, 0.0f, 1.0f );
 	D3DXVECTOR3 pos( -38.0f, -10.0f, -40.0f );
@@ -235,7 +239,10 @@ void EpLight::updateFlicker( float fElapsedTime )
 		m_eLightState = LIGHT_FLICKER;
 
 	} else
-		m_fFlickerDuration = 0.0f;
+	{
+		m_bIsFlicker = false;
+		fadeInLight();
+	}
 }
 
 void EpLight::setColor( float r, float g, float b )
@@ -275,4 +282,32 @@ void EpLight::flicker( float flickerDuration )
 	m_light.Specular = m_cFlickerSpecular;
 
 	m_bLightValueDirty = true;
+	m_bIsFlicker	   = true;
 }
+
+void EpLight::stopFlicker()
+{
+	m_fFlickerDuration = 0.0f;
+	m_bIsFlicker = false;
+}
+//////////////////////////////////////////////////////////////////////////
+
+int EpLightFlicker( int flickerDuration )
+{
+	D3DXCOLOR color( 1.0f, 0.0f, 0.0f, 1.0f );
+	GetEpLight().setFlickerColor( color );
+	GetEpLight().setFadeDuration( 0.5f );
+	GetEpLight().flicker( flickerDuration / 1000.0f );
+	return 0;
+} SCRIPT_CALLABLE_I_I( EpLightFlicker )
+
+int EpLightStopFlicker()
+{
+	GetEpLight().stopFlicker();
+	return 0;
+} SCRIPT_CALLABLE_I( EpLightStopFlicker )
+
+START_SCRIPT_FACTORY(EpLight)
+	CREATE_OBJ_COMMAND( EpLightFlicker )
+	CREATE_OBJ_COMMAND( EpLightStopFlicker )
+END_SCRIPT_FACTORY(EpLight)

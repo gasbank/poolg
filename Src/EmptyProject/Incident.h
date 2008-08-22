@@ -61,4 +61,4 @@ private:
 };
 
 
-SCRIPT_FACTORY( Incident )
+SCRIPT_FACTORY( Incident )	

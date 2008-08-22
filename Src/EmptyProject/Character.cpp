@@ -405,6 +405,9 @@ void Character::setBoundaryRect( LONG x0, LONG y0, LONG x1, LONG y1 )
 void Character::damage( int point )
 {
 	m_curHp -= point;
+	
+	if ( getType() == UT_HERO )
+		GetG().m_screenFlash.screenFlashing( 1.3f, 1.0f, 0.0f, 0.0f );
 
 	if ( getType() == UT_HERO )
 	{

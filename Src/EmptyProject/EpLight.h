@@ -2,7 +2,7 @@
 
 enum LightState { LIGHT_FADE, LIGHT_FLICKER, LIGHT_NORMAL };
 
-class EpLight
+class EpLight : public Singleton<EpLight>
 {
 public:
 	EpLight(void);
@@ -26,7 +26,8 @@ public:
 	void fadeInLightForcedDelayed( float d );
 	void fadeOutLight();
 	void flicker( float flickerDuration );
-	void stopFlicker() { m_fFlickerDuration = 0.0f; }
+	void stopFlicker();
+	bool isFlicker() { return m_bIsFlicker; }
 private:
 	void updateFadeBrightness( float fElapsedTime );
 	void updateFlicker( float fElapsedTime );
@@ -54,4 +55,10 @@ private:
 	D3DXVECTOR3			m_vPos;
 
 	float				m_fDelay;
+
+	bool				m_bIsFlicker;
 };
+
+inline EpLight& GetEpLight() { return EpLight::getSingleton(); }
+
+SCRIPT_FACTORY( EpLight )

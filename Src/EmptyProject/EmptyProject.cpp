@@ -24,6 +24,7 @@
 #include <process.h>
 #include "SpriteManager.h"
 #include "Sprite.h"
+#include "EpLight.h"
 
 
 G								g_g;
@@ -33,6 +34,7 @@ WorldStateManager*				g_wsm					= 0;
 ScriptManager*					g_scriptManager			= 0;		// Set to zero is 'CRUCIAL!'
 BombShader*						g_bombShader			= 0;
 SpriteManager*					g_spriteManager			= 0;
+EpLight*						g_epLight				= 0;
 
 LPD3DXFONT						g_pFont					= 0;
 LPD3DXEFFECT		            g_pEffect				= 0;
@@ -210,7 +212,7 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 	g_camera.SetProjParams( D3DX_PI / 4, fAspectRatio, 1.0f, 100000.0f );
 
 	GetG().m_screenFlash.setup();
-	GetG().m_EpLight.setupLight();
+	GetEpLight().setupLight();
 
 
 	V( D3DXCreateSprite( pd3dDevice, &g_d3dxSprite ) );
@@ -302,7 +304,7 @@ void CALLBACK OnFrameMove( double fTime, float fElapsedTime, void* pUserContext 
 	//////////////////////////////////////////////////////////////////////////
 
 	GetG().m_camera.frameMove( fElapsedTime );
-	GetG().m_EpLight.frameMove( fElapsedTime );
+	GetEpLight().frameMove( fElapsedTime );
 
 	TopStateManager::getSingleton().transit();
 
@@ -495,7 +497,7 @@ LRESULT CALLBACK MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
 
 	//g_avatar.handleMessages(hWnd, uMsg, wParam, lParam);
 	g_camera.handleMessages(hWnd, uMsg, wParam, lParam);
-	GetG().m_EpLight.handleMessages(hWnd, uMsg, wParam, lParam);
+	GetEpLight().handleMessages(hWnd, uMsg, wParam, lParam);
 	GetG().m_screenFlash.handleMessage( hWnd, uMsg, wParam, lParam );
 
 	if (g_tsm && GetTopStateManager().getCurState())
@@ -535,6 +537,7 @@ void CALLBACK OnD3D9DestroyDevice( void* pUserContext )
 	SAFE_RELEASE( g_tex );
 
 	EP_SAFE_RELEASE( g_wm );
+	delete g_epLight;
 
 	SAFE_DELETE( g_spriteManager );
 
@@ -689,6 +692,7 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 	GetG().m_camera.SetEnablePositionMovement( true );
 
 	g_wm = new WorldManager();
+	g_epLight = new EpLight();
 
 	uintptr_t t = _beginthread( EpConsoleThreadMain, 0, 0 );
 

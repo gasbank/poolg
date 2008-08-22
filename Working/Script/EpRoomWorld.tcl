@@ -13,13 +13,26 @@ namespace eval EpRoomWorld {
 		set world				$curWorld;
 	}
 
+	proc registerAlertIncident {} {
+		variable pHeroUnit
+
+		set trigger		[ EpCreateUnitPositionTrigger $pHeroUnit 26 73 26 73 0x001 ]
+		set action		[ EpCreateFlickerAction 10000 500 255 0 0 ]
+		set incident	[ EpCreateNonblockingActionIncident $trigger $action 1 ]
+
+		EpIncidentSetName	$incident "alert incident"
+
+		set incCount	[ EpRegisterIncident			$incident ]
+		EpOutputDebugString " - Incident count: $incCount\n"
+	}
+
 	proc registerIncidentHeal {} {
 		variable pHeroUnit
 		variable testEnemy
 			
-		set trigger [ EpCreateUnitPositionTrigger $pHeroUnit 44 81 44 81 0x001 ]
+		set trigger		[ EpCreateUnitPositionTrigger $pHeroUnit 44 81 44 81 0x001 ]
 		set action		[ EpCreateHealAction $pHeroUnit 500 ]
-		set incident	[ EpCreateBlockingActionIncident $trigger $action 2 ]
+		set incident		[ EpCreateBlockingActionIncident $trigger $action 2 ]
 
 		set action2		[ EpCreateDialogAction "EpDialogHeal" ]
 		set action3		[ EpCreateTeleportAction $pHeroUnit 53 66 ]
@@ -30,7 +43,7 @@ namespace eval EpRoomWorld {
 		EpIncidentSetName	$incident "Heal incident"
 
 		
-		set incCount	[ EpRegisterIncident $incident ]
+		set incCount		[ EpRegisterIncident $incident ]
 		EpOutputDebugString " - Incident count: $incCount\n"
 	}
 
@@ -40,7 +53,7 @@ namespace eval EpRoomWorld {
 		
 		set trigger		[ EpCreateTotalAnnihilationTrigger $world ]
 		set actions		[ EpCreateFadeAction out 3500 ]
-		set incident	[ EpCreateBlockingActionIncident $trigger 0 1 ]
+		set incident		[ EpCreateBlockingActionIncident $trigger 0 1 ]
 
 		lappend actions		[ EpCreateTeleportAction $pHeroUnit 53 45 ]
 		lappend actions		[ EpCreateFadeAction in 3000 ]
@@ -106,7 +119,7 @@ namespace eval EpRoomWorld {
 		
 		set trigger		[ EpCreateUnitPositionTrigger $TestStObject 50 35 -1 -1 0x101 ]
 		set action		[ EpCreateScriptAction "EpSetDoAnim [EpGetNode Door] 1" ]
-		set incident		[ EpCreateNonblockingActionIncident $trigger $action 1 ]
+		set incident	[ EpCreateNonblockingActionIncident $trigger $action 1 ]
 
 		set action2		[ EpCreateScriptAction "EpSetDoAnim [EpGetNode TofuMan] 1" ]
 
@@ -121,9 +134,9 @@ namespace eval EpRoomWorld {
 	proc registerIncidentCamera {} {
 		variable pHeroUnit
 		
-		set trigger		[ EpCreateUnitPositionTrigger	$pHeroUnit 52 45 52 45 0x101 ]
-		set action		[ EpCreateCameraAction			external Camera 0 ]
-		set incident	[ EpCreateNonblockingActionIncident				$trigger $action 1 ]
+		set trigger		[ EpCreateUnitPositionTrigger		$pHeroUnit 52 45 52 45 0x101 ]
+		set action		[ EpCreateCameraAction				external Camera 0 ]
+		set incident	[ EpCreateNonblockingActionIncident $trigger $action 1 ]
 
 		EpIncidentSetName	$incident "Camera1 incident"
 
@@ -134,9 +147,9 @@ namespace eval EpRoomWorld {
 	proc registerIncidentCamera2 {} {
 		variable pHeroUnit
 		
-		set trigger		[ EpCreateUnitPositionTrigger	$pHeroUnit 54 45 54 45 0x101 ]
-		set action		[ EpCreateCameraAction			attach 0 5000 ]
-		set incident	[ EpCreateNonblockingActionIncident				$trigger $action 1 ]
+		set trigger		[ EpCreateUnitPositionTrigger		$pHeroUnit 54 45 54 45 0x101 ]
+		set action		[ EpCreateCameraAction				attach 0 5000 ]
+		set incident	[ EpCreateNonblockingActionIncident	$trigger $action 1 ]
 
 		EpIncidentSetName	$incident "Camera2 incident"
 
@@ -264,6 +277,7 @@ namespace eval EpRoomWorld {
 		#Incident_TofuManEnter
 		registerIncidentSwitch
 		registerIncidentControl
+		registerAlertIncident
 		
 		# Warp Positions -------------------------------------------------------
 		createWarpPosition			"EpA213World" GO 49 28 61 30

@@ -10,11 +10,13 @@
 #include "ShaderWrapper.h"
 #include "Trigger.h"
 
+
 class Incident;
 class Unit;
 class Dialog;
 class Sound;
 class ArnMesh;
+class Hero;
 
 typedef std::set<Unit*> UnitSet;
 typedef std::list<Dialog*> DialogList;
@@ -72,6 +74,9 @@ public:
 
 	void				printDebugInfo() const;
 	void				printDebugInfoOfIncident( UINT index ) const;
+	
+	Hero*				pullOutHero();
+
 private:
 						World( const char* worldName, const TCHAR* modelFilePath );
 	void				setupLight();

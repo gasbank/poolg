@@ -4,6 +4,19 @@ namespace eval EpCeilingWorld {
 	global world hero npcGetg npcGloop pHeroUnit npcSetg
 	variable startPos { 30 77 }
 
+	proc registerAlertIncident {} {
+		global world hero npcGetg npcGloop npcSetg pHeroUnit
+
+		set trigger		[ EpCreateUnitPositionTrigger $pHeroUnit 26 73 26 73 0x001 ]
+		set action		[ EpCreateFlickerAction 10000 500 255 0 0 ]
+		set incident	[ EpCreateNonblockingActionIncident $trigger $action 1 ]
+
+		EpIncidentSetName	$incident "alert incident"
+
+		set incCount	[ EpRegisterIncident			$incident ]
+		EpOutputDebugString " - Incident count: $incCount\n"
+	}
+
 	proc registerIncidentInitTalk {} {
 		global world hero npcGetg npcGloop pHeroUnit
 		
@@ -68,9 +81,9 @@ namespace eval EpCeilingWorld {
 	proc Quest3 {} {
 		global world hero npcGetg npcGloop pHeroUnit npcSetg
 
-		set trigger	 [ EpCreateUnitPositionWithTraceTrigger $pHeroUnit $npcSetg 0x001 ]
-		set action	 [ EpCreateDialogAction "EpCeilingWorld::SetGDialog" ]
-		set incident	 [ EpCreateBlockingActionIncident $trigger $action -1 ]
+		set trigger			[ EpCreateUnitPositionWithTraceTrigger $pHeroUnit $npcSetg 0x001 ]
+		set action			[ EpCreateDialogAction "EpCeilingWorld::SetGDialog" ]
+		set incident		[ EpCreateBlockingActionIncident $trigger $action -1 ]
 		EpIncidentSetName	$incident "Quest3 incident"
 		## --------------------------------------------
 		## Do not register a incident planned
@@ -122,7 +135,6 @@ namespace eval EpCeilingWorld {
 		EpCharacterSetCurHp			$npcSetg -1
 		EpEnemySetTalkable			$npcSetg 1
 		EpUnitSetArnMesh			$npcSetg "PoolGModel"
-
 
 		registerIncidentInitTalk
 		Quest1

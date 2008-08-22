@@ -71,7 +71,6 @@ void ScriptManager::throwScriptErrorWithMessage( Tcl_Interp* interp )
 	OutputDebugStringA( "\n@@@------------------------- SCRIPT ERROR -------------------------@@@\n" );
 	OutputDebugStringA( trace );
 	OutputDebugStringA( "\n@@@------------------------- SCRIPT ERROR -------------------------@@@\n\n" );
-
 		
 	throw std::runtime_error( trace );
 }

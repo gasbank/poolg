@@ -243,3 +243,22 @@ public:
 private:
 	Incident* m_incident;
 };
+
+//////////////////////////////////////////////////////////////////////////
+
+class FlickerAction : public Action
+{
+public:
+	FlickerAction( float durationms, float fadeDuration, D3DXCOLOR& color );
+
+	virtual bool update( double dTime, float fElapsedTime );
+
+protected:
+	virtual	void activate();
+	virtual void deactivate();
+
+private:
+	float m_durationms;
+	float m_fadeDuration;
+	D3DXCOLOR m_color;
+};

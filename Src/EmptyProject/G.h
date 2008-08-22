@@ -1,6 +1,5 @@
 #pragma once
 #include "EpCamera.h"
-#include "EpLight.h"
 #include "VideoMan.h"
 #include "ScreenFlash.h"
 
@@ -13,7 +12,6 @@ public:
 	LPDIRECT3DDEVICE9	m_dev;
 	EpCamera			m_camera;
 	D3DLIGHT9			m_light;
-	EpLight				m_EpLight;
 	VideoMan			m_videoMan;
 	ScreenFlash			m_screenFlash;
 

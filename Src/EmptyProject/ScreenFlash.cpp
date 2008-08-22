@@ -71,9 +71,9 @@ HRESULT ScreenFlash::frameMove( double fTime, float fElapsedTime )
 
 	// Change alpha for duration m_redFadeDurationSec
 	if ( m_screenFlashAlphaAngle < 90.0f  )
-		m_screenFlashAlphaAngle += fElapsedTime * 180.0f / m_screenFlashDurationSec * 2.0f;
+		m_screenFlashAlphaAngle += fElapsedTime * 180.0f / m_screenFlashDurationSec * 8.0f;
 	else if ( m_screenFlashAlphaAngle < 180.0f  )
-		m_screenFlashAlphaAngle += fElapsedTime * 180.0f / m_screenFlashDurationSec / 4.0f;
+		m_screenFlashAlphaAngle += fElapsedTime * 180.0f / m_screenFlashDurationSec / 2.0f;
 	else if ( m_screenFlashAlphaAngle != 180.0f )
 		m_screenFlashAlphaAngle = 180.0f;
 	else

@@ -3,6 +3,7 @@
 #include "World.h"
 #include "WorldStateManager.h"
 #include "ScriptManager.h"
+#include "EpLight.h"
 
 IMPLEMENT_SINGLETON( WorldManager )
 
@@ -24,7 +25,7 @@ void WorldManager::addWorld( World* ws )
 
 void WorldManager::changeToNextWorldIfExist()
 {
-	if ( m_nextWorld && m_nextWorld != m_curWorld && !GetG().m_EpLight.isInFading() )
+	if ( m_nextWorld && m_nextWorld != m_curWorld && !GetEpLight().isInFading() )
 	{
 		if ( m_curWorld )
 			m_curWorld->release();
@@ -34,9 +35,9 @@ void WorldManager::changeToNextWorldIfExist()
 		m_nextWorld = 0;
 
 		GetWorldStateManager().setNextStateForced(GAME_WORLD_STATE_FIELD);
-		GetG().m_EpLight.setFadeDuration( 1.0f );
-		GetG().m_EpLight.setBrightness( 0.0f );
-		GetG().m_EpLight.fadeInLightForcedDelayed( 2.0f );
+		GetEpLight().setFadeDuration( 1.0f );
+		GetEpLight().setBrightness( 0.0f );
+		GetEpLight().fadeInLightForcedDelayed( 2.0f );
 	}
 }
 
@@ -47,16 +48,16 @@ void WorldManager::setNextWorld( const char* nextWorldName )
 	else
 		throw std::runtime_error( "World name not found" );
 
-	GetG().m_EpLight.setFadeDuration( 1.0f );
-	GetG().m_EpLight.fadeOutLight();
+	GetEpLight().setFadeDuration( 1.0f );
+	GetEpLight().fadeOutLight();
 }
 
 void WorldManager::setNextWorld( World* nextWorld )
 {
 	m_nextWorld = nextWorld;
 
-	GetG().m_EpLight.setFadeDuration( 1.0f );
-	GetG().m_EpLight.fadeOutLight();
+	GetEpLight().setFadeDuration( 1.0f );
+	GetEpLight().fadeOutLight();
 }
 
 void WorldManager::detachAllWorlds()

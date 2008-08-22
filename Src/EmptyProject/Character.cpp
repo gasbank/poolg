@@ -522,6 +522,20 @@ int EpCharacterSetStat( void* ptr, int statHealth, int statWill, int statCoding,
 	return 0;
 } SCRIPT_CALLABLE_I_PV_I_I_I_I_I_I( EpCharacterSetStat )
 
+int EpCharacterSetControllable( void* ptr, int controllable )
+{
+	Character* instance = reinterpret_cast<Character*>( ptr );
+	instance->Character::setControllable( controllable?true:false );
+	return 0;
+} SCRIPT_CALLABLE_I_PV_I( EpCharacterSetControllable )
+
+int EpCharacterSetTilePos( void* ptr, int tx, int ty )
+{
+	Character* instance = reinterpret_cast<Character*>( ptr );
+	instance->Character::setTilePos( tx, ty );
+	instance->Character::setTileBufferPos( tx, ty );
+	return 0;
+} SCRIPT_CALLABLE_I_PV_I_I( EpCharacterSetTilePos )
 
 START_SCRIPT_FACTORY(Character)
 	CREATE_OBJ_COMMAND( EpCreateCharacter )
@@ -530,4 +544,6 @@ START_SCRIPT_FACTORY(Character)
 	CREATE_OBJ_COMMAND( EpCharacterSetMoveDuration )
 	CREATE_OBJ_COMMAND( EpCharacterSetBoundary )
 	CREATE_OBJ_COMMAND( EpCharacterSetStat )
+	CREATE_OBJ_COMMAND( EpCharacterSetControllable )
+	CREATE_OBJ_COMMAND( EpCharacterSetTilePos )
 END_SCRIPT_FACTORY(Character)

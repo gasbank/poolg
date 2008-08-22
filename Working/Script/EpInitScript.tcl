@@ -32,9 +32,9 @@ proc EpInitGame {} {
 
 proc createHero { tilePos } {
 	set curWorld [ EpGetCurWorld ];
-	set hasHero EpHasHero
+	set hasHero [ EpHasHero ];
 	if { $hasHero == 1 } {
-		set	$unit EpGetHero
+		set	unit [ EpGetHero ]
 	} else {
 		set unit [ EpCreateHero $tilePos ];
 		EpRegisterToWorld $curWorld $unit

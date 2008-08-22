@@ -4,6 +4,8 @@
 #include "WorldStateManager.h"
 #include "ScriptManager.h"
 #include "EpLight.h"
+#include "Hero.h"
+#include "Unit.h"
 
 IMPLEMENT_SINGLETON( WorldManager )
 
@@ -27,10 +29,16 @@ void WorldManager::changeToNextWorldIfExist()
 {
 	if ( m_nextWorld && m_nextWorld != m_curWorld && !GetEpLight().isInFading() )
 	{
+		Hero* pHero = NULL;
 		if ( m_curWorld )
+		{
+			pHero = m_curWorld->pullOutHero();
 			m_curWorld->release();
+		}
 
 		m_curWorld = m_nextWorld;
+		if ( pHero )
+			m_curWorld->addUnit( static_cast<Unit*>(pHero) );
 		m_curWorld->init();
 		m_nextWorld = 0;
 
@@ -47,17 +55,17 @@ void WorldManager::setNextWorld( const char* nextWorldName )
 		setNextWorld( m_worlds[ nextWorldName ] );
 	else
 		throw std::runtime_error( "World name not found" );
-
-	GetEpLight().setFadeDuration( 1.0f );
-	GetEpLight().fadeOutLight();
 }
 
 void WorldManager::setNextWorld( World* nextWorld )
 {
 	m_nextWorld = nextWorld;
 
-	GetEpLight().setFadeDuration( 1.0f );
-	GetEpLight().fadeOutLight();
+	if ( m_curWorld )
+	{
+		GetEpLight().setFadeDuration( 1.0f );
+		GetEpLight().fadeOutLight();
+	}
 }
 
 void WorldManager::detachAllWorlds()

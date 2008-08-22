@@ -418,6 +418,11 @@ int EpRegisterToWorld( void* pv1, void* pv2 )
 	return w->addUnit(u);
 } SCRIPT_CALLABLE_I_PV_PV( EpRegisterToWorld )
 
+
+
+
+
+
 int EpUnitSetRotX( void* ptr, double val )
 {
 	Unit* instance = reinterpret_cast<Unit*>( ptr );

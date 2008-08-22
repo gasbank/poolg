@@ -30,9 +30,11 @@ namespace eval EpA213World {
 		set pEnemyUnit9				[ createEnemy 45 109 ];
 		set pEnemyUnit10			[ createEnemy 81 103 ];
 		                                      # Health Will Coding Defence Sense Immunity
-		EpCharacterSetStat			$pHeroUnit    7     5     7       5      5      5
-		EpCharacterSetCurHp			$pHeroUnit 10
-		EpCharacterSetCurCs			$pHeroUnit -1
+		EpCharacterSetControllable	$pHeroUnit 1
+		EpCharacterSetTilePos		$pHeroUnit 14 66
+		#EpCharacterSetStat			$pHeroUnit    7     5     7       5      5      5
+		#EpCharacterSetCurHp			$pHeroUnit 10
+		#EpCharacterSetCurCs			$pHeroUnit -1
 		EpCharacterSetMoveDuration	$pHeroUnit [expr 0.2]
 		EpUnitSetColor			$pHeroUnit 255 0 255
 		EpUnitSetPosZ				$pHeroUnit -[EpUnitGetUpperRightZ $pHeroUnit]

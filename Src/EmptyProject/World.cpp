@@ -774,11 +774,14 @@ Incident* World::getIncident( UINT idx ) const
 // Delete hero pointer from UnitSet of this world and return hero's pointer.
 Hero* World::pullOutHero()
 {
-	UnitSet::iterator it;
-	for ( it = m_unitSet.begin(); it != m_unitSet.end(); it++ )
+	UnitSet::iterator it = m_unitSet.begin();
+	for ( ; it != m_unitSet.end(); ++it )
 	{
 		if ( *it == m_heroUnit )
+		{
 			m_unitSet.erase( it );
+			break;
+		}
 	}
 	assert( m_heroUnit );
 	return static_cast<Hero*>(getHero());

@@ -238,7 +238,7 @@ void EpLight::updateFlicker( float fElapsedTime )
 
 		m_eLightState = LIGHT_FLICKER;
 
-	} else
+	} else if ( m_bIsFlicker )
 	{
 		m_bIsFlicker = false;
 		fadeInLight();

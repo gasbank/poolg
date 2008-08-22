@@ -4,19 +4,6 @@ namespace eval EpCeilingWorld {
 	global world hero npcGetg npcGloop pHeroUnit npcSetg
 	variable startPos { 30 77 }
 
-	proc registerAlertIncident {} {
-		global world hero npcGetg npcGloop npcSetg pHeroUnit
-
-		set trigger		[ EpCreateUnitPositionTrigger $pHeroUnit 26 73 26 73 0x001 ]
-		set action		[ EpCreateFlickerAction 10000 500 255 0 0 ]
-		set incident	[ EpCreateNonblockingActionIncident $trigger $action 1 ]
-
-		EpIncidentSetName	$incident "alert incident"
-
-		set incCount	[ EpRegisterIncident			$incident ]
-		EpOutputDebugString " - Incident count: $incCount\n"
-	}
-
 	proc registerIncidentInitTalk {} {
 		global world hero npcGetg npcGloop pHeroUnit
 		

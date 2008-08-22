@@ -182,6 +182,8 @@ namespace eval EpRoomWorld {
 		set testEnemy				[createEnemy 46 75 1];
 		
 		set pHeroUnit				[createHero $radiatorStartPos];
+		EpCharacterSetControllable	$pHeroUnit 1
+		EpCharacterSetTilePos		$pHeroUnit 26 74
 		
 		set pEnemyUnit1				[createEnemy 25 90 1];
 		set pEnemyUnit2				[createEnemy 37 88 1];
@@ -197,6 +199,8 @@ namespace eval EpRoomWorld {
 
 		set TestStObject			[createStructureObject 50 40];
 		EpUnitSetArnMesh			$TestStObject "PushableBox"
+
+		
 		
 		EpUnitSetPosZ				$pHeroUnit -[EpUnitGetUpperRightZ $pHeroUnit]
                                              # Health Will Coding Defence Sense Immunity

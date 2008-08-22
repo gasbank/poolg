@@ -40,7 +40,6 @@ Unit* Hero::createHero( LPD3DXMESH mesh, int tileX, int tileY, float posZ )
 	skillSet->setSkill (SL_FOURTH, (Skill*) new MultiThread());
 	skillSet->setSkill (SL_FIFTH, (Skill*) new Meditation());
 
-
 	return u;
 }
 

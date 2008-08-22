@@ -410,8 +410,6 @@ UINT World::addUnit( Unit* u )
 	{
 		/*주인공 유닛 설정*/
 		m_heroUnit = dynamic_cast<Character*>( u );
-		m_heroUnit->setAttack (10);
-		m_heroUnit->setInt (150);
 
 	}
 
@@ -698,8 +696,6 @@ void World::battleEventCheck()
 					getHeroUnit()->clearKey();
 					getHeroUnit()->setControllable( false );
 
-					// Set power of enemy!
-					getCurEnemyUnit()->setAttack(30);
 
 					// view each other
 					getHero()->setViewAt( &getCurEnemyUnit()->getPos() );

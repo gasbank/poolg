@@ -47,13 +47,10 @@ public:
 	int									getCurCs() const			{ return m_curCs; }
 	int									getMaxCs() const			{ return m_maxCs; }
 	void								damage( int point );
-	int									getAttack() const			{ return m_attack; }
-	int									getInt() const				{ return m_intelligence; }
 	bool								getMoving() const			{ return m_bMoving; }
-	void								setAttack (int point)		{ m_attack = point; }
-	void								setInt (int point)			{ m_intelligence = point; }
 	const Stat&							getStat() const				{ return m_stat; }
 	bool								isDead() const				{ return (m_curHp<=0); }
+
 	void								setDead();
 	void								addMoveImpulse( const D3DXVECTOR3& impulse );
 	
@@ -86,8 +83,6 @@ private:
 	int						m_curCs;
 	float					m_moveDuration; // A time needed to move one time(tile) in seconds
 	
-	int									m_attack;		// 일반 공격 스킬에 영향
-	int									m_intelligence; // 힐링 등의 스킬에 영향
 	
 	TileRegion							m_boundaryTileRect;
 

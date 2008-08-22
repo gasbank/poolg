@@ -89,6 +89,11 @@ BattleState::BattleState()
 	m_mpIllusionPlayer.setSize(statusBarWidth, statusBarHeight);
 	m_mpIllusionPlayer.setPos (statusBoxPlayersPositionX + statusBoxWidth*0.23f, statusBoxPlayersPositionY + statusBoxHeight * 0.65f, 4.8f);
 
+	m_expIllusionPlayer.init(L"Images/BattleUI/EXPillusion.jpg", m_pDev);
+	m_expIllusionPlayer.setSize(statusBarWidth, statusBarHeight);
+	m_expIllusionPlayer.setPos (statusBoxPlayersPositionX + statusBoxWidth*0.23f, statusBoxPlayersPositionY + statusBoxHeight * 0.48f, 4.8f);
+
+
 	m_hpBarPlayer.init(L"Images/BattleUI/HPbar.jpg", m_pDev);
 	m_hpBarPlayer.setSize(statusBarWidth, statusBarHeight);
 	m_hpBarPlayer.setPos (statusBoxPlayersPositionX + statusBoxWidth*0.23f, statusBoxPlayersPositionY + statusBoxHeight * 0.82f, 4.5f);
@@ -106,7 +111,6 @@ BattleState::BattleState()
 	m_expBarPlayer.initRate();
 	m_expBarPlayer.setPos (statusBoxPlayersPositionX + statusBoxWidth*0.23f, statusBoxPlayersPositionY + statusBoxHeight * 0.48f, 4.5f);
 	m_expBarPlayer.setSize(statusBarWidth, statusBarHeight);
-	m_expBarPlayer.changeRate(73.3f);
 
 	m_hpBarEnemy.init(L"Images/BattleUI/HPbar.jpg", m_pDev);
 	m_hpBarEnemy.setPos (statusBoxEnemysPositionX + statusBoxWidth*0.23f, statusBoxEnemysPositionY + statusBoxHeight * 0.82f, 4.5f);
@@ -146,13 +150,17 @@ HRESULT BattleState::enter()
 	m_hpIllusionEnemy.initRate((float)getEnemy()->getMaxHp());
 	m_mpBarPlayer.initRate((float)getHero()->getMaxCs());
 	m_mpIllusionPlayer.initRate((float)getHero()->getMaxCs());
+	m_expBarPlayer.initRate( (float) ( (Hero*)getHero() )->getMaxExp() );
+	m_expIllusionPlayer.initRate( (float) ( (Hero*)getHero() )->getMaxExp() );
 
 	m_hpBarPlayer.setRate((float)getHero()->getCurHp());
 	m_hpBarEnemy.setRate((float)getEnemy()->getCurHp());
 	m_mpBarPlayer.setRate((float)getHero()->getCurCs());
+	m_expBarPlayer.setRate ( (float) ( (Hero*)getHero() )->getCurExp() );
 	m_hpIllusionPlayer.setRate((float)getHero()->getCurHp());
 	m_hpIllusionEnemy.setRate((float)getEnemy()->getCurHp());
 	m_mpIllusionPlayer.setRate((float)getHero()->getCurCs());
+	m_expIllusionPlayer.setRate( (float) ( (Hero*)getHero() )->getCurExp() );
 
 	/*스킬 대상 설정*/
 	SkillSet* skillSet = getHero()->getSkillSet();
@@ -219,6 +227,7 @@ HRESULT BattleState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, flo
 	m_hpIllusionPlayer.draw();
 	m_hpIllusionEnemy.draw();
 	m_mpIllusionPlayer.draw();
+	m_expIllusionPlayer.draw();
 
 
 	m_hpBarPlayer.draw();
@@ -260,6 +269,7 @@ HRESULT BattleState::frameMove(double fTime, float fElapsedTime)
 	m_hpIllusionPlayer.frameMove(fElapsedTime);
 	m_hpIllusionEnemy.frameMove(fElapsedTime);
 	m_mpIllusionPlayer.frameMove(fElapsedTime);
+	m_expIllusionPlayer.frameMove( fElapsedTime );
 
 	m_hpBarPlayer.frameMove(fElapsedTime);
 	m_mpBarPlayer.frameMove(fElapsedTime);
@@ -277,6 +287,8 @@ HRESULT BattleState::frameMove(double fTime, float fElapsedTime)
 	m_hpIllusionEnemy.changeRate((float)getEnemy()->getCurHp());
 	m_mpBarPlayer.changeRate((float)getHero()->getCurCs());
 	m_mpIllusionPlayer.changeRate((float)getHero()->getCurCs());
+	m_expBarPlayer.changeRate( (float) ( (Hero*)getHero() )->getCurCs() );
+	m_expIllusionPlayer.changeRate( (float) ( (Hero*)getHero() )->getCurCs() );
 
 
 	
@@ -298,10 +310,10 @@ HRESULT BattleState::frameMove(double fTime, float fElapsedTime)
 
 HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	m_hpBarPlayer.handleMessages(hWnd, uMsg, wParam, lParam);
-	m_mpBarPlayer.handleMessages(hWnd, uMsg, wParam, lParam);
-	m_expBarPlayer.handleMessages(hWnd, uMsg, wParam, lParam);
-	m_mpBarEnemy.handleMessages(hWnd, uMsg, wParam, lParam);
+	//m_hpBarPlayer.handleMessages(hWnd, uMsg, wParam, lParam);
+	//m_mpBarPlayer.handleMessages(hWnd, uMsg, wParam, lParam);
+	//m_expBarPlayer.handleMessages(hWnd, uMsg, wParam, lParam);
+	//m_mpBarEnemy.handleMessages(hWnd, uMsg, wParam, lParam);
 
 
 
@@ -441,6 +453,7 @@ HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 					break;
 				case 22:
 					m_battleLog.push_back( std::string( "OOO군은 무려 EP를 지우고, DXUT에 오타를 가하는 등의 음해를 가했습니다." ));
+					break;
 				default:
 					m_battleLog.push_back(std::string("훗, 더 이상의 자세한 팁은 생략한다."));;
 					break;
@@ -472,6 +485,7 @@ HRESULT BattleState::release ()
 	m_hpIllusionPlayer.release();
 	m_hpIllusionEnemy.release();
 	m_mpIllusionPlayer.release();
+	m_expIllusionPlayer.release ();
 
 	m_hpBarPlayer.release();
 	m_mpBarPlayer.release();

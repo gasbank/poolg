@@ -15,6 +15,8 @@ public:
 	virtual LRESULT				handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 	int							gainExp (int expPoint);
 	void						levelUp ();
+	int							getCurExp () const	{ return m_curExp; }
+	int							getMaxExp () const	{ return m_maxExp; }
 
 	int						m_maxExp;
 	int						m_curExp;

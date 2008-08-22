@@ -49,6 +49,7 @@ private:
 
 	Picture				m_SkillBox;
 	SkillDescBox		m_SkillContentBox;
+	SkillDescBox		m_StatSelectBox;
 	Picture				m_DialogBox;
 
 	Picture				m_hpBgPlayer;
@@ -61,6 +62,7 @@ private:
 	IllusionBar			m_hpIllusionPlayer;
 	IllusionBar			m_hpIllusionEnemy;
 	IllusionBar			m_mpIllusionPlayer;
+	IllusionBar			m_expIllusionPlayer;
 
 	ProgressBar			m_hpBarPlayer;
 	ProgressBar			m_mpBarPlayer;

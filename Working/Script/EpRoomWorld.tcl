@@ -4,6 +4,9 @@ namespace eval EpRoomWorld {
 	variable world
 	variable pHeroUnit
 	variable radiatorStartPos { 26 74 }
+	variable doorFront { 50 42 }
+	
+	variable heroStartPos $doorFront
 	
 	proc init { curWorld } {
 		variable world
@@ -175,15 +178,15 @@ namespace eval EpRoomWorld {
 		variable pHeroUnit
 		variable pTestEnemyUnit
 		variable TestStObject
-		variable radiatorStartPos
+		variable heroStartPos
 		
 		EpOutputDebugString " - [info level 0] called\n"
 		
 		set testEnemy				[createEnemy 46 75 1];
 		
-		set pHeroUnit				[createHero $radiatorStartPos];
+		set pHeroUnit				[createHero $heroStartPos];
 		EpCharacterSetControllable	$pHeroUnit 1
-		EpCharacterSetTilePos		$pHeroUnit 26 74
+		#EpCharacterSetTilePos		$pHeroUnit 26 74
 		
 		set pEnemyUnit1				[createEnemy 25 90 1];
 		set pEnemyUnit2				[createEnemy 37 88 1];

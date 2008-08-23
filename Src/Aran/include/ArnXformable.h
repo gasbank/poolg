@@ -19,6 +19,7 @@ public:
 	double						getAnimCtrlTime() const;
 	void						setAnimCtrlTime( double dTime );
 	void						setDoAnim( bool bDoAnim );
+	void						resetAnimSeqTime() { m_bAnimSeqEnded = false; setAnimCtrlTime(0); }
 	void						advanceTime( float fTime ) { m_d3dxAnimCtrl->AdvanceTime( fTime, 0 ); }
 protected:
 								ArnXformable(NODE_DATA_TYPE ndt);

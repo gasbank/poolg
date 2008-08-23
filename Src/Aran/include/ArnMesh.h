@@ -21,6 +21,11 @@ public:
 	const MeshData&		getMeshData() const { return m_data; }
 	const D3DMATERIAL9*	getMaterial(unsigned int i) const;
 	ArnMaterial*		getMaterialNode(unsigned int i) const { return m_materialRefList[i]; }
+	bool				isVisible() const { return m_bVisible; }
+	void				setVisible(bool val) { m_bVisible = val; }
+	bool				isCollide() const { return m_bCollide; }
+	void				setCollide(bool val) { m_bCollide = val; }
+
 	// *** INTERNAL USE ONLY START ***
 	virtual void		interconnect(ArnNode* sceneRoot);
 	// *** INTERNAL USE ONLY END ***
@@ -31,6 +36,10 @@ private:
 	LPD3DXMESH			m_d3dxMesh;
 	MaterialRefList		m_materialRefList;
 	MeshData			m_data;
+
+	bool				m_bVisible;
+	bool				m_bCollide;
+	
 };
 
 HRESULT arn_build_mesh(IN LPDIRECT3DDEVICE9 dev, IN const NodeMesh2* nm, OUT LPD3DXMESH& mesh);

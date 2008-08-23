@@ -10,6 +10,7 @@
 #include "TileManager.h"
 #include "Hero.h"
 #include "Enemy.h"
+#include "ArnMesh.h"
 
 BattleState::BattleState()
 {
@@ -194,6 +195,12 @@ HRESULT BattleState::enter()
 	m_battleWinner = PS_NOTSET;
 	setNextTurnType( TT_PLAYER );
 	passTurn();
+
+
+	// TODO Anim test
+	ArnNode* guardBallNode = getHero()->getArnMesh()->getNodeByName("Sphere.004");
+	((ArnMesh*)guardBallNode)->setDoAnim( true );
+	((ArnMesh*)guardBallNode)->setVisible( true );
 	return S_OK;
 }
 
@@ -205,7 +212,9 @@ HRESULT BattleState::leave()
 	GetAudioState().leaveBattle();
 
 	getHero()->setControllable( true );
-
+	
+	ArnMesh* guardBallNode = (ArnMesh*)(getHero()->getArnMesh()->getNodeByName("Sphere.004"));
+	guardBallNode->setVisible( false );
 	return S_OK;
 }
 
@@ -310,6 +319,15 @@ HRESULT BattleState::frameMove(double fTime, float fElapsedTime)
 	m_expIllusionPlayer.changeRate( (float) ( (Hero*)getHero() )->getCurExp() );
 
 
+	// TODO Anim test
+
+	ArnNode* guardBallNode = getHero()->getArnMesh()->getNodeByName("Sphere.004");
+	guardBallNode->update( fTime, fElapsedTime );
+	if ( ((ArnXformable*)guardBallNode)->isAnimSeqEnded() )
+	{
+		((ArnXformable*)guardBallNode)->resetAnimSeqTime();
+		((ArnXformable*)guardBallNode)->setDoAnim( true );
+	}
 	
 	//// WorldState에 접근하기 위한 코드.
 	//TopStateManager& tsm = TopStateManager::getSingleton();

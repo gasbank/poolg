@@ -45,6 +45,7 @@ public:
 	const D3DXVECTOR3&				getLowerLeft() const	{ return m_lowerLeft; }
 	const D3DXVECTOR3&				getUpperRight() const	{ return m_upperRight; }
 	LPD3DXMESH						getMesh() const			{ return m_d3dxMesh; }
+	
 	void							release()				{ SAFE_RELEASE(m_d3dxMesh); }
 	void							clearKey();
 
@@ -92,7 +93,8 @@ public:
 	void							setForcedMove( int i );
 	void							forcedMoveTest();
 	void							setArnMesh( ArnMesh* arnMesh )			{ assert( arnMesh ); m_arnMesh = arnMesh; }
-	
+	ArnMesh*						getArnMesh() const						{ return m_arnMesh; }
+
 	void							setColor( int r, int g, int b );
 	
 	bool							isForcedMove() const					{ return m_bForcedMove; }

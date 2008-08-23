@@ -16,6 +16,14 @@ namespace eval EpThreadTest {
 		EpUnitPrintTilePos $hero
 	}
 
+	proc help { { pattern "Ep*" } } {
+		set epCommandList [info commands $pattern]
+		set sorted [lsort -increasing $epCommandList]
+		foreach cmd $sorted {
+			puts $cmd
+		}
+	}
+					
 	proc localHandler {} {
 		# get the data from stdin
 		gets stdin data
@@ -65,6 +73,14 @@ namespace eval EpThreadTest {
 					world {
 						EpCurWorldDebugInfo
 					}
+					cheat {
+						                                        # Health Will Coding Defence Sense Immunity
+						EpCharacterSetStat			[ EpGetHero ]  999    999   999    999    999    999
+						EpCharacterSetCurHp			[ EpGetHero ] 9999
+						EpCharacterSetCurCs			[ EpGetHero ] 9999
+						EpCharacterSetMoveDuration	[ EpGetHero ] 0.01
+					}
+					
 					default {
 						if [string length $data] {
 							puts $::errorInfo

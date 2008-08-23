@@ -854,6 +854,34 @@ ArnNode* EpGetNode( const char* nodeName )
 
 } SCRIPT_CALLABLE_PV_PC( EpGetNode )
 
+int EpMeshSetVisible( void* node, int b )
+{
+	ArnMesh* mesh = static_cast<ArnMesh*>( node );
+	if ( mesh->getType() == NDT_RT_MESH )
+	{
+		mesh->setVisible( b?true:false );
+	}
+	else
+		throw std::runtime_error( "First argument should be ArnMesh type" );
+
+	return 0;
+
+} SCRIPT_CALLABLE_I_PV_I( EpMeshSetVisible )
+
+int EpMeshSetCollide( void* node, int b )
+{
+	ArnMesh* mesh = static_cast<ArnMesh*>( node );
+	if ( mesh->getType() == NDT_RT_MESH )
+	{
+		mesh->setCollide( b?true:false );
+	}
+	else
+		throw std::runtime_error( "First argument should be ArnMesh type" );
+
+	return 0;
+
+} SCRIPT_CALLABLE_I_PV_I( EpMeshSetCollide )
+
 int EpSetDoAnim( void* ptr, int bDoAnim )
 {
 	if ( ptr )
@@ -899,4 +927,6 @@ START_SCRIPT_FACTORY( World )
 	CREATE_OBJ_COMMAND( EpSetAnimTime )
 	CREATE_OBJ_COMMAND( EpCurWorldDebugInfo )
 	CREATE_OBJ_COMMAND( EpCurWorldDebugInfoOfIncident )
+	CREATE_OBJ_COMMAND( EpMeshSetVisible )
+	CREATE_OBJ_COMMAND( EpMeshSetCollide )
 END_SCRIPT_FACTORY( World )

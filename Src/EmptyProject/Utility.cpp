@@ -113,28 +113,36 @@ void Utility::FullTraverseExhaustiveRayTesting(
 	{
 		ArnMesh* mesh = static_cast<ArnMesh*>( node );
 		float dist = 0;
-		const D3DXMATRIX& meshXform = mesh->getFinalLocalXform();
-		D3DXVECTOR3 relativeRayStartPos = DX_CONSTS::D3DXVEC3_ZERO;
-		D3DXVECTOR3 relativeRayDir = DX_CONSTS::D3DXVEC3_ZERO;
+		if ( mesh->isCollide() )
+		{	
+			const D3DXMATRIX& meshXform = mesh->getFinalLocalXform();
+			D3DXVECTOR3 relativeRayStartPos = DX_CONSTS::D3DXVEC3_ZERO;
+			D3DXVECTOR3 relativeRayDir = DX_CONSTS::D3DXVEC3_ZERO;
 
-		if ( mesh->getIpoName().length() == 0 )
-		{
-			relativeRayStartPos = rayStartPos - mesh->getLocalXform_Trans();
-			dist = MeshRayClosestIntersectDist( mesh->getD3DXMesh(), relativeRayStartPos, rayDir );
+			if ( mesh->getIpoName().length() == 0 )
+			{
+				relativeRayStartPos = rayStartPos - mesh->getLocalXform_Trans();
+				dist = MeshRayClosestIntersectDist( mesh->getD3DXMesh(), relativeRayStartPos, rayDir );
+			}
+			else
+			{
+				D3DXMATRIX meshXformInv;
+				D3DXVECTOR3 vScale, vTrans;
+				D3DXQUATERNION qRot;
+				D3DXMatrixInverse( &meshXformInv, 0, &meshXform );
+				D3DXMatrixDecompose( &vScale, &qRot, &vTrans, &meshXformInv );
+				D3DXMATRIX mRot;
+				D3DXMatrixRotationQuaternion( &mRot, &qRot );
+				D3DXVec3TransformCoord( &relativeRayStartPos, &rayStartPos, &meshXformInv );
+				D3DXVec3TransformCoord( &relativeRayDir, &rayDir, &mRot );
+				dist = MeshRayClosestIntersectDist( mesh->getD3DXMesh(), relativeRayStartPos, relativeRayDir );
+			}
 		}
 		else
 		{
-			D3DXMATRIX meshXformInv;
-			D3DXVECTOR3 vScale, vTrans;
-			D3DXQUATERNION qRot;
-			D3DXMatrixInverse( &meshXformInv, 0, &meshXform );
-			D3DXMatrixDecompose( &vScale, &qRot, &vTrans, &meshXformInv );
-			D3DXMATRIX mRot;
-			D3DXMatrixRotationQuaternion( &mRot, &qRot );
-			D3DXVec3TransformCoord( &relativeRayStartPos, &rayStartPos, &meshXformInv );
-			D3DXVec3TransformCoord( &relativeRayDir, &rayDir, &mRot );
-			dist = MeshRayClosestIntersectDist( mesh->getD3DXMesh(), relativeRayStartPos, relativeRayDir );
+			dist = FLOAT_POS_INF;
 		}
+		
 
 		if ( dist == FLOAT_POS_INF )
 			*pIntersectedMeshCount = 0;

@@ -18,6 +18,8 @@ public:
 	unsigned int				getTexImgCount() const { return m_data.m_texImgList.size(); }
 	const STRING&				getTexImgName(unsigned int idx) const { return m_data.m_texImgList[idx]; }
 	LPDIRECT3DTEXTURE9			getD3DTexture(unsigned int idx) const { if (idx < m_d3dTextureList.size()) return m_d3dTextureList[idx]; else return 0; }
+
+	void						loadTexture();
 private:
 	void						buildFrom(const NodeMaterial1* nm);
 	void						buildFrom(const NodeMaterial2* nm);
@@ -25,4 +27,7 @@ private:
 	unsigned int m_materialCount;
 	MaterialData m_data;
 	TextureList m_d3dTextureList;
+
+	const NodeMaterial2* m_nodeMaterial; // Needed for late loading of texture images
+	bool m_bTextureLoaded;
 };

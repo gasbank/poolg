@@ -1,6 +1,5 @@
 
 float4x4 mWorldViewProj;
-float fTime; // Time parameter. This keeps increasing
 float alpha; // Alpha
 float diffuseR;
 float diffuseG;
@@ -23,6 +22,6 @@ VS_OUTPUT Alpha( in float4 vPosition : POSITION, in float2 vTex0 : TEXCOORD0, in
 	Output.Diffuse.b = diffuseB;
 	//Output.Diffuse.a = abs( sin( fTime ) ) / 2;
 	Output.Diffuse.a = alpha;
-	Output.Tex0 = float4( vTex0.x, vTex0.y, sin( fTime ), 1.0f );
+	Output.Tex0 = float4( vTex0.x, vTex0.y, 0.0f, 1.0f );
     return Output;
 }

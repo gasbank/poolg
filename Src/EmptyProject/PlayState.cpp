@@ -28,6 +28,8 @@ HRESULT PlayState::enter()
 
 HRESULT PlayState::leave()
 {
+	// TODO Current world release if exist
+
 	return S_OK;
 }
 

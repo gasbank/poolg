@@ -540,6 +540,37 @@ Action* EpCreateFlickerAction( int duration, int fadeDuration, int r, int g, int
 
 //////////////////////////////////////////////////////////////////////////
 
+StartAnimationAction::StartAnimationAction( ArnXformable* xformableNode )
+: m_xformableNode( xformableNode )
+{
+}
+
+bool StartAnimationAction::update( double dTime, float fElapsedTime )
+{
+	Action::update( dTime, fElapsedTime );
+	if ( m_xformableNode->isAnimSeqEnded() )
+	{
+		deactivate();
+		return false;
+	}
+	else
+		return true;
+}
+
+void StartAnimationAction::activate()
+{
+	Action::activate();
+
+	m_xformableNode->setDoAnim( true );
+}
+
+Action* EpCreateStartAnimationAction( void* ptr )
+{
+	return new StartAnimationAction( reinterpret_cast<ArnXformable*>( ptr ) );
+} SCRIPT_CALLABLE_PV_PV( EpCreateStartAnimationAction )
+
+//////////////////////////////////////////////////////////////////////////
+
 START_SCRIPT_FACTORY( Action )
 	CREATE_OBJ_COMMAND( EpCreateDialogAction )
 	CREATE_OBJ_COMMAND( EpCreateSoundAction )
@@ -554,5 +585,7 @@ START_SCRIPT_FACTORY( Action )
 	CREATE_OBJ_COMMAND( EpCreateDelayAction )
 	CREATE_OBJ_COMMAND( EpCreateStartIncidentAction )
 	CREATE_OBJ_COMMAND( EpCreateFlickerAction )
+	CREATE_OBJ_COMMAND( EpCreateStartAnimationAction )
 END_SCRIPT_FACTORY( Action )
+
 

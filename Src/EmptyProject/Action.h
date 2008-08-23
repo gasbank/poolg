@@ -5,7 +5,7 @@
 class World;
 class Enemy;
 class Unit;
-
+class ArnXformable;
 
 enum ActionType { AT_BATTLE, AT_DIALOG, AT_SOUND, AT_HEAL, AT_UNITSPAWN, AT_SCRIPT, AT_FADE };
 
@@ -261,4 +261,23 @@ private:
 	float m_durationms;
 	float m_fadeDuration;
 	D3DXCOLOR m_color;
+};
+
+
+//////////////////////////////////////////////////////////////////////////
+
+// Should be applied blocked type incident only
+class StartAnimationAction : public Action
+{
+public:
+	StartAnimationAction( ArnXformable* xformableNode );
+	virtual ~StartAnimationAction() {}
+
+	virtual bool update( double dTime, float fElapsedTime );
+
+protected:
+	virtual	void activate();
+
+private:
+	ArnXformable* m_xformableNode;
 };

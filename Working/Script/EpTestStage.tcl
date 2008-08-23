@@ -15,6 +15,8 @@ namespace eval EpTestStage {
 		EpOutputDebugString " - [info level 0] called\n"
 		
 		set pHeroUnit				[ getHero { 43 79 } ];
+		EpCharacterSetControllable	$pHeroUnit 1
+		
 		                                      # Health Will Coding Defence Sense Immunity
 		EpCharacterSetStat				$pHeroUnit    10     5     7       5      5      5
 		EpCharacterSetCurHp				$pHeroUnit -1
@@ -28,6 +30,7 @@ namespace eval EpTestStage {
 		EpCharacterSetCurHp				$testEnemy -1
 		EpEnemySetRandomWalkable		$testEnemy 1
 		
+		EpRegisterInitFadeInIncident
 	}
 	
 	proc leave {} {

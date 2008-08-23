@@ -4,8 +4,9 @@
 #                                                                                  #
 #----------------------------------------------------------------------------------#
 
-set EpWorldList [ list EpCeilingWorld EpRoomWorld EpA213World EpTestStage ]
-set EpStartWorldName EpA213World
+variable EpStartTopStateName		IntroState
+set EpStartWorldName				EpTestStage
+set EpWorldList						[ list EpCeilingWorld EpRoomWorld EpA213World EpTestStage ]
 
 proc EpInitApp {} {
 	# Screen Resolution
@@ -16,13 +17,13 @@ proc EpInitApp {} {
 }
 
 proc EpInitGame {} {
+	variable EpStartTopStateName
 	
-	# initialState:		1000	Intro
-	#					1001	Play
-	#					1002	Credit
-	
-	set initialState 1001
-	EpSetNextState $initialState
+	set TOP_STATE(IntroState)		1000
+	set TOP_STATE(PlayState)		1001
+	set TOP_STATE(CreditState)		1002
+		
+	EpSetNextState $TOP_STATE($EpStartTopStateName)
 	EpOutputDebugString "<Script> EpInitGame called\n"
 }
 

@@ -22,7 +22,7 @@ private:
 	LPDIRECT3DDEVICE9		m_dev;
 	LPD3DXSPRITE			m_d3dxSprite;			// Screen space sprite
 	LPD3DXSPRITE			m_d3dxObjectSprite;		// Object space sprite
-	SpriteMap				m_spriteMap;
+	SpriteMap				m_spriteMap;			// Automatically rendered set of Sprites. Rendering is done at the last part of frameRender.
 };
 
 inline SpriteManager& GetSpriteManager() { return SpriteManager::getSingleton(); }

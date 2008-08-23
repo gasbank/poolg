@@ -120,15 +120,15 @@ namespace eval EpRoomWorld {
 		variable TestStObject
 		variable pTestEnemyUnit
 		
-		set trigger		[ EpCreateUnitPositionTrigger $TestStObject 50 35 -1 -1 0x101 ]
-		set action		[ EpCreateScriptAction "EpSetDoAnim [EpGetNode Door] 1" ]
-		set incident	[ EpCreateNonblockingActionIncident $trigger $action 1 ]
-
-		set action2		[ EpCreateScriptAction "EpSetDoAnim [EpGetNode TofuMan] 1" ]
-
-		EpIncidentSetName	$incident "Switch incident"
+		set trigger		[ EpCreateUnitPositionTrigger $TestStObject 50 39 -1 -1 0x101 ]
+		set action1		[ EpCreateStartAnimationAction [ EpGetNode Door ] ]
+		set action2		[ EpCreateStartAnimationAction [ EpGetNode TofuMan ] ]
 		
+		set incident	[ EpCreateBlockingActionIncident $trigger 0 1 ]
+		EpAddActionToIncident $incident $action1
 		EpAddActionToIncident $incident $action2
+		
+		EpIncidentSetName	$incident "Switch incident"
 		
 		set incCount	[ EpRegisterIncident $incident ]
 		EpOutputDebugString " - Incident count: $incCount\n"

@@ -24,3 +24,5 @@ private:
 	LPD3DXSPRITE			m_d3dxObjectSprite;		// Object space sprite
 	SpriteMap				m_spriteMap;
 };
+
+inline SpriteManager& GetSpriteManager() { return SpriteManager::getSingleton(); }

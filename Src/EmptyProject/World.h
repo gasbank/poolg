@@ -33,6 +33,7 @@ public:
 	HRESULT				frameMove(double fTime, float fElapsedTime);
 	HRESULT				handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	HRESULT				release();
+	VOID				enter();
 
 	const std::string&	getWorldName() { return m_worldName; }
 	UINT				addUnit( Unit* u );
@@ -116,6 +117,8 @@ private:
 	std::tstring					m_modelFilePath;
 
 	std::list<ArnMesh*>				m_collisionMeshes;
+
+	bool							m_bNotEntered;
 	
 };
 

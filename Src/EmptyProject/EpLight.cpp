@@ -290,6 +290,12 @@ void EpLight::stopFlicker()
 	m_fFlickerDuration = 0.0f;
 	m_bIsFlicker = false;
 }
+
+void EpLight::setLight( D3DLIGHT9* light )
+{
+	m_light = *light;
+	GetG().m_dev->SetLight( 1, &m_light );
+}
 //////////////////////////////////////////////////////////////////////////
 
 int EpLightFlicker( int flickerDuration )

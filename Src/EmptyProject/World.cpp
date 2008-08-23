@@ -12,6 +12,7 @@
 #include "Sound.h"
 #include "Utility.h"
 #include "Hero.h"
+#include "EpLight.h"
 // Aran Includes
 #include "ArnMesh.h"
 #include "ArnCamera.h"
@@ -34,6 +35,7 @@ World::World( const char* worldName, const TCHAR* modelFilePath )
 	m_curEnemyUnit			= 0;
 	m_curDialog				= 0;
 	m_sound					= 0;
+	m_bNotEntered			= true;
 }
 
 World::~World(void)
@@ -111,9 +113,6 @@ HRESULT World::init()
 	m_incidents.push_back( inc2 );*/
 
 	m_curDialog = 0;
-
-	GetG().m_camera.setAttachPos( &getHeroPos() );
-	GetG().m_camera.begin( CAMERA_ATTACH );
 	return hr;
 }
 
@@ -177,6 +176,12 @@ HRESULT World::frameMove(double fTime, float fElapsedTime)
 	HRESULT hr;
 
 	UNREFERENCED_PARAMETER( hr );
+
+	if ( GetTopStateManager().curStateEnum() == GAME_TOP_STATE_PLAY && m_bNotEntered )
+	{
+		enter();
+		m_bNotEntered = false;
+	}
 	
 	m_pic.frameMove(fElapsedTime);
 	m_avatar.frameMove(fElapsedTime);
@@ -785,6 +790,18 @@ Hero* World::pullOutHero()
 	}
 	assert( m_heroUnit );
 	return static_cast<Hero*>(getHero());
+}
+
+VOID World::enter()
+{
+	D3DXVECTOR3 eye( getHero()->getPos().x, getHero()->getPos().y, getHero()->getPos().z - 30.0f );
+	D3DXVECTOR3 at( getHero()->getPos().x, getHero()->getPos().y, getHero()->getPos().z - 1.0f );
+	D3DXVECTOR3 up( 0.0f, 1.0f, 0.0f );
+	GetG().m_camera.setViewParamsWithUp( &eye, &at, &up );
+
+	GetEpLight().setFadeDuration( 1.0f );
+	GetEpLight().setBrightness( 0.0f );
+	GetEpLight().fadeInLightForcedDelayed( 2.0f );
 }
 
 //////////////////////////////////////////////////////////////////////////

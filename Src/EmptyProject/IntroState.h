@@ -3,6 +3,7 @@
 #include "State.h"
 #include "Picture.h"
 #include "Sound.h" // 사운드 헤더파일
+#include "Sprite.h"
 
 #define NUM_OF_LINES 20
 
@@ -34,11 +35,14 @@ private:
 
 	D3DXMATRIX m_matObjs[NUM_OF_LINES];	// Matrixes for transform of each text meshes
 	
-	Picture m_background;
 	bool m_backgroundVisible;
 	D3DXMATRIX m_matBackground;
 
-	Picture m_pLogo;
+	Sprite* m_pLogo;
+	DrawRequest* m_pLogoDrawRequest;
+	Sprite* m_pGalaxy;
+	DrawRequest* m_pGalaxyDrawRequest;
+
 	bool m_logoVisible;
 	float m_logoFading;
 
@@ -55,6 +59,9 @@ private:
 	float m_velocity;
 
 	Sound	m_sound; // 사운드 변수
+
+	float m_fFadeTimer;
+	float m_fTextAlpha;
 };
 
 /* SDKmisc.h

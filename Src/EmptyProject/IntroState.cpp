@@ -2,6 +2,8 @@
 #include "IntroState.h"
 #include "Picture.h"
 #include "TopStateManager.h"
+#include "EpLIght.h"
+#include "SpriteManager.h"
 
 //The Great Adventure of PoolG"
 //~ PoolG's Strikes Back ~"
@@ -31,6 +33,7 @@ IntroState::IntroState(void)
 		m_pTextMeshes[i] = 0;
 	}
 
+	m_fFadeTimer = 0.0f;
 }
 
 IntroState::~IntroState(void)
@@ -75,11 +78,6 @@ HRESULT IntroState::enter()
 	m_pStrs[15] = L"Now PoolG's difficult journey is just";
 	m_pStrs[16] = L"beginning!";
 
-	// Load background and logo
-	m_background.init(L"Images/the Whirlpool Galaxy (M51) and Companion Galaxy.jpg", pd3dDevice);
-	//m_background.init(L"ratatouille.jpg", pd3dDevice);
-	m_pLogo.init( L"Images/poolc logo by ooo.png", pd3dDevice );
-
 	// Create text meshes
 	createTextMeshes(GetG().m_dev);
 
@@ -88,7 +86,26 @@ HRESULT IntroState::enter()
 	setupCamera();
 
 	m_sound.init(); // 사운드 초기화
-	
+
+	//pd3dDevice->SetTransform( D3DTS_WORLD, &DX_CONSTS::D3DXMAT_IDENTITY );
+
+
+	m_pLogo = GetSpriteManager().registerSprite( "PoolCLogo", "Images/PoolC_Square.png" );
+	m_pLogo->registerRect( "PoolCLogo", 0, 0, 248, 129 );
+
+	D3DXVECTOR3 logoPos( GetG().m_scrWidth / 2.0f - 124.0f, GetG().m_scrHeight / 2.0f - 64.5f, 0.0f );
+	D3DXCOLOR logoColor( 1.0f, 1.0f, 1.0f, 0.0f );
+	m_pLogoDrawRequest = m_pLogo->drawRequest( "PoolCLogo", 0, &logoPos, logoColor );
+
+
+	m_pGalaxy = GetSpriteManager().registerSprite( "Galaxy", "Images/the_Whirlpool_Galaxy_M51.jpg" );
+	m_pGalaxy->registerRect( "Galaxy", 0, 0, 1280, 1280 );
+
+	D3DXVECTOR3 galaxyPos( 0.0f, 0.0f, 3.0f );
+	D3DXCOLOR galaxyColor( 1.0f, 1.0f, 1.0f, 0.0f );
+	m_pGalaxyDrawRequest = m_pGalaxy->drawRequest( "Galaxy", 0, &galaxyPos, galaxyColor );
+
+
 	return S_OK;
 }
 
@@ -101,53 +118,53 @@ HRESULT IntroState::leave()
 
 HRESULT IntroState::frameMove( double fTime, float fElapsedTime )
 {
-	double fStateTime = getStateTime(fTime);
+	if ( fElapsedTime <= 0.1f )
+		m_fFadeTimer += fElapsedTime;
 
-	fStateTime -= 1.5f;
-
-	if (0.0f < fStateTime  && fStateTime < 3.0f)
-	{		
-		m_logoVisible = true;
-		m_logoFading = (float)fStateTime / 3.0f;
-	}
-	else if (3.0f < fStateTime  && fStateTime < 6.0f)
+	if ( 0.0f <= m_fFadeTimer && m_fFadeTimer <= 6.0f )
 	{
-		double newfTime = (float)fStateTime - 3.0f;
-		m_logoFading = 1 - (float)newfTime / 3.0f;
+		float ratio = (float)m_fFadeTimer / 6.0f;
+		m_pLogoDrawRequest->color = D3DXCOLOR( 1.0f, 1.0f, 1.0f, sin( D3DXToRadian( ratio * 180.0f ) ) );
 	}
-	else if (6.0f < fStateTime  && fStateTime < 46.0f)
+	/*else if ( 6.0f <= m_fFadeTimer && m_fFadeTimer < 12.0f )
 	{
-		fStateTime = (float)fStateTime - 6.0f;
+		float ratio = (float)(m_fFadeTimer - 6.0f) / 6.0f;
+		m_pGalaxyDrawRequest->color = D3DXCOLOR( 1.0f, 1.0f, 1.0f, sin( D3DXToRadian( ratio * 90.0f ) ) );
+	}
+	else if ( 40.0f <= m_fFadeTimer && m_fFadeTimer < 46.0f )
+	{
+		float ratio = (float)(m_fFadeTimer - 40.0f) / 6.0f;
+		m_pGalaxyDrawRequest->color = D3DXCOLOR( 1.0f, 1.0f, 1.0f, sin( D3DXToRadian( ratio * 90.0f + 90.0f ) ) );
+	}*/
 
-		if (m_logoVisible == true)
-		{
-			m_logoVisible = false;
-			m_backgroundVisible = true;
-		}
-		
-		// Fade in, fade out
-		if (0.0f < fStateTime  && fStateTime < 5.0f)
-			m_mtrlControl = (float)(fStateTime / 5.0f);
-		else if ( 35.0f < fStateTime && fStateTime < 40.0f )
-			m_mtrlControl = (float)(1.0f - (fStateTime - 35.0f)  / 5.0f);
-
-		D3DXVECTOR3 vAxis(0.0f, 0.0f, -1.0f );
-		D3DXMatrixRotationAxis( &m_matBackground, &vAxis, D3DXToRadian( (FLOAT) fStateTime ) );
-
+	if ( 6.0f <= m_fFadeTimer && m_fFadeTimer < 46.0f )
 		m_sound.Opening(); // 오프닝 사운드 시작
+
+	if ( 0.0f <= m_fFadeTimer && m_fFadeTimer < 46.0f )
+	{
 		// Add some translational values to the matrices
 		for (int i = 0; i < NUM_OF_LINES; i++)
 		{
 			D3DXMatrixTranslation( 
 				&m_matObjs[i], 
 				-12.0f, 
-				-20 - ( float) i * 2.0f + ( float ) fStateTime * m_velocity,
+				-20 - ( float) i * 2.0f + ( float ) (m_fFadeTimer - 6.0f) * m_velocity,
 				0.0f );
 		}
 	}
-	else if (46.0f < fStateTime)
+	else if ( 46.0f < m_fFadeTimer )
 	{
 		TopStateManager::getSingleton().setNextState( GAME_TOP_STATE_PLAY );
+	}
+
+	if ( 40.0f <= m_fFadeTimer && m_fFadeTimer < 46.0f )
+	{
+		float ratio = (m_fFadeTimer - 40.0f) / 6.0f;
+		m_fTextAlpha = 1 - ratio;
+	}
+	else if ( 40.0f >= m_fFadeTimer )
+	{
+		m_fTextAlpha = 1.0f;
 	}
 
 	return S_OK;
@@ -163,84 +180,34 @@ HRESULT IntroState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, floa
 	// Apply fixed camera
 	pd3dDevice->SetTransform(D3DTS_VIEW, &GetG().g_fixedViewMat);
 	pd3dDevice->SetTransform(D3DTS_PROJECTION, &GetG().g_orthoProjMat);
+	
+	// Setup view and projection xforms - ?
+	pd3dDevice->SetTexture(0, 0);
 
-	// Background
-	if ( m_backgroundVisible )
-	{		
+	// Apply non-fixed camera
+	pd3dDevice->SetTransform(D3DTS_VIEW, GetG().m_camera.GetViewMatrix());
+	pd3dDevice->SetTransform(D3DTS_PROJECTION, GetG().m_camera.GetProjMatrix());
 
-		D3DXMATRIX mScale, mTrans, mWorld;
-		D3DXMatrixScaling(&mScale, (FLOAT) GetG().m_scrWidth * 2.0f, (FLOAT) GetG().m_scrHeight * 2.0f, 1.0f);
-		D3DXMatrixTranslation(&mTrans, (FLOAT) -GetG().m_scrWidth, (FLOAT) -GetG().m_scrHeight, 49.0f);
-
-		mWorld = mScale * mTrans * m_matBackground;
-
+	if( m_pTextMeshes[0] != NULL )
+	{
 		ZeroMemory( &mtrl, sizeof( D3DMATERIAL9 ) );
-		mtrl.Diffuse.r = mtrl.Ambient.r = mtrl.Specular.r = m_mtrlControl;
-		mtrl.Diffuse.g = mtrl.Ambient.g = mtrl.Specular.g = m_mtrlControl;
-		mtrl.Diffuse.b = mtrl.Ambient.b = mtrl.Specular.b = m_mtrlControl;
-		mtrl.Diffuse.a = mtrl.Ambient.a = mtrl.Specular.a = m_mtrlControl;
+		
+		D3DXCOLOR cv( 1.0f * m_fTextAlpha, 0.8f * m_fTextAlpha, 0.0f, m_fTextAlpha );
+		mtrl.Diffuse  = cv;
+		mtrl.Ambient = cv;
+		mtrl.Ambient = cv;
+
 		pd3dDevice->SetMaterial( &mtrl );
 
-		m_background.setLocalXform(&mWorld);
-
-		m_background.draw();
-	}
-
-	// Logo
-	if ( m_logoVisible )
-	{
-		D3DXMATRIX mScale2, mTrans2, mWorld2;
-
-		//D3DXMatrixScaling(&mScale2, (FLOAT) g_scrWidth * 0.5f, (FLOAT) g_scrHeight * 0.5f , 1.0f);
-		//D3DXMatrixTranslation(&mTrans2, (FLOAT) -g_scrWidth / 4.0f, (FLOAT) -g_scrHeight / 4.0f, 0.0f);
-
-		D3DXMatrixScaling(&mScale2, (FLOAT) 109.0, (FLOAT) 49.0, 1.0f);
-		D3DXMatrixTranslation(&mTrans2, (FLOAT) -109.0 / 2.0f, (FLOAT) -49.0 / 2.0f, 0.0f);
-
-		mWorld2 = mScale2 * mTrans2;
-
-		ZeroMemory( &mtrl, sizeof( D3DMATERIAL9 ) );
-		mtrl.Diffuse.r = mtrl.Ambient.r = mtrl.Specular.r = m_logoFading;
-		mtrl.Diffuse.g = mtrl.Ambient.g = mtrl.Specular.g = m_logoFading;
-		mtrl.Diffuse.b = mtrl.Ambient.b = mtrl.Specular.b = m_logoFading;
-		mtrl.Diffuse.a = mtrl.Ambient.a = mtrl.Specular.a = 0.1f;
-		pd3dDevice->SetMaterial(&mtrl);
-
-		m_pLogo.setLocalXform(&mWorld2);
-
-		m_pLogo.draw();
-	}
-	else
-	{
-		// Setup view and projection xforms - ?
-		pd3dDevice->SetTexture(0, 0);
-
-		// Apply non-fixed camera
-		pd3dDevice->SetTransform(D3DTS_VIEW, GetG().m_camera.GetViewMatrix());
-		pd3dDevice->SetTransform(D3DTS_PROJECTION, GetG().m_camera.GetProjMatrix());
-
-		if( m_pTextMeshes[0] != NULL )
+		for (int i = 0; i < NUM_OF_LINES; i++)
 		{
-			ZeroMemory( &mtrl, sizeof( D3DMATERIAL9 ) );
-			D3DCOLORVALUE cv_diffuse = { 198.0f / 255.0f * m_mtrlControl, 198.0f / 255.0f * m_mtrlControl, 198.0f / 255.0f * m_mtrlControl, 1.0f };
-			mtrl.Diffuse  = cv_diffuse;
-			D3DCOLORVALUE cv_ambient = { 0.0f, 0.0f, 0.0f, 1.0f };
-			mtrl.Ambient = cv_ambient;
-			D3DCOLORVALUE cv_specular = { 198.0f / 255.0f * m_mtrlControl, 198.0f / 255.0f * m_mtrlControl, 198.0f / 255.0f * m_mtrlControl, 1.0f };
-			mtrl.Ambient = cv_specular;
-			pd3dDevice->SetMaterial( &mtrl );
+			if ( m_pTextMeshes[i] == NULL )
+				continue;
 
-			for (int i = 0; i < NUM_OF_LINES; i++)
-			{
-				if ( m_pTextMeshes[i] == NULL )
-					continue;
-
-				pd3dDevice->SetTransform( D3DTS_WORLD, &m_matObjs[i] );
-				m_pTextMeshes[i]->DrawSubset( 0 );
-			}
+			pd3dDevice->SetTransform( D3DTS_WORLD, &m_matObjs[i] );
+			m_pTextMeshes[i]->DrawSubset( 0 );
 		}
 	}
-	
 
 	return S_OK;
 }
@@ -249,8 +216,9 @@ HRESULT IntroState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 {
 	if (uMsg == WM_KEYDOWN)
 	{
-		if (wParam == VK_F4)
+		if ( wParam == VK_ESCAPE )
 		{
+			m_pLogoDrawRequest->color = D3DXCOLOR( 1.0f, 1.0f, 1.0f, 0.0f );
 			TopStateManager::getSingleton().setNextState( GAME_TOP_STATE_PLAY );
 		}
 	}
@@ -265,47 +233,28 @@ HRESULT IntroState::release()
 		SAFE_RELEASE( m_pTextMeshes[i] );
 	}
 
-	m_background.release();
-	m_pLogo.release();
+	m_pLogo->release();
 	m_pBlack.release();
+
+	m_pLogoDrawRequest->release();
+	m_pGalaxyDrawRequest->release();
 
 	return S_OK;
 }
 
 void IntroState::setupLight() 
 {
-	D3DLIGHT9& light = GetG().m_light;
-	LPDIRECT3DDEVICE9& pd3dDevice = GetG().m_dev;
-
-	ZeroMemory(&light, sizeof(D3DLIGHT9));
-	D3DCOLORVALUE cv = { 0.8f, 0.8f, 0.8f, 1.0f };
-	light.Ambient = cv;
-	light.Diffuse = cv;
-	light.Specular = cv;
-
-	D3DXVECTOR3 dir(10.0f, -10.0f, 10.0f);
-	D3DXVec3Normalize((D3DXVECTOR3*)&light.Direction, &dir);
-	
-	D3DXVECTOR3 pos(-10.0f, 10.0f, -10.0f);
-	light.Position = pos;
-
-	// What are these?
-	light.Falloff = 0.5f; 
-	light.Phi = D3DXToRadian(80);
-	light.Theta = D3DXToRadian(10);
-	
-	light.Type = D3DLIGHT_DIRECTIONAL;
-	light.Range = 1000.0f;
-
-	pd3dDevice->SetLight(0, &light);
-	pd3dDevice->LightEnable(0, TRUE);
+	GetEpLight().setBrightness( 1.0f );
+	GetEpLight().setFadeDuration( 0.1f );
+	GetEpLight().fadeInLight();
 }
 
 void IntroState::setupCamera()
 {
 	D3DXVECTOR3 vecEye( 0.0f, -30.0f, -20.0f );
 	D3DXVECTOR3 vecAt( 0.0f, 0.0f, 0.0f );
-	GetG().m_camera.SetViewParams( &vecEye, &vecAt );
+	D3DXVECTOR3 vecUp( 0.0f, 1.0f, 0.0f );
+	GetG().m_camera.setViewParamsWithUp( &vecEye, &vecAt, &vecUp );
 }
 
 HRESULT IntroState::createTextMeshes( IDirect3DDevice9* pd3dDevice )

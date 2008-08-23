@@ -465,7 +465,7 @@ void Character::pushUnitInFront( UnitInput dir )
 void Character::setDead()
 {
 	m_curHp = -1;
-	startSoulAnimation( 3.0f, 3.0f );
+	startSoulAnimation( 1.0f, 3.0f );
 }
 
 void Character::addMoveImpulse( const D3DXVECTOR3& impulse )
@@ -529,13 +529,15 @@ int EpCharacterSetControllable( void* ptr, int controllable )
 	return 0;
 } SCRIPT_CALLABLE_I_PV_I( EpCharacterSetControllable )
 
-int EpCharacterSetTilePos( void* ptr, int tx, int ty )
+int EpCharacterSetTilePos( void* ptr, Tcl_Obj* tilePos )
 {
 	Character* instance = reinterpret_cast<Character*>( ptr );
-	instance->Character::setTilePos( tx, ty );
-	instance->Character::setTileBufferPos( tx, ty );
+	int tileX = 0, tileY = 0;
+	GetScriptManager().readTwoIntObj( tilePos, tileX, tileY );
+	instance->Character::setTilePos( tileX, tileY );
+	instance->Character::setTileBufferPos( tileX, tileY );
 	return 0;
-} SCRIPT_CALLABLE_I_PV_I_I( EpCharacterSetTilePos )
+} SCRIPT_CALLABLE_I_PV_OBJ( EpCharacterSetTilePos )
 
 START_SCRIPT_FACTORY(Character)
 	CREATE_OBJ_COMMAND( EpCreateCharacter )

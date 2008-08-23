@@ -2,6 +2,7 @@
 #include "WorldManager.h"
 #include "World.h"
 #include "WorldStateManager.h"
+#include "TopStateManager.h"
 #include "ScriptManager.h"
 #include "EpLight.h"
 #include "Hero.h"
@@ -43,9 +44,6 @@ void WorldManager::changeToNextWorldIfExist()
 		m_nextWorld = 0;
 
 		GetWorldStateManager().setNextStateForced(GAME_WORLD_STATE_FIELD);
-		GetEpLight().setFadeDuration( 1.0f );
-		GetEpLight().setBrightness( 0.0f );
-		GetEpLight().fadeInLightForcedDelayed( 2.0f );
 	}
 }
 

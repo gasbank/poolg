@@ -28,6 +28,8 @@ public:
 	void flicker( float flickerDuration );
 	void stopFlicker();
 	bool isFlicker() { return m_bIsFlicker; }
+
+	void setLight( D3DLIGHT9* light );;
 private:
 	void updateFadeBrightness( float fElapsedTime );
 	void updateFlicker( float fElapsedTime );

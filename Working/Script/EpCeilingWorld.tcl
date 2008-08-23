@@ -90,7 +90,7 @@ namespace eval EpCeilingWorld {
 		EpOutputDebugString " - [info level 0] called / curWorld: $curWorld\n"
 		set world					$curWorld;
 		
-		set pHeroUnit				[ createHero $startPos ];
+		set pHeroUnit				[ getHero $startPos ];
 		                                      # Health Will Coding Defence Sense Immunity
 		EpCharacterSetStat			$pHeroUnit    7     5     7       5      5      5
 		EpCharacterSetCurHp			$pHeroUnit 10

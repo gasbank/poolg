@@ -18,7 +18,7 @@ namespace eval EpA213World {
 		
 		EpOutputDebugString " - [info level 0] called\n"
 		
-		set pHeroUnit				[ createHero $gatePos ];
+		set pHeroUnit				[ getHero $gatePos ];
 		set pEnemyUnit1				[ createEnemy 81 70 ];
 		set pEnemyUnit2				[ createEnemy 82 60 ];
 		set pEnemyUnit3				[ createEnemy 64 64 ];
@@ -31,7 +31,6 @@ namespace eval EpA213World {
 		set pEnemyUnit10			[ createEnemy 81 103 ];
 		                                      # Health Will Coding Defence Sense Immunity
 		EpCharacterSetControllable	$pHeroUnit 1
-		EpCharacterSetTilePos		$pHeroUnit 14 66
 		#EpCharacterSetStat			$pHeroUnit    7     5     7       5      5      5
 		#EpCharacterSetCurHp			$pHeroUnit 10
 		#EpCharacterSetCurCs			$pHeroUnit -1

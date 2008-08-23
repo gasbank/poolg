@@ -102,7 +102,7 @@ HRESULT Picture::initRhw( const TCHAR* imgFileName, LPDIRECT3DDEVICE9 d3dDev, fl
 	m_d3dDev = d3dDev;
 
 	D3DXMatrixIdentity(&m_localXform);
-
+	
 	V(D3DXCreateTextureFromFile(d3dDev, imgFileName, &m_d3dTex));
 
 	V(d3dDev->CreateVertexBuffer(4 * sizeof(VertexRhw), D3DUSAGE_WRITEONLY, D3DFVF_XYZRHW | D3DFVF_TEX1, D3DPOOL_MANAGED, &m_d3dVB, 0));

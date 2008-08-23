@@ -303,21 +303,14 @@ void CALLBACK OnFrameMove( double fTime, float fElapsedTime, void* pUserContext 
 
 	//////////////////////////////////////////////////////////////////////////
 
-	GetG().m_camera.frameMove( fElapsedTime );
-	GetEpLight().frameMove( fElapsedTime );
-
 	TopStateManager::getSingleton().transit();
 
 	if (GetTopStateManager().getCurState())
 		GetTopStateManager().getCurState()->frameMove(fTime, fElapsedTime);
 
-	// Alpha shader testing
-	D3DXMATRIXA16 mWorldViewProj;
-	D3DXMatrixIdentity( &mWorldViewProj );
-	//mWorldViewProj = *GetG().m_camera.GetViewMatrix() * *GetG().m_camera.GetProjMatrix();
-	//V( g_alphaShader->getConstantTable()->SetMatrix( DXUTGetD3D9Device(), "mWorldViewProj", &mWorldViewProj ) );
-	//V( g_alphaShader->getConstantTable()->SetFloat( DXUTGetD3D9Device(), "fTime", (float)fTime ) );
-	
+	GetG().m_camera.frameMove( fElapsedTime );
+	GetEpLight().frameMove( fElapsedTime );
+
 
 	WCHAR msg[128];
 	
@@ -495,7 +488,6 @@ LRESULT CALLBACK MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
 {
 	EpCamera& g_camera = GetG().m_camera;
 
-	//g_avatar.handleMessages(hWnd, uMsg, wParam, lParam);
 	g_camera.handleMessages(hWnd, uMsg, wParam, lParam);
 	GetEpLight().handleMessages(hWnd, uMsg, wParam, lParam);
 	GetG().m_screenFlash.handleMessage( hWnd, uMsg, wParam, lParam );

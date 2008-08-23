@@ -13,7 +13,7 @@ class Action;
 
 enum TurnType { TT_NATURAL, TT_COMPUTER, TT_PLAYER };
 enum PlayerSide { PS_NOTSET, PS_COMPUTER, PS_PLAYER };
-enum StatSelect { SS_HEALTH, SS_WILL, SS_CODING, SS_DEF, SS_SENSE, SS_IMMUNITY };
+enum StatSelect { SS_HEALTH, SS_WILL, SS_CODING, SS_DEF, SS_SENSE, SS_IMMUNITY, SS_EXIT };
 
 class BattleState : public State
 {
@@ -37,6 +37,9 @@ public:
 	void setNextTurnType( TurnType tt ) { m_nextTurnType = tt; }
 	void passTurn();
 	void pushBattleLog( const char* log ) { m_battleLog.push_back( log ); }	
+	void statSelectMove (char choice);
+	
+
 private:
 
 	void doComputerAction();
@@ -92,6 +95,7 @@ private:
 
 	int				m_noneSkillSelectedCount;
 	bool			m_levelProgress;
+	bool			m_levelUpFlag;
 
 	//StatSelect ฐüทร
 	StatSelect		m_statSelect;

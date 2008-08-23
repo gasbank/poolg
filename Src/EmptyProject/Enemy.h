@@ -20,6 +20,7 @@ public:
 	void						setFightRange( int i )						{ m_iFightRange = i; }
 	int							getFightRange() const						{ return m_iFightRange; }
 	int							getExpReward() const						{ return m_expReward; }
+	void						setExpReward( int exp )						{ m_expReward = exp; }
 
 private:
 								Enemy();

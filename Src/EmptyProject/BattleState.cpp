@@ -54,7 +54,7 @@ BattleState::BattleState()
 /*
 	int StatSelectBoxHeight = 200;
 	int StatSelectBoxWidth = StatSelectBoxHeight * 390 / 269;
-	m_StatSelectBox.init(L"Images/BattleUI/StatSelectBox.png", m_pDev);
+	m_StatSelectBox.init(L"Images/BattleUI/SkillContentBox.png", m_pDev);
 	m_StatSelectBox.setDistance(500);
 	m_StatSelectBox.setOff();
 	m_StatSelectBox.setOnPos((float)skillBoxPositionX - StatSelectBoxWidth, (float)skillBoxPositionY, 7);
@@ -182,6 +182,7 @@ HRESULT BattleState::enter()
 	skillSet->setBattleState(this);
 	m_noneSkillSelectedCount = 0;
 	m_levelProgress = false;
+	m_levelUpFlag = false;
 	m_SkillContentBox.setOff();
 
 	setupCamera();
@@ -340,6 +341,13 @@ HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 		{
 			if (wParam == VK_RETURN)
 			{
+				Hero* hero = ( Hero* )getHero();
+				Enemy* enemy = ( Enemy* )getEnemy();
+
+				if (m_levelUpFlag == true)
+				{
+					hero->levelUp();
+				}
 
 				if (m_levelProgress == true)
 				{
@@ -347,16 +355,37 @@ HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 					getEnemy()->setRemoveFlag( true ); // Should be deleted before next frame update
 					return S_OK;
 				}
-				/*
-				Hero* hero = ( Hero* )getHero();
-				int expReward = ( ( Enemy* )getEnemy() )->getExpReward();
-
+				
+				
+				int expReward = enemy->getExpReward();
 				int remainExp = hero->gainExp( expReward );
-				if ( remainExp == 0)
+				printf("remainExp : %d\n" , remainExp);
+
+				//레벨업을 하고 경험치가 남지 않았을 때
+				if ( remainExp == -1 )
 				{
-					m_levelProgress = true;
-				}*/
-				m_levelProgress = true;
+					pushBattleLog("레벨업을 하였습니다!");
+					enemy->setExpReward( 0 );
+					m_levelUpFlag = true;
+				}
+				//레벨업을 하고 경험치가 남았을 때
+				else if ( remainExp > 0 )
+				{
+					pushBattleLog("레벨업을 하였습니다!");
+					enemy->setExpReward( remainExp );
+					m_levelUpFlag = true;
+				}
+				else
+				{/*
+					if (m_levelUpFlag == true)
+					{
+					
+					}*/
+					GetWorldStateManager().setNextState(GAME_WORLD_STATE_FIELD);
+					getEnemy()->setRemoveFlag( true ); // Should be deleted before next frame update
+					return S_OK;
+
+				}
 			}
 			return S_OK;
 		}
@@ -692,4 +721,67 @@ void BattleState::setupCamera()
 	const D3DXVECTOR3& vHeroPos = ws->getHeroPos();
 
 	GetG().m_camera.beginShoulderLookCamera( &vHeroPos, &vEnemyPos );
+}
+
+void BattleState::statSelectMove (char choice)
+{
+	if (choice == 'u')
+	{
+		switch (m_statSelect)
+		{
+		case SS_HEALTH :
+			m_statSelect = SS_EXIT;
+			break;
+		case SS_WILL :
+			m_statSelect = SS_HEALTH;
+			break;
+		case SS_CODING :
+			m_statSelect = SS_WILL;
+			break;
+		case SS_DEF :
+			m_statSelect = SS_CODING;
+			break;
+		case SS_SENSE :
+			m_statSelect = SS_DEF;
+			break;
+		case SS_IMMUNITY :
+			m_statSelect = SS_SENSE;
+			break;
+		case SS_EXIT :
+			m_statSelect = SS_IMMUNITY;
+			break;
+		}
+	}
+	else if (choice == 'd')
+	{
+		switch (m_statSelect)
+		{
+		case SS_HEALTH :
+			m_statSelect = SS_WILL;
+			break;
+		case SS_WILL :
+			m_statSelect = SS_CODING;
+			break;
+		case SS_CODING :
+			m_statSelect = SS_DEF;
+			break;
+		case SS_DEF :
+			m_statSelect = SS_SENSE;
+			break;
+		case SS_SENSE :
+			m_statSelect = SS_IMMUNITY;
+			break;
+		case SS_IMMUNITY :
+			m_statSelect = SS_EXIT;
+			break;
+		case SS_EXIT :
+			m_statSelect = SS_HEALTH;
+			break;
+		}
+	}
+	else if (choice == 'i')
+	{
+		m_statSelect = SS_EXIT;
+	}
+
 }

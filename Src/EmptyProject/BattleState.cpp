@@ -51,15 +51,15 @@ BattleState::BattleState()
 	m_SkillContentBox.setOnPos((float)skillBoxPositionX - skillContentBoxWidth, (float)skillBoxPositionY, 7);
 	m_SkillContentBox.setSize((float)skillContentBoxWidth, (float)skillContentBoxHeight);
 
-/*
+
 	int StatSelectBoxHeight = 200;
-	int StatSelectBoxWidth = StatSelectBoxHeight * 390 / 269;
+	int StatSelectBoxWidth = skillBoxWidth;
 	m_StatSelectBox.init(L"Images/BattleUI/SkillContentBox.png", m_pDev);
 	m_StatSelectBox.setDistance(500);
 	m_StatSelectBox.setOff();
-	m_StatSelectBox.setOnPos((float)skillBoxPositionX - StatSelectBoxWidth, (float)skillBoxPositionY, 7);
+	m_StatSelectBox.setOnPos( 0 , (float)skillBoxPositionY + StatSelectBoxHeight, 7);
 	m_StatSelectBox.setSize((float)StatSelectBoxWidth, (float)StatSelectBoxHeight);
-*/
+
 
 	float dialogBoxWidth = (float)(int)(scrWidth - statusBoxWidth - 30);
 	float dialogBoxHeight = 124;
@@ -229,6 +229,7 @@ HRESULT BattleState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, flo
 	m_pDev->SetRenderState(D3DRS_ZENABLE, FALSE);
 	m_StatusBoxPlayer.draw();
 	m_StatusBoxEnemy.draw();
+	m_StatSelectBox.draw();
 	m_SkillBox.draw();
 	m_SkillContentBox.draw();
 	m_DialogBox.draw();
@@ -274,6 +275,7 @@ HRESULT BattleState::frameMove(double fTime, float fElapsedTime)
 	m_StatusBoxEnemy.frameMove(fElapsedTime);
 	m_SkillBox.frameMove(fElapsedTime);
 	m_SkillContentBox.frameMove(fElapsedTime);
+	m_StatSelectBox.frameMove( fElapsedTime );
 	m_DialogBox.frameMove(fElapsedTime);
 	m_hpBgPlayer.frameMove(fElapsedTime);
 	m_mpBgPlayer.frameMove(fElapsedTime);
@@ -336,6 +338,29 @@ HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 
 	if (uMsg == WM_KEYDOWN)
 	{
+		if ( this->m_StatSelectBox.isOn())
+		{
+			if (wParam == VK_UP)
+			{
+				statSelectMove('u');
+			}
+			if (wParam == VK_DOWN)
+			{
+				statSelectMove('d');
+			}
+			if (wParam == VK_RETURN)
+			{
+				switch (m_statSelect)
+				{
+				case SS_EXIT:
+					m_StatSelectBox.setOff();
+					break;
+				}
+
+			}
+
+			return S_OK;
+		}
 		/*죽었을 시 enter 키를 입력하면 대상 파괴, 아니면 다른 키 안 받고 메시지 핸들링 종료*/
 		if ( getEnemy()->getCurHp() <= 0 && !getEnemy()->getSoulAnimation() )
 		{
@@ -349,12 +374,13 @@ HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 					hero->levelUp();
 				}
 
+				/*
 				if (m_levelProgress == true)
 				{
 					GetWorldStateManager().setNextState(GAME_WORLD_STATE_FIELD);
 					getEnemy()->setRemoveFlag( true ); // Should be deleted before next frame update
 					return S_OK;
-				}
+				}*/
 				
 				
 				int expReward = enemy->getExpReward();
@@ -376,11 +402,11 @@ HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 					m_levelUpFlag = true;
 				}
 				else
-				{/*
+				{
 					if (m_levelUpFlag == true)
 					{
-					
-					}*/
+						m_StatSelectBox.onBox();
+					}
 					GetWorldStateManager().setNextState(GAME_WORLD_STATE_FIELD);
 					getEnemy()->setRemoveFlag( true ); // Should be deleted before next frame update
 					return S_OK;
@@ -518,6 +544,7 @@ HRESULT BattleState::release ()
 	m_StatusBoxEnemy.release();
 	m_SkillBox.release();
 	m_SkillContentBox.release();
+	m_StatSelectBox.release();
 	m_DialogBox.release();
 	m_hpBgPlayer.release();
 	m_mpBgPlayer.release();

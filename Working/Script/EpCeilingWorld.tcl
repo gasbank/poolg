@@ -14,6 +14,7 @@ namespace eval EpCeilingWorld {
 		set incident	[ EpCreateBlockingActionIncident $trigger 0 1 ]
 		
 		EpIncidentSetName $incident "Init Talk"
+		EpIncidentSetControlDuringAction $incident 0
 		
 		foreach act $actions {
 			EpAddActionToIncident $incident $act

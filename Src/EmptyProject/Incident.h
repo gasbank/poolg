@@ -38,6 +38,8 @@ public:
 
 	void printDebugInfo() const;
 	void printDebugInfoDetailed() const;
+	bool getControlDuringAction() const { return m_bControlDuringAction; }
+	void setControlDuringAction(bool val) { m_bControlDuringAction = val; }
 
 	
 protected:
@@ -56,7 +58,9 @@ protected:
 private:
 	std::string m_incidentName;
 	bool m_bActivated;
+	bool m_bControlDuringAction; // Indicates the capability of controlling player when actions in progress.
 	
+
 	// Indicates the remaining occurrence count of this incident.
 	// 0 means no more trigger testing(and no more action)
 	// and -1 means infinite occurrence incident.

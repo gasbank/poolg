@@ -129,6 +129,7 @@ namespace eval EpRoomWorld {
 		EpAddActionToIncident $incident $action2
 		
 		EpIncidentSetName	$incident "Switch incident"
+		EpIncidentSetControlDuringAction $incident 1
 		
 		set incCount	[ EpRegisterIncident $incident ]
 		EpOutputDebugString " - Incident count: $incCount\n"

@@ -7,12 +7,12 @@
 
 
 Incident::Incident( int trigCount )
-: m_bActivated( false ), m_trigCount( trigCount ), m_LeastOnetime( false )
+: m_bActivated( false ), m_trigCount( trigCount ), m_LeastOnetime( false ), m_bControlDuringAction( false )
 {
 }
 
 Incident::Incident( Trigger* trigger, Action* action, int trigCount )
-: m_bActivated( false ), m_trigCount( trigCount ), m_LeastOnetime( false )
+: m_bActivated( false ), m_trigCount( trigCount ), m_LeastOnetime( false ), m_bControlDuringAction( false )
 {
 	addTrigger( trigger );
 	addAction( action );
@@ -78,6 +78,9 @@ void Incident::activate()
 	{
 		throw std::runtime_error( "Action invoked by Incident is already activated. You should deactivate the action when it is finished." );
 	}
+
+	
+	GetWorldManager().getCurWorld()->getHeroUnit()->setControllable( m_bControlDuringAction );
 }
 
 void Incident::deactivate()
@@ -85,6 +88,8 @@ void Incident::deactivate()
 	if ( !isActivated() )
 		throw std::runtime_error( "Incident::deactivate() is called during not activated state" );
 	m_bActivated = false;
+
+	GetWorldManager().getCurWorld()->getHeroUnit()->setControllable( !m_bControlDuringAction );
 }
 
 bool Incident::update( double dTime, float fElapsedTime )
@@ -150,9 +155,16 @@ int EpIncidentSetName( void* pv1, const char* pv2 )
 	return 0;
 } SCRIPT_CALLABLE_I_PV_PC( EpIncidentSetName )
 
+int EpIncidentSetControlDuringAction( void* pv1, int b )
+{
+	Incident* inci = reinterpret_cast<Incident*>( pv1 );
+	inci->setControlDuringAction( b?true:false );
+	return 0;
+} SCRIPT_CALLABLE_I_PV_I( EpIncidentSetControlDuringAction )
 
 START_SCRIPT_FACTORY( Incident )
 	CREATE_OBJ_COMMAND( EpIncidentSetName )
 	CREATE_OBJ_COMMAND( EpAddTriggerToIncident )
 	CREATE_OBJ_COMMAND( EpAddActionToIncident )
+	CREATE_OBJ_COMMAND( EpIncidentSetControlDuringAction )
 END_SCRIPT_FACTORY( Incident )

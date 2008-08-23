@@ -17,10 +17,12 @@ class Dialog;
 class Sound;
 class ArnMesh;
 class Hero;
+class SequentialIncident;
 
 typedef std::set<Unit*> UnitSet;
 typedef std::list<Dialog*> DialogList;
 typedef std::list<Incident*> IncidentList;
+typedef std::list<SequentialIncident*> SequentialIncidentList;
 
 class World
 {
@@ -38,6 +40,7 @@ public:
 	const std::string&	getWorldName() { return m_worldName; }
 	UINT				addUnit( Unit* u );
 	UINT				addIncident( Incident* inc );
+	UINT				addSequentialIncident( SequentialIncident* inc );
 	UINT				addDialog( Dialog* dlg ) { m_scriptedDialog.push_back( dlg ); return m_scriptedDialog.size(); }
 
 	Incident*			getIncident( UINT idx ) const;
@@ -101,6 +104,7 @@ private:
 
 	DialogList						m_scriptedDialog;
 	IncidentList					m_incidents;
+	SequentialIncidentList			m_sequentialIncidents;
 
 
 	float							m_sampleTeapotMeshRot;

@@ -13,6 +13,7 @@
 #include "Utility.h"
 #include "Hero.h"
 #include "EpLight.h"
+#include "SequentialIncident.h"
 // Aran Includes
 #include "ArnMesh.h"
 #include "ArnCamera.h"
@@ -239,6 +240,13 @@ HRESULT World::frameMove(double fTime, float fElapsedTime)
 	for ( ; itInc != m_incidents.end(); ++itInc )
 	{
 		(*itInc)->update( fTime, fElapsedTime );
+	}
+
+	// SequentialIncidents update
+	SequentialIncidentList::iterator itseqInc = m_sequentialIncidents.begin();
+	for ( ; itseqInc != m_sequentialIncidents.end(); ++itseqInc )
+	{
+		(*itseqInc)->update( fTime, fElapsedTime );
 	}
 
 	UnitSet::iterator it2 = m_unitSet.begin();
@@ -632,6 +640,12 @@ UINT World::addIncident( Incident* inc )
 	return m_incidents.size();
 }
 
+UINT World::addSequentialIncident( SequentialIncident* inc )
+{
+	m_sequentialIncidents.push_back( inc );
+	return m_sequentialIncidents.size();
+}
+
 void World::loadWorldModel()
 {
 	// World model init and loading
@@ -827,6 +841,13 @@ int EpRegisterIncident( void* ptr )
 
 } SCRIPT_CALLABLE_I_PV( EpRegisterIncident )
 
+int EpRegisterSequentialIncident( void* ptr )
+{
+	SequentialIncident* inc = reinterpret_cast<SequentialIncident*>( ptr );
+	return GetWorldManager().getCurWorld()->addSequentialIncident( inc );
+
+} SCRIPT_CALLABLE_I_PV( EpRegisterSequentialIncident )
+
 ArnNode* EpGetNode( const char* nodeName )
 {
 	return GetWorldManager().getCurWorld()->getNode( nodeName );
@@ -872,6 +893,7 @@ START_SCRIPT_FACTORY( World )
 	CREATE_OBJ_COMMAND( EpGetHero )
 	CREATE_OBJ_COMMAND( EpHasHero )
 	CREATE_OBJ_COMMAND( EpRegisterIncident )
+	CREATE_OBJ_COMMAND( EpRegisterSequentialIncident )
 	CREATE_OBJ_COMMAND( EpGetNode )
 	CREATE_OBJ_COMMAND( EpSetDoAnim )
 	CREATE_OBJ_COMMAND( EpSetAnimTime )

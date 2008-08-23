@@ -17,8 +17,46 @@ namespace eval EpCeilingWorld {
 		foreach act $actions {
 			EpAddActionToIncident $incident $act
 		}
+
+		EpIncidentSetName	$incident "InitTalk incident"
 		
 		set incCount	[ EpRegisterIncident $incident ]
+		EpOutputDebugString " - Incident count: $incCount\n"
+	}
+
+	proc testQuest {} {
+		global world hero npcGetg npcGloop pHeroUnit npcSetg
+
+		set incident	[ EpCreateSequentialIncident -1 ]
+
+		set trigger	[ EpCreateUnitPositionWithTraceTrigger $pHeroUnit $npcGetg 0x001 ]
+		set action	[ EpCreateDialogAction "EpCeilingWorld::GetGDialog" ]
+		EpAddTriggerToSequence		$incident $trigger
+		EpAddActionToSequence		$incident $action
+		set action	[ EpCreateFadeAction out 3500 ]
+		EpAddActionToSequence		$incident $action
+		set action	[ EpCreateFadeAction in 3000 ]
+		EpAddActionToSequence		$incident $action
+		set trigger	[ EpCreateUnitPositionWithTraceTrigger $pHeroUnit $npcGloop 0x001 ]
+		set action	[ EpCreateDialogAction "EpCeilingWorld::GlooPDialog" ]
+		EpAddTriggerToSequence		$incident $trigger
+		EpAddActionToSequence		$incident $action
+		set action	[ EpCreateFadeAction out 3500 ]
+		EpAddActionToSequence		$incident $action
+		set action	[ EpCreateFadeAction in 3000 ]
+		EpAddActionToSequence		$incident $action
+		set trigger	[ EpCreateUnitPositionWithTraceTrigger $pHeroUnit $npcSetg 0x001 ]
+		set action	[ EpCreateDialogAction "EpCeilingWorld::SetGDialog" ]
+		EpAddTriggerToSequence		$incident $trigger
+		EpAddActionToSequence		$incident $action
+		set action	[ EpCreateFadeAction out 3500 ]
+		EpAddActionToSequence		$incident $action
+		set action	[ EpCreateFadeAction in 3000 ]
+		EpAddActionToSequence		$incident $action
+
+		EpSequentialIncidentSetName	$incident "testQuest incident"
+		
+		set incCount	[ EpRegisterSequentialIncident $incident ]
 		EpOutputDebugString " - Incident count: $incCount\n"
 	}
 
@@ -54,6 +92,8 @@ namespace eval EpCeilingWorld {
 			EpAddActionToIncident $incident $act
 		}
 
+		EpIncidentSetName	$incident "Quest2 incident"
+
 		## --------------------------------------------
 		## Do not register a incident planned
 		## to be invoked by EpCreateStartIncidentAndWaitAction!!!
@@ -72,6 +112,7 @@ namespace eval EpCeilingWorld {
 		set action			[ EpCreateDialogAction "EpCeilingWorld::SetGDialog" ]
 		set incident		[ EpCreateBlockingActionIncident $trigger $action -1 ]
 		EpIncidentSetName	$incident "Quest3 incident"
+
 		## --------------------------------------------
 		## Do not register a incident planned
 		## to be invoked by EpCreateStartIncidentAndWaitAction!!!
@@ -124,7 +165,8 @@ namespace eval EpCeilingWorld {
 		EpUnitSetArnMesh			$npcSetg "PoolGModel"
 
 		registerIncidentInitTalk
-		Quest1
+		#Quest1
+		testQuest
 			
 		createWarpPosition			"EpRoomWorld" STOP 25 82
 	}

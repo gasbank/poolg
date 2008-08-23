@@ -686,6 +686,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\SequentialIncident.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SequentialIncident.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Trigger.cpp"
 				>
 			</File>

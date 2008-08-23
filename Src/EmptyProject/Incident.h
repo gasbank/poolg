@@ -26,6 +26,9 @@ public:
 	
 	void addTrigger( Trigger* trigger );
 	void addAction( Action* action );
+
+	TriggerList getTriggerList() { return m_trigger; }
+	ActionList getActionList() { return m_action; }
 	
 	bool getLeastOnetime() { return m_LeastOnetime; }
 	

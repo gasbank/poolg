@@ -813,9 +813,9 @@ VOID World::enter()
 	D3DXVECTOR3 up( 0.0f, 1.0f, 0.0f );
 	GetG().m_camera.setViewParamsWithUp( &eye, &at, &up );
 
-	GetEpLight().setFadeDuration( 1.0f );
+	//GetEpLight().setFadeDuration( 1.0f );
 	GetEpLight().setBrightness( 0.0f );
-	GetEpLight().fadeInLightForcedDelayed( 2.0f );
+	//GetEpLight().fadeInLightForcedDelayed( 2.0f );
 }
 
 //////////////////////////////////////////////////////////////////////////

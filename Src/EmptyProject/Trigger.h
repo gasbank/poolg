@@ -132,3 +132,27 @@ public:
 private:
 	Trigger* m_trigger;
 };
+
+enum ScreenState { FADING_FINISHED };
+
+class ScreenTrigger : public Trigger
+{
+public:
+	ScreenTrigger( ScreenState ss );
+	virtual ~ScreenTrigger() {}
+
+	virtual bool check();
+
+private:
+	ScreenState m_ss;
+};
+
+//////////////////////////////////////////////////////////////////////////
+
+class NullTrigger : public Trigger
+{
+public:
+	NullTrigger() {}
+	virtual ~NullTrigger() {}
+	virtual bool check() { return true; }
+};

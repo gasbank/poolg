@@ -396,6 +396,11 @@ void Unit::printDebugInfo() const
 	Utility::printValue( getPos() );
 	printf( "\n" );
 }
+
+void Unit::drawName()
+{
+}
+
 //////////////////////////////////////////////////////////////////////////
 //
 //Unit* EpCreateUnit( int tileX, int tileY )

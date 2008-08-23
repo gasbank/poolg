@@ -59,11 +59,11 @@ void WorldManager::setNextWorld( World* nextWorld )
 {
 	m_nextWorld = nextWorld;
 
-	if ( m_curWorld )
+	/*if ( m_curWorld )
 	{
 		GetEpLight().setFadeDuration( 1.0f );
 		GetEpLight().fadeOutLight();
-	}
+	}*/
 }
 
 void WorldManager::detachAllWorlds()

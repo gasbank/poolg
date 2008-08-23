@@ -284,6 +284,7 @@ namespace eval EpRoomWorld {
 		registerIncidentSwitch
 		registerIncidentControl
 		registerAlertIncident
+		EpRegisterInitFadeInIncident
 		
 		# Warp Positions -------------------------------------------------------
 		createWarpPosition			"EpA213World" GO 49 28 61 30

@@ -127,6 +127,7 @@ private:
 	World*							getWorldState() const;
 	void							drawSoul();
 	void							updateSoulAnimation( float fElapsedTime );
+	void							drawName();
 
 	struct TeapotVertex
 	{
@@ -164,6 +165,7 @@ private:
 	bool							m_bSoulAnimation;
 	D3DXMATRIX						m_prevLocalXform;
 	D3DMATERIAL9					m_prevMaterial;
+	std::string						m_name;
 };
 
 SCRIPT_FACTORY( Unit )

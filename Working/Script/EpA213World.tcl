@@ -111,6 +111,7 @@ namespace eval EpA213World {
 		registerIncidentMirror
 		registerIncidentOpen
 		registerIncidentOpen2
+		EpRegisterInitFadeInIncident
 	}
 	
 	

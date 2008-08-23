@@ -8,7 +8,8 @@ namespace eval EpCeilingWorld {
 		global world hero npcGetg npcGloop pHeroUnit
 		
 		set trigger		[ EpCreateUnitPositionTrigger $pHeroUnit 30 77 30 77 0x100 ]
-		set actions		[ EpCreateDialogAction "EpCeilingWorld::introDialog" ]
+		set actions		[ EpCreateFadeAction "in" 3000 ]
+		lappend actions [ EpCreateDialogAction "EpCeilingWorld::introDialog" ]
 				
 		set incident	[ EpCreateBlockingActionIncident $trigger 0 1 ]
 		

@@ -9,6 +9,7 @@
 #include "ScriptManager.h"
 #include "Unit.h"
 #include "Utility.h"
+#include "EpLight.h"
 
 Trigger::Trigger(void)
 {
@@ -270,6 +271,38 @@ Trigger* EpCreateReverseTrigger( void* trigger )
 
 //////////////////////////////////////////////////////////////////////////
 
+ScreenTrigger::ScreenTrigger( ScreenState ss )
+{
+	m_ss = ss;
+}
+
+bool ScreenTrigger::check()
+{
+	switch ( m_ss )
+	{
+	case FADING_FINISHED:
+		return GetEpLight().isInFading();
+	}
+	return false;
+}
+
+Trigger* EpCreateScreenTrigger( const char* type )
+{
+	if ( strcmp( type, "FADING_FINISHED" ) == 0)
+		return new ScreenTrigger( FADING_FINISHED );
+	else
+		throw std::runtime_error( "Type check failed" );
+} SCRIPT_CALLABLE_PV_PC( EpCreateScreenTrigger )
+
+//////////////////////////////////////////////////////////////////////////
+
+Trigger* EpCreateNullTrigger()
+{
+	return new NullTrigger();
+} SCRIPT_CALLABLE_PV( EpCreateNullTrigger )
+
+//////////////////////////////////////////////////////////////////////////
+
 START_SCRIPT_FACTORY( Trigger )
 	CREATE_OBJ_COMMAND( EpCreateCharHpTrigger )
 	CREATE_OBJ_COMMAND( EpCreateUnitPositionTrigger )
@@ -278,5 +311,6 @@ START_SCRIPT_FACTORY( Trigger )
 	CREATE_OBJ_COMMAND( EpCreateIncidentTrigger )
 	CREATE_OBJ_COMMAND( EpCreateUnitPositionWithTraceTrigger )
 	CREATE_OBJ_COMMAND( EpCreateReverseTrigger )
+	CREATE_OBJ_COMMAND( EpCreateScreenTrigger )
+	CREATE_OBJ_COMMAND( EpCreateNullTrigger )
 END_SCRIPT_FACTORY( Trigger )
-

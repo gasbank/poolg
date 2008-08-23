@@ -16,6 +16,7 @@ EpLight::EpLight(void)
 	m_fBrightness = 1.0f;
 	m_bInFading = false;
 	m_bIsFlicker = false;
+	m_fDelay = 0.0f;
 
 	D3DXVECTOR3 dir( 0.0f, 0.0f, 1.0f );
 	D3DXVECTOR3 pos( -38.0f, -10.0f, -40.0f );
@@ -113,6 +114,7 @@ void EpLight::frameMove( FLOAT fElapsedTime )
 		m_fDelay -= fElapsedTime;
 	else
 	{
+		m_fDelay = 0.0f;
 		updateFadeBrightness( fElapsedTime );
 		updateFlicker( fElapsedTime );
 	}
@@ -159,6 +161,11 @@ void EpLight::frameMove( FLOAT fElapsedTime )
 		//printf("lightPos: %f %f %f \n", m_light.Position.x, m_light.Position.y, m_light.Position.z );
 	}
 
+	/*printf( "%f\n", m_fFadeTimer );
+	if ( m_bInFading )
+		printf( "true\n" );
+	else
+		printf ( "false\n" );*/
 }
 
 void EpLight::fadeInLight()
@@ -167,6 +174,8 @@ void EpLight::fadeInLight()
 
 	m_fFadeTimer += 0.01f;
 	m_fFadeTimerSign = 1.0f;
+
+	m_bInFading = true;
 }
 
 void EpLight::fadeInLightForcedDelayed( float delay )
@@ -186,6 +195,8 @@ void EpLight::fadeOutLight()
 	else
 		m_fFadeTimer -= 0.01f;
 	m_fFadeTimerSign = -1.0f;
+
+	m_bInFading = true;
 }
 
 void EpLight::turnOnLight()
@@ -203,7 +214,8 @@ void EpLight::updateFadeBrightness( float fElapsedTime )
 	m_bInFading = true;
 	if ( 0.0f < m_fFadeTimer && m_fFadeTimer < m_fFadeDuration )
 	{
-		m_fFadeTimer += fElapsedTime * m_fFadeTimerSign;
+		if ( fElapsedTime < 0.1f )
+			m_fFadeTimer += fElapsedTime * m_fFadeTimerSign;
 	}
 	else if ( m_fFadeTimer > m_fFadeDuration )
 	{
@@ -215,6 +227,8 @@ void EpLight::updateFadeBrightness( float fElapsedTime )
 		m_fFadeTimer = 0.0f;
 		m_bInFading = false;
 	}
+	else if ( m_fFadeTimer == m_fFadeDuration || m_fFadeTimer == 0.0f )
+		m_bInFading = false;
 
 	m_eLightState = LIGHT_FADE;
 

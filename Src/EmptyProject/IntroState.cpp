@@ -239,15 +239,20 @@ HRESULT IntroState::release()
 	
 	m_pBlack.release();
 
-	EP_SAFE_RELEASE( m_pGalaxy );
-	EP_SAFE_RELEASE( m_pLogo );
-	EP_SAFE_RELEASE( m_pLogoDrawRequest );
-	EP_SAFE_RELEASE( m_pGalaxyDrawRequest );
+	if ( m_pGalaxy )
+		m_pGalaxy->release();
+	if ( m_pLogo ) 
+		m_pLogo->release();
+	if ( m_pLogoDrawRequest )
+		m_pLogoDrawRequest->release();
+	if ( m_pGalaxyDrawRequest )
+		m_pGalaxyDrawRequest->release();
 
 	return S_OK;
 }
 
-void IntroState::setupLight() 
+
+void IntroState::setupLight()
 {
 	GetEpLight().setBrightness( 1.0f );
 	GetEpLight().setFadeDuration( 0.1f );

@@ -465,7 +465,7 @@ void Character::pushUnitInFront( UnitInput dir )
 void Character::setDead()
 {
 	m_curHp = -1;
-	startSoulAnimation( 1.0f, 3.0f );
+	startSoulAnimation( 1.0f, 10.0f );
 }
 
 void Character::addMoveImpulse( const D3DXVECTOR3& impulse )

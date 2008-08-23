@@ -34,6 +34,10 @@ IntroState::IntroState(void)
 	}
 
 	m_fFadeTimer = 0.0f;
+	m_pLogo = 0;
+	m_pLogoDrawRequest = 0;
+	m_pGalaxy = 0;
+	m_pGalaxyDrawRequest = 0;
 }
 
 IntroState::~IntroState(void)
@@ -232,12 +236,13 @@ HRESULT IntroState::release()
 	{		
 		SAFE_RELEASE( m_pTextMeshes[i] );
 	}
-
-	m_pLogo->release();
+	
 	m_pBlack.release();
 
-	m_pLogoDrawRequest->release();
-	m_pGalaxyDrawRequest->release();
+	EP_SAFE_RELEASE( m_pGalaxy );
+	EP_SAFE_RELEASE( m_pLogo );
+	EP_SAFE_RELEASE( m_pLogoDrawRequest );
+	EP_SAFE_RELEASE( m_pGalaxyDrawRequest );
 
 	return S_OK;
 }

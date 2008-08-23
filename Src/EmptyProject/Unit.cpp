@@ -294,9 +294,13 @@ void Unit::drawSoul()
 		m_pd3dDevice->SetTransform(D3DTS_WORLD, &m_localXformSoul);
 		m_pd3dDevice->SetMaterial( &m_materialSoul );
 
+		m_pd3dDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+		m_pd3dDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+		m_pd3dDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
 		m_pd3dDevice->SetRenderState( D3DRS_CULLMODE, D3DCULL_CW );
 		m_arnMesh->getD3DXMesh()->DrawSubset( 0 );
 		m_pd3dDevice->SetRenderState( D3DRS_CULLMODE, D3DCULL_CCW );
+		m_pd3dDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
 	}
 }
 

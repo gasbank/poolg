@@ -39,14 +39,17 @@ HRESULT ScreenFlash::frameRender()
 
 	if ( !m_bStop )
 	{
-		GetG().m_dev->SetRenderState( D3DRS_LIGHTING, FALSE );
-		GetG().m_dev->SetRenderState( D3DRS_CULLMODE, D3DCULL_NONE );
-		GetG().m_dev->SetTexture( 0, 0 );
+		LPDIRECT3DDEVICE9& dev = GetG().m_dev;
+		dev->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+		dev->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+		dev->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+		dev->SetRenderState( D3DRS_LIGHTING, FALSE );
+		dev->SetRenderState( D3DRS_CULLMODE, D3DCULL_NONE );
+		dev->SetTexture( 0, 0 );
 		V_RETURN( GetG().m_dev->SetVertexShader( m_alphaShader->getVertexShader() ) );
-		D3DPERF_BeginEvent( 0, L"Draw Alpha Animated" );
 		V_RETURN( m_testPolygonCloned->DrawSubset( 0 ) );
-		D3DPERF_EndEvent();
 		V_RETURN( GetG().m_dev->SetVertexShader( 0 ) );
+		dev->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -65,7 +68,7 @@ HRESULT ScreenFlash::frameMove( double fTime, float fElapsedTime )
 	D3DXMATRIXA16 mWorldViewProj;
 	D3DXMatrixIdentity( &mWorldViewProj );
 	V( m_alphaShader->getConstantTable()->SetMatrix( DXUTGetD3D9Device(), "mWorldViewProj", &mWorldViewProj ) );
-	V( m_alphaShader->getConstantTable()->SetFloat( DXUTGetD3D9Device(), "fTime", (float)fTime ) );
+
 
 	m_bStop = false;
 

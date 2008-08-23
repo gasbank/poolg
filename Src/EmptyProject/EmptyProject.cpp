@@ -242,9 +242,6 @@ HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFA
 	pd3dDevice->SetRenderState( D3DRS_SPECULARENABLE, TRUE );
 
 	pd3dDevice->SetRenderState(D3DRS_LIGHTING, TRUE);
-	pd3dDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
-	pd3dDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-	pd3dDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 	pd3dDevice->SetRenderState(D3DRS_ZENABLE, TRUE);
 
 	// MacBook Air has problem with this render state... strange

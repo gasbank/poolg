@@ -115,7 +115,7 @@ namespace eval EpA213World {
 		lappend actions		[ EpCreateScriptAction			"EpSetDoAnim [ EpGetNode GateLeft   ] 1" ]
 		lappend actions		[ EpCreateScriptAction			"EpSetDoAnim [ EpGetNode GateCamera ] 1" ]
 		lappend actions		[ EpCreateCameraAction			external GateCamera 0 ]
-		lappend actions		[ EpCreateDelayAction			15000 ]
+		lappend actions		[ EpCreateDelayAction			10000 ]
 		lappend actions		[ EpCreateCameraAction			attach GateCamera 1500 ]
 		lappend actions		[ EpCreateControllableAction	$pHeroUnit 1 ]
 		set incident		[ EpCreateBlockingActionIncident $trigger 0 1 ]
@@ -126,6 +126,30 @@ namespace eval EpA213World {
 		set incCount	[ EpRegisterIncident $incident ]
 		EpOutputDebugString " - Incident count: $incCount\n"
 	}
+	
+	proc Incident_GateOpen_NewMethod {} {
+			variable pHeroUnit
+			set animObjectNames [ list Blocking1 Blocking2 Blocking3 GateRight GateLeft GateCamera ]
+			set animObjects [ list ]
+			foreach objName $animObjectNames {
+				lappend xformables [ EpGetNode $objName ]
+			}
+			
+			set trigger			[ EpCreateUnitPositionTrigger	$pHeroUnit 23 75 21 57 0x001 ]
+			set actions			[ EpCreateControllableAction	$pHeroUnit 0 ]
+			lappend actions		[ EpCreateCameraAction			external GateCamera 0 ]
+			lappend actions		[ EpCreateStartAnimationAction	$animObjects ]
+			lappend actions		[ EpCreateCameraAction			attach GateCamera 1500 ]
+			lappend actions		[ EpCreateControllableAction	$pHeroUnit 1 ]
+			
+			set incident		[ EpCreateBlockingActionIncident $trigger 0 1 ]
+			foreach act $actions {
+				EpAddActionToIncident $incident $act
+			}
+	
+			set incCount	[ EpRegisterIncident $incident ]
+			EpOutputDebugString " - Incident count: $incCount\n"
+		}
 	
 	proc leave {} {
 		EpOutputDebugString " - [info level 0] called\n"

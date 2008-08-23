@@ -13,6 +13,7 @@ class Action;
 
 enum TurnType { TT_NATURAL, TT_COMPUTER, TT_PLAYER };
 enum PlayerSide { PS_NOTSET, PS_COMPUTER, PS_PLAYER };
+enum StatSelect { SS_HEALTH, SS_WILL, SS_CODING, SS_DEF, SS_SENSE, SS_IMMUNITY };
 
 class BattleState : public State
 {
@@ -91,4 +92,8 @@ private:
 
 	int				m_noneSkillSelectedCount;
 	bool			m_levelProgress;
+
+	//StatSelect ฐüทร
+	StatSelect		m_statSelect;
+	int				m_statCount;
 };

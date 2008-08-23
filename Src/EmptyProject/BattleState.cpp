@@ -51,6 +51,16 @@ BattleState::BattleState()
 	m_SkillContentBox.setOnPos((float)skillBoxPositionX - skillContentBoxWidth, (float)skillBoxPositionY, 7);
 	m_SkillContentBox.setSize((float)skillContentBoxWidth, (float)skillContentBoxHeight);
 
+/*
+	int StatSelectBoxHeight = 200;
+	int StatSelectBoxWidth = StatSelectBoxHeight * 390 / 269;
+	m_StatSelectBox.init(L"Images/BattleUI/StatSelectBox.png", m_pDev);
+	m_StatSelectBox.setDistance(500);
+	m_StatSelectBox.setOff();
+	m_StatSelectBox.setOnPos((float)skillBoxPositionX - StatSelectBoxWidth, (float)skillBoxPositionY, 7);
+	m_StatSelectBox.setSize((float)StatSelectBoxWidth, (float)StatSelectBoxHeight);
+*/
+
 	float dialogBoxWidth = (float)(int)(scrWidth - statusBoxWidth - 30);
 	float dialogBoxHeight = 124;
 	m_DialogBox.init(L"Images/BattleUI/DialogBox.png", m_pDev);
@@ -128,6 +138,9 @@ BattleState::BattleState()
 
 	m_noneSkillSelectedCount = 0;
 
+	m_statSelect = SS_HEALTH;
+	m_statCount = 0;
+
 	m_curTurnType = TT_NATURAL;
 	m_nextTurnType = TT_NATURAL;
 }
@@ -161,6 +174,7 @@ HRESULT BattleState::enter()
 	m_hpIllusionEnemy.setRate((float)getEnemy()->getCurHp());
 	m_mpIllusionPlayer.setRate((float)getHero()->getCurCs());
 	m_expIllusionPlayer.setRate( (float) ( (Hero*)getHero() )->getCurExp() );
+
 
 	/*스킬 대상 설정*/
 	SkillSet* skillSet = getHero()->getSkillSet();
@@ -287,8 +301,8 @@ HRESULT BattleState::frameMove(double fTime, float fElapsedTime)
 	m_hpIllusionEnemy.changeRate((float)getEnemy()->getCurHp());
 	m_mpBarPlayer.changeRate((float)getHero()->getCurCs());
 	m_mpIllusionPlayer.changeRate((float)getHero()->getCurCs());
-	m_expBarPlayer.changeRate( (float) ( (Hero*)getHero() )->getCurCs() );
-	m_expIllusionPlayer.changeRate( (float) ( (Hero*)getHero() )->getCurCs() );
+	m_expBarPlayer.changeRate( (float) ( (Hero*)getHero() )->getCurExp() );
+	m_expIllusionPlayer.changeRate( (float) ( (Hero*)getHero() )->getCurExp() );
 
 
 	

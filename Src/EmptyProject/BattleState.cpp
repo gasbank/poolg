@@ -52,8 +52,8 @@ BattleState::BattleState()
 	m_SkillContentBox.setSize((float)skillContentBoxWidth, (float)skillContentBoxHeight);
 
 
-	int StatSelectBoxHeight = 200;
-	int StatSelectBoxWidth = skillBoxWidth;
+	int StatSelectBoxHeight = 230;
+	int StatSelectBoxWidth = skillBoxWidth + 40;
 	m_StatSelectBox.init(L"Images/BattleUI/SkillContentBox.png", m_pDev);
 	m_StatSelectBox.setDistance(500);
 	m_StatSelectBox.setOff();
@@ -134,6 +134,7 @@ BattleState::BattleState()
 	D3DXCreateFont(m_pDev, 18, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Rockwell Extra Bold"), &m_lblREB);
 	D3DXCreateFont(m_pDev, 20, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblSkill);
 	D3DXCreateFont(m_pDev, 15, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblSkillDescription);
+	D3DXCreateFont(m_pDev, 17, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblStatSelect);
 
 
 	m_noneSkillSelectedCount = 0;
@@ -184,6 +185,7 @@ HRESULT BattleState::enter()
 	m_levelProgress = false;
 	m_levelUpFlag = false;
 	m_SkillContentBox.setOff();
+	m_StatSelectBox.setOff();
 
 	setupCamera();
 	
@@ -338,7 +340,7 @@ HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 
 	if (uMsg == WM_KEYDOWN)
 	{
-		if ( this->m_StatSelectBox.isOn())
+		if ( m_StatSelectBox.isOn() )
 		{
 			if (wParam == VK_UP)
 			{
@@ -350,11 +352,61 @@ HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 			}
 			if (wParam == VK_RETURN)
 			{
+				Stat retStat = getHero()->getStat();
 				switch (m_statSelect)
 				{
-				case SS_EXIT:
-					m_StatSelectBox.setOff();
+				case SS_HEALTH:
+					if (m_statCount != 0)
+					{
+						m_statCount--;
+						retStat.health ++;
+						getHero()->setStat(retStat.health, retStat.will, retStat.coding, retStat.def, retStat.sense, retStat.immunity);
+					}
 					break;
+				case SS_WILL:
+					if (m_statCount != 0)
+					{
+						m_statCount--;
+						retStat.will ++;
+						getHero()->setStat(retStat.health, retStat.will, retStat.coding, retStat.def, retStat.sense, retStat.immunity);
+					}
+					break;
+				case SS_CODING:
+					if (m_statCount != 0)
+					{
+						m_statCount--;
+						retStat.coding ++;
+						getHero()->setStat(retStat.health, retStat.will, retStat.coding, retStat.def, retStat.sense, retStat.immunity);
+					}
+					break;
+				case SS_DEF:
+					if (m_statCount != 0)
+					{
+						m_statCount--;
+						retStat.def ++;
+						getHero()->setStat(retStat.health, retStat.will, retStat.coding, retStat.def, retStat.sense, retStat.immunity);
+					}
+					break;
+				case SS_SENSE:
+					if (m_statCount != 0)
+					{
+						m_statCount--;
+						retStat.sense ++;
+						getHero()->setStat(retStat.health, retStat.will, retStat.coding, retStat.def, retStat.sense, retStat.immunity);
+					}
+					break;
+				case SS_IMMUNITY:
+					if (m_statCount != 0)
+					{
+						m_statCount--;
+						retStat.immunity ++;
+						getHero()->setStat(retStat.health, retStat.will, retStat.coding, retStat.def, retStat.sense, retStat.immunity);
+					}
+					break;
+				case SS_EXIT:
+					GetWorldStateManager().setNextState(GAME_WORLD_STATE_FIELD);
+					getEnemy()->setRemoveFlag( true ); 
+					return S_OK;
 				}
 
 			}
@@ -372,43 +424,51 @@ HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 				if (m_levelUpFlag == true)
 				{
 					hero->levelUp();
+					m_expBarPlayer.initRate( (float) ( (Hero*)getHero() )->getMaxExp() );
+					m_expIllusionPlayer.initRate( (float) ( (Hero*)getHero() )->getMaxExp() );
+					m_expIllusionPlayer.setRate( (float) ( (Hero*)getHero() )->getCurExp() );
+					m_expBarPlayer.setRate ( (float) ( (Hero*)getHero() )->getCurExp() );
+
+					m_statCount += 5;
 				}
 
-				/*
-				if (m_levelProgress == true)
+
+				
+				int expReward = enemy->getExpReward();
+
+				if (expReward == 0)
 				{
 					GetWorldStateManager().setNextState(GAME_WORLD_STATE_FIELD);
 					getEnemy()->setRemoveFlag( true ); // Should be deleted before next frame update
-					return S_OK;
-				}*/
-				
-				
-				int expReward = enemy->getExpReward();
+				}
+
 				int remainExp = hero->gainExp( expReward );
 				printf("remainExp : %d\n" , remainExp);
 
 				//레벨업을 하고 경험치가 남지 않았을 때
 				if ( remainExp == -1 )
 				{
-					pushBattleLog("레벨업을 하였습니다!");
+					pushBattleLog("레벨업!");
 					enemy->setExpReward( 0 );
 					m_levelUpFlag = true;
 				}
 				//레벨업을 하고 경험치가 남았을 때
 				else if ( remainExp > 0 )
 				{
-					pushBattleLog("레벨업을 하였습니다!");
+					pushBattleLog("레벨업!");
 					enemy->setExpReward( remainExp );
 					m_levelUpFlag = true;
 				}
 				else
 				{
+					enemy->setExpReward( 0 );
 					if (m_levelUpFlag == true)
 					{
 						m_StatSelectBox.onBox();
+						m_levelUpFlag = false;
+						return S_OK;
 					}
-					GetWorldStateManager().setNextState(GAME_WORLD_STATE_FIELD);
-					getEnemy()->setRemoveFlag( true ); // Should be deleted before next frame update
+
 					return S_OK;
 
 				}
@@ -571,6 +631,7 @@ HRESULT BattleState::release ()
 	SAFE_RELEASE( m_lblREB );
 	SAFE_RELEASE( m_lblSkill );
 	SAFE_RELEASE( m_lblSkillDescription );
+	SAFE_RELEASE( m_lblStatSelect );
 
 	return S_OK;
 }
@@ -615,6 +676,9 @@ void BattleState::renderFixedText(int scrWidth, int scrHeight)
 	m_lblREB->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 	rc.top += (LONG)21.08;
 	StringCchPrintf(textBuffer, 512, L"EX");
+	m_lblREB->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+	rc.top += (LONG)21.08;
+	StringCchPrintf(textBuffer, 512, L"Level : %d", ( ( Hero* )getHero() )->getLevel() );
 	m_lblREB->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 
 
@@ -701,6 +765,114 @@ void BattleState::renderFixedText(int scrWidth, int scrHeight)
 
 	if (m_SkillContentBox.isOn())
 		m_lblSkillDescription->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 0.8f, 0.8f, 1.0f, 1.0f ) );
+
+
+	if ( m_StatSelectBox.isOn() )
+	{
+		int statSelectX = scrWidth/2 + 10;
+		int statSelectY = scrHeight/2 - 150;
+		int statSelectInterval = 25;
+		rc.top = statSelectY;
+		rc.left = statSelectX;
+
+
+		StringCchPrintf(textBuffer, 512, L"HEALTH");
+		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+		rc.top += statSelectInterval;
+		StringCchPrintf(textBuffer, 512, L"WILL");
+		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+		rc.top += statSelectInterval;
+		StringCchPrintf(textBuffer, 512, L"CODING");
+		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+		rc.top += statSelectInterval;
+		StringCchPrintf(textBuffer, 512, L"DEFENSE");
+		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+		rc.top += statSelectInterval;
+		StringCchPrintf(textBuffer, 512, L"SENSE");
+		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+		rc.top += statSelectInterval;
+		StringCchPrintf(textBuffer, 512, L"IMMUNITY");
+		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+		rc.top += statSelectInterval;
+		StringCchPrintf(textBuffer, 512, L"exit");
+		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+		rc.top += statSelectInterval;
+
+
+
+		rc.top = statSelectY;
+
+		switch (m_statSelect)
+		{
+		case SS_HEALTH:
+			StringCchPrintf(textBuffer, 512, L"HEALTH");
+			break;
+		case SS_WILL:
+			rc.top += statSelectInterval * 1;
+			StringCchPrintf(textBuffer, 512, L"WILL");
+			break;
+		case SS_CODING:
+			rc.top += statSelectInterval * 2;
+			StringCchPrintf(textBuffer, 512, L"CODING");
+			break;
+		case SS_DEF:
+			rc.top += statSelectInterval * 3;
+			StringCchPrintf(textBuffer, 512, L"DEFENSE");
+			break;
+		case SS_SENSE:
+			rc.top += statSelectInterval * 4;
+			StringCchPrintf(textBuffer, 512, L"SENSE");
+			break;
+		case SS_IMMUNITY:
+			rc.top += statSelectInterval * 5;
+			StringCchPrintf(textBuffer, 512, L"IMMUNITY");
+			break;
+		case SS_EXIT:
+			rc.top += statSelectInterval * 6;
+			StringCchPrintf(textBuffer, 512, L"exit");
+			break;
+		}
+
+		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 0.0f, 1.0f, 0.0f, 1.0f ) );
+
+
+
+		rc.top = statSelectY;
+		rc.left = statSelectX + 100;
+
+		StringCchPrintf(textBuffer, 512, L"%d", getHero()->getStat().health);
+		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+		rc.top += statSelectInterval;
+		StringCchPrintf(textBuffer, 512, L"%d", getHero()->getStat().will);
+		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+		rc.top += statSelectInterval;
+		StringCchPrintf(textBuffer, 512, L"%d", getHero()->getStat().coding);
+		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+		rc.top += statSelectInterval;
+		StringCchPrintf(textBuffer, 512, L"%d", getHero()->getStat().def);
+		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+		rc.top += statSelectInterval;
+		StringCchPrintf(textBuffer, 512, L"%d", getHero()->getStat().sense);
+		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+		rc.top += statSelectInterval;
+		StringCchPrintf(textBuffer, 512, L"%d", getHero()->getStat().immunity);
+		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+		rc.top += statSelectInterval * 2;
+
+		StringCchPrintf( textBuffer, 512, L"%d", m_statCount );
+		if (m_statCount != 0)
+		{
+			m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+		}
+		else
+		{
+			m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 0.0f, 0.0f, 1.0f ) );
+		}
+
+
+
+
+	}
 
 }
 

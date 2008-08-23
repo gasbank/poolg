@@ -57,17 +57,20 @@ void Hero::levelUp()
 int Hero::gainExp( int expPoint )
 {
 
+	//초과할 경우
 	if ( m_maxExp < m_curExp + expPoint ) 
 	{
 		int retExp = m_curExp + expPoint - m_maxExp;
 		m_curExp = m_maxExp;
 		return retExp;
 	}
+	//딱 맞을 경우
 	else if (m_maxExp == m_curExp + expPoint)
 	{
 		m_curExp = m_maxExp;
 		return -1;
 	}
+	//부족할 경우
 	else
 	{
 		m_curExp += expPoint;

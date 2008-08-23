@@ -79,6 +79,7 @@ private:
 	LPD3DXFONT			m_lblREB;
 	LPD3DXFONT			m_lblSkill;
 	LPD3DXFONT			m_lblSkillDescription;
+	LPD3DXFONT			m_lblStatSelect;
 
 	
 	LPDIRECT3DDEVICE9	m_pDev;

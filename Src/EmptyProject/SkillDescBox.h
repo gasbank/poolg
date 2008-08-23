@@ -10,7 +10,7 @@ public:
 	void offBox();
 	bool isOn();
 
-	void setOff () { m_isOn = false; }
+	void setOff ();
 
 	void frameMove( float fElapsedTime );
 

@@ -17,6 +17,7 @@ public:
 	void						levelUp ();
 	int							getCurExp () const	{ return m_curExp; }
 	int							getMaxExp () const	{ return m_maxExp; }
+	int							getLevel () const	{ return m_level; }
 
 	int						m_maxExp;
 	int						m_curExp;

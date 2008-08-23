@@ -6,6 +6,19 @@ void SkillDescBox::setOnPos(float x, float y, float z)
 	m_vPos.x = x + m_distance; m_vPos.y = y; m_vPos.z = z; m_onPosX = x;
 }
 
+void SkillDescBox::setOff()
+{
+	m_vPos.x = m_onPosX + m_distance;
+	m_isOn = false;
+	m_movingDirect = false;
+
+	D3DXMATRIX mScaling, mTranslation;
+	D3DXMatrixScaling(&mScaling, m_width, m_height, 1.0f);
+	D3DXMatrixTranslation(&mTranslation, m_vPos.x, m_vPos.y, m_vPos.z);
+
+	m_localXform = mScaling * mTranslation;
+}
+
 void SkillDescBox::onBox()
 {
 	/*다른 상태일 때만 작동한다.*/

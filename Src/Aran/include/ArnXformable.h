@@ -14,6 +14,7 @@ public:
 	const D3DXQUATERNION&		getLocalXform_Rot() const { return m_localXform_Rot; }
 	const D3DXVECTOR3&			getLocalXform_Trans() const { return m_localXform_Trans; }
 	D3DXMATRIX					getFinalXform();
+	bool						isAnimSeqEnded() const { return m_bAnimSeqEnded; }
 
 	double						getAnimCtrlTime() const;
 	void						setAnimCtrlTime( double dTime );
@@ -28,10 +29,14 @@ protected:
 	void						setIpoName(const char* ipoName) { m_ipoName = ipoName; }
 	void						setLocalXform(const D3DXMATRIX& localXform);
 	virtual void				update(double fTime, float fElapsedTime);
+
 	// *** INTERNAL USE ONLY START ***
 	void						configureAnimCtrl();
 	// *** INTERNAL USE ONLY END ***
 private:
+	
+	void						setAnimSeqEnded(bool val) { m_bAnimSeqEnded = val; }
+
 	ArnIpo*						m_ipo;
 	STRING						m_ipoName;
 
@@ -46,5 +51,7 @@ private:
 
 	LPD3DXANIMATIONCONTROLLER	m_d3dxAnimCtrl;
 	bool						m_bDoAnim;
+	bool						m_bAnimSeqEnded;
+	
 };
 

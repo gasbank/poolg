@@ -17,12 +17,13 @@ public:
 	const CurveData&			getCurveData(unsigned int idx) const { return m_curves[idx]; }
 	LPD3DXKEYFRAMEDANIMATIONSET getD3DXAnimSet() const { return m_d3dxAnimSet; }
 	DWORD						getCurveNames() const { return m_curveNames; }
+	int							getEndKeyframe() const { return m_endKeyframe; }
 
 	// *** INTERNAL USE ONLY START ***
 	virtual void				interconnect(ArnNode* sceneRoot);
 	// *** INTERNAL USE ONLY END ***
 
-	static const unsigned int	FPS = 25;
+	static const unsigned int	FPS = 60;
 	static CurveName			CurveNameStrToEnum(const char* name);
 private:
 	void						buildFrom(const NodeIpo1* ni);
@@ -34,4 +35,6 @@ private:
 	unsigned int				m_curveCount;
 	std::vector<CurveData>		m_curves;
 	LPD3DXKEYFRAMEDANIMATIONSET m_d3dxAnimSet;
+	int							m_endKeyframe;
+	
 };

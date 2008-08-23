@@ -252,6 +252,24 @@ Trigger* EpCreateUnitPositionWithTraceTrigger( void* unitA, void* unitB, int typ
 
 //////////////////////////////////////////////////////////////////////////
 
+
+ReverseTrigger::ReverseTrigger( Trigger* trigger )
+: m_trigger ( trigger )
+{
+}
+
+bool ReverseTrigger::check()
+{
+	return !m_trigger->check();
+}
+
+Trigger* EpCreateReverseTrigger( void* trigger )
+{
+	return new ReverseTrigger( reinterpret_cast<Trigger*>( trigger ) );
+} SCRIPT_CALLABLE_PV_PV( EpCreateReverseTrigger )
+
+//////////////////////////////////////////////////////////////////////////
+
 START_SCRIPT_FACTORY( Trigger )
 	CREATE_OBJ_COMMAND( EpCreateCharHpTrigger )
 	CREATE_OBJ_COMMAND( EpCreateUnitPositionTrigger )
@@ -259,5 +277,6 @@ START_SCRIPT_FACTORY( Trigger )
 	CREATE_OBJ_COMMAND( EpCreateUnTotalAnnihilationTrigger )
 	CREATE_OBJ_COMMAND( EpCreateIncidentTrigger )
 	CREATE_OBJ_COMMAND( EpCreateUnitPositionWithTraceTrigger )
+	CREATE_OBJ_COMMAND( EpCreateReverseTrigger )
 END_SCRIPT_FACTORY( Trigger )
 

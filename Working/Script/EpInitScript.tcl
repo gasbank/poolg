@@ -5,7 +5,7 @@
 #----------------------------------------------------------------------------------#
 
 set EpWorldList [ list EpCeilingWorld EpRoomWorld EpA213World EpTestStage ]
-set EpStartWorldName EpCeilingWorld
+set EpStartWorldName EpA213World
 
 proc EpInitApp {} {
 	# Screen Resolution

@@ -1,6 +1,6 @@
 namespace eval EpA213World {
 	set modelFilePath	"A213World.arn"
-	set dialogNameList [ list  ]
+	set dialogNameList [ list laserDialog laserDialog2 ]
 	variable pHeroUnit
 	variable gatePos { 14 66 }
 	
@@ -15,6 +15,8 @@ namespace eval EpA213World {
 	proc enter {} {
 		variable pHeroUnit
 		variable gatePos
+		variable Box
+		variable Mirror
 		
 		EpOutputDebugString " - [info level 0] called\n"
 		
@@ -97,8 +99,18 @@ namespace eval EpA213World {
 		EpCharacterSetCurHp			$pEnemyUnit10 -1
 		EpEnemySetRandomWalkable		$pEnemyUnit10 1
 		EpCharacterSetBoundary			$pEnemyUnit10 78 100 84 106
+
+		set Box					[createStructureObject 6 70];
+		EpUnitSetArnMesh			$Box "PushableBox"
+
+		set Mirror				[createStructureObject 6 60];
+		EpUnitSetArnMesh			$Mirror "PushableBox"
 		
 		Incident_GateOpen
+		registerIncidentBox
+		registerIncidentMirror
+		registerIncidentOpen
+		registerIncidentOpen2
 	}
 	
 	
@@ -126,7 +138,101 @@ namespace eval EpA213World {
 		set incCount	[ EpRegisterIncident $incident ]
 		EpOutputDebugString " - Incident count: $incCount\n"
 	}
-	
+
+	proc registerIncidentBox {} {
+		variable world
+		variable Box
+		variable Mirror
+		
+		set triggers		[ EpCreateUnitPositionTrigger $Box 9 70 -1 -1 0x001 ]
+		set trigger	[ EpCreateUnitPositionTrigger $Mirror 9 60 -1 -1 0x100 ]
+		lappend triggers	[ EpCreateReverseTrigger $trigger ]
+		set actions		[ EpCreateFadeAction out 3500 ]
+		lappend actions		[ EpCreateFadeAction in 3000 ]
+		set incident	[ EpCreateBlockingActionIncident 0 0 -1 ]
+
+		foreach trig $triggers {
+			EpAddTriggerToIncident $incident $trig
+		}
+
+		foreach act $actions {
+			EpAddActionToIncident $incident $act
+		}
+
+		EpIncidentSetName	$incident "Box incident"
+		
+		set incCount	[ EpRegisterIncident $incident ]
+		EpOutputDebugString " - Incident count: $incCount\n"
+	}
+
+	proc registerIncidentMirror {} {
+		variable world
+		variable Box
+		variable Mirror
+		
+		set trigger		[ EpCreateUnitPositionTrigger $Mirror 9 60 -1 -1 0x001 ]
+		set actions		[ EpCreateFadeAction out 3500 ]
+		lappend actions		[ EpCreateFadeAction in 3000 ]
+		set incident	[ EpCreateBlockingActionIncident $trigger 0 -1 ]
+
+		foreach act $actions {
+			EpAddActionToIncident $incident $act
+		}
+
+		EpIncidentSetName	$incident "Mirror incident"
+		
+		set incCount	[ EpRegisterIncident $incident ]
+		EpOutputDebugString " - Incident count: $incCount\n"
+	}
+
+	proc registerIncidentOpen {} {
+		variable world
+		variable Box
+		variable Mirror
+
+		set triggers		[ EpCreateUnitPositionTrigger $Box 9 70 -1 -1 0x100 ]
+		lappend triggers		[ EpCreateUnitPositionTrigger $Mirror 9 60 -1 -1 0x001 ]
+		set actions		[ EpCreateDialogAction "EpA213World::laserDialog" ]
+		set incident	[ EpCreateBlockingActionIncident 0 0 1 ]
+
+		foreach trig $triggers {
+			EpAddTriggerToIncident $incident $trig
+		}
+
+		foreach act $actions {
+			EpAddActionToIncident $incident $act
+		}
+
+		EpIncidentSetName	$incident "Open incident"
+		
+		set incCount	[ EpRegisterIncident $incident ]
+		EpOutputDebugString " - Incident count: $incCount\n"
+	}
+
+	proc registerIncidentOpen2 {} {
+		variable world
+		variable Box
+		variable Mirror
+
+		set triggers		[ EpCreateUnitPositionTrigger $Box 9 70 -1 -1 0x001 ]
+		lappend triggers		[ EpCreateUnitPositionTrigger $Mirror 9 60 -1 -1 0x100 ]
+		set actions		[ EpCreateDialogAction "EpA213World::laserDialog2" ]
+		set incident	[ EpCreateBlockingActionIncident 0 0 1 ]
+
+		foreach trig $triggers {
+			EpAddTriggerToIncident $incident $trig
+		}
+
+		foreach act $actions {
+			EpAddActionToIncident $incident $act
+		}
+
+		EpIncidentSetName	$incident "Open2 incident"
+		
+		set incCount	[ EpRegisterIncident $incident ]
+		EpOutputDebugString " - Incident count: $incCount\n"
+	}
+		
 	proc Incident_GateOpen_NewMethod {} {
 			variable pHeroUnit
 			set animObjectNames [ list Blocking1 Blocking2 Blocking3 GateRight GateLeft GateCamera ]
@@ -155,4 +261,25 @@ namespace eval EpA213World {
 		EpOutputDebugString " - [info level 0] called\n"
 	}
 
+	namespace eval laserDialog {	
+		set region [ list 0 0 0 0 ]; ;# left, top, right, bottom
+		set oneTime 0;
+	
+		set player "SYSTEM"
+	
+		set dialog [ list\
+			$player		"레이져가 통과하다가 꺾였다?"\
+		];
+	}
+
+	namespace eval laserDialog2 {	
+		set region [ list 0 0 0 0 ]; ;# left, top, right, bottom
+		set oneTime 0;
+	
+		set player "SYSTEM"
+	
+		set dialog [ list\
+			$player		"레이져가 시작하다가 꺾였다?"\
+		];
+	}
 }

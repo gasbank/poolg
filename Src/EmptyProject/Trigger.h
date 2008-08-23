@@ -118,3 +118,17 @@ private:
 	bool m_lastCheckResult;
 	UnitPositionTriggerType m_type;
 };
+
+//////////////////////////////////////////////////////////////////////////
+
+class ReverseTrigger : public Trigger
+{
+public:
+	ReverseTrigger( Trigger* trigger );
+	virtual ~ReverseTrigger() {}
+
+	virtual bool check();
+
+private:
+	Trigger* m_trigger;
+};

@@ -5,6 +5,14 @@
 class AUDIO_STATE : public Singleton<AUDIO_STATE>
 {
 public:
+	AUDIO_STATE()
+	{
+		pbSoundBank = 0;
+	}
+	~AUDIO_STATE()
+	{
+		SAFE_DELETE_ARRAY( pbSoundBank );
+	}
 	XACTINDEX iSE;
     XACTINDEX iStage[2][2];
 	XACTINDEX iOpening;

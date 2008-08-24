@@ -11,7 +11,6 @@
 Hero::Hero(void)
 : Character( UT_HERO )
 {
-	m_skillSet = new SkillSet();
 	m_curExp = 0;
 	m_maxExp = 6;
 	m_expGap = 3;

@@ -89,7 +89,7 @@ HRESULT IntroState::enter()
 	setupLight();
 	setupCamera();
 
-	m_sound.init(); // 사운드 초기화
+	//m_sound.init(); // 사운드 초기화
 
 	//pd3dDevice->SetTransform( D3DTS_WORLD, &DX_CONSTS::D3DXMAT_IDENTITY );
 

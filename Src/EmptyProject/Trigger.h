@@ -32,7 +32,7 @@ class UnitPositionTrigger : public Trigger
 {
 public:
 	UnitPositionTrigger( Unit* unit, TileRegion* region, UnitPositionTriggerType type );
-	virtual ~UnitPositionTrigger() {}
+	virtual ~UnitPositionTrigger();
 
 	virtual bool check();
 	virtual void printDebugInfo() const;

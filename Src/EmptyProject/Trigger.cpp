@@ -16,7 +16,7 @@ Trigger::Trigger(void)
 }
 
 Trigger::~Trigger(void)
-{
+{	
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -60,6 +60,12 @@ void UnitPositionTrigger::printDebugInfo() const
 	m_unit->printDebugInfo();
 	printf( "lastcheck=%d trigType=0x%x region=", m_lastCheckResult, m_type ); Utility::printValue( *m_region );
 	printf( "\n" );
+}
+
+UnitPositionTrigger::~UnitPositionTrigger()
+{
+	assert( m_region );
+	SAFE_DELETE( m_region );
 }
 Trigger* EpCreateUnitPositionTrigger( void* unit, int x0, int y0, int x1, int y1, int type )
 {

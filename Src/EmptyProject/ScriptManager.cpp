@@ -41,7 +41,7 @@ HRESULT ScriptManager::init()
 HRESULT ScriptManager::release()
 {
 	Tcl_DeleteInterp( m_interp );
-	Tcl_Finalize();
+	//Tcl_Finalize();
 	return S_OK;
 }
 

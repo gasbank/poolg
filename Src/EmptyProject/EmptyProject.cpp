@@ -41,6 +41,7 @@ LPD3DXEFFECT		            g_pEffect				= 0;
 D3DXHANDLE						g_tech					= 0;
 LPDIRECT3DVERTEXBUFFER9			g_lineElement			= 0;
 HANDLE							g_scriptBindingFinishedEvent				= 0;		// Signal object to resolve multi-threaded problems on console thread and main app thread
+HANDLE							g_consoleReleasedEvent = 0;		// Signal object to resolve multi-threaded problems on console thread and main app thread
 
 LPD3DXMESH						g_testTeapot			= 0;
 
@@ -604,24 +605,38 @@ int EpOutputDebugString( const char* msg )
 
 
 
+#define EP_CONSOLE
+
+static int g_closeConsole = 2008;
+
 void EpConsoleThreadMain( void* cd )
 {
-	//printf( "xx ^________^ xx" );
+#if defined(DEBUG) && defined(EP_CONSOLE)
 	g_consoleInterp = Tcl_CreateInterp();
 	if (Tcl_Init(g_consoleInterp) == TCL_ERROR)
 		throw std::runtime_error( "Tcl_Init() error" );
+#endif
 
 	GetScriptManager().initScriptBindings();
 
 	CREATE_OBJ_COMMAND( EpOutputDebugString );
 
 	SetEvent( g_scriptBindingFinishedEvent );
-
-#ifdef DEBUG
+	if ( Tcl_LinkVar( g_consoleInterp, "closeConsole", (char*)&g_closeConsole, TCL_LINK_INT ) != TCL_OK )
+	{
+		DebugBreak();
+	}
+#if defined(DEBUG) && defined(EP_CONSOLE)
 	if ( Tcl_EvalFile( g_consoleInterp, "Script/EpThreadTest.tcl" ) != TCL_OK )
 		ScriptManager::throwScriptErrorWithMessage( g_consoleInterp );
 #endif
 
+	// Could not reach here...
+	Tcl_DeleteInterp( g_consoleInterp );
+	g_consoleInterp = 0;
+
+	SetEvent( g_consoleReleasedEvent );
+	return;
 }
 
 
@@ -652,7 +667,7 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 #endif
 	// Enable run-time memory check for debug builds.
 #if defined(DEBUG) | defined(_DEBUG)
-	//_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
+	_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 #endif
 	// Set the callback functions
 	DXUTSetCallbackD3D9DeviceAcceptable( IsD3D9DeviceAcceptable );
@@ -700,9 +715,14 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 	DXUTMainLoop();
 
 	// TODO: Perform any application-level cleanup here
-	//Tcl_DeleteInterp( g_consoleInterp );
-	EP_SAFE_RELEASE( g_scriptManager );
+	g_closeConsole = 1;
 
+	g_consoleReleasedEvent = CreateEvent( NULL , TRUE , FALSE , NULL );  
+	ResetEvent( g_consoleReleasedEvent ); 
+	WaitForSingleObject( g_consoleReleasedEvent, INFINITE );
+
+	EP_SAFE_RELEASE( g_scriptManager );
+	Tcl_Finalize();
 
 	return DXUTGetExitCode();
 }

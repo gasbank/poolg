@@ -23,7 +23,7 @@ namespace eval EpThreadTest {
 			puts $cmd
 		}
 	}
-					
+	
 	proc localHandler {} {
 		# get the data from stdin
 		gets stdin data
@@ -99,6 +99,8 @@ namespace eval EpThreadTest {
 		flush stdout	
 		return
 	}
+	
+	
 	# assign our event handler for stdin
 	fileevent stdin readable EpThreadTest::localHandler
 	# send a startup message and initial prompt
@@ -106,6 +108,11 @@ namespace eval EpThreadTest {
 	flush stdout
 	
 	# enter the tcl event loop
+	puts "Engine global variable g_closeConsole is $closeConsole"
 	
-	vwait __forever__
+	while { $closeConsole eq 2008 } {
+		set x 0
+		after 500 {set x 1}
+		vwait x
+	}
 }

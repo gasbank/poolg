@@ -61,13 +61,11 @@ public:
 
 	void								pushSkillObject (SkillObject* skillObj);
 
-	SkillSet* getSkillSet () const { return m_skillSet; }
-	
+	SkillSet*							getSkillSet() const { return m_skillSet; }
 	
 protected:
 										Character( UnitType type );
-	SkillSet*				m_skillSet;
-
+	
 private:
 	void								boundaryTesting( UnitInput );
 
@@ -99,6 +97,7 @@ private:
 
 	bool								m_bControllable;
 
+	SkillSet*							m_skillSet;	
 	
 };
 

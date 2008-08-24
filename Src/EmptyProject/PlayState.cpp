@@ -59,10 +59,10 @@ HRESULT PlayState::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 
 HRESULT PlayState::release()
 {
-	SAFE_DELETE(m_CharactersArnFile);
-	SAFE_DELETE(m_CharactersSg);
-	if (m_CharactersArnFile)
-		release_arnfile(*m_CharactersArnFile);
+	assert( m_CharactersArnFile && m_CharactersSg );
+	release_arnfile(*m_CharactersArnFile);
+	delete m_CharactersArnFile;
+	delete m_CharactersSg;
 
 	return S_OK;
 }

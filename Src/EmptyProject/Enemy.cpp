@@ -15,7 +15,6 @@ Enemy::Enemy()
 	m_bRandomWalkable	= false;
 	m_bTalkable			= false;
 	m_iFightRange		= 3;
-	m_skillSet			= new SkillSet();
 	m_expReward			= 10;
 }
 

@@ -10,12 +10,12 @@ public:
 	virtual HRESULT frameRender ();
 	virtual bool frameMove ( float fElapsedTime );
 
-	static SkillObject* createSOnormalAttack (Character* user, Character* target, Unit* effectObject);
-	static SkillObject* createSOheal (Character* user, Unit* effectObject);
-	static SkillObject* createSOmeditation (Character* usedr, Unit* effectObject);
-	static SkillObject* createSOcsBurn (Character* target, Unit* effectObject);
-	static SkillObject* createSOmtBullet (Character* user, Character* target, Unit* effectObject, int leftNumber, int maxNumber);
-	static SkillObject* createSOgoto (Character* user, Character* target, Unit* effectObject);
+	static SkillObject* createSOnormalAttack	(Character* user, Character* target, Unit* effectObject);
+	static SkillObject* createSOheal			(Character* user, Unit* effectObject);
+	static SkillObject* createSOmeditation		(Character* user, Unit* effectObject);
+	static SkillObject* createSOcsBurn			(Character* target, Unit* effectObject);
+	static SkillObject* createSOmtBullet		(Character* user, Character* target, Unit* effectObject, int leftNumber, int maxNumber);
+	static SkillObject* createSOgoto			(Character* user, Character* target, Unit* effectObject);
 
 
 protected:

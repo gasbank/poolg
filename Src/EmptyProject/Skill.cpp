@@ -22,10 +22,7 @@ SkillSet::~SkillSet()
 	}
 }
 
-void Skill::useSkill (BattleState* bs)
-{
-	bs->pushBattleLog("그냥..");
-}
+
 
 void SkillSet::setSkill (SkillLocation skillLocation, Skill* skill)
 {
@@ -119,7 +116,6 @@ void SkillSet::setCharacter (Character* hero, Character* enemy)
 		if (m_skillSet[i] != NULL)
 			m_skillSet[i]->setUser (hero, enemy);
 	}
-
 }
 
 
@@ -138,6 +134,23 @@ Skill 행하는 순서
 AttackObject기반으로 인한 수치변경 or 자기자신 효과(buff). (공격 or 자가)
 공격일 경우 공격 object가 대사출력, 자가일 경우 
 */
+
+
+void Skill::useSkill (BattleState *bs)
+{
+	int curCs = m_hero->getCurCs();
+
+	if (curCs < m_csEssentials)
+	{
+		bs->pushBattleLog("스피릿이 부족합니다.");
+		bs->pushBattleLog("기술은 취소되며 코딩스피릿 번이 일어납니다.");
+		m_hero->doCsBurn();
+		return;
+	}
+
+	m_hero->setCurCs (curCs - m_csEssentials);
+
+}
 
 void NormalAttack::useSkill(BattleState *bs)
 {

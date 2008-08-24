@@ -54,7 +54,7 @@ public:
 		m_skillName = L"N.A."; 
 		m_description =
 			L"[Normal Attack]\n"
-			L"일반적인 방법으로 적을 공격합니다.\n";
+			L"타락한 코딩의 혼을 담아 적을 공격합니다.\n";
 		m_csEssentials = 3;
 	}
 	virtual void useSkill( BattleState* battleState );
@@ -112,8 +112,9 @@ public:
 		m_skillName = L"Goto";
 		m_description =
 			L"[Goto]\n"
-			L"상대방에게 맹렬히 돌진하여 피해를\n"
-			L"입힙니다.\n";
+			L"프로그래머들 사이에서 악습, 금기로\n"
+			L"여겨져 왔었던 스킬입니다. 적을 향해\n"
+			L"맹렬히 돌진하여 피해를 입힙니다.\n";
 		m_csEssentials = 8;
 	}
 	virtual void useSkill( BattleState* battleState );

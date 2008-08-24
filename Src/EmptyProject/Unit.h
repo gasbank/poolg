@@ -102,6 +102,8 @@ public:
 	void							setViewAt( const D3DXVECTOR3* at );
 
 	void							setVisible (bool choice);
+	static Unit*					createUnit( LPD3DXMESH mesh, int tileX = 0, int tileY = 0, float posZ = 0 );
+
 
 	bool getSoulAnimation() { return m_bSoulAnimation; }
 
@@ -119,7 +121,6 @@ protected:
 	D3DXVECTOR3						m_vVelocity;
 	LPD3DXMESH						m_d3dxMesh;
 	LPDIRECT3DTEXTURE9				m_d3dTex;
-	static Unit*					createUnit( LPD3DXMESH mesh, int tileX = 0, int tileY = 0, float posZ = 0 );
 
 	DynamicMotion*					m_dm;
 

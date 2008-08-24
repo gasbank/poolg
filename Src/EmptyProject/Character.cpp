@@ -40,18 +40,7 @@ void Character::doNormalAttack( int type, Character* enemy )
 
 }
 
-void Character::doHeal ()
-{
-	LPD3DXMESH mesh;
-	D3DXCreateSphere( GetG().m_dev, 0.3f, 16, 16, &mesh, 0);
-	Unit* healBall = Unit::createUnit(mesh, 0, 0, 0);
 
-	healBall->setDynamicMotion(DynamicMotion::createDMspinAround
-		(healBall, this->getPos(), 5, 0.03f, 10));
-
-	SkillObject* so = SkillObject::createSOheal(this, healBall);
-	m_skillObjectList.push_back(so);
-}
 
 void Character::doCsBurn ()
 {
@@ -66,55 +55,7 @@ void Character::doCsBurn ()
 	m_skillObjectList.push_back(so);
 }
 
-void Character::doMeditation ()
-{
-	LPD3DXMESH mesh;
-	D3DXCreateSphere( GetG().m_dev, 0.7f, 16, 16, &mesh, 0);
-	Unit* healBall = Unit::createUnit(mesh, 0, 0, 0);
 
-	healBall->setDynamicMotion(DynamicMotion::createDMspinAround
-		(healBall, this->getPos(), 5, 0.03f, 2));
-
-	SkillObject* so = SkillObject::createSOmeditation(this, healBall);
-	m_skillObjectList.push_back(so);
-}
-
-void Character::doMultiThread (int frequency, Character* enemy)
-{
-	D3DXVECTOR3 fireDir = enemy->getPos() - getPos();
-	float dist = D3DXVec3Length( &fireDir );
-
-	D3DXVec3Normalize( &fireDir, &fireDir );
-
-
-
-	for (int i=frequency-1; i >= 0; i--)
-	{
-		LPD3DXMESH mesh;
-		D3DXCreateBox( GetG().m_dev, 0.5f, 8, 0.5f, &mesh, 0);
-		Unit* effectObj = Unit::createUnit(mesh, 0, 0, 0);
-
-		effectObj->setDynamicMotion(DynamicMotion::createDMfireUniformly
-		(effectObj, this->getPos(), fireDir, dist, 4.0f ));
-
-		SkillObject* so = SkillObject::createSOmtBullet(this, enemy, effectObj, i, frequency);
-		m_skillObjectList.push_back(so);
-	}
-}
-
-
-void Character::doGoto (Character* enemy)
-{
-	LPD3DXMESH mesh;
-	D3DXCreateSphere( GetG().m_dev, 0.3f, 16, 16, &mesh, 0);
-	Unit* effectObj = Unit::createUnit(mesh, 0, 0, 0);
-
-	effectObj->setDynamicMotion(DynamicMotion::createDMpuff
-		(effectObj, enemy->getPos(), 25, 0.2f));
-
-	SkillObject* so = SkillObject::createSOgoto(this, enemy, effectObj);
-	m_skillObjectList.push_back(so);
-}
 
 
 
@@ -400,6 +341,11 @@ void Character::boundaryTesting( UnitInput mappedKey )
 void Character::setBoundaryRect( LONG x0, LONG y0, LONG x1, LONG y1 )
 {
 	m_boundaryTileRect = TileRegion( x0, y0, x1, y1 );
+}
+
+void Character::pushSkillObject (SkillObject* skillObj)
+{
+	m_skillObjectList.push_back( skillObj );
 }
 
 void Character::damage( int point )

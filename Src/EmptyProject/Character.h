@@ -29,11 +29,8 @@ public:
 
 	/*스킬 함수*/
 	void doNormalAttack(int type, Character* enemy);
-	void doHeal();
 	void doCsBurn();
-	void doMeditation();
-	void doMultiThread(int frequency, Character* enemy);
-	void doGoto(Character* enemy);
+
 
 
 	void recoverCs();
@@ -63,6 +60,8 @@ public:
 	void								setStat( int statHealth, int statWill, int statCoding, int statDef, int statSen, int statImmu );
 
 	void								setControllable(bool bCtrl)		{ m_bControllable = bCtrl; }
+
+	void								pushSkillObject (SkillObject* skillObj);
 
 	SkillSet* getSkillSet () const { return m_skillSet; }
 	

@@ -294,10 +294,10 @@ bool SOmtBullet::frameMove (float fElapsedTime)
 		int damage;
 		// Hit to the target!
 		if (m_leftNumber != 0)
-			damage = m_user->getStat().coding - m_target->getStat().def + 10;
+			damage = m_user->getStat().coding - m_target->getStat().def + 1;
 		else
 			//방어 무시
-			damage = m_user->getStat().coding + 10 ;
+			damage = m_user->getStat().coding + 5 ;
 
 		m_target->damage(damage);
 

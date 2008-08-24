@@ -42,6 +42,8 @@ private:
 	DrawRequest* m_pLogoDrawRequest;
 	Sprite* m_pGalaxy;
 	DrawRequest* m_pGalaxyDrawRequest;
+	Sprite* m_pPrologue;
+	DrawRequest* m_pPrologueDrawRequest;
 
 	bool m_logoVisible;
 	float m_logoFading;

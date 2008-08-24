@@ -110,6 +110,15 @@ HRESULT IntroState::enter()
 	m_pGalaxyDrawRequest = m_pGalaxy->drawRequest( "Galaxy", 0, &galaxyPos, galaxyColor );
 
 
+	m_pPrologue = GetSpriteManager().registerSprite( "Prologue", "Images/PoolG_Prologue.png" );
+	m_pPrologue->registerRect( "Prologue", 0, 0, 512, 1024 );
+	
+	D3DXVECTOR3 prologuePos( 0.0f, 0.0f, 0.0f );
+	D3DXCOLOR prologueColor( 1.0f, 1.0f, 1.0f, 1.0f );
+	m_pPrologueDrawRequest = m_pPrologue->drawRequestXformable( "Prologue" );
+
+
+
 	return S_OK;
 }
 
@@ -130,6 +139,12 @@ HRESULT IntroState::frameMove( double fTime, float fElapsedTime )
 		float ratio = (float)m_fFadeTimer / 6.0f;
 		m_pLogoDrawRequest->color = D3DXCOLOR( 1.0f, 1.0f, 1.0f, sin( D3DXToRadian( ratio * 180.0f ) ) );
 	}
+	else
+	{
+		if ( m_pLogoDrawRequest != 0 )
+			m_pLogo->removeDrawRequest( m_pLogoDrawRequest );
+	}
+
 	/*else if ( 6.0f <= m_fFadeTimer && m_fFadeTimer < 12.0f )
 	{
 		float ratio = (float)(m_fFadeTimer - 6.0f) / 6.0f;
@@ -146,18 +161,31 @@ HRESULT IntroState::frameMove( double fTime, float fElapsedTime )
 
 	if ( 0.0f <= m_fFadeTimer && m_fFadeTimer < 46.0f )
 	{
-		// Add some translational values to the matrices
-		for (int i = 0; i < NUM_OF_LINES; i++)
-		{
-			D3DXMatrixTranslation( 
-				&m_matObjs[i], 
-				-12.0f, 
-				-20 - ( float) i * 2.0f + ( float ) (m_fFadeTimer - 6.0f) * m_velocity,
-				0.0f );
-		}
+		//// Add some translational values to the matrices
+		//for (int i = 0; i < NUM_OF_LINES; i++)
+		//{
+		//	D3DXMatrixTranslation( 
+		//		&m_matObjs[i], 
+		//		-12.0f, 
+		//		-20 - ( float) i * 2.0f + ( float ) (m_fFadeTimer - 6.0f) * m_velocity,
+		//		0.0f );
+		//}
+
+		D3DXMATRIX prologueTrans;
+		D3DXMATRIX prologueScale;
+		D3DXMatrixScaling( &prologueScale, 0.03f, -0.03f, 0.03f );
+		D3DXMatrixTranslation( 
+			&prologueTrans, 0.0f, 
+			-35.0f + ( float ) (m_fFadeTimer - 6.0f) * m_velocity,
+			0.0f );
+		m_pPrologueDrawRequest->xform = prologueScale * prologueTrans;
+
 	}
 	else if ( 46.0f < m_fFadeTimer )
 	{
+		if ( m_pPrologueDrawRequest != 0 )
+			m_pPrologue->removeDrawRequest( m_pPrologueDrawRequest );
+
 		TopStateManager::getSingleton().setNextState( GAME_TOP_STATE_PLAY );
 	}
 
@@ -176,7 +204,7 @@ HRESULT IntroState::frameMove( double fTime, float fElapsedTime )
 
 HRESULT IntroState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, float fElapsedTime)
 {
-	D3DMATERIAL9 mtrl;
+	/*D3DMATERIAL9 mtrl;*/
 
 	//pd3dDevice->Clear( 0L, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x00000000, 1.0f, 0L );
 	pd3dDevice->SetRenderState( D3DRS_LIGHTING, TRUE );
@@ -192,7 +220,7 @@ HRESULT IntroState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, floa
 	pd3dDevice->SetTransform(D3DTS_VIEW, GetG().m_camera.GetViewMatrix());
 	pd3dDevice->SetTransform(D3DTS_PROJECTION, GetG().m_camera.GetProjMatrix());
 
-	if( m_pTextMeshes[0] != NULL )
+	/*if( m_pTextMeshes[0] != NULL )
 	{
 		ZeroMemory( &mtrl, sizeof( D3DMATERIAL9 ) );
 		
@@ -211,7 +239,7 @@ HRESULT IntroState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, floa
 			pd3dDevice->SetTransform( D3DTS_WORLD, &m_matObjs[i] );
 			m_pTextMeshes[i]->DrawSubset( 0 );
 		}
-	}
+	}*/
 
 	return S_OK;
 }

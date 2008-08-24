@@ -26,13 +26,13 @@ BattleState::BattleState()
 
 	float statusBoxPlayersPositionX = -(float)scrWidth/2 + 10;
 	float statusBoxPlayersPositionY = -(float)scrHeight/2 + 10;
-	m_StatusBoxPlayer.init(L"Images/BattleUI/StatusBox.png", m_pDev);
+	m_StatusBoxPlayer.init(L"Images/BattleUI/StatusBoxPlayer.png", m_pDev);
 	m_StatusBoxPlayer.setPos(D3DXVECTOR3(statusBoxPlayersPositionX, statusBoxPlayersPositionY, 7));
 	m_StatusBoxPlayer.setSize(statusBoxWidth, statusBoxHeight);
 
 	float statusBoxEnemysPositionX = (float)scrWidth/2 - statusBoxWidth - 10;
 	float statusBoxEnemysPositionY = (float)scrHeight/2 - statusBoxHeight - 10;
-	m_StatusBoxEnemy.init(L"Images/BattleUI/StatusBox.png", m_pDev);
+	m_StatusBoxEnemy.init(L"Images/BattleUI/StatusBoxPlayer.png", m_pDev);
 	m_StatusBoxEnemy.setPos(D3DXVECTOR3(statusBoxEnemysPositionX, statusBoxEnemysPositionY, 6.9f));
 	m_StatusBoxEnemy.setSize(statusBoxWidth, statusBoxHeight);
 

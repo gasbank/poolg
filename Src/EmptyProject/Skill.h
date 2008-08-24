@@ -55,7 +55,7 @@ public:
 		m_description =
 			L"[Normal Attack]\n"
 			L"타락한 코딩의 혼을 담아 적을 공격합니다.\n";
-		m_csEssentials = 3;
+		m_csEssentials = 2;
 	}
 	virtual void useSkill( BattleState* battleState );
 };

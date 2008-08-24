@@ -5,7 +5,7 @@
 #----------------------------------------------------------------------------------#
 
 variable EpStartTopStateName		IntroState
-set EpStartWorldName				EpCeilingWorld 
+set EpStartWorldName				EpRoomWorld 
 set EpWorldList						[ list EpCeilingWorld EpRoomWorld EpA213World EpTestStage ]
 
 proc EpInitApp {} {

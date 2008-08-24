@@ -78,7 +78,7 @@ bool SOnormalAttack::frameMove (float fElapsedTime)
 	if ( !m_effectObject->frameMove ( fElapsedTime ) )
 	{
 		// Hit to the target!
-		int damage = m_user->getStat().coding - m_target->getStat().def + 20;
+		int damage = m_user->getStat().coding- m_target->getStat().def + 5;
 
 		m_target->damage(damage);
 
@@ -294,10 +294,10 @@ bool SOmtBullet::frameMove (float fElapsedTime)
 		int damage;
 		// Hit to the target!
 		if (m_leftNumber != 0)
-			damage = m_user->getStat().coding - m_target->getStat().def + 1;
+			damage = ( m_user->getStat().coding - m_target->getStat().def + 5) / 3;
 		else
 			//방어 무시
-			damage = m_user->getStat().coding + 5 ;
+			damage = m_user->getStat().coding / 2;
 
 		m_target->damage(damage);
 
@@ -400,8 +400,8 @@ bool SOgoto::frameMove (float fElapsedTime)
 			return true;
 
 		// Hit to the target!
-		// 자신의 공격력 + 자신의 방어력 - 상대방 공격력 + 10
-		int damage = m_user->getStat().coding + m_user->getStat().def - m_target->getStat().def + 10;
+		// 자신의 공격력 + 자신의 방어력 - 상대방 공격력
+		int damage = m_user->getStat().coding + m_user->getStat().def - m_target->getStat().def;
 
 		m_target->damage(damage);
 

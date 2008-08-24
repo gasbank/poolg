@@ -10,6 +10,7 @@
 #include "ArnMesh.h"
 #include "ArnSceneGraph.h"
 #include "Utility.h"
+#include "EpLight.h"
 
 extern TileManager tileManager;
 
@@ -22,11 +23,15 @@ Unit::Unit( UnitType type )
 	m_arnMesh			= 0;
 	m_pd3dDevice		= 0;
 	m_d3dTex			= 0;
+	m_pd3dxFont			= 0;
 
 	m_fSoulAnimationDuration	= 1.0f;
 	m_fSoulAnimationHeight		= 10.0f;
 	m_fSoulAnimationTimer		= m_fSoulAnimationDuration;
 	m_bSoulAnimation			= false;
+
+	m_name				= "Unconfirmed Object";
+	m_bNameVisible				= false;
 
 	m_tilePos			= Point2Uint::ZERO;
 	m_tileBufferPos		= m_tilePos;
@@ -68,6 +73,12 @@ HRESULT Unit::init( LPDIRECT3DDEVICE9 pd3dDevice, LPD3DXMESH mesh )
 	V(D3DXComputeBoundingBox((const D3DXVECTOR3*)v, m_d3dxMesh->GetNumVertices(), sizeof(float)*6, &m_lowerLeft, &m_upperRight));
 	m_d3dxMesh->UnlockVertexBuffer();
 
+	D3DXCreateFont( 
+		GetG().m_dev, 26, 0, 
+		FW_NORMAL, 1, 
+		FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, 
+		DEFAULT_PITCH | FF_DONTCARE, _T( "Pristina"), &m_pd3dxFont );
+
 	return hr;
 }
 
@@ -104,6 +115,9 @@ HRESULT Unit::frameRender()
 	}
 	else
 		m_d3dxMesh->DrawSubset(0);
+
+	drawName();
+
 	return hr;
 }
 
@@ -230,7 +244,6 @@ void Unit::setHeadDir( UnitInput unitInput )
 				break;
 		}
 	}
-	
 }
 
 void Unit::setForcedMove( int i )
@@ -399,8 +412,39 @@ void Unit::printDebugInfo() const
 
 void Unit::drawName()
 {
+	if ( m_bNameVisible && !GetEpLight().isInFading() )
+	{
+		D3DXVECTOR3 vProj;
+		D3DXMATRIX ident;
+		D3DXMatrixIdentity( &ident );
+
+		D3DXVec3Project( 
+			&vProj, &getPos(),
+			&GetG().m_dev->Viewport,
+			GetG().m_camera.GetProjMatrix(),
+			GetG().m_camera.GetViewMatrix(),
+			&ident );
+
+		TEXTMETRICA tm;
+		m_pd3dxFont->GetTextMetricsA( &tm );
+
+		D3DXCOLOR m_textColor = D3DXCOLOR( 1.0f, 0.8f, 0.0f, 1.0f );
+		RECT rc;
+		rc.top = (int)vProj.y + 30;
+		rc.left = (int)vProj.x - (int)(m_name.size() / 2.0f * tm.tmAveCharWidth);
+		rc.right = (int)vProj.x - (int)(m_name.size() / 2.0f * tm.tmAveCharWidth);
+		rc.bottom = (int)vProj.y + 30;
+		GetG().m_dev->SetRenderState( D3DRS_LIGHTING, FALSE );
+		m_pd3dxFont->DrawTextA( 0, m_name.c_str(), -1, &rc, DT_NOCLIP, m_textColor );
+		GetG().m_dev->SetRenderState( D3DRS_LIGHTING, TRUE );
+	}
 }
 
+void Unit::release()
+{
+	SAFE_RELEASE( m_d3dxMesh );
+	SAFE_RELEASE( m_pd3dxFont );
+}
 //////////////////////////////////////////////////////////////////////////
 //
 //Unit* EpCreateUnit( int tileX, int tileY )
@@ -503,6 +547,21 @@ int EpUnitSetColor( void* ptr, int r, int g, int b )
 	return 0;
 } SCRIPT_CALLABLE_I_PV_I_I_I( EpUnitSetColor )
 
+int EpUnitSetName( void* ptr, const char* name )
+{
+	Unit* instance = reinterpret_cast<Unit*>( ptr );
+	std::string str( name );
+	instance->Unit::setName( str );
+	return 0;
+} SCRIPT_CALLABLE_I_PV_PC( EpUnitSetName )
+
+int EpUnitSetNameVisible( void* ptr, int i )
+{
+	Unit* instance = reinterpret_cast<Unit*>( ptr );
+	instance->Unit::setNameVisible( i?true:false );
+	return 0;
+} SCRIPT_CALLABLE_I_PV_I( EpUnitSetNameVisible )
+
 
 START_SCRIPT_FACTORY( Unit )
 	//CREATE_OBJ_COMMAND( EpCreateUnit )
@@ -517,4 +576,6 @@ START_SCRIPT_FACTORY( Unit )
 	CREATE_OBJ_COMMAND( EpUnitGetPos )
 	CREATE_OBJ_COMMAND( EpUnitSetArnMesh )
 	CREATE_OBJ_COMMAND( EpUnitSetColor )
+	CREATE_OBJ_COMMAND( EpUnitSetName )
+	CREATE_OBJ_COMMAND( EpUnitSetNameVisible )
 END_SCRIPT_FACTORY( Unit )

@@ -46,7 +46,7 @@ public:
 	const D3DXVECTOR3&				getUpperRight() const	{ return m_upperRight; }
 	LPD3DXMESH						getMesh() const			{ return m_d3dxMesh; }
 	
-	void							release()				{ SAFE_RELEASE(m_d3dxMesh); }
+	void							release();
 	void							clearKey();
 
 	void							setRotX( float rad ) { m_vRot.x = rad; m_bLocalXformDirty = true; }
@@ -106,6 +106,8 @@ public:
 
 
 	bool getSoulAnimation() { return m_bSoulAnimation; }
+	void							setNameVisible( bool b ) { m_bNameVisible = b; }
+	void							setName( std::string str ) { m_name = str; }
 
 	void							printDebugInfo() const;
 protected:
@@ -160,6 +162,7 @@ private:
 	ArnMesh*						m_arnMesh;
 	bool							m_bMovable;
 
+	// For soul animation
 	float							m_fSoulAnimationTimer;
 	float							m_fSoulAnimationDuration;
 	float							m_fSoulAnimationHeight;
@@ -168,7 +171,11 @@ private:
 	bool							m_bSoulAnimation;
 	D3DXMATRIX						m_prevLocalXform;
 	D3DMATERIAL9					m_prevMaterial;
+
+	// For name drawing
 	std::string						m_name;
+	LPD3DXFONT						m_pd3dxFont;
+	bool							m_bNameVisible;
 };
 
 SCRIPT_FACTORY( Unit )

@@ -151,6 +151,8 @@ namespace eval EpCeilingWorld {
 		EpCharacterSetCurHp			$npcGetg -1
 		EpEnemySetTalkable			$npcGetg 1
 		EpUnitSetArnMesh			$npcGetg "PoolGModel"
+		EpUnitSetName				$npcGetg "GetG"
+		EpUnitSetNameVisible		$npcGetg 1
 		
 		set npcGloop				[ createEnemy 30 82 ];
 		EpUnitSetColor				$npcGloop 0 255 255
@@ -158,6 +160,8 @@ namespace eval EpCeilingWorld {
 		EpCharacterSetCurHp			$npcGloop -1
 		EpEnemySetTalkable			$npcGloop 1
 		EpUnitSetArnMesh			$npcGloop "PoolGModel"
+		EpUnitSetName				$npcGloop "Gloop"
+		EpUnitSetNameVisible		$npcGloop 1
 
 		set npcSetg					[ createEnemy 30 72 ];
 		EpUnitSetColor				$npcSetg 128 128 0
@@ -165,6 +169,8 @@ namespace eval EpCeilingWorld {
 		EpCharacterSetCurHp			$npcSetg -1
 		EpEnemySetTalkable			$npcSetg 1
 		EpUnitSetArnMesh			$npcSetg "PoolGModel"
+		EpUnitSetName				$npcSetg "SetG"
+		EpUnitSetNameVisible		$npcSetg 1
 
 		registerIncidentInitTalk
 		#Quest1

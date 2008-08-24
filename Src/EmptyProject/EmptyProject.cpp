@@ -675,6 +675,7 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 	CreateScriptManagerIfNotExist();
 	GetScriptManager().executeFile( "Script/EpInitScript.tcl" );
 	GetScriptManager().executeFile( "Script/EpDialog1.tcl" );
+	GetScriptManager().executeFile( "Script/EpSkill.tcl" );
 	GetScriptManager().execute( "EpInitApp" );
 
 	GetG().m_camera.SetAttachCameraToModel( true );

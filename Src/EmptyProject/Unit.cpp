@@ -128,9 +128,9 @@ LRESULT Unit::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 
 bool Unit::frameMove( float fElapsedTime )
 {	
-	if (m_dm != NULL)
-		if(!m_dm->frameMove ( fElapsedTime ))
-			return false;
+	bool flag = true;
+	if ( m_dm != NULL )
+		flag = m_dm->frameMove( fElapsedTime );
 
 	updateLocalXform();
 	if ( m_bForcedMove )
@@ -138,12 +138,12 @@ bool Unit::frameMove( float fElapsedTime )
 
 	updateSoulAnimation( fElapsedTime );
 
-	return true;
+	return flag;
 }
 
 void Unit::updateLocalXform()
 {
-	if (m_bLocalXformDirty)
+	if ( m_bLocalXformDirty )
 	{
 		D3DXMATRIX mRotX, mRotY, mRotZ, mScale, mTrans, mWorld;
 		D3DXMatrixRotationX(&mRotX, m_vRot.x);

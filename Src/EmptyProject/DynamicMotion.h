@@ -8,8 +8,8 @@ public:
 	virtual bool frameMove( float fElapsedTime );
 
 	static DynamicMotion* createDMfireUniformly ( Unit* target, const D3DXVECTOR3& initPos, const D3DXVECTOR3& fireDir, float retainDist, float velocity );
-	static DynamicMotion* createDMspinAround (Unit* target, const D3DXVECTOR3& fireDest, float radius, float radiusVelocity, float angularVelocity);
-	static DynamicMotion* createDMpuff (Unit* target, const D3DXVECTOR3& initPos, float puffRate, float puffSpeed);
+	static DynamicMotion* createDMspinAround	( Unit* target, const D3DXVECTOR3& fireDest, float radius, float radiusVelocity, float angularVelocity );
+	static DynamicMotion* createDMpuff			( Unit* target, const D3DXVECTOR3& initPos, float puffRate, float puffSpeed );
 
 
 protected:

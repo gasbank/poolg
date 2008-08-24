@@ -859,6 +859,10 @@
 			</File>
 		</Filter>
 		<File
+			RelativePath=".\cd.cd"
+			>
+		</File>
+		<File
 			RelativePath=".\Dialog.cpp"
 			>
 		</File>

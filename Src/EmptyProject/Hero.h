@@ -1,5 +1,6 @@
 #pragma once
 #include "character.h"
+enum SkillLocation;
 
 class Hero :
 	public Character
@@ -25,6 +26,8 @@ public:
 	int						m_level;
 
 	//virtual void pushUnitInFront( UnitInput dir );
+
+	void						addToSkillSet( SkillLocation sl );
 
 private:
 								Hero( void );

@@ -36,15 +36,22 @@ Unit* Hero::createHero( LPD3DXMESH mesh, int tileX, int tileY, float posZ )
 	u->setArnMesh( arnMesh );
 
 
-	SkillSet* skillSet = u->getSkillSet();
-
-	skillSet->setSkill (SL_FIRST, (Skill*) new NormalAttack());
-	skillSet->setSkill (SL_SECOND, (Skill*) new Heal());
-	skillSet->setSkill (SL_THIRD, (Skill*) new Goto());
-	skillSet->setSkill (SL_FOURTH, (Skill*) new MultiThread());
-	skillSet->setSkill (SL_FIFTH, (Skill*) new Meditation());
-
+	u->addToSkillSet( SL_FIRST );
 	return u;
+}
+
+void Hero::addToSkillSet( SkillLocation sl )
+{
+	SkillSet* skillSet = getSkillSet();
+
+	switch ( sl )
+	{
+	case SL_FIRST: skillSet->setSkill (SL_FIRST, (Skill*) new NormalAttack()); break;
+	case SL_SECOND: skillSet->setSkill (SL_SECOND, (Skill*) new Heal()); break;
+	case SL_THIRD: skillSet->setSkill (SL_THIRD, (Skill*) new Goto()); break;
+	case SL_FOURTH: skillSet->setSkill (SL_FOURTH, (Skill*) new MultiThread());; break;
+	case SL_FIFTH: skillSet->setSkill (SL_FIFTH, (Skill*) new Meditation()); break;
+	}
 }
 
 void Hero::levelUp()
@@ -95,6 +102,8 @@ LRESULT Hero::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 	return Character::handleMessages( hWnd, uMsg, wParam, lParam );
 }
 
+///////////////////////////////////////////////////////////////////////////////////////
+
 Unit* EpCreateHero( Tcl_Obj* tilePos )
 {
 	LPD3DXMESH d3dxMesh;
@@ -105,6 +114,23 @@ Unit* EpCreateHero( Tcl_Obj* tilePos )
 
 } SCRIPT_CALLABLE_PV_OBJ( EpCreateHero )
 
+int EpAddSkillToHero( int skillNo )
+{
+	Hero* hero = (Hero*)GetWorldManager().getCurWorld()->getHeroUnit();
+	hero->addToSkillSet( (SkillLocation)skillNo );
+	return 0;
+} SCRIPT_CALLABLE_I_I( EpAddSkillToHero )
+
+int EpDeleteSkillFromHero( int skillNo )
+{
+	Hero* hero = (Hero*)GetWorldManager().getCurWorld()->getHeroUnit();
+	hero->getSkillSet()->deleteSkill(  ( SkillLocation )skillNo );
+	return 0;
+} SCRIPT_CALLABLE_I_I( EpDeleteSkillFromHero )
+
+
 START_SCRIPT_FACTORY(Hero)
 	CREATE_OBJ_COMMAND( EpCreateHero )
+	CREATE_OBJ_COMMAND( EpAddSkillToHero )
+	CREATE_OBJ_COMMAND( EpDeleteSkillFromHero )
 END_SCRIPT_FACTORY(Hero)

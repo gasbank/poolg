@@ -9,17 +9,27 @@ enum SkillLocation { SL_FIRST, SL_SECOND, SL_THIRD, SL_FOURTH, SL_FIFTH };
 class Skill
 {
 public:
-	//Skill ( std::wstring skillName, std::wstring description, int csEssentials );
+//	Skill ( std::wstring skillName, std::wstring description, int csEssentials,  );
+
 	virtual void useSkill( BattleState* battleState );
 	std::wstring getDescription() { return m_description; }
 	void setUser(Character* hero, Character* enemy) { m_hero = hero; m_enemy = enemy; }
 	std::wstring getSkillName() { return m_skillName; }
-	std::wstring			m_skillName;
-	std::wstring			m_description;
+
+	std::wstring		m_skillName;
+	std::wstring		m_description;
+	int					m_csEssentials;
+	int					m_skillObjectCount;
+	SkillObject*		m_so;
+
+
+	Unit*				m_effectObject;
+	DynamicMotion*		m_dm;
+
 
 	Character*			m_hero;
 	Character*			m_enemy;
-	int					m_csEssentials;
+	
 };
 
 

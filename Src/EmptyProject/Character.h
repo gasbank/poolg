@@ -29,11 +29,9 @@ public:
 
 	/*스킬 함수*/
 	void doNormalAttack(int type, Character* enemy);
+
 	void doCsBurn();
-
-
-
-	void recoverCs();
+	void recoverCs ();
 	void heal (int point);
 
 	

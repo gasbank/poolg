@@ -77,6 +77,10 @@ bool SOnormalAttack::frameMove (float fElapsedTime)
 
 	if ( !m_effectObject->frameMove ( fElapsedTime ) )
 	{
+		//스크립트 함수를 호출한다.
+		//onObjectHitTarget(---);
+
+
 		// Hit to the target!
 		int damage = m_user->getStat().coding- m_target->getStat().def + 5;
 
@@ -488,6 +492,7 @@ SOgoto::SOgoto (Character* user, Character* target, Unit* effectObject)
 
 	LPD3DXMESH mesh;
 	D3DXCreateSphere( GetG().m_dev, 0.3f, 16, 16, &mesh, 0);
+
 	m_illusion = Character::createCharacter(mesh, 0, 0, 0);
 	//m_illusion = Unit::createUnit(mesh, 0, 0, 0);
 

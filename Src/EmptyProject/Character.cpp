@@ -104,9 +104,6 @@ Character::~Character()
 
 bool Character::frameMove( float fElapsedTime )
 {
-	if (m_dm != NULL)
-		if(!m_dm->frameMove ( fElapsedTime ))
-			return false;
 
 	if (m_bMoving == false)
 	{

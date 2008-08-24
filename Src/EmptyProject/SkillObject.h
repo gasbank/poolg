@@ -110,7 +110,7 @@ class SOgoto : public SkillObject
 public:
 	~SOgoto();
 	virtual bool frameMove ( float fElapsedTime );
-
+	
 	friend class SkillObject;
 
 protected:

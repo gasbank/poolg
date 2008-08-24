@@ -506,6 +506,7 @@ HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 		}
 
 		SkillSet* skillSet = this->getHero()->getSkillSet();
+		skillSet->setCharacter( getHero(), getEnemy() );
 
 		/*화살표에 따라 기술 분기*/
 		if (wParam == VK_UP)
@@ -527,6 +528,8 @@ HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 		if (wParam == VK_RETURN)
 		{
 			m_curTurnType = TT_NATURAL;
+
+
 			if (!(skillSet->useSkill()))
 			{
 				/*이부분에 스킬이 없습니다 라는 다이얼로그를 추가할수도.*/

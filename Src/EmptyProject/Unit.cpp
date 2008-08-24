@@ -446,6 +446,8 @@ void Unit::drawName()
 
 void Unit::release()
 {
+	SAFE_DELETE( m_dm );
+
 	SAFE_RELEASE( m_d3dxMesh );
 	SAFE_RELEASE( m_pd3dxFont );
 }

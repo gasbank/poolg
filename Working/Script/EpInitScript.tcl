@@ -65,7 +65,7 @@ proc createWarpPosition { nextWorldName stopMoving tx0 ty0 { tx1 -1 } { ty1 -1 }
 	if { $stopMoving eq "STOP" } {
 		lappend actions		[ EpCreateControllableAction [ EpGetHero ] 0 ]
 	}
-	lappend actions		[ EpCreateFadeAction "out" 3000 ]
+	lappend actions		[ EpCreateFadeAction "out" 1500 ]
 	lappend actions		[ EpCreateScriptAction "EpChangeWorld $nextWorldName" ]
 	set incident		[ EpCreateBlockingActionIncident $trigger 0 1 ]
 	foreach act $actions {
@@ -86,7 +86,7 @@ proc createStructureObject { tileX tileY { pushable 1 } } {
 
 proc EpRegisterInitFadeInIncident {} {
 	set trigger		[ EpCreateNullTrigger ]
-	set action		[ EpCreateFadeAction "in" 3000 ]
+	set action		[ EpCreateFadeAction "in" 1500 ]
 	set incident	[ EpCreateNonblockingActionIncident $trigger $action 1 ]
 
 	EpIncidentSetName	$incident "init fade incident"

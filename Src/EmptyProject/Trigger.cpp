@@ -303,6 +303,24 @@ Trigger* EpCreateNullTrigger()
 
 //////////////////////////////////////////////////////////////////////////
 
+RemoveFlagTrigger::RemoveFlagTrigger( Character* unit )
+: m_char ( unit )
+{
+}
+
+bool RemoveFlagTrigger::check()
+{
+	return m_char->getRemoveFlag();
+}
+
+Trigger* EpRemoveFlagTrigger( void* unit )
+{
+	return new RemoveFlagTrigger( reinterpret_cast<Character*>( unit ) );
+} SCRIPT_CALLABLE_PV_PV( EpRemoveFlagTrigger )
+
+
+//////////////////////////////////////////////////////////////////////////
+
 START_SCRIPT_FACTORY( Trigger )
 	CREATE_OBJ_COMMAND( EpCreateCharHpTrigger )
 	CREATE_OBJ_COMMAND( EpCreateUnitPositionTrigger )
@@ -313,4 +331,5 @@ START_SCRIPT_FACTORY( Trigger )
 	CREATE_OBJ_COMMAND( EpCreateReverseTrigger )
 	CREATE_OBJ_COMMAND( EpCreateScreenTrigger )
 	CREATE_OBJ_COMMAND( EpCreateNullTrigger )
+	CREATE_OBJ_COMMAND( EpRemoveFlagTrigger )
 END_SCRIPT_FACTORY( Trigger )

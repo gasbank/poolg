@@ -1,6 +1,8 @@
 #include "EmptyProjectPCH.h"
 #include "FieldState.h"
 #include "WorldStateManager.h"
+#include "World.h"
+#include "WorldManager.h"
 #include "TopStateManager.h"
 #include "World.h"
 

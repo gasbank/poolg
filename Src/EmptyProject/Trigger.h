@@ -133,6 +133,8 @@ private:
 	Trigger* m_trigger;
 };
 
+//////////////////////////////////////////////////////////////////////////
+
 enum ScreenState { FADING_FINISHED };
 
 class ScreenTrigger : public Trigger
@@ -155,4 +157,18 @@ public:
 	NullTrigger() {}
 	virtual ~NullTrigger() {}
 	virtual bool check() { return true; }
+};
+
+//////////////////////////////////////////////////////////////////////////
+
+class RemoveFlagTrigger : public Trigger
+{
+public:
+	RemoveFlagTrigger( Character* unit );
+	virtual ~RemoveFlagTrigger() {}
+
+	virtual bool check();
+
+private:
+	Character* m_char;
 };

@@ -16,8 +16,8 @@ Global Settings
     Header File = Sounds.h;
     Exclude Category Names = 0;
     Exclude Variable Names = 0;
-    Last Modified Low = 828452935;
-    Last Modified High = 29950649;
+    Last Modified Low = 2278634518;
+    Last Modified High = 29951231;
 
     Category
     {
@@ -240,6 +240,19 @@ Global Settings
         Min = 0.000000;
         Max = 1000000.000000;
     }
+
+    Compression Preset
+    {
+        Name = Compression Preset;
+        Xbox Format Tag = 357;
+        Target Sample Rate = 48000;
+        XMA Quality = 60;
+        Find Best Quality = 0;
+        High Freq Cut = 0;
+        Loop = 0;
+        PC Format Tag = 2;
+        Samples Per Block = 128;
+    }
 }
 
 Wave Bank
@@ -250,22 +263,20 @@ Wave Bank
     Xbox Bank Path Edited = 0;
     Windows Bank Path Edited = 0;
     Seek Tables = 1;
-    Compression Preset Name = <none>;
+    Compression Preset Name = Compression Preset;
     Xbox Bank Last Modified Low = 0;
     Xbox Bank Last Modified High = 0;
-    PC Bank Last Modified Low = 828482935;
-    PC Bank Last Modified High = 29950649;
-    Header Last Modified Low = 0;
-    Header Last Modified High = 0;
-    Bank Last Revised Low = 2439259514;
-    Bank Last Revised High = 29946019;
+    PC Bank Last Modified Low = 2278674518;
+    PC Bank Last Modified High = 29951231;
+    Bank Last Revised Low = 2191974518;
+    Bank Last Revised High = 29951231;
 
     Wave
     {
         Name = se;
         File = se.wav;
-        Build Settings Last Modified Low = 689736810;
-        Build Settings Last Modified High = 29946018;
+        Build Settings Last Modified Low = 2191934518;
+        Build Settings Last Modified High = 29951231;
 
         Cache
         {
@@ -293,22 +304,20 @@ Wave Bank
     Windows Bank Path Edited = 0;
     Streaming = 1;
     Seek Tables = 1;
-    Compression Preset Name = <none>;
+    Compression Preset Name = Compression Preset;
     Xbox Bank Last Modified Low = 0;
     Xbox Bank Last Modified High = 0;
-    PC Bank Last Modified Low = 830112935;
-    PC Bank Last Modified High = 29950649;
-    Header Last Modified Low = 0;
-    Header Last Modified High = 0;
-    Bank Last Revised Low = 2719599091;
-    Bank Last Revised High = 29950565;
+    PC Bank Last Modified Low = 2280084518;
+    PC Bank Last Modified High = 29951231;
+    Bank Last Revised Low = 2238864518;
+    Bank Last Revised High = 29951231;
 
     Wave
     {
         Name = opening;
         File = opening.wav;
-        Build Settings Last Modified Low = 4082574415;
-        Build Settings Last Modified High = 29947989;
+        Build Settings Last Modified Low = 2238814518;
+        Build Settings Last Modified High = 29951231;
 
         Cache
         {
@@ -330,8 +339,8 @@ Wave Bank
     {
         Name = battle1;
         File = battle1.wav;
-        Build Settings Last Modified Low = 1450089091;
-        Build Settings Last Modified High = 29950565;
+        Build Settings Last Modified Low = 2238834518;
+        Build Settings Last Modified High = 29951231;
 
         Cache
         {
@@ -353,8 +362,8 @@ Wave Bank
     {
         Name = battle2;
         File = battle2.wav;
-        Build Settings Last Modified Low = 1450089091;
-        Build Settings Last Modified High = 29950565;
+        Build Settings Last Modified Low = 2238844518;
+        Build Settings Last Modified High = 29951231;
 
         Cache
         {
@@ -376,8 +385,8 @@ Wave Bank
     {
         Name = boss;
         File = boss.wav;
-        Build Settings Last Modified Low = 1450089091;
-        Build Settings Last Modified High = 29950565;
+        Build Settings Last Modified Low = 2238844518;
+        Build Settings Last Modified High = 29951231;
 
         Cache
         {
@@ -399,8 +408,8 @@ Wave Bank
     {
         Name = ceiling;
         File = ceiling.wav;
-        Build Settings Last Modified Low = 1450099091;
-        Build Settings Last Modified High = 29950565;
+        Build Settings Last Modified Low = 2238844518;
+        Build Settings Last Modified High = 29951231;
 
         Cache
         {
@@ -422,8 +431,8 @@ Wave Bank
     {
         Name = stage1-1;
         File = stage1-1.wav;
-        Build Settings Last Modified Low = 1450099091;
-        Build Settings Last Modified High = 29950565;
+        Build Settings Last Modified Low = 2238854518;
+        Build Settings Last Modified High = 29951231;
 
         Cache
         {
@@ -445,8 +454,8 @@ Wave Bank
     {
         Name = stage1-2;
         File = stage1-2.wav;
-        Build Settings Last Modified Low = 1450099091;
-        Build Settings Last Modified High = 29950565;
+        Build Settings Last Modified Low = 2238854518;
+        Build Settings Last Modified High = 29951231;
 
         Cache
         {
@@ -468,8 +477,8 @@ Wave Bank
     {
         Name = stage2-1;
         File = stage2-1.wav;
-        Build Settings Last Modified Low = 1450109091;
-        Build Settings Last Modified High = 29950565;
+        Build Settings Last Modified Low = 2238864518;
+        Build Settings Last Modified High = 29951231;
 
         Cache
         {
@@ -491,8 +500,8 @@ Wave Bank
     {
         Name = stage2-2;
         File = stage2-2.wav;
-        Build Settings Last Modified Low = 1450109091;
-        Build Settings Last Modified High = 29950565;
+        Build Settings Last Modified Low = 2238864518;
+        Build Settings Last Modified High = 29951231;
 
         Cache
         {
@@ -518,8 +527,8 @@ Sound Bank
     Windows File = Win\Sound Bank.xsb;
     Xbox Bank Path Edited = 0;
     Windows Bank Path Edited = 0;
-    Bank Last Modified Low = 1063192935;
-    Bank Last Modified High = 29950649;
+    Bank Last Modified Low = 2570324518;
+    Bank Last Modified High = 29951231;
     Header Last Modified High = 0;
     Header Last Modified Low = 0;
 

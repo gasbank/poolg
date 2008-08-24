@@ -356,7 +356,7 @@ HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 
 
 
-	if (uMsg == WM_KEYDOWN)
+	if (uMsg == WM_KEYUP)
 	{
 		if ( m_StatSelectBox.isOn() )
 		{

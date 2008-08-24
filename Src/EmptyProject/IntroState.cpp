@@ -159,7 +159,7 @@ HRESULT IntroState::frameMove( double fTime, float fElapsedTime )
 	if ( 6.0f <= m_fFadeTimer && m_fFadeTimer < 46.0f )
 		m_sound.Opening(); // 오프닝 사운드 시작
 
-	if ( 0.0f <= m_fFadeTimer && m_fFadeTimer < 46.0f )
+	if ( 0.0f <= m_fFadeTimer && m_fFadeTimer < 56.0f )
 	{
 		//// Add some translational values to the matrices
 		//for (int i = 0; i < NUM_OF_LINES; i++)
@@ -181,22 +181,12 @@ HRESULT IntroState::frameMove( double fTime, float fElapsedTime )
 		m_pPrologueDrawRequest->xform = prologueScale * prologueTrans;
 
 	}
-	else if ( 46.0f < m_fFadeTimer )
+	else if ( 56.0f <= m_fFadeTimer )
 	{
 		if ( m_pPrologueDrawRequest != 0 )
 			m_pPrologue->removeDrawRequest( m_pPrologueDrawRequest );
 
 		TopStateManager::getSingleton().setNextState( GAME_TOP_STATE_PLAY );
-	}
-
-	if ( 40.0f <= m_fFadeTimer && m_fFadeTimer < 46.0f )
-	{
-		float ratio = (m_fFadeTimer - 40.0f) / 6.0f;
-		m_fTextAlpha = 1 - ratio;
-	}
-	else if ( 40.0f >= m_fFadeTimer )
-	{
-		m_fTextAlpha = 1.0f;
 	}
 
 	return S_OK;
@@ -250,7 +240,10 @@ HRESULT IntroState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 	{
 		if ( wParam == VK_ESCAPE )
 		{
-			m_pLogoDrawRequest->color = D3DXCOLOR( 1.0f, 1.0f, 1.0f, 0.0f );
+			if ( m_pLogoDrawRequest != 0 )
+				m_pLogo->removeDrawRequest( m_pLogoDrawRequest );
+			if ( m_pPrologueDrawRequest != 0 )
+				m_pPrologue->removeDrawRequest( m_pPrologueDrawRequest );
 			TopStateManager::getSingleton().setNextState( GAME_TOP_STATE_PLAY );
 		}
 	}

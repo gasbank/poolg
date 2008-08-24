@@ -77,7 +77,7 @@ HRESULT Unit::init( LPDIRECT3DDEVICE9 pd3dDevice, LPD3DXMESH mesh )
 		GetG().m_dev, 26, 0, 
 		FW_NORMAL, 1, 
 		FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, 
-		DEFAULT_PITCH | FF_DONTCARE, _T( "Pristina"), &m_pd3dxFont );
+		DEFAULT_PITCH | FF_DONTCARE, _T( "Arial Black"), &m_pd3dxFont );
 
 	return hr;
 }
@@ -424,6 +424,10 @@ void Unit::drawName()
 			GetG().m_camera.GetProjMatrix(),
 			GetG().m_camera.GetViewMatrix(),
 			&ident );
+
+		/*std::string str( "An Old Rat..." );
+		if ( m_name == str )
+			printf ( "%f %f %f\n", vProj.x, vProj.y, vProj.z );*/
 
 		TEXTMETRICA tm;
 		m_pd3dxFont->GetTextMetricsA( &tm );

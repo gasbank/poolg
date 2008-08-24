@@ -47,7 +47,7 @@ HRESULT ScreenFlash::frameRender()
 		dev->SetRenderState( D3DRS_CULLMODE, D3DCULL_NONE );
 		dev->SetTexture( 0, 0 );
 		V_RETURN( GetG().m_dev->SetVertexShader( m_alphaShader->getVertexShader() ) );
-		V_RETURN( m_testPolygonCloned->DrawSubset( 0 ) );
+//		V_RETURN( m_testPolygonCloned->DrawSubset( 0 ) );
 		V_RETURN( GetG().m_dev->SetVertexShader( 0 ) );
 		dev->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
 	}

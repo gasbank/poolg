@@ -1,8 +1,10 @@
 namespace eval EpA213World {
 	set modelFilePath	"A213World.arn"
-	set dialogNameList [ list laserDialog openDialog ]
+	set dialogNameList [ list laserDialog openDialog NPC_OldRatDialog NPC_OldCatDialog ]
 	variable pHeroUnit
+	global pNPC_OldRat pEnemy_OldCat
 	variable gatePos { 14 66 }
+	variable ratholPos { 12 50 }
 	
 	proc init { curWorld } {
 		variable world
@@ -15,12 +17,14 @@ namespace eval EpA213World {
 	proc enter {} {
 		variable pHeroUnit
 		variable gatePos
+		variable ratholPos
 		variable Box
 		variable Mirror
+		global pNPC_OldRat pEnemy_OldCat
 		
 		EpOutputDebugString " - [info level 0] called\n"
 		
-		set pHeroUnit				[ getHero $gatePos ];
+		set pHeroUnit				[ getHero $ratholPos ];
 		set pEnemyUnit1				[ createEnemy 81 70 ];
 		set pEnemyUnit2				[ createEnemy 82 60 ];
 		set pEnemyUnit3				[ createEnemy 64 64 ];
@@ -110,19 +114,39 @@ namespace eval EpA213World {
 		EpCharacterSetBoundary			$pEnemyUnit10 78 100 84 106
 		EpUnitSetArnMesh				$pEnemyUnit10 "DinoModel"
 
+		set pNPC_OldRat				[ createEnemy 4 59 ]
+		EpUnitSetArnMesh			$pNPC_OldRat "PoolGModel"
+		EpUnitSetColor				$pNPC_OldRat 128 128 128
+		EpCharacterSetStat			$pNPC_OldRat 4 1 3 1 1 1
+		EpCharacterSetCurHp			$pNPC_OldRat -1
+		EpEnemySetTalkable			$pNPC_OldRat 1
+		EpUnitSetName				$pNPC_OldRat "An Old Rat..."
+		EpUnitSetNameVisible		$pNPC_OldRat 1
+
+		set	pEnemy_OldCat			[ createEnemy 21 70 ]
+		EpUnitSetArnMesh			$pEnemy_OldCat "GwengYiModel"
+		EpUnitSetColor				$pEnemy_OldCat 128 128 128
+		EpCharacterSetStat			$pEnemy_OldCat 10 10 10 10 10 10
+		EpCharacterSetCurHp			$pEnemy_OldCat 100
+		EpEnemySetTalkable			$pEnemy_OldCat 1
+		EpUnitSetName				$pEnemy_OldCat "Very Strong Gatekeeper"
+		EpUnitSetNameVisible		$pEnemy_OldCat 1
+
 		set Box					[createStructureObject 6 70];
 		EpUnitSetArnMesh			$Box "PushableBox"
 
 		set Mirror				[createStructureObject 6 60];
 		EpUnitSetArnMesh			$Mirror "PushableBox"
-		
-		Incident_GateOpen
+
+
+		# Incidents ------------------------------------------------------------
 		#Incident_BossGateOpen
 		registerIncidentBox
 		registerIncidentMirror
 		registerIncidentOpen
 		registerIncidentOpen2
 		EpRegisterInitFadeInIncident
+		Incident_TalkWithOldRat
 	}
 	
 	
@@ -130,7 +154,8 @@ namespace eval EpA213World {
 		variable pHeroUnit
 		set animObjects [ list Blocking1 Blocking2 Blocking3 GateRight GateLeft GateCamera ]
 		
-		set trigger			[ EpCreateUnitPositionTrigger	$pHeroUnit 23 75 21 57 0x001 ]
+		#set trigger			[ EpCreateUnitPositionTrigger	$pHeroUnit 23 75 21 57 0x001 ]
+		set trigger			[ EpCreateNullTrigger ]
 		set actions			[ EpCreateControllableAction	$pHeroUnit 0 ]
 		lappend actions		[ EpCreateScriptAction			"EpSetDoAnim [ EpGetNode Blocking1  ] 1" ]
 		lappend actions		[ EpCreateScriptAction			"EpSetDoAnim [ EpGetNode Blocking2  ] 1" ]
@@ -313,6 +338,52 @@ namespace eval EpA213World {
 			set incCount	[ EpRegisterIncident $incident ]
 			EpOutputDebugString " - Incident count: $incCount\n"
 		}
+
+	# 설명 : 늙은 쥐와의 대화를 통해 A213에 얽힌 전설을 듣게 되고, 문지기를 해치우고 A213의 문을
+	# 열기 위한 필수 아이템 상한 두부를 얻는다.
+	proc Incident_TalkWithOldRat {} {
+		variable pHeroUnit
+		global pNPC_OldRat pEnemy_OldCat
+		set animObjects [ list Blocking1 Blocking2 Blocking3 GateRight GateLeft GateCamera ]
+
+		set sqIncident		[ EpCreateSequentialIncident -1 ]
+
+		set trigger0		[ EpCreateUnitPositionWithTraceTrigger $pHeroUnit $pNPC_OldRat 0x001 ]
+		set action0			[ EpCreateDialogAction "EpA213World::NPC_OldRatDialog" ]
+
+		set trigger1		[ EpCreateUnitPositionWithTraceTrigger $pHeroUnit $pEnemy_OldCat 0x001 ]
+		set action1			[ EpCreateDialogAction "EpA213World::NPC_OldCatDialog" ]
+		#set action2			[ EpCreateScriptAction "Incident_GateOpen" ]
+
+		EpAddTriggerToSequence		$sqIncident $trigger0
+		EpAddActionToSequence		$sqIncident	$action0
+		EpAddTriggerToSequence		$sqIncident	$trigger1
+		EpAddActionToSequence		$sqIncident	$action1
+		#EpAddActionToSequence		$sqIncident	$action2
+
+		# 문 열기 ---------------------------------------------------------------------------------
+		set actions			[ EpCreateControllableAction	$pHeroUnit 0 ]
+		lappend actions		[ EpCreateScriptAction			"EpSetDoAnim [ EpGetNode Blocking1  ] 1" ]
+		lappend actions		[ EpCreateScriptAction			"EpSetDoAnim [ EpGetNode Blocking2  ] 1" ]
+		lappend actions		[ EpCreateScriptAction			"EpSetDoAnim [ EpGetNode Blocking3  ] 1" ]
+		lappend actions		[ EpCreateScriptAction			"EpSetDoAnim [ EpGetNode GateRight  ] 1" ]
+		lappend actions		[ EpCreateScriptAction			"EpSetDoAnim [ EpGetNode GateLeft   ] 1" ]
+		lappend actions		[ EpCreateScriptAction			"EpSetDoAnim [ EpGetNode GateCamera ] 1" ]
+		lappend actions		[ EpCreateCameraAction			external GateCamera 0 ]
+		lappend actions		[ EpCreateDelayAction			10000 ]
+		lappend actions		[ EpCreateCameraAction			attach GateCamera 1500 ]
+		lappend actions		[ EpCreateControllableAction	$pHeroUnit 1 ]
+
+		foreach act $actions {
+			EpAddActionToSequence $sqIncident $act
+		}
+		# ------------------------------------------------------------------------------------------
+		
+		EpSequentialIncidentSetName	$sqIncident "TalkWithRat incident"
+		
+		set incCount		[ EpRegisterSequentialIncident $sqIncident ]
+		EpOutputDebugString " - Incident count: $incCount\n"
+	}
 	
 	proc leave {} {
 		EpOutputDebugString " - [info level 0] called\n"
@@ -338,5 +409,69 @@ namespace eval EpA213World {
 		set dialog [ list\
 			$player		"레이져가 문을 부셔버렸다!"\
 		];
+	}
+
+
+	namespace eval NPC_OldRatDialog {} {
+	
+		set region [ list 0 0 0 0 ]; ;# left, top, right, bottom
+		set oneTime 0;
+	
+		set player "PoolG"
+		set npc "An Old Rat..."
+	
+		set dialog [ list\
+			$npc		"자네도 Dark Lord Choi를 만나러 왔는가?"\
+			$player		"....."\
+			$npc		"자네의 깊고 어두운 코딩 스피릿을 감지하고 알 수 있었지.."\
+			$npc		"왜 그에게 도전하려 하는겐가?"\
+			$player		"복수하기 위해서 입니다."\
+			$npc		"그렇군..."\
+			$npc		"나도 자네처럼 젊은 때가 있었지."\
+			$npc		"A213에는 전력과 냉방이 풍부하다는 소문이 있었어."\
+			$npc		"동료들을 모아 모험을 떠났고, 여기에 도착했지. 자네처럼 말이야..."\
+			$npc		"그리고 그를 만났지..."\
+			$npc		"그는 정말 강했어! Ctr-C, Ctr-V 공격에 그는 눈 하나 깜박하지 않았어!"\
+			$npc		"동료들은 모두 죽었고, 나는 비겁하게 혼자 살아 나왔다네."\
+			$npc		"그리고 그 이후로 나는 계속 여기에서 살고 있지..."\
+			$player		"왜 여기서 사십니까?"\
+			$npc		"자네같은 친구를 위해서일세"\
+			$npc		"내가 나온 그날 이후로, 이 문을 넘어가서 살아 돌아온 쥐는 없었다네."\
+			$npc		"자네도 나처럼 모든 것을 잃지 말고, 돌아가게나."\
+			$player		"저는 이미 대청소로 모든 것을 잃었습니다."\
+			$player		"반드시 저 문을 지나서, 그에게 복수해야만 합니다."\
+			$npc		"소용이 없구먼.."\
+			$npc		"굳이 가겠다면, 내 부탁 하나만 들어주겠나?"\
+			$player		"무엇입니까?"\
+			$npc		"내가 쓰레기통에서 먹다 남은 두부 캔을 하나 주웠네"\
+			$npc		"저기 북동쪽의 문지기와 이것을 나누어 먹고 싶은데, 나는 늙고 병들어서 움직이기가 귀찮아."\
+			$npc		"자네가 이것을 좀 가져다 주게."\
+			$player		"네"\
+		];	
+	}
+
+	namespace eval NPC_OldCatDialog {} {
+	
+		set region [ list 0 0 0 0 ]; ;# left, top, right, bottom
+		set oneTime 0;
+	
+		set player "PoolG"
+		set npc "Old Cat(Gatekeeper)"
+		set	system "System"
+	
+		set dialog [ list\
+			$npc		"두부 냄새가 나는군."\
+			$player		"조금 드릴까요?"\
+			$npc		"응 그러면 고맙겠어."\
+			$player		"여기요."\
+			$npc		"(냠냠...)"\
+			$npc		"(쩝쩝...)"\
+			$npc		"(우걱우걱...)"\
+			$npc		"(꿀꺽!)"\
+			$npc		"읔!!!!!!!!!!!"\
+			$npc		"상했잖아!!!!"\
+			$npc		"(털썩)"\
+			$system		"당신은 쓰러진 문지기로부터 열쇠를 얻어서 구멍에 끼워 돌려 보았다."\
+		];	
 	}
 }

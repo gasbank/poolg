@@ -43,13 +43,16 @@ void SpriteManager::frameRender()
 		SpriteMap::iterator it = m_spriteMap.begin();	
 		for ( ; it != m_spriteMap.end(); ++it )
 		{
+			if ( it->second->isCustomRendered() )
+				continue;
+
 			const Sprite::DrawRequestList& dr = it->second->getDrawRequestList();
 			if ( dr.size() )
 			{
 				Sprite::DrawRequestList::const_iterator itDr = dr.begin();
-				const DrawRequest* drawReq = *itDr;
 				for ( ; itDr != dr.end(); ++itDr )
 				{
+					const DrawRequest* drawReq = *itDr;
 					m_d3dxSprite->Draw( it->second->getTexture(), &drawReq->srcRect, &drawReq->center, &drawReq->position, drawReq->color );
 				}
 			}
@@ -67,13 +70,17 @@ void SpriteManager::frameRender()
 		SpriteMap::iterator it = m_spriteMap.begin();
 		for ( ; it != m_spriteMap.end(); ++it )
 		{
+			if ( it->second->isCustomRendered() )
+				continue;
+
 			const Sprite::DrawRequestList& dr = it->second->getDrawReqXformableList();
 			if ( dr.size() )
 			{
 				Sprite::DrawRequestList::const_iterator itDr = dr.begin();
-				const DrawRequest* drawReq = *itDr;
+				
 				for ( ; itDr != dr.end(); ++itDr )
 				{
+					const DrawRequest* drawReq = *itDr;
 					D3DXMATRIX centerBiased = drawReq->xform;
 					*((D3DXVECTOR3*)&centerBiased._41) -= drawReq->center;
 					m_dev->SetTransform( D3DTS_WORLD, &drawReq->xform );
@@ -112,4 +119,24 @@ Sprite* SpriteManager::getSprite( const char* spriteName ) const
 		return it->second;
 	else
 		throw std::runtime_error( "Requested sprite name does not exist" );
+}
+
+void SpriteManager::frameRenderSpecificSprite( const char* spriteName )
+{
+	m_d3dxSprite->Begin( D3DXSPRITE_ALPHABLEND );
+	Sprite* sprite = m_spriteMap[ spriteName ];
+	assert( sprite->isCustomRendered() );
+	const Sprite::DrawRequestList& dr = sprite->getDrawRequestList();
+	
+	if ( dr.size() )
+	{
+		Sprite::DrawRequestList::const_iterator itDr = dr.begin();
+		for ( ; itDr != dr.end(); ++itDr )
+		{
+			const DrawRequest* drawReq = *itDr;
+			m_d3dxSprite->Draw( sprite->getTexture(), &drawReq->srcRect, &drawReq->center, &drawReq->position, drawReq->color );
+		}
+	}
+	m_d3dxSprite->End();
+
 }

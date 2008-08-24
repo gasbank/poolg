@@ -11,10 +11,12 @@ public:
 	~SpriteManager(void);
 	
 	void frameRender();
+	void frameRenderSpecificSprite( const char* spriteName );
 	Sprite* registerSprite( const char* spriteName, const char* spriteFileName );
 
 	Sprite* getSprite( const char* spriteName ) const;
 
+	LPD3DXSPRITE getSpriteRenerer() const { return m_d3dxSprite; }
 private:
 	void init();
 	void release();

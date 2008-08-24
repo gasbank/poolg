@@ -2,7 +2,7 @@
 #include "Sprite.h"
 
 Sprite::Sprite( LPDIRECT3DTEXTURE9 d3dTex )
-: m_d3dTex( d3dTex )
+: m_d3dTex( d3dTex ), m_bCustomRendered( false )
 {
 
 }
@@ -58,6 +58,37 @@ DrawRequest* Sprite::drawRequest( const char* rectName, const D3DXVECTOR3* cente
 	return dr;
 }
 
+DrawRequest* Sprite::drawRequest( const char* rectName, const D3DXVECTOR3* center, int posX, int posY, int posZ, D3DCOLOR color )
+{
+	D3DXVECTOR3 vPos( (float)posX, (float)posY, (float)posZ );
+	return drawRequest( rectName, center, &vPos, color );
+}
+
+DrawRequest* Sprite::drawRequest( const char* rectName, ScreenPosition spe, D3DCOLOR color )
+{
+	int scrWidth = GetG().m_scrWidth;
+	int scrHeight = GetG().m_scrHeight;
+	D3DXVECTOR3 vPos = DX_CONSTS::D3DXVEC3_ZERO;
+	const RECT& imgRect = m_rectMap[ rectName ];
+	int imgWidth = imgRect.right - imgRect.left;
+	int imgHeight = imgRect.bottom - imgRect.top;
+	assert( imgWidth > 0 && imgHeight > 0 );
+
+	switch ( spe )
+	{
+	case LEFT_TOP:		vPos.x = 0;								vPos.y = 0;									break;
+	case MID_TOP:		vPos.x = (scrWidth-imgWidth)/2.0f;		vPos.y = 0;									break;
+	case RIGHT_TOP:		vPos.x = (float)(scrWidth - imgWidth);	vPos.y = 0;									break;
+	case LEFT_MID:		vPos.x = 0;								vPos.y = (scrHeight - imgHeight)/2.0f;		break;
+	case MID_MID:		vPos.x = (scrWidth-imgWidth)/2.0f;		vPos.y = (scrHeight - imgHeight)/2.0f;		break;
+	case RIGHT_MID:		vPos.x = (float)(scrWidth - imgWidth);	vPos.y = (scrHeight - imgHeight)/2.0f;		break;
+	case LEFT_BOTTOM:	vPos.x = 0;								vPos.y = (float)(scrHeight - imgHeight);	break;
+	case MID_BOTTOM:	vPos.x = (scrWidth-imgWidth)/2.0f;		vPos.y = (float)(scrHeight - imgHeight);	break;
+	case RIGHT_BOTTOM:	vPos.x = (float)(scrWidth - imgWidth);	vPos.y = (float)(scrHeight - imgHeight);	break;
+	}
+
+	return drawRequest( rectName, 0, &vPos, color );
+}
 DrawRequest* Sprite::drawRequestXformable( const char* rectName )
 {
 	DrawRequest* dr = new DrawRequest( true );

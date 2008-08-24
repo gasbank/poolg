@@ -11,6 +11,8 @@
 #include "Hero.h"
 #include "Enemy.h"
 #include "ArnMesh.h"
+#include "SpriteManager.h"
+#include "Sprite.h"
 
 BattleState::BattleState()
 {
@@ -24,25 +26,39 @@ BattleState::BattleState()
 	int scrWidth = GetG().m_scrWidth;
 	int scrHeight = GetG().m_scrHeight;
 
+	m_sprite = GetSpriteManager().registerSprite( "BattleUI", "Images/BattleUI.tga" );
+	m_sprite->setCustomRendered( true );
+	m_sprite->registerRect( "StatusBoxBg", 0, 150, 0+163, 150+128 );
+	m_sprite->registerRect( "BattleLogBg", 0, 0, 0+503, 0+150 );
+	m_sprite->registerRect( "SkillBg", 0, 272, 0+170, 272+161 );
+	m_sprite->registerRect( "BarFg", 163, 150, 163+220, 150+22 );		// Progress bar foreground
+	m_sprite->registerRect( "BarBg", 163, 172, 163+220, 172+22 );		// Progress bar background
+
+
+	m_sprite->drawRequest( "StatusBoxBg", Sprite::RIGHT_TOP, 0xffffffff );
+	m_sprite->drawRequest( "StatusBoxBg", Sprite::LEFT_BOTTOM, 0xffffffff );
+	m_sprite->drawRequest( "BattleLogBg", Sprite::LEFT_TOP, D3DCOLOR_RGBA(255, 0, 0, 255) );
+	m_sprite->drawRequest( "SkillBg", Sprite::RIGHT_BOTTOM, 0xffffffff );
+
+	m_sprite->drawRequest( "BarBg", 0, 200, 200, 0, 0xffffffff );
+	DrawRequest* dr = m_sprite->drawRequest( "BarFg", 0, 200, 200, 0, D3DCOLOR_RGBA(255, 0, 0, 255) );
+
+	dr->srcRect.right -= 50;
+	
+	
+
+	//////////////////////////////////////////////////////////////////////////
+
 	float statusBoxPlayersPositionX = -(float)scrWidth/2 + 10;
 	float statusBoxPlayersPositionY = -(float)scrHeight/2 + 10;
-	m_StatusBoxPlayer.init(L"Images/BattleUI/StatusBoxPlayer.png", m_pDev);
-	m_StatusBoxPlayer.setPos(D3DXVECTOR3(statusBoxPlayersPositionX, statusBoxPlayersPositionY, 7));
-	m_StatusBoxPlayer.setSize(statusBoxWidth, statusBoxHeight);
 
 	float statusBoxEnemysPositionX = (float)scrWidth/2 - statusBoxWidth - 10;
 	float statusBoxEnemysPositionY = (float)scrHeight/2 - statusBoxHeight - 10;
-	m_StatusBoxEnemy.init(L"Images/BattleUI/StatusBoxPlayer.png", m_pDev);
-	m_StatusBoxEnemy.setPos(D3DXVECTOR3(statusBoxEnemysPositionX, statusBoxEnemysPositionY, 6.9f));
-	m_StatusBoxEnemy.setSize(statusBoxWidth, statusBoxHeight);
 
 	int skillBoxHeight = 200;
 	int skillBoxWidth = skillBoxHeight * 593 / 933;
 	int skillBoxPositionX = scrWidth/2 -skillBoxWidth - 3;
 	int skillBoxPositionY =  -scrHeight/2 + 3;
-	m_SkillBox.init(L"Images/BattleUI/SkillBox.png", m_pDev);
-	m_SkillBox.setPos (D3DXVECTOR3((float)skillBoxPositionX, (float)skillBoxPositionY, 6.9f));
-	m_SkillBox.setSize((float)skillBoxWidth, (float)skillBoxHeight);
 
 	int skillContentBoxHeight = 200;
 	int skillContentBoxWidth = skillContentBoxHeight * 390 / 269;
@@ -64,10 +80,6 @@ BattleState::BattleState()
 
 	float dialogBoxWidth = (float)(int)(scrWidth - statusBoxWidth - 30);
 	float dialogBoxHeight = 124;
-	m_DialogBox.init(L"Images/BattleUI/DialogBox.png", m_pDev);
-	m_DialogBox.setPos(D3DXVECTOR3((float)-(scrWidth)/2 + 10, (float)(scrHeight)/2 - dialogBoxHeight - 10, 6.9f));
-	//m_DialogBox.setPos (10, 10, 6.9f);
-	m_DialogBox.setSize(dialogBoxWidth, dialogBoxHeight);
 
 	float statusBarWidth = statusBoxWidth * 0.67f;
 	float statusBarHeight = statusBarWidth * 0.1f;
@@ -226,6 +238,8 @@ HRESULT BattleState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, flo
 
 	m_pDev->SetRenderState(D3DRS_LIGHTING, FALSE);
 
+	GetSpriteManager().frameRenderSpecificSprite( "BattleUI" );
+
 	D3DMATERIAL9 material;
 	D3DCOLORVALUE cv, cv2;
 	cv.a = 0.3f; cv.r = 0.1f; cv.g = 0.1f; cv.b = 0.1f;
@@ -238,12 +252,9 @@ HRESULT BattleState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, flo
 	m_pDev->SetMaterial(&material);
 
 	m_pDev->SetRenderState(D3DRS_ZENABLE, FALSE);
-	m_StatusBoxPlayer.draw();
-	m_StatusBoxEnemy.draw();
+	
 	m_StatSelectBox.draw();
-	m_SkillBox.draw();
 	m_SkillContentBox.draw();
-	m_DialogBox.draw();
 	
 	m_hpBgPlayer.draw();
 	m_mpBgPlayer.draw();
@@ -282,12 +293,8 @@ HRESULT BattleState::frameMove(double fTime, float fElapsedTime)
 {
 	double fStateTime = getStateTime(fTime);
 
-	m_StatusBoxPlayer.frameMove(fElapsedTime);
-	m_StatusBoxEnemy.frameMove(fElapsedTime);
-	m_SkillBox.frameMove(fElapsedTime);
 	m_SkillContentBox.frameMove(fElapsedTime);
 	m_StatSelectBox.frameMove( fElapsedTime );
-	m_DialogBox.frameMove(fElapsedTime);
 	m_hpBgPlayer.frameMove(fElapsedTime);
 	m_mpBgPlayer.frameMove(fElapsedTime);
 	m_expBgPlayer.frameMove(fElapsedTime);
@@ -621,12 +628,10 @@ HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 
 HRESULT BattleState::release ()
 {
-	m_StatusBoxPlayer.release();
-	m_StatusBoxEnemy.release();
-	m_SkillBox.release();
+	m_sprite->release();
+
 	m_SkillContentBox.release();
 	m_StatSelectBox.release();
-	m_DialogBox.release();
 	m_hpBgPlayer.release();
 	m_mpBgPlayer.release();
 	m_expBgPlayer.release();

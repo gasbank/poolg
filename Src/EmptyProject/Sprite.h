@@ -33,14 +33,25 @@ public:
 	Sprite( LPDIRECT3DTEXTURE9 d3dTex );
 	~Sprite(void);
 
+	enum ScreenPosition {
+		LEFT_TOP, MID_TOP, RIGHT_TOP,
+		LEFT_MID, MID_MID, RIGHT_MID,
+		LEFT_BOTTOM, MID_BOTTOM, RIGHT_BOTTOM
+	};
+
 	void release();
 	void registerRect( const char* rectName, const RECT& rect );
 	void registerRect( const char* rectName, long left, long top, long right, long bottom );
 	DrawRequest* drawRequest( const char* rectName, const D3DXVECTOR3* center, const D3DXVECTOR3* position, D3DCOLOR color );
+	DrawRequest* drawRequest( const char* rectName, const D3DXVECTOR3* center, int posX, int posY, int posZ, D3DCOLOR color );
+	DrawRequest* drawRequest( const char* rectName, ScreenPosition spe, D3DCOLOR color );
 	DrawRequest* drawRequestXformable( const char* rectName );
 	LPDIRECT3DTEXTURE9 getTexture() const { assert( m_d3dTex ); return m_d3dTex; }
 
 	void removeDrawRequest( DrawRequest*& dr );
+
+	bool isCustomRendered() const { return m_bCustomRendered; }
+	void setCustomRendered(bool val) { m_bCustomRendered = val; }
 private:
 	friend class SpriteManager;
 
@@ -48,7 +59,6 @@ private:
 	typedef std::list<DrawRequest*> DrawRequestList;
 
 
-	void draw();
 	const DrawRequestList& getDrawRequestList() const { return m_drawReqList; }
 	const DrawRequestList& getDrawReqXformableList() const { return m_drawReqXformableList; }
 
@@ -57,5 +67,6 @@ private:
 	
 	DrawRequestList m_drawReqList;				// Screen space sprite drawing
 	DrawRequestList m_drawReqXformableList;		// Object(3D) space sprite drawing
-
+	bool m_bCustomRendered;
+	
 };

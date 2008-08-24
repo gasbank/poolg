@@ -141,6 +141,11 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 
 	}
 
+	g_spriteManager = new SpriteManager( pd3dDevice );
+
+	Sprite* sprite = g_spriteManager->registerSprite( "GUI", "Images/UI.png" );
+	sprite->registerRect( "BlueCircle", 0, 0, 127, 127 );
+
 	// State Manager Initialization
 	g_tsm = new TopStateManager();
 	ConstCharList startWorldName;
@@ -153,6 +158,8 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 
 	g_tsm->init();
 	g_wsm->init();
+
+
 
 	// InitGame: State init completed and WorldState instances are allocated in pool area
 	// (world loading is not done yet)
@@ -219,10 +226,7 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 	V( D3DXCreateSprite( pd3dDevice, &g_d3dxSprite ) );
 	D3DXCreateTextureFromFile( pd3dDevice, L"Images/UI.png", &g_tex );
 
-	g_spriteManager = new SpriteManager( pd3dDevice );
-
-	Sprite* sprite = g_spriteManager->registerSprite( "GUI", "Images/UI.png" );
-	sprite->registerRect( "BlueCircle", 0, 0, 127, 127 );
+	
 
 	/*
 	g_dr = sprite->drawRequest( "BlueCircle", 0, 0, D3DCOLOR_RGBA( 255, 255, 255, 255 ) );

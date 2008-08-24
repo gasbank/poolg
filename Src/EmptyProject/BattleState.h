@@ -10,6 +10,7 @@
 class SkillSet;
 class World;
 class Action;
+class Sprite;
 
 enum TurnType { TT_NATURAL, TT_COMPUTER, TT_PLAYER };
 enum PlayerSide { PS_NOTSET, PS_COMPUTER, PS_PLAYER };
@@ -48,13 +49,10 @@ private:
 	void setupCamera();
 
 	/*이곳부터가 컴포넌트*/
-	Picture				m_StatusBoxPlayer;
-	Picture				m_StatusBoxEnemy;
+	Sprite*				m_sprite;
 
-	Picture				m_SkillBox;
 	SkillDescBox		m_SkillContentBox;
 	SkillDescBox		m_StatSelectBox;
-	Picture				m_DialogBox;
 
 	Picture				m_hpBgPlayer;
 	Picture				m_mpBgPlayer;

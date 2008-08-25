@@ -3,8 +3,8 @@ source "Script/EpA213World_LegendOfDinosaurQuest.tcl"
 source "Script/EpA213World_OldRatandGatekeeperQuest.tcl"
 
 namespace eval EpA213World {
-	global pNPC_OldRat pEnemy_OldCat1 pEnemy_OldCat10 pEnemy_OldCat11\
-			pNPC_GoodDinosaur pEnemy_EvilRat
+	global pOldCat1 pOldCat10 pOldCat11\
+			pGoodDinosaur pEvilRat
 	variable pHeroUnit
 	variable modelFilePath					"A213World.arn"
 	variable gatePos						{ 14 66 }
@@ -12,10 +12,10 @@ namespace eval EpA213World {
 	variable bossPos						{ 75 124 }
 	variable bossBattleStartPos				{ 69 124 }
 	variable startPos						$ratholPos
-	variable dialogNameList					[ list	laserDialog openDialog NPC_OldRatDialog\
-													NPC_OldCat1Dialog NPC_OldCat10Dialog\
-													Dialog_LegendOfDinosaur_GoodDinosaur0 Dialog_LegendOfDinosaur_GoodDinosaur1 \
-													Dialog_LegendOfDinosaur_EvilRat	Dialog_LegendOfDinosaur_BigRigsAssault \
+	variable dialogNameList					[ list	laserDialog openDialog oldRatDialog\
+													oldCat1Dialog oldCat10Dialog\
+													goodDinosaurDialog0 goodDinosaurDialog1 \
+													evilRatDialog bigRigsAssaultDialog \
 ]
 	
 	proc init { curWorld } {
@@ -35,7 +35,7 @@ namespace eval EpA213World {
 		variable startPos
 		variable bossPos
 		
-		global pNPC_OldRat pEnemy_OldCat1 pEnemy_OldCat10 pEnemy_OldCat11 pNPC_GoodDinosaur pEnemy_EvilRat
+		global pOldCat1 pOldCat10 pOldCat11 pGoodDinosaur pEvilRat
 		
 		EpOutputDebugString " - [info level 0] called\n"
 		
@@ -150,7 +150,7 @@ namespace eval EpA213World {
 		registerIncidentOpen2
 		EpRegisterInitFadeInIncident
 		registerIncident_TalkWithOldRat
-		registerIncident_pEnemy_OldCat1
+		registerIncident_pOldCat1
 		registerIncident_LegendOfDinosaur
 		
 		registerMirrorQuest

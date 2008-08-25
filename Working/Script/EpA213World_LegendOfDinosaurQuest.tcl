@@ -1,4 +1,6 @@
 namespace eval EpA213World {
+	global pOldRat pOldCat1 pOldCat10 pOldCat11\
+			pGoodDinosaur pEvilRat
 	# -----------------------------------------------------------------------------------------
 	# 제목 : 공룡의 전설
 	# 설명 : A213의 공룡들은 사실 원래 쥐였다. 이 쥐들은 A213에 들어왔다가 최재영을 만나서
@@ -8,42 +10,45 @@ namespace eval EpA213World {
 	# 그리고 이 아이템은 A213 남서쪽 공간의 한 쥐(25, 45)가 가지고 있다.
 	# 주인공은 "Big Rigs..."를 가져오면서 다른 쥐들의 습격(12, 56)도 받는다.
 	proc registerUnitsLegendOfDinosaur {} {
-		set pNPC_GoodDinosaur		[ createEnemy 43 54 ]
-		EpUnitSetColor				$pNPC_GoodDinosaur 255 128 0
-		EpUnitSetArnMesh			$pNPC_GoodDinosaur "GwengYiModel"
-		EpEnemySetTalkable			$pNPC_GoodDinosaur 1
-		EpUnitSetName				$pNPC_GoodDinosaur "Gentle Dinosaur"
-		EpUnitSetNameVisible		$pNPC_GoodDinosaur 1
+		global pOldRat pOldCat1 pOldCat10 pOldCat11\
+		pGoodDinosaur pEvilRat
 
-		set pEnemy_EvilRat			[ createEnemy 25 45 ]
-		EpUnitSetColor				$pEnemy_EvilRat	255 0 0
-		EpUnitSetArnMesh			$pEnemy_EvilRat "PoolGModel"
-		EpEnemySetTalkable			$pEnemy_EvilRat 1
-		EpUnitSetName				$pEnemy_EvilRat "Evil Rat"
-		EpUnitSetNameVisible		$pEnemy_EvilRat	1
+		set pGoodDinosaur		[ createEnemy 43 54 ]
+		EpUnitSetColor				$pGoodDinosaur 255 128 0
+		EpUnitSetArnMesh			$pGoodDinosaur "DinoModel"
+		EpEnemySetTalkable			$pGoodDinosaur 1
+		EpUnitSetName				$pGoodDinosaur "Gentle Dinosaur"
+		EpUnitSetNameVisible		$pGoodDinosaur 1
+
+		set pEvilRat			[ createEnemy 25 45 ]
+		EpUnitSetColor				$pEvilRat	255 0 0
+		EpUnitSetArnMesh			$pEvilRat "PoolGModel"
+		EpEnemySetTalkable			$pEvilRat 1
+		EpUnitSetName				$pEvilRat "Evil Rat"
+		EpUnitSetNameVisible		$pEvilRat	1
 	}
 
 	proc registerIncident_LegendOfDinosaur {} {
 		variable pHeroUnit
-		global	pNPC_GoodDinosaur pEnemy_EvilRat
+		global	pGoodDinosaur pEvilRat
 
 		set seqIncident		[ EpCreateSequentialIncident 1 ]
 
-		set triggerA0		[ EpCreateUnitPositionWithTraceTrigger $pHeroUnit $pNPC_GoodDinosaur 0x001 ]
-		set actionA0		[ EpCreateDialogAction "EpA213World::Dialog_LegendOfDinosaur_GoodDinosaur0" ]
+		set triggerA0		[ EpCreateUnitPositionWithTraceTrigger $pHeroUnit $pGoodDinosaur 0x001 ]
+		set actionA0		[ EpCreateDialogAction "EpA213World::goodDinosaurDialog0" ]
 
-		set triggerB0		[ EpCreateUnitPositionWithTraceTrigger $pHeroUnit $pEnemy_EvilRat 0x001 ]
-		set actionB0		[ EpCreateDialogAction "EpA213World::Dialog_LegendOfDinosaur_EvilRat" ]
-		set actionB1		[ EpCreateScriptAction "EpEnemySetTalkable $pEnemy_EvilRat 0" ]
+		set triggerB0		[ EpCreateUnitPositionWithTraceTrigger $pHeroUnit $pEvilRat 0x001 ]
+		set actionB0		[ EpCreateDialogAction "EpA213World::evilRatDialog" ]
+		set actionB1		[ EpCreateScriptAction "EpEnemySetTalkable $pEvilRat 0" ]
 
 		set triggerC0		[ EpCreateUnitPositionTrigger $pHeroUnit 10 54 14 53 0x001 ]
-		set actionC1		[ EpCreateDialogAction "EpA213World::Dialog_LegendOfDinosaur_BigRigsAssault" ]
+		set actionC1		[ EpCreateDialogAction "EpA213World::bigRigsAssaultDialog" ]
 		set actionC2		[ EpCreateScriptAction "createEnemy 11 55" ]
 		set actionC3		[ EpCreateScriptAction "createEnemy 13 55" ]
 
-		set triggerD0		[ EpCreateUnitPositionWithTraceTrigger $pHeroUnit $pNPC_GoodDinosaur 0x001 ]
-		set actionD0		[ EpCreateDialogAction "EpA213World::Dialog_LegendOfDinosaur_GoodDinosaur1" ]
-		set actionD1		[ EpCreateScriptAction "EpUnitSetRemoveFlag $pNPC_GoodDInosaur 1" ]
+		set triggerD0		[ EpCreateUnitPositionWithTraceTrigger $pHeroUnit $pGoodDinosaur 0x001 ]
+		set actionD0		[ EpCreateDialogAction "EpA213World::goodDinosaurDialog1" ]
+		set actionD1		[ EpCreateScriptAction "EpUnitSetRemoveFlag $pGoodDinosaur 1" ]
 		# TODO: 착한 공룡이 사라지거나 쥐로 변하거나 해야 한다.
 
 		EpAddTriggerToSequence	$seqIncident $triggerA0
@@ -60,6 +65,7 @@ namespace eval EpA213World {
 
 		EpAddTriggerToSequence	$seqIncident $triggerD0
 		EpAddActionToSequence	$seqIncident $actionD0
+		EpAddActionToSequence	$seqIncident $actionD1
 
 		EpSequentialIncidentSetName	$seqIncident "LegendOfDinsaur sequential incident"
 
@@ -69,7 +75,7 @@ namespace eval EpA213World {
 		return $seqIncident
 	}
 
-	namespace eval Dialog_LegendOfDinosaur_GoodDinosaur0 {} {
+	namespace eval goodDinosaurDialog0 {} {
 		set region [ list 0 0 0 0 ] ;# left, top, right, bottom
 		set oneTime 0;
 
@@ -96,7 +102,7 @@ namespace eval EpA213World {
 		];
 	}
 
-	namespace eval Dialog_LegendOfDinosaur_EvilRat {} {
+	namespace eval evilRatDialog {} {
 		set region [ list 0 0 0 0 ] ;# left, top, right, bottom
 		set oneTime 0;
 
@@ -112,7 +118,7 @@ namespace eval EpA213World {
 		];
 	}
 
-	namespace eval Dialog_LegendOfDinosaur_BigRigsAssault {} {
+	namespace eval bigRigsAssaultDialog {} {
 	set region [ list 0 0 0 0 ] ;# left, top, right, bottom
 		set oneTime 0;
 
@@ -127,7 +133,7 @@ namespace eval EpA213World {
 		];
 	}
 
-	namespace eval Dialog_LegendOfDinosaur_GoodDinosaur1 {} {
+	namespace eval goodDinosaurDialog1 {} {
 		set region [ list 0 0 0 0 ] ;# left, top, right, bottom
 		set oneTime 0;
 

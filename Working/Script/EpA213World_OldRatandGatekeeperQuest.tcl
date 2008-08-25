@@ -1,59 +1,64 @@
 namespace eval EpA213World {
+	global pOldRat pOldCat1 pOldCat10 pOldCat11\
+			pGoodDinosaur pEvilRat
 # -----------------------------------------------------------------------------------------
 	# 제목 : 늙은 쥐의 전설과 문지기
 	# 설명 : 늙은 쥐와의 대화를 통해 A213에 얽힌 전설을 듣게 되고, 문지기를 해치우고 A213의 문을
 	# 열기 위한 필수 아이템 상한 두부를 얻는다.
 	# registerIncident_TalkWithOldRat
-	# registerIncident_pEnemy_OldCat1 
+	# registerIncident_pOldCat1 
 	proc registerUnitsOldRatandGatekeeper {} {
-		set pNPC_OldRat				[ createEnemy 4 59 ]
-		EpUnitSetArnMesh			$pNPC_OldRat "PoolGModel"
-		EpUnitSetColor				$pNPC_OldRat 128 128 128
-		EpCharacterSetStat			$pNPC_OldRat 4 1 3 1 1 1
-		EpCharacterSetCurHp			$pNPC_OldRat -1
-		EpEnemySetTalkable			$pNPC_OldRat 1
-		EpUnitSetName				$pNPC_OldRat "An Old Rat..."
-		EpUnitSetNameVisible		$pNPC_OldRat 1
+		global pOldRat pOldCat1 pOldCat10 pOldCat11\
+		pGoodDinosaur pEvilRat
 
-		set	pEnemy_OldCat1			[ createEnemy 21 65 ]
-		EpUnitSetArnMesh			$pEnemy_OldCat1 "GwengYiModel"
-		EpUnitSetColor				$pEnemy_OldCat1 128 128 128
-		EpCharacterSetStat			$pEnemy_OldCat1 10 10 10 10 10 10
-		EpCharacterSetCurHp			$pEnemy_OldCat1 100
-		EpEnemySetTalkable			$pEnemy_OldCat1 1
-		EpUnitSetName				$pEnemy_OldCat1 "No.1 Gatekeeper"
-		EpUnitSetNameVisible		$pEnemy_OldCat1 1
+		set pOldRat				[ createEnemy 4 59 ]
+		EpUnitSetArnMesh			$pOldRat "PoolGModel"
+		EpUnitSetColor				$pOldRat 128 128 128
+		EpCharacterSetStat			$pOldRat 4 1 3 1 1 1
+		EpCharacterSetCurHp			$pOldRat -1
+		EpEnemySetTalkable			$pOldRat 1
+		EpUnitSetName				$pOldRat "An Old Rat..."
+		EpUnitSetNameVisible		$pOldRat 1
 
-		set	pEnemy_OldCat10			[ createEnemy 21 70 ]
-		EpUnitSetArnMesh			$pEnemy_OldCat10 "GwengYiModel"
-		EpUnitSetColor				$pEnemy_OldCat10 128 128 128
-		EpCharacterSetStat			$pEnemy_OldCat10 10 10 10 10 10 10
-		EpCharacterSetCurHp			$pEnemy_OldCat10 100
-		EpEnemySetTalkable			$pEnemy_OldCat10 1
-		EpUnitSetName				$pEnemy_OldCat10 "No.10 Gatekeeper"
-		EpUnitSetNameVisible		$pEnemy_OldCat10 1
+		set	pOldCat1			[ createEnemy 21 65 ]
+		EpUnitSetArnMesh			$pOldCat1 "GwengYiModel"
+		EpUnitSetColor				$pOldCat1 128 128 128
+		EpCharacterSetStat			$pOldCat1 10 10 10 10 10 10
+		EpCharacterSetCurHp			$pOldCat1 100
+		EpEnemySetTalkable			$pOldCat1 1
+		EpUnitSetName				$pOldCat1 "No.1 Gatekeeper"
+		EpUnitSetNameVisible		$pOldCat1 1
 
-		set	pEnemy_OldCat11			[ createEnemy 21 60 ]
-		EpUnitSetArnMesh			$pEnemy_OldCat11 "GwengYiModel"
-		EpEnemySetTalkable			$pEnemy_OldCat11 1
-		EpUnitSetName				$pEnemy_OldCat11 "No.11 Gatekeeper"
-		EpUnitSetNameVisible		$pEnemy_OldCat11 1
+		set	pOldCat10			[ createEnemy 21 70 ]
+		EpUnitSetArnMesh			$pOldCat10 "GwengYiModel"
+		EpUnitSetColor				$pOldCat10 128 128 128
+		EpCharacterSetStat			$pOldCat10 10 10 10 10 10 10
+		EpCharacterSetCurHp			$pOldCat10 100
+		EpEnemySetTalkable			$pOldCat10 1
+		EpUnitSetName				$pOldCat10 "No.10 Gatekeeper"
+		EpUnitSetNameVisible		$pOldCat10 1
+
+		set	pOldCat11			[ createEnemy 21 60 ]
+		EpUnitSetArnMesh			$pOldCat11 "GwengYiModel"
+		EpEnemySetTalkable			$pOldCat11 1
+		EpUnitSetName				$pOldCat11 "No.11 Gatekeeper"
+		EpUnitSetNameVisible		$pOldCat11 1
 	}
 
 	proc registerIncident_TalkWithOldRat {} {
 		variable pHeroUnit
-		global pNPC_OldRat pEnemy_OldCat10 pEnemy_OldCat11
+		global pOldRat pOldCat10 pOldCat11
 		set animObjects [ list Blocking1 Blocking2 Blocking3 GateRight GateLeft GateCamera ]
 
 		set sqIncident		[ EpCreateSequentialIncident 1 ]
 
-		set trigger0		[ EpCreateUnitPositionWithTraceTrigger $pHeroUnit $pNPC_OldRat 0x001 ]
-		set action0			[ EpCreateDialogAction "EpA213World::NPC_OldRatDialog" ]
+		set trigger0		[ EpCreateUnitPositionWithTraceTrigger $pHeroUnit $pOldRat 0x001 ]
+		set action0			[ EpCreateDialogAction "EpA213World::oldRatDialog" ]
 
-		set action1			[ EpCreateScriptAction "EpEnemySetTalkable pEnemy_OldCat1 1" ]
+		set action1			[ EpCreateScriptAction "EpEnemySetTalkable pOldCat1 1" ]
 
-		set trigger1		[ EpCreateUnitPositionWithTraceTrigger $pHeroUnit $pEnemy_OldCat10 0x001 ]
-		set action1			[ EpCreateDialogAction "EpA213World::NPC_OldCat10Dialog" ]
+		set trigger1		[ EpCreateUnitPositionWithTraceTrigger $pHeroUnit $pOldCat10 0x001 ]
+		set action1			[ EpCreateDialogAction "EpA213World::oldCat10Dialog" ]
 		#set action2			[ EpCreateScriptAction "Incident_GateOpen" ]
 
 		EpAddTriggerToSequence		$sqIncident $trigger0
@@ -80,9 +85,9 @@ namespace eval EpA213World {
 		}
 		# ------------------------------------------------------------------------------------------
 
-		set action					[ EpCreateScriptAction	"EpEnemySetTalkable $pEnemy_OldCat11 0" ]
+		set action					[ EpCreateScriptAction	"EpEnemySetTalkable $pOldCat11 0" ]
 		EpAddActionToSequence		$sqIncident	$action
-		set action					[ EpCreateScriptAction	"EpUnitSetRemoveFlag $pEnemy_OldCat10 1" ]
+		set action					[ EpCreateScriptAction	"EpUnitSetRemoveFlag $pOldCat10 1" ]
 		EpAddActionToSequence		$sqIncident $action
 		
 		EpSequentialIncidentSetName	$sqIncident "TalkWithRat incident"
@@ -91,15 +96,15 @@ namespace eval EpA213World {
 		EpOutputDebugString " - Incident count: $incCount\n"
 	}
 
-	proc registerIncident_pEnemy_OldCat1 {} {
+	proc registerIncident_pOldCat1 {} {
 		variable pHeroUnit
-		global pNPC_OldRat pEnemy_OldCat1 pEnemy_OldCat11
+		global pOldRat pOldCat1 pOldCat11
 
-		set trigger0		[ EpCreateUnitPositionWithTraceTrigger $pHeroUnit $pNPC_OldRat 0x001 ]
-		set trigger1		[ EpCreateUnitPositionWithTraceTrigger $pHeroUnit $pEnemy_OldCat1 0x001 ]
+		set trigger0		[ EpCreateUnitPositionWithTraceTrigger $pHeroUnit $pOldRat 0x001 ]
+		set trigger1		[ EpCreateUnitPositionWithTraceTrigger $pHeroUnit $pOldCat1 0x001 ]
 		set action0		[ EpCreateScriptAction "#" ]
-		set action1		[ EpCreateDialogAction "EpA213World::NPC_OldCat1Dialog" ]
-		set action2		[ EpCreateScriptAction "EpEnemySetTalkable $pEnemy_OldCat1 0" ]
+		set action1		[ EpCreateDialogAction "EpA213World::oldCat1Dialog" ]
+		set action2		[ EpCreateScriptAction "EpEnemySetTalkable $pOldCat1 0" ]
 				
 		set seqIncident	[ EpCreateSequentialIncident 1 ]
 		EpAddTriggerToSequence $seqIncident $trigger0
@@ -108,18 +113,18 @@ namespace eval EpA213World {
 		EpAddActionToSequence $seqIncident $action1
 		EpAddActionToSequence $seqIncident $action2
 
-		set action					[ EpCreateScriptAction	"EpEnemySetTalkable $pEnemy_OldCat11 0" ]
+		set action					[ EpCreateScriptAction	"EpEnemySetTalkable $pOldCat11 0" ]
 		EpAddActionToSequence		$seqIncident	$action
 
-		EpSequentialIncidentSetName	$seqIncident "pEnemy_OldCat1 sequential incident"
+		EpSequentialIncidentSetName	$seqIncident "pOldCat1 sequential incident"
 
 		set incCount		[ EpRegisterSequentialIncident $seqIncident ]
 		
-		EpOutputDebugString " - pEnemy_OldCat1 Incident returned $seqIncident\n"
+		EpOutputDebugString " - pOldCat1 Incident returned $seqIncident\n"
 		return $seqIncident
 	}
 
-		namespace eval NPC_OldRatDialog {} {
+		namespace eval oldRatDialog {} {
 	
 		set region [ list 0 0 0 0 ]; ;# left, top, right, bottom
 		set oneTime 0;
@@ -159,7 +164,7 @@ namespace eval EpA213World {
 		];	
 	}
 
-	namespace eval NPC_OldCat10Dialog {} {
+	namespace eval oldCat10Dialog {} {
 	
 		set region [ list 0 0 0 0 ] ;# left, top, right, bottom
 		set oneTime 0;
@@ -184,7 +189,7 @@ namespace eval EpA213World {
 		];	
 	}
 
-	namespace eval NPC_OldCat1Dialog {} {
+	namespace eval oldCat1Dialog {} {
 		
 		set region [ list 0 0 0 0 ] ;# left, top, right, bottom
 		set oneTime 0;

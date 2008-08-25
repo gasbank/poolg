@@ -2,6 +2,9 @@
 #include "Picture.h"
 #include "State.h"
 
+class Sprite;
+class DrawRequest;
+
 class MenuState : public State
 { 
 public:
@@ -20,7 +23,17 @@ public:
 
 	
 private:
-	
+	Sprite*			m_sprite;
+
+	DrawRequest*	m_menuBoxDr;
+	DrawRequest*	m_menuBoxDr1;
+	DrawRequest*	m_menuBoxDr2;
+	DrawRequest*	m_menuBoxDr3;
+	DrawRequest*	m_menuBoxDr4;
+
+	DrawRequest*	m_menuDr[5];
+	int				m_curSelMenu;
+
 	LPD3DXFONT		m_lblHYnamL;
 	LPD3DXFONT		m_lblREB;
 	LPD3DXFONT		m_lblsREB;

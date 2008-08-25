@@ -6,6 +6,8 @@
 #include "TopStateManager.h"
 #include "WorldStateManager.h"
 #include "Hero.h"
+#include "Sprite.h"
+#include "SpriteManager.h"
 
 int loc;
 int slb;
@@ -19,10 +21,70 @@ float maxExp = 0;
 bool op_st = false;
 bool op_sa = false;
 bool op_lo = false;
+const UINT menuButtonWidth = 184;
+const UINT menuButtonHeight = 44;
 
 void MenuState::select(int move)
 {
-	if ( loc == 0)
+	if ( move == 0 )
+	{
+		if ( m_curSelMenu == 0 )
+		{
+			if ( op_st == false )
+			{
+				op_st = true;
+			}
+			else op_st = false;
+		}
+		else if ( m_curSelMenu == 1 )
+		{
+			if ( op_sa == false )
+			{
+				op_sa = true;
+			}
+			else op_sa = false;
+		}
+		else if ( m_curSelMenu == 2 )
+		{
+			if ( op_lo == false )
+			{
+				op_lo = true;
+			}
+			else op_lo = false;
+		}
+		else if ( m_curSelMenu == 4 )
+			SendMessage( DXUTGetHWND(), WM_CLOSE, 0, 0 );
+	}
+
+
+	if ( move == 8 || move == 9 )
+	{
+		m_menuDr[ m_curSelMenu ]->srcRect.top		+= menuButtonHeight * 5;
+		m_menuDr[ m_curSelMenu ]->srcRect.bottom	+= menuButtonHeight * 5;
+
+		
+		if(GetWorldStateManager().prevStateEnum() == GAME_WORLD_STATE_BATTLE)
+		{
+			if ( move == 8 ) m_curSelMenu += 2;
+			if ( move == 9 ) m_curSelMenu -= 2;
+		}
+		else if ( move == 8 ) --m_curSelMenu;
+		else if ( move == 9 ) ++m_curSelMenu;
+
+		if ( m_curSelMenu < 0 )
+			m_curSelMenu += 5;
+		else if ( m_curSelMenu > 4 )
+			m_curSelMenu = 0;
+
+
+		m_menuDr[ m_curSelMenu ]->srcRect.top		-= menuButtonHeight * 5;
+		m_menuDr[ m_curSelMenu ]->srcRect.bottom	-= menuButtonHeight * 5;
+
+	}
+
+
+
+	/*if ( loc == 0)
 	{
 		if(GetWorldStateManager().prevStateEnum() == GAME_WORLD_STATE_BATTLE)
 		{
@@ -45,11 +107,13 @@ void MenuState::select(int move)
 		if(GetWorldStateManager().prevStateEnum() == GAME_WORLD_STATE_BATTLE && loc == 2)
 		{
 			if( move == 8 )
+			{
 				loc -= 2;
+			}
 		}
-		else if (move == 8)
+		else if ( move == 8 )
 		{
-				loc -= 1;
+			loc -= 1;
 		}
 		if (move == 9)
 		{
@@ -57,7 +121,7 @@ void MenuState::select(int move)
 		}
 	}
 	else if ( loc == 4 )
-	{
+	{				
 		if ( move == 8 )
 		{
 			loc -= 1;
@@ -72,11 +136,7 @@ void MenuState::select(int move)
 	{
 		if ( move == 0 )
 		{
-			if ( op_st == false )
-			{
-				op_st = true;
-			}
-			else op_st = false;
+			
 		}
 	}
 
@@ -84,22 +144,14 @@ void MenuState::select(int move)
 	{
 		if ( move == 0 )
 		{
-			if ( op_sa == false )
-			{
-				op_sa = true;
-			}
-			else op_sa = false;
+			
 		}
 	}
 	if ( loc == 2 )
 	{
 		if ( move == 0 )
 		{
-			if ( op_lo == false )
-			{
-				op_lo = true;
-			}
-			else op_lo = false;
+			
 		}
 	}
 
@@ -107,7 +159,7 @@ void MenuState::select(int move)
 	{
 		if ( move == 0 )
 			SendMessage( DXUTGetHWND(), WM_CLOSE, 0, 0 );
-	}
+	}*/
 }
 
 void MenuState::saveloadselect(int select)
@@ -198,6 +250,8 @@ HRESULT MenuState::frameRender(IDirect3DDevice9* pd3dDevice,  double fTime, floa
 	pd3dDevice->SetTransform(D3DTS_VIEW, &GetG().g_fixedViewMat);
 	pd3dDevice->SetTransform(D3DTS_PROJECTION, &GetG().g_orthoProjMat);
 
+	GetSpriteManager().frameRenderSpecificSprite( "MenuUI" );
+
 	D3DMATERIAL9 material;
 	D3DCOLORVALUE cv, cv2;
 	cv.a = 0.3f; cv.r = 0.1f; cv.g = 0.1f; cv.b = 0.1f;
@@ -223,19 +277,15 @@ HRESULT MenuState::frameRender(IDirect3DDevice9* pd3dDevice,  double fTime, floa
 	switch ( loc )
 	{
 	case 0 :
-		m_stdb.draw();
+		
 		break;
 	case 1 :
-		m_sadb.draw();
 		break;
 	case 2 :
-		m_lodb.draw();
 		break;
 	case 3 :
-		m_sedb.draw();
 		break;
 	case 4 :
-		m_exdb.draw();
 		break;
 	}
 
@@ -457,15 +507,33 @@ MenuState::MenuState()
 
 	HRESULT hr;
 	m_pDev = GetG().m_dev;
-	float scrWidth = (float)GetG().m_scrWidth;
-	float scrHeight = (float)GetG().m_scrHeight;
 
-	float menuBoxWidth = 200;
-	float menuBoxHeight = 264;
+	const UINT menuBoxWidth = 200;
+	const UINT menuBoxHeight = 264;
+	const int scrWidth_i = GetG().m_scrWidth;
+	const int scrHeight_i = GetG().m_scrHeight;
+	float scrWidth_f = (float)GetG().m_scrWidth;
+	float scrHeight_f = (float)GetG().m_scrHeight;
 
-	float menuButtonWidth = 184;
-	float menuButtonHeight = 44;
+	m_sprite = GetSpriteManager().registerSprite( "MenuUI", "Images/menu_images.png" );
+	m_sprite->setCustomRendered( true );
+	m_sprite->registerRect( "MenuBox", menuButtonWidth, 0, menuButtonWidth+menuBoxWidth, menuBoxHeight);
+	m_sprite->registerRect( "Status_Unpushed", 0, 0, 0+menuButtonWidth, 0+menuButtonHeight*1 );
+	m_sprite->registerRect( "Save_Unpushed", 0, 0+menuButtonHeight*6, 0+menuButtonWidth, 0+menuButtonHeight*7 );
+	m_sprite->registerRect( "Load_Unpushed", 0, 0+menuButtonHeight*7, 0+menuButtonWidth, 0+menuButtonHeight*8 );
+	m_sprite->registerRect( "Setting_Unpushed", 0, 0+menuButtonHeight*8, 0+menuButtonWidth, 0+menuButtonHeight*9 );
+	m_sprite->registerRect( "Exit_Unpushed", 0, 0+menuButtonHeight*9, 0+menuButtonWidth, 0+menuButtonHeight*10 );
 
+	m_sprite->drawRequest( "MenuBox", 0, scrWidth_i - menuBoxWidth - 12, 5, 0, 0xffffffff );
+	m_menuDr[0] = m_sprite->drawRequest( "Status_Unpushed", 0, scrWidth_i - menuButtonWidth - 20, menuButtonHeight - 30, 0, 0xffffffff );
+	m_menuDr[1] = m_sprite->drawRequest( "Save_Unpushed", 0, scrWidth_i - menuButtonWidth - 20, menuButtonHeight + 20, 0, 0xffffffff );
+	m_menuDr[2] = m_sprite->drawRequest( "Load_Unpushed", 0, scrWidth_i - menuButtonWidth - 20, menuButtonHeight + 70, 0, 0xffffffff );
+	m_menuDr[3] = m_sprite->drawRequest( "Setting_Unpushed", 0, scrWidth_i - menuButtonWidth - 20, menuButtonHeight + 120, 0, 0xffffffff );
+	m_menuDr[4] = m_sprite->drawRequest( "Exit_Unpushed", 0, scrWidth_i - menuButtonWidth - 20, menuButtonHeight + 170, 0, 0xffffffff );
+
+	m_curSelMenu = 0;
+
+	/*
 	float menuBoxPositionX = (float)scrWidth/2 - menuBoxWidth - 12;
 	float menuBoxPositionY = (float)scrHeight/2 - menuBoxHeight - 20;
 	m_menu.init(L"Images/menu_window.png", m_pDev);
@@ -515,39 +583,39 @@ MenuState::MenuState()
 
 	m_exdb.init(L"Images/exit_down_button.png", m_pDev);
 	m_exdb.setPos ( (float)scrWidth/2 - menuButtonWidth - 20, (float)scrHeight/2 - menuButtonHeight - 230, 2.7f);
-	m_exdb.setSize( menuButtonWidth, menuButtonHeight);
+	m_exdb.setSize( menuButtonWidth, menuButtonHeight);*/
 
 	m_stwin.init(L"Images/status_window.png", m_pDev);
-	m_stwin.setPos ( 0 - scrWidth / 2, 0 - scrHeight / 2, 2.6f);
-	m_stwin.setSize(scrWidth, scrHeight);
+	m_stwin.setPos ( 0 - scrWidth_f / 2, 0 - scrHeight_f / 2, 2.6f);
+	m_stwin.setSize(scrWidth_f, scrHeight_f);
 
 	m_sawin.init(L"Images/save_window.png", m_pDev);
-	m_sawin.setPos ( 0 - scrWidth / 2, 0 - scrHeight / 2, 2.6f);
-	m_sawin.setSize(scrWidth, scrHeight);
+	m_sawin.setPos ( 0 - scrWidth_f / 2, 0 - scrHeight_f / 2, 2.6f);
+	m_sawin.setSize(scrWidth_f, scrHeight_f);
 
 	m_lowin.init(L"Images/load_window.png", m_pDev);
-	m_lowin.setPos ( 0 - scrWidth / 2, 0 - scrHeight / 2, 2.6f);
-	m_lowin.setSize(scrWidth, scrHeight);
+	m_lowin.setPos ( 0 - scrWidth_f / 2, 0 - scrHeight_f / 2, 2.6f);
+	m_lowin.setSize( scrWidth_f, scrHeight_f);
 
 	m_hpbar.init(L"Images/BattleUI/HPbar.jpg", m_pDev);
-	m_hpbar.setPos ( (0 - scrWidth / 2) + 163, (0 - scrHeight / 2) + 223, 2.4f);
+	m_hpbar.setPos ( (0 - scrWidth_f / 2) + 163, (0 - scrHeight_f / 2) + 223, 2.4f);
 
 	m_hpbg.init(L"Images/BattleUI/HPbg.jpg", m_pDev);
-	m_hpbg.setPos ( (0 - scrWidth / 2) + 163, (0 - scrHeight / 2) + 223, 2.5f);
+	m_hpbg.setPos ( (0 - scrWidth_f / 2) + 163, (0 - scrHeight_f / 2) + 223, 2.5f);
 	m_hpbg.setSize(220, 22);
 
 	m_mpbar.init(L"Images/BattleUI/DKbar.jpg", m_pDev);
-	m_mpbar.setPos ( (0 - scrWidth / 2) + 163, (0 - scrHeight / 2) + 171, 2.4f);
+	m_mpbar.setPos ( (0 - scrWidth_f / 2) + 163, (0 - scrHeight_f / 2) + 171, 2.4f);
 
 	m_mpbg.init(L"Images/BattleUI/MPbg.jpg", m_pDev);
-	m_mpbg.setPos ( (0 - scrWidth / 2) + 163, (0 - scrHeight / 2) + 171, 2.5f);
+	m_mpbg.setPos ( (0 - scrWidth_f / 2) + 163, (0 - scrHeight_f / 2) + 171, 2.5f);
 	m_mpbg.setSize(220, 22);
 	
 	m_expbar.init(L"Images/BattleUI/EXPbar.jpg", m_pDev);
-	m_expbar.setPos ( (0 - scrWidth / 2) + 163, (0 - scrHeight / 2) + 119, 2.4f);
+	m_expbar.setPos ( (0 - scrWidth_f / 2) + 163, (0 - scrHeight_f / 2) + 119, 2.4f);
 
 	m_expbg.init(L"Images/BattleUI/EXPbg.jpg", m_pDev);
-	m_expbg.setPos ( (0 - scrWidth / 2) + 163, (0 - scrHeight / 2) + 119, 2.5f);
+	m_expbg.setPos ( (0 - scrWidth_f / 2) + 163, (0 - scrHeight_f / 2) + 119, 2.5f);
 	m_expbg.setSize(220, 22);
 
 	m_slb0.init(L"Images/save_load_selected.png", m_pDev);

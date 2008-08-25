@@ -584,6 +584,13 @@ int EpUnitSetNameVisible( void* ptr, int i )
 	return 0;
 } SCRIPT_CALLABLE_I_PV_I( EpUnitSetNameVisible )
 
+int EpUnitSetRemoveFlag( void* ptr, int i )
+{
+	Unit* instance = reinterpret_cast<Unit*>( ptr );
+	instance->Unit::setRemoveFlag( i?true:false );
+	return 0;
+} SCRIPT_CALLABLE_I_PV_I( EpUnitSetRemoveFlag )
+
 
 START_SCRIPT_FACTORY( Unit )
 	//CREATE_OBJ_COMMAND( EpCreateUnit )
@@ -600,4 +607,5 @@ START_SCRIPT_FACTORY( Unit )
 	CREATE_OBJ_COMMAND( EpUnitSetColor )
 	CREATE_OBJ_COMMAND( EpUnitSetName )
 	CREATE_OBJ_COMMAND( EpUnitSetNameVisible )
+	CREATE_OBJ_COMMAND( EpUnitSetRemoveFlag )
 END_SCRIPT_FACTORY( Unit )

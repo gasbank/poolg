@@ -552,6 +552,10 @@ int EpUnitSetArnMesh( void* ptr1, const char* ptr2 )
 		static_cast<ArnMesh*>(
 		static_cast<PlayState*>(
 		GetTopStateManager().getState( GAME_TOP_STATE_PLAY ))->getCharacterSceneGraph()->getSceneRoot()->getNodeByName( ptr2 ));
+	if ( !arnMesh )
+	{
+		throw std::runtime_error( "Specified ArnMesh not found on Character model file." );
+	}
 	instance1->setArnMesh( arnMesh );
 	return 0;
 } SCRIPT_CALLABLE_I_PV_PC( EpUnitSetArnMesh )

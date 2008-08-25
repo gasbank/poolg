@@ -58,6 +58,7 @@ bool							g_bTileGrid				= false;
 LPD3DXSPRITE					g_d3dxSprite			= 0;
 LPDIRECT3DTEXTURE9				g_tex					= 0;
 
+MotionBlurShader*				g_motionBlurShader		= 0;
 
 //--------------------------------------------------------------------------------------
 // Rejects any D3D9 devices that aren't acceptable to the app by returning false
@@ -166,11 +167,14 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 	GetScriptManager().execute( "EpInitGame" );
 
 	// Shader
-	/*
+	
 	g_bombShader = new BombShader();
 	g_bombShader->initEffect( pd3dDevice, L"Shaders/HLSL/vbomb.fx" );
 	g_bombShader->initMainTechnique();
-	*/
+
+	g_motionBlurShader = new MotionBlurShader();
+	g_motionBlurShader->initShader( pd3dDevice, L"" );
+
 
 	//g_alphaShader = new AlphaShader();
 	//g_alphaShader->initShader( pd3dDevice, L"Shaders/Alpha.vsh" );
@@ -232,6 +236,7 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 	g_dr = sprite->drawRequest( "BlueCircle", 0, 0, D3DCOLOR_RGBA( 255, 255, 255, 255 ) );
 	g_dr2 = sprite->drawRequestXformable( "BlueCircle" );
 	*/
+
 
 	return S_OK;
 }
@@ -461,7 +466,7 @@ void CALLBACK OnD3D9FrameRender( IDirect3DDevice9* pd3dDevice, double fTime, flo
 	// Render the scene
 	if( SUCCEEDED( pd3dDevice->BeginScene() ) )
 	{
-		//drawBurningTeapot( fTime, fElapsedTime );
+		drawBurningTeapot( fTime, fElapsedTime );
 
 		if ( g_bTileGrid )
 			renderTileGrid();
@@ -534,6 +539,8 @@ void CALLBACK OnD3D9DestroyDevice( void* pUserContext )
 	delete g_epLight;
 
 	SAFE_DELETE( g_spriteManager );
+
+	EP_SAFE_RELEASE( g_motionBlurShader );
 
 	GetG().m_videoMan.SetDev(0);
 	GetG().m_screenFlash.release();

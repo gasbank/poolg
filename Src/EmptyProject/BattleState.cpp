@@ -219,7 +219,7 @@ HRESULT BattleState::enter()
 
 
 	// TODO Anim test
-	ArnNode* guardBallNode = getHero()->getArnMesh()->getNodeByName("Sphere.004");
+	ArnNode* guardBallNode = getHero()->getArnMesh()->getNodeByName("GuardBall");
 	((ArnMesh*)guardBallNode)->setDoAnim( true );
 	((ArnMesh*)guardBallNode)->setVisible( true );
 	return S_OK;
@@ -234,7 +234,7 @@ HRESULT BattleState::leave()
 
 	getHero()->setControllable( true );
 	
-	ArnMesh* guardBallNode = (ArnMesh*)(getHero()->getArnMesh()->getNodeByName("Sphere.004"));
+	ArnMesh* guardBallNode = (ArnMesh*)(getHero()->getArnMesh()->getNodeByName("GuardBall"));
 	guardBallNode->setVisible( false );
 	return S_OK;
 }
@@ -337,7 +337,7 @@ HRESULT BattleState::frameMove(double fTime, float fElapsedTime)
 
 	// TODO Anim test
 
-	ArnNode* guardBallNode = getHero()->getArnMesh()->getNodeByName("Sphere.004");
+	ArnNode* guardBallNode = getHero()->getArnMesh()->getNodeByName("GuardBall");
 	guardBallNode->update( fTime, fElapsedTime );
 	if ( ((ArnXformable*)guardBallNode)->isAnimSeqEnded() )
 	{

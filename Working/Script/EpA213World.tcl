@@ -5,6 +5,7 @@ namespace eval EpA213World {
 	global pNPC_OldRat pEnemy_OldCat1 pEnemy_OldCat10 pEnemy_OldCat11
 	variable gatePos { 14 66 }
 	variable ratholPos { 12 50 }
+	variable bossPos { 75 124 }
 	
 	proc init { curWorld } {
 		variable world
@@ -148,10 +149,10 @@ namespace eval EpA213World {
 		EpUnitSetNameVisible		$pEnemy_OldCat11 1
 
 		set Box					[createStructureObject 6 70];
-		EpUnitSetArnMesh			$Box "PushableBox"
+		EpUnitSetArnMesh			$Box "PushableMirror"
 
 		set Mirror				[createStructureObject 6 60];
-		EpUnitSetArnMesh			$Mirror "PushableBox"
+		EpUnitSetArnMesh			$Mirror "PushableMirror"
 
 
 		# Incidents ------------------------------------------------------------

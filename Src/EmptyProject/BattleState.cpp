@@ -25,7 +25,7 @@ BattleState::BattleState()
 
 	int scrWidth = GetG().m_scrWidth;
 	int scrHeight = GetG().m_scrHeight;
-
+/*
 	m_sprite = GetSpriteManager().registerSprite( "BattleUI", "Images/BattleUI.tga" );
 	m_sprite->setCustomRendered( true );
 	m_sprite->registerRect( "StatusBoxBg", 0, 150, 0+163, 150+128 );
@@ -33,6 +33,15 @@ BattleState::BattleState()
 	m_sprite->registerRect( "SkillBg", 0, 272, 0+170, 272+161 );
 	m_sprite->registerRect( "BarFg", 163, 150, 163+220, 150+22 );		// Progress bar foreground
 	m_sprite->registerRect( "BarBg", 163, 172, 163+220, 172+22 );		// Progress bar background
+	*/
+	m_sprite = GetSpriteManager().registerSprite( "BattleUI", "Images/BattleUI/BattleUISet.tga" );
+	m_sprite->setCustomRendered( true );
+	m_sprite->registerRect( "StatusBoxBg", 600, 0, 763, 124 );
+	m_sprite->registerRect( "BattleLogBg", 0, 0, 600, 124 );
+	m_sprite->registerRect( "SkillBg", 0, 124, 128, 324 );
+	m_sprite->registerRect( "BarFg", 0, 554, 110, 567 );		// Progress bar foreground
+	m_sprite->registerRect( "BarBg", 0, 580, 110, 593 );	
+
 
 
 	m_sprite->drawRequest( "StatusBoxBg", Sprite::RIGHT_TOP, 0xffffffff );
@@ -71,7 +80,7 @@ BattleState::BattleState()
 
 	int StatSelectBoxHeight = 230;
 	int StatSelectBoxWidth = skillBoxWidth + 40;
-	m_StatSelectBox.init(L"Images/BattleUI/SkillContentBox.png", m_pDev);
+	m_StatSelectBox.init(L"Images/BattleUI/StatSelectBox.png", m_pDev);
 	m_StatSelectBox.setDistance(500);
 	m_StatSelectBox.setOff();
 	m_StatSelectBox.setOnPos( 0 , (float)skillBoxPositionY + StatSelectBoxHeight, 7);

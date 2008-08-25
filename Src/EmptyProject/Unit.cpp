@@ -427,9 +427,11 @@ void Unit::drawName()
 			D3DXMATRIX ident;
 			D3DXMatrixIdentity( &ident );
 
+			D3DVIEWPORT9 vp9;
+			GetG().m_dev->GetViewport( &vp9 );
 			D3DXVec3Project( 
 				&vProj, &getPos(),
-				&GetG().m_dev->Viewport,
+				&vp9,
 				GetG().m_camera.GetProjMatrix(),
 				GetG().m_camera.GetViewMatrix(),
 				&ident );

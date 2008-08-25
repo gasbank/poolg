@@ -1,11 +1,16 @@
+source "Script/EpA213World_MirrorQuest.tcl"
+
 namespace eval EpA213World {
-	set modelFilePath	"A213World.arn"
-	set dialogNameList [ list laserDialog openDialog NPC_OldRatDialog NPC_OldCat1Dialog NPC_OldCat10Dialog ]
-	variable pHeroUnit
 	global pNPC_OldRat pEnemy_OldCat1 pEnemy_OldCat10 pEnemy_OldCat11
-	variable gatePos { 14 66 }
-	variable ratholPos { 12 50 }
-	variable bossPos { 75 124 }
+	variable pHeroUnit
+	variable modelFilePath					"A213World.arn"
+	variable gatePos						{ 14 66 }
+	variable ratholPos						{ 12 50 }
+	variable bossPos						{ 75 124 }
+	variable bossBattleStartPos				{ 69 124 }
+	variable startPos						$bossBattleStartPos
+	variable dialogNameList					[ list	laserDialog openDialog NPC_OldRatDialog\
+													NPC_OldCat1Dialog NPC_OldCat10Dialog ]
 	
 	proc init { curWorld } {
 		variable world
@@ -21,11 +26,14 @@ namespace eval EpA213World {
 		variable ratholPos
 		variable Box
 		variable Mirror
+		variable startPos
+		variable bossPos
+		
 		global pNPC_OldRat pEnemy_OldCat1 pEnemy_OldCat10 pEnemy_OldCat11
 		
 		EpOutputDebugString " - [info level 0] called\n"
 		
-		set pHeroUnit				[ getHero $ratholPos ];
+		set pHeroUnit				[ getHero $startPos ];
 		set pEnemyUnit1				[ createEnemy 81 70 ];
 		set pEnemyUnit2				[ createEnemy 82 60 ];
 		set pEnemyUnit3				[ createEnemy 64 64 ];
@@ -36,6 +44,9 @@ namespace eval EpA213World {
 		set pEnemyUnit8				[ createEnemy 64 97 ];
 		set pEnemyUnit9				[ createEnemy 45 109 ];
 		set pEnemyUnit10			[ createEnemy 81 103 ];
+		set pFinalBoss				[ createEnemy2 $bossPos ];
+		EpUnitSetArnMesh			$pFinalBoss "ChimpModel"
+		
 		                                      # Health Will Coding Defence Sense Immunity
 		EpCharacterSetControllable	$pHeroUnit 1
 		#EpCharacterSetStat			$pHeroUnit    7     5     7       5      5      5
@@ -164,6 +175,8 @@ namespace eval EpA213World {
 		EpRegisterInitFadeInIncident
 		registerIncident_TalkWithOldRat
 		registerIncident_pEnemy_OldCat1
+		
+		registerMirrorQuest
 	}
 	
 	

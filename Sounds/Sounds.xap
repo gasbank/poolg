@@ -5,6 +5,7 @@ Release = March 2008;
 
 Options
 {
+    Report File = test.txt;
     Verbose Report = 0;
     Generate C/C++ Headers = 1;
 }
@@ -16,8 +17,8 @@ Global Settings
     Header File = Sounds.h;
     Exclude Category Names = 0;
     Exclude Variable Names = 0;
-    Last Modified Low = 2405235900;
-    Last Modified High = 29951591;
+    Last Modified Low = 1662028092;
+    Last Modified High = 29951614;
 
     Category
     {
@@ -266,10 +267,10 @@ Wave Bank
     Compression Preset Name = Compression Preset;
     Xbox Bank Last Modified Low = 0;
     Xbox Bank Last Modified High = 0;
-    PC Bank Last Modified Low = 2405385900;
-    PC Bank Last Modified High = 29951591;
-    Bank Last Revised Low = 1909455900;
-    Bank Last Revised High = 29951591;
+    PC Bank Last Modified Low = 1662078092;
+    PC Bank Last Modified High = 29951614;
+    Bank Last Revised Low = 1662078092;
+    Bank Last Revised High = 29951614;
 
     Wave
     {
@@ -308,12 +309,12 @@ Wave Bank
             Sampling Rate = 16000;
             Bits Per Sample = 1;
             Play Region Offset = 44;
-            Play Region Length = 3893508;
+            Play Region Length = 37904;
             Loop Region Offset = 0;
             Loop Region Length = 0;
             File Type = 1;
-            Last Modified Low = 4160413196;
-            Last Modified High = 29951590;
+            Last Modified Low = 3290115388;
+            Last Modified High = 29951613;
         }
     }
 
@@ -331,12 +332,12 @@ Wave Bank
             Sampling Rate = 16000;
             Bits Per Sample = 1;
             Play Region Offset = 44;
-            Play Region Length = 3950340;
+            Play Region Length = 101596;
             Loop Region Offset = 0;
             Loop Region Length = 0;
             File Type = 1;
-            Last Modified Low = 4209393196;
-            Last Modified High = 29951590;
+            Last Modified Low = 2361995388;
+            Last Modified High = 29951613;
         }
     }
 
@@ -354,12 +355,12 @@ Wave Bank
             Sampling Rate = 16000;
             Bits Per Sample = 1;
             Play Region Offset = 44;
-            Play Region Length = 3878060;
+            Play Region Length = 29316;
             Loop Region Offset = 0;
             Loop Region Length = 0;
             File Type = 1;
-            Last Modified Low = 4190943196;
-            Last Modified High = 29951590;
+            Last Modified Low = 3575185388;
+            Last Modified High = 29951613;
         }
     }
 
@@ -377,12 +378,12 @@ Wave Bank
             Sampling Rate = 16000;
             Bits Per Sample = 1;
             Play Region Offset = 44;
-            Play Region Length = 754912;
+            Play Region Length = 452984;
             Loop Region Offset = 0;
             Loop Region Length = 0;
             File Type = 1;
-            Last Modified Low = 4097013196;
-            Last Modified High = 29951590;
+            Last Modified Low = 2982205388;
+            Last Modified High = 29951613;
         }
     }
 
@@ -397,15 +398,15 @@ Wave Bank
         {
             Format Tag = 0;
             Channels = 2;
-            Sampling Rate = 16000;
+            Sampling Rate = 44100;
             Bits Per Sample = 1;
             Play Region Offset = 44;
-            Play Region Length = 3845952;
+            Play Region Length = 47480;
             Loop Region Offset = 0;
             Loop Region Length = 0;
             File Type = 1;
-            Last Modified Low = 4126323196;
-            Last Modified High = 29951590;
+            Last Modified Low = 1233528092;
+            Last Modified High = 29951614;
         }
     }
 }
@@ -422,8 +423,8 @@ Wave Bank
     Compression Preset Name = Compression Preset;
     Xbox Bank Last Modified Low = 0;
     Xbox Bank Last Modified High = 0;
-    PC Bank Last Modified Low = 2453305900;
-    PC Bank Last Modified High = 29951591;
+    PC Bank Last Modified Low = 1667778092;
+    PC Bank Last Modified High = 29951614;
     Header Last Modified Low = 0;
     Header Last Modified High = 0;
     Bank Last Revised Low = 2238864518;
@@ -644,8 +645,8 @@ Sound Bank
     Windows File = Win\Sound Bank.xsb;
     Xbox Bank Path Edited = 0;
     Windows Bank Path Edited = 0;
-    Bank Last Modified Low = 2750905900;
-    Bank Last Modified High = 29951591;
+    Bank Last Modified Low = 2009128092;
+    Bank Last Modified High = 29951614;
     Header Last Modified High = 0;
     Header Last Modified Low = 0;
 

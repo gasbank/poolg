@@ -34,14 +34,13 @@ namespace eval EpCeilingWorld {
 		variable mainQuest2_incident
 
 		set incident	[ EpCreateSequentialIncident 1 ]
-		set mainQuest1_incident [ EpCeilingWorld::mainQuest1 ]
-		set mainQuest2_incident [ EpCeilingWorld::mainQuest2 ]
 
-		EpAddTriggerToSequence	$incident	[ EpCreateNullTrigger ]
-		EpAddActionToSequence	$incident	[ EpCreateStartIncidentAction $mainQuest1_incident ]
+		EpAddTriggerToSequence	$incident	[ EpCreateUnitPositionWithTraceTrigger $pHeroUnit $npcGloop 0x001 ]
+		EpAddActionToSequence	$incident	[ EpCreateDialogAction "EpCeilingWorld::GlooPDialog" ]
 		
-		EpAddTriggerToSequence	$incident	[ EpCreateIncidentTrigger $mainQuest1_incident ]
-		EpAddActionToSequence	$incident	[ EpCreateStartIncidentAction $mainQuest2_incident ]
+		EpAddTriggerToSequence	$incident	[ EpCreateUnitPositionWithTraceTrigger $pHeroUnit $weakCat 0x001 ]
+		EpAddActionToSequence	$incident	[ EpCreateDialogAction "EpCeilingWorld::weakCatDialog" ]
+		EpAddActionToSequence	$incident	[ EpCreateScriptAction "EpEnemySetTalkable $weakCat 0" ]
 
 		EpAddTriggerToSequence	$incident	[ EpRemoveFlagTrigger $weakCat ]
 		EpAddActionToSequence	$incident	[ EpCreateDialogAction "EpCeilingWorld::catDeadDialog" ]
@@ -53,70 +52,6 @@ namespace eval EpCeilingWorld {
 		
 		set incCount	[ EpRegisterSequentialIncident $incident ]
 		EpOutputDebugString " - Incident count: $incCount\n"
-	}
-
-	proc repeatTalk {} {
-		global world hero npcGetg npcGloop pHeroUnit npcSetg weakCat
-		variable mainQuest1_incident
-		variable mainQuest2_incident
-	
-		set triggers		[ EpCreateIncidentTrigger $mainQuest1_incident ]
-		set incidenttrigger	[ EpCreateIncidentTrigger $mainQuest2_incident ]
-		lappend triggers	[ EpCreateReverseTrigger $incidenttrigger ]
-		lappend triggers	[ EpCreateUnitPositionWithTraceTrigger $pHeroUnit $npcGloop 0x001 ]
-		set actions		[ EpCreateDialogAction "EpCeilingWorld::rGlooPDialog" ]
-				
-		set incident	[ EpCreateBlockingActionIncident 0 0 -1 ]
-
-		foreach trig $triggers {
-			EpAddTriggerToIncident $incident $trig
-		}
-
-		foreach act $actions {
-			EpAddActionToIncident $incident $act
-		}
-
-		EpIncidentSetName	$incident "repeatTalk incident"
-		
-		set incCount	[ EpRegisterIncident $incident ]
-		EpOutputDebugString " - Incident count: $incCount\n"
-	}
-
-	proc mainQuest1 {} {
-		global world hero npcGetg npcGloop pHeroUnit npcSetg weakCat
-	
-		set trigger		[ EpCreateUnitPositionWithTraceTrigger $pHeroUnit $npcGloop 0x001 ]
-		set actions		[ EpCreateDialogAction "EpCeilingWorld::GlooPDialog" ]
-				
-		set incident	[ EpCreateBlockingActionIncident $trigger 0 1 ]
-
-		foreach act $actions {
-			EpAddActionToIncident $incident $act
-		}
-
-		EpIncidentSetName	$incident "mainQuest1 incident"
-		
-		EpOutputDebugString " - mainQuest1 Incident returned $incident\n"
-		return $incident
-	}
-
-	proc mainQuest2 {} {
-		global world hero npcGetg npcGloop pHeroUnit npcSetg weakCat
-	
-		set trigger		[ EpCreateUnitPositionWithTraceTrigger $pHeroUnit $weakCat 0x001 ]
-		set actions		[ EpCreateDialogAction "EpCeilingWorld::weakCatDialog" ]
-		lappend actions		[ EpCreateScriptAction "EpEnemySetTalkable $weakCat 0" ]
-				
-		set incident	[ EpCreateBlockingActionIncident $trigger 0 1 ]
-
-		foreach act $actions {
-			EpAddActionToIncident $incident $act
-		}
-
-		EpIncidentSetName	$incident "mainQuest2 incident"
-		
-		EpOutputDebugString " - mainQuest2 Incident returned $incident\n"
-		return $incident
 	}
 
 	proc Quest3 {} {
@@ -218,7 +153,6 @@ namespace eval EpCeilingWorld {
 
 		registerIncidentInitTalk
 		mainQuest
-		#repeatTalk
 			
 		createWarpPosition			"EpRoomWorld" STOP 25 82
 	}

@@ -85,6 +85,9 @@ proc createStructureObject { tileX tileY { pushable 1 } } {
 	EpRegisterToWorld $curWorld $unit
 	return $unit
 }
+proc createStructureObject2 { tilePos { pushable 1 } } {
+	return [ createStructureObject [lindex $tilePos 0] [lindex $tilePos 1] $pushable ]
+}
 
 proc EpRegisterInitFadeInIncident {} {
 	set trigger		[ EpCreateNullTrigger ]

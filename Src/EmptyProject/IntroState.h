@@ -24,16 +24,8 @@ public:
 	virtual HRESULT release();
 	
 private:
-
-	HRESULT createTextMeshes( IDirect3DDevice9* pd3dDevice );
-	HRESULT createD3DXTextMesh( IDirect3DDevice9* pd3dDevice, LPCWSTR str, LPD3DXMESH* ppTextMesh );
 	void setupLight();
 	void setupCamera();
-
-	LPD3DXMESH m_pTextMeshes[NUM_OF_LINES];
-	TCHAR* m_pStrs[NUM_OF_LINES];
-
-	D3DXMATRIX m_matObjs[NUM_OF_LINES];	// Matrixes for transform of each text meshes
 	
 	bool m_backgroundVisible;
 	D3DXMATRIX m_matBackground;
@@ -51,12 +43,6 @@ private:
 	float m_mtrlControl;
 
 	Picture m_pBlack;
-
-	// Shape of text
-	TCHAR* m_pStrFont;
-	BOOL m_bBold;
-	BOOL m_bItalic;
-	DWORD m_dwFontSize;
 
 	float m_velocity;
 

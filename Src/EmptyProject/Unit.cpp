@@ -414,33 +414,43 @@ void Unit::drawName()
 {
 	if ( m_bNameVisible && !GetEpLight().isInFading() )
 	{
-		D3DXVECTOR3 vProj;
-		D3DXMATRIX ident;
-		D3DXMatrixIdentity( &ident );
 
-		D3DXVec3Project( 
-			&vProj, &getPos(),
-			&GetG().m_dev->Viewport,
-			GetG().m_camera.GetProjMatrix(),
-			GetG().m_camera.GetViewMatrix(),
-			&ident );
+		// 대상이 카메라 앞에 있는지, 뒤에 있는지 카메라의 방향 벡터와,
+		// 카메라로부터 대상까지의 방향 벡터를 내적하여 판단한다.
+		const D3DXVECTOR3* pvCamEye = GetG().m_camera.GetEyePt();
+		const D3DXVECTOR3* pvCamAt  = GetG().m_camera.GetLookAtPt();
+		D3DXVECTOR3  vCamDir  = *pvCamAt - *pvCamEye;
+		D3DXVECTOR3  vUnitDir = getPos() - *pvCamEye;
+		if ( D3DXVec3Dot( &vCamDir, &vUnitDir ) > 0 )
+		{
+			D3DXVECTOR3 vProj;
+			D3DXMATRIX ident;
+			D3DXMatrixIdentity( &ident );
 
-		/*std::string str( "An Old Rat..." );
-		if ( m_name == str )
+			D3DXVec3Project( 
+				&vProj, &getPos(),
+				&GetG().m_dev->Viewport,
+				GetG().m_camera.GetProjMatrix(),
+				GetG().m_camera.GetViewMatrix(),
+				&ident );
+
+			/*std::string str( "An Old Rat..." );
+			if ( m_name == str )
 			printf ( "%f %f %f\n", vProj.x, vProj.y, vProj.z );*/
 
-		TEXTMETRICA tm;
-		m_pd3dxFont->GetTextMetricsA( &tm );
+			TEXTMETRICA tm;
+			m_pd3dxFont->GetTextMetricsA( &tm );
 
-		D3DXCOLOR m_textColor = D3DXCOLOR( 1.0f, 0.8f, 0.0f, 1.0f );
-		RECT rc;
-		rc.top = (int)vProj.y + 30;
-		rc.left = (int)vProj.x - (int)(m_name.size() / 2.0f * tm.tmAveCharWidth);
-		rc.right = (int)vProj.x - (int)(m_name.size() / 2.0f * tm.tmAveCharWidth);
-		rc.bottom = (int)vProj.y + 30;
-		GetG().m_dev->SetRenderState( D3DRS_LIGHTING, FALSE );
-		m_pd3dxFont->DrawTextA( 0, m_name.c_str(), -1, &rc, DT_NOCLIP, m_textColor );
-		GetG().m_dev->SetRenderState( D3DRS_LIGHTING, TRUE );
+			D3DXCOLOR m_textColor = D3DXCOLOR( 1.0f, 0.8f, 0.0f, 1.0f );
+			RECT rc;
+			rc.top = (int)vProj.y + 30;
+			rc.left = (int)vProj.x - (int)(m_name.size() / 2.0f * tm.tmAveCharWidth);
+			rc.right = (int)vProj.x - (int)(m_name.size() / 2.0f * tm.tmAveCharWidth);
+			rc.bottom = (int)vProj.y + 30;
+			GetG().m_dev->SetRenderState( D3DRS_LIGHTING, FALSE );
+			m_pd3dxFont->DrawTextA( 0, m_name.c_str(), -1, &rc, DT_NOCLIP, m_textColor );
+			GetG().m_dev->SetRenderState( D3DRS_LIGHTING, TRUE );
+		}
 	}
 }
 

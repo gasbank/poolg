@@ -359,7 +359,7 @@ namespace eval EpA213World {
 	# 열기 위한 필수 아이템 상한 두부를 얻는다.
 	proc registerIncident_TalkWithOldRat {} {
 		variable pHeroUnit
-		global pNPC_OldRat pEnemy_OldCat10
+		global pNPC_OldRat pEnemy_OldCat10 pEnemy_OldCat11
 		set animObjects [ list Blocking1 Blocking2 Blocking3 GateRight GateLeft GateCamera ]
 
 		set sqIncident		[ EpCreateSequentialIncident 1 ]
@@ -396,6 +396,9 @@ namespace eval EpA213World {
 			EpAddActionToSequence $sqIncident $act
 		}
 		# ------------------------------------------------------------------------------------------
+
+		set action					[ EpCreateScriptAction	"EpEnemySetTalkable $pEnemy_OldCat11 0" ]
+		EpAddActionToSequence		$sqIncident	$action
 		
 		EpSequentialIncidentSetName	$sqIncident "TalkWithRat incident"
 		
@@ -405,7 +408,7 @@ namespace eval EpA213World {
 
 	proc registerIncident_pEnemy_OldCat1 {} {
 		variable pHeroUnit
-		global pNPC_OldRat pEnemy_OldCat1
+		global pNPC_OldRat pEnemy_OldCat1 pEnemy_OldCat11
 
 		set trigger0		[ EpCreateUnitPositionWithTraceTrigger $pHeroUnit $pNPC_OldRat 0x001 ]
 		set trigger1		[ EpCreateUnitPositionWithTraceTrigger $pHeroUnit $pEnemy_OldCat1 0x001 ]
@@ -419,6 +422,9 @@ namespace eval EpA213World {
 		EpAddTriggerToSequence $seqIncident $trigger1
 		EpAddActionToSequence $seqIncident $action1
 		EpAddActionToSequence $seqIncident $action2
+
+		set action					[ EpCreateScriptAction	"EpEnemySetTalkable $pEnemy_OldCat11 0" ]
+		EpAddActionToSequence		$seqIncident	$action
 
 		EpSequentialIncidentSetName	$seqIncident "pEnemy_OldCat1 sequential incident"
 

@@ -13,7 +13,7 @@ namespace eval EpA213World {
 		global pOldRat pOldCat1 pOldCat10 pOldCat11\
 		pGoodDinosaur pEvilRat
 
-		set pGoodDinosaur		[ createEnemy 43 54 ]
+		set pGoodDinosaur		[ createEnemy 44 74 ]
 		EpUnitSetColor				$pGoodDinosaur 255 128 0
 		EpUnitSetArnMesh			$pGoodDinosaur "DinoModel"
 		EpEnemySetTalkable			$pGoodDinosaur 1

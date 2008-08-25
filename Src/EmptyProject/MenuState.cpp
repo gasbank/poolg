@@ -5,6 +5,7 @@
 #include "World.h"
 #include "TopStateManager.h"
 #include "WorldStateManager.h"
+#include "Hero.h"
 
 int loc;
 int slb;
@@ -13,6 +14,8 @@ float curHp = 0;
 float maxHp = 0;
 float curCs = 0;
 float maxCs = 0;
+float curExp = 0;
+float maxExp = 0;
 bool op_st = false;
 bool op_sa = false;
 bool op_lo = false;
@@ -172,6 +175,7 @@ HRESULT MenuState::frameMove(double fTime, float fElapsedTime)
 
 	m_hpbar.frameMove(fElapsedTime);
 	m_mpbar.frameMove(fElapsedTime);
+	m_expbar.frameMove(fElapsedTime);
 
 	m_hpbg.frameMove(fElapsedTime);
 	m_mpbg.frameMove(fElapsedTime);
@@ -261,7 +265,7 @@ HRESULT MenuState::frameRender(IDirect3DDevice9* pd3dDevice,  double fTime, floa
 
 		rc3.top		= 62;
 		rc3.left	= 446;
-		rc3.right	= 800;
+		rc3.right	= 500;
 		rc3.bottom	= 600;
 
 		DWORD dtProp = DT_NOCLIP | DT_CENTER;
@@ -430,6 +434,7 @@ HRESULT MenuState::release()
 
 	m_hpbar.release();
 	m_mpbar.release();
+	m_expbar.release();
 
 	m_hpbg.release();
 	m_mpbg.release();
@@ -537,6 +542,9 @@ MenuState::MenuState()
 	m_mpbg.init(L"Images/BattleUI/MPbg.jpg", m_pDev);
 	m_mpbg.setPos ( (0 - scrWidth / 2) + 163, (0 - scrHeight / 2) + 171, 2.5f);
 	m_mpbg.setSize(220, 22);
+	
+	m_expbar.init(L"Images/BattleUI/EXPbar.jpg", m_pDev);
+	m_expbar.setPos ( (0 - scrWidth / 2) + 163, (0 - scrHeight / 2) + 119, 2.4f);
 
 	m_expbg.init(L"Images/BattleUI/EXPbg.jpg", m_pDev);
 	m_expbg.setPos ( (0 - scrWidth / 2) + 163, (0 - scrHeight / 2) + 119, 2.5f);
@@ -561,8 +569,8 @@ MenuState::MenuState()
 
 
 	V( D3DXCreateFont(m_pDev, 17, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblHYnamL) );
-	V( D3DXCreateFont(m_pDev, 26, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Rockwell Extra Bold"), &m_lblREB) );
-	V( D3DXCreateFont(m_pDev, 16, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Rockwell Extra Bold"), &m_lblsREB) );
+	V( D3DXCreateFont(m_pDev, 26, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Gulim"), &m_lblREB) );
+	V( D3DXCreateFont(m_pDev, 16, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Gulim"), &m_lblsREB) );
 }
 
 MenuState::~MenuState()
@@ -584,8 +592,12 @@ HRESULT MenuState::enter()
 		curCs = (float)( (Character*) ws->getHero() )->getCurCs();
 		maxCs = (float)( (Character*) ws->getHero() )->getMaxCs();
 
+		curExp = (float) ( (Hero*) ws->getHero() )->getCurExp();
+		maxExp = (float) ( (Hero*) ws->getHero() )->getMaxExp();
+
 		m_hpbar.setSize(220 * (curHp / maxHp), 22);
 		m_mpbar.setSize(220 * (curCs / maxCs), 22);
+		m_expbar.setSize(220 * (curExp / maxExp), 22);
 	}
 
 	loc = 0;

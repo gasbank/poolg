@@ -49,6 +49,7 @@ private:
 
 	Picture m_hpbar;
 	Picture m_mpbar;
+	Picture m_expbar;
 	Picture m_hpbg;
 	Picture m_mpbg;
 	Picture m_expbg;

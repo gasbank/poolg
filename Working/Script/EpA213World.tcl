@@ -217,6 +217,10 @@ namespace eval EpA213World {
 		
 		set actions		[ EpCreateScriptAction			"EpSetDoAnim [ EpGetNode LaserConeDeco  ] 1" ]
 		lappend actions		[ EpCreateScriptAction			"EpSetDoAnim [ EpGetNode Laser1  ] 1" ]
+		lappend actions		[ EpCreateScriptAction			"EpSetDoAnim [ EpGetNode BossWallEventCamera ] 1" ]
+		lappend actions		[ EpCreateCameraAction			external BossWallEventCamera 0 ]
+		lappend actions		[ EpCreateDelayAction			10000 ]
+		lappend actions		[ EpCreateCameraAction			attach BossWallEventCamera 1500 ]
 		lappend actions		[ EpCreateDialogAction "EpA213World::laserDialog" ]
 
 		set incident	[ EpCreateBlockingActionIncident 0 0 -1 ]

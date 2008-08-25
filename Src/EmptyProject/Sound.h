@@ -19,10 +19,17 @@ public:
 	XACTINDEX iBattle[2];
 	XACTINDEX iBoss;
 	XACTINDEX iCeiling;
+	XACTINDEX iAttack;
+	XACTINDEX iBomb;
+	XACTINDEX iHit;
+	XACTINDEX iPuzzleClear;
+	XACTINDEX iWalk;
 
 	XACTCATEGORY iGlobalCategory;
 	XACTCATEGORY iMusicCategory;
 	XACTCATEGORY iBGMCategory;
+
+	IXACT3Cue* pZeroLatencyWalkCue;
 
     IXACT3Engine* pEngine;
 	IXACT3WaveBank* pInMemoryWaveBank;
@@ -36,6 +43,9 @@ public:
 	CRITICAL_SECTION cs;
     bool bHandleStreamingWaveBankPrepared;
     bool bHandleSongStopped;
+	bool bBattleSongStopped;
+	bool bHandleZeroLatencyWalkCueStop;
+	bool bInBattle;
 
 	bool bGlobalPaused;
 	float fGlobalVolume;

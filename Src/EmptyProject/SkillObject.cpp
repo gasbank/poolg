@@ -122,13 +122,13 @@ bool SOnormalAttack::frameMove (float fElapsedTime)
 				getBattleState()->pushBattleLog("´ë»óÀ» ¼¶¸êÇÏ¿´½À´Ï´Ù! (Enter key·Î ¿ùµå·Î º¹±Í)");
 				m_target->setDead();
 				getBattleState()->setNextTurnType(TT_NATURAL);
-				GetAudioState().pSoundBank->Play( GetAudioState().iSE, 0, 0, NULL );
+				GetAudioState().pSoundBank->Play( GetAudioState().iAttack, 0, 0, NULL );
 			}
 			else
 			{
 				getBattleState()->setNextTurnType(TT_COMPUTER);
 				getBattleState()->passTurn();
-				GetAudioState().pSoundBank->Play( GetAudioState().iSE, 0, 0, NULL );
+				GetAudioState().pSoundBank->Play( GetAudioState().iAttack, 0, 0, NULL );
 			}
 		}
 
@@ -349,7 +349,7 @@ bool SOmtBullet::frameMove (float fElapsedTime)
 				getBattleState()->pushBattleLog("´ë»óÀ» ¼¶¸êÇÏ¿´½À´Ï´Ù! (Enter key·Î ¿ùµå·Î º¹±Í)");
 				m_target->setDead();
 				getBattleState()->setNextTurnType(TT_NATURAL);
-				GetAudioState().pSoundBank->Play( GetAudioState().iSE, 0, 0, NULL );
+				GetAudioState().pSoundBank->Play( GetAudioState().iAttack, 0, 0, NULL );
 			}
 			else
 			{
@@ -357,7 +357,7 @@ bool SOmtBullet::frameMove (float fElapsedTime)
 				{
 					getBattleState()->setNextTurnType(TT_COMPUTER);
 					getBattleState()->passTurn();
-					GetAudioState().pSoundBank->Play( GetAudioState().iSE, 0, 0, NULL );
+					GetAudioState().pSoundBank->Play( GetAudioState().iAttack, 0, 0, NULL );
 				}
 			}
 		}
@@ -440,7 +440,7 @@ bool SOgoto::frameMove (float fElapsedTime)
 				getBattleState()->pushBattleLog("´ë»óÀ» ¼¶¸êÇÏ¿´½À´Ï´Ù! (Enter key·Î ¿ùµå·Î º¹±Í)");
 				m_target->setDead();
 				getBattleState()->setNextTurnType(TT_NATURAL);
-				GetAudioState().pSoundBank->Play( GetAudioState().iSE, 0, 0, NULL );
+				GetAudioState().pSoundBank->Play( GetAudioState().iAttack, 0, 0, NULL );
 				return false;
 			}
 		}
@@ -472,7 +472,7 @@ bool SOgoto::frameMove (float fElapsedTime)
 		{
 			getBattleState()->setNextTurnType(TT_COMPUTER);
 			getBattleState()->passTurn();
-			GetAudioState().pSoundBank->Play( GetAudioState().iSE, 0, 0, NULL );
+			GetAudioState().pSoundBank->Play( GetAudioState().iAttack, 0, 0, NULL );
 		}
 
 		return false;

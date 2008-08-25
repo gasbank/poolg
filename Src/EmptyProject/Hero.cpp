@@ -7,6 +7,7 @@
 #include "PlayState.h"
 #include "ArnMesh.h"
 #include "Skill.h"
+#include "Sound.h"
 
 Hero::Hero(void)
 : Character( UT_HERO )
@@ -33,9 +34,9 @@ Unit* Hero::createHero( LPD3DXMESH mesh, int tileX, int tileY, float posZ )
 	ArnSceneGraph* charSceneGraph = ps->getCharacterSceneGraph();
 	ArnMesh* arnMesh = static_cast<ArnMesh*>(charSceneGraph->getSceneRoot()->getNodeByName( "PoolGModel" ));
 	u->setArnMesh( arnMesh );
-
-
+	
 	u->addToSkillSet( SL_FIRST );
+
 	return u;
 }
 
@@ -98,6 +99,19 @@ bool Hero::frameMove( float fElapsedTime )
 
 LRESULT Hero::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
+	switch ( wParam )
+	{
+	case 'W' :
+	case 'A' :
+	case 'S' :
+	case 'D' :
+		DWORD dwState;
+		GetAudioState().pZeroLatencyWalkCue->GetState( &dwState );
+		if( ( dwState & ( XACT_CUESTATE_PREPARING | XACT_CUESTATE_PREPARED ) ) != 0 )
+			GetAudioState().pZeroLatencyWalkCue->Play();
+	default :
+		break;
+	}
 	return Character::handleMessages( hWnd, uMsg, wParam, lParam );
 }
 

@@ -81,6 +81,11 @@ SequentialIncident::~SequentialIncident()
 {
 
 }
+
+void SequentialIncident::release()
+{
+	EpSafeReleaseAll( m_sequencer );
+}
 //////////////////////////////////////////////////////////////////////////
 
 int EpAddTriggerToSequence( void* pv1, void* pv2 )

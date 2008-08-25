@@ -24,6 +24,8 @@ public:
 
 	void setName( const char* name ) { m_incidentName = name; }
 	const char* getName() const { return m_incidentName.c_str(); }
+
+	void release();
 protected:
 	void activate();
 	void deactivate();

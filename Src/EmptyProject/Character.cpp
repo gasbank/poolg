@@ -15,6 +15,7 @@
 #include "DynamicMotion.h"
 #include "Skill.h"
 #include "Utility.h"
+#include "Sound.h"
 
 extern TileManager tileManager;
 
@@ -33,7 +34,7 @@ void Character::doNormalAttack( int type, Character* enemy )
 	Unit* missile = Unit::createUnit(mesh, 0, 0, 0);
 
 	missile->setDynamicMotion(DynamicMotion::createDMfireUniformly
-		(missile, this->getPos(), fireDir, dist, 40.0f ));
+		(missile, this->getPos(), fireDir, dist, 10.0f ));
 
 	SkillObject* so = SkillObject::createSOnormalAttack(this, enemy, missile);
 	m_skillObjectList.push_back(so);
@@ -350,7 +351,10 @@ void Character::damage( int point )
 	m_curHp -= point;
 	
 	if ( getType() == UT_HERO )
+	{
 		GetG().m_screenFlash.screenFlashing( 1.3f, 1.0f, 0.0f, 0.0f );
+		GetAudioState().pSoundBank->Play( GetAudioState().iHit, 0, 0, NULL );
+	}
 
 	if ( getType() == UT_HERO )
 	{

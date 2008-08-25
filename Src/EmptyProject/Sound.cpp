@@ -24,6 +24,8 @@ HRESULT Sound::init()
 
 	audioState.nCurSongPlaying = -1;
 	audioState.nCurWorld = -1;
+
+	audioState.bInBattle = false;
 	
 	audioState.bGlobalPaused = false;
 	audioState.bMusicPaused = false;
@@ -229,6 +231,12 @@ HRESULT Sound::init()
 	audioState.iOpening = audioState.pSoundBank->GetCueIndex( "opening" );
 	audioState.iBoss = audioState.pSoundBank->GetCueIndex( "boss" );
 	audioState.iCeiling = audioState.pSoundBank->GetCueIndex( "ceiling" );
+	audioState.iAttack = audioState.pSoundBank->GetCueIndex( "attack" );
+	audioState.iBomb = audioState.pSoundBank->GetCueIndex( "bomb" );
+	audioState.iHit = audioState.pSoundBank->GetCueIndex( "hit" );
+	audioState.iPuzzleClear = audioState.pSoundBank->GetCueIndex( "puzzleclear" );
+	audioState.iWalk = audioState.pSoundBank->GetCueIndex( "walk" );
+
 
 	audioState.iGlobalCategory = audioState.pEngine->GetCategory( "Global" );
 	audioState.iMusicCategory = audioState.pEngine->GetCategory( "Music" );
@@ -368,6 +376,15 @@ void WINAPI XACTNotificationCallback( const XACT_NOTIFICATION* pNotification )
         LeaveCriticalSection( &audioState.cs );
     }
 
+	if( pNotification->type == XACTNOTIFICATIONTYPE_CUESTOP &&
+		( pNotification->cue.cueIndex == audioState.iBattle[0] ||
+		  pNotification->cue.cueIndex == audioState.iBattle[1] ) )
+	{
+		EnterCriticalSection( &audioState.cs );
+		audioState.bBattleSongStopped = true;
+		LeaveCriticalSection( &audioState.cs );
+	}
+
     if( pNotification->type == XACTNOTIFICATIONTYPE_WAVEBANKPREPARED &&
         pNotification->waveBank.pWaveBank == audioState.pStreamingWaveBank )
     {
@@ -387,6 +404,15 @@ void WINAPI XACTNotificationCallback( const XACT_NOTIFICATION* pNotification )
             audioState.pbSoundBank = NULL;
         }
     }
+
+	if( pNotification->type == XACTNOTIFICATIONTYPE_CUESTOP &&
+		pNotification->cue.pCue == audioState.pZeroLatencyWalkCue )
+	{
+		// Respond to this notification outside of this callback so Prepare() can be called
+		EnterCriticalSection( &audioState.cs );
+		audioState.bHandleZeroLatencyWalkCueStop = true;
+		LeaveCriticalSection( &audioState.cs );
+	}
 }
 
 //-----------------------------------------------------------------------------------------
@@ -409,6 +435,7 @@ void Sound::UpdateAudio()
 
     EnterCriticalSection( &audioState.cs );
     bool bHandleStreamingWaveBankPrepared = audioState.bHandleStreamingWaveBankPrepared;
+	bool bHandleZeroLatencyCueStop = audioState.bHandleZeroLatencyWalkCueStop;
     LeaveCriticalSection( &audioState.cs );
 
     if( bHandleStreamingWaveBankPrepared )
@@ -429,8 +456,27 @@ void Sound::UpdateAudio()
 				audioState.pSoundBank->Play( audioState.iStage[audioState.nCurWorld][audioState.nCurSongPlaying], 0, 0, NULL );
 				
         }
+
+		// Prepare a new cue for zero-latency playback now that the wave bank is prepared
+		audioState.pSoundBank->Prepare( audioState.iWalk, 0, 0, &audioState.pZeroLatencyWalkCue );
     }
 
+	if( bHandleZeroLatencyCueStop )
+	{
+		EnterCriticalSection( &audioState.cs );
+		audioState.bHandleZeroLatencyWalkCueStop = false;
+		LeaveCriticalSection( &audioState.cs );
+
+		// Destroy the cue when it stops
+		audioState.pZeroLatencyWalkCue->Destroy();
+		audioState.pZeroLatencyWalkCue = NULL;
+		
+		// For this tutorial, we will prepare another zero-latency cue
+		// after the current one stops playing, but this isn't typical done
+		// Its up to the application to define its own behavior
+		audioState.pSoundBank->Prepare( audioState.iWalk, 0, 0, &audioState.pZeroLatencyWalkCue );
+	}
+	
     if( audioState.bHandleSongStopped )
     {
         EnterCriticalSection( &audioState.cs );
@@ -447,7 +493,14 @@ void Sound::UpdateAudio()
 		}
     }
 
+	if( audioState.bBattleSongStopped )
+	{
+		EnterCriticalSection( &audioState.cs );
+		audioState.bBattleSongStopped = false;
+		LeaveCriticalSection( &audioState.cs );
 
+		audioState.pSoundBank->Play( audioState.iBattle[audioState.nCurWorld], 0, 0, NULL );
+	}
     // It is important to allow XACT to do periodic work by calling pEngine->DoWork().  
     // However this must function be call often enough.  If you call it too infrequently, 
     // streaming will suffer and resources will not be managed promptly.  On the other hand 
@@ -512,14 +565,16 @@ void Sound::Opening()
 
 void AUDIO_STATE::enterBattle()
 {
+	audioState.pEngine->Stop( GetAudioState().iMusicCategory, 0 );
 	audioState.bBGMFade = true;
 	audioState.bMusicFade = false;
-	audioState.pEngine->Stop( GetAudioState().iMusicCategory, 0 );
 	audioState.pSoundBank->Play( GetAudioState().iBattle[GetAudioState().nCurWorld], 0, 0, NULL );
+	audioState.bInBattle = true;
 }
 
 void AUDIO_STATE::leaveBattle()
 {
 	audioState.bBGMFade = false;
 	audioState.bMusicFade = true;
+	audioState.bInBattle = false;
 }

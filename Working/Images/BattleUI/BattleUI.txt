@@ -1,0 +1,16 @@
+			x1	y1	x2	y2
+DialogBox		0	0	600	124
+SkillBox		0	124	128	324
+SkillContentBox		128	124	418	324
+StatusBox		600	0	763	124
+StatSelectBox		0	324	170	554
+HPbar			0	554	110	567
+HPillusion		0	567	110	580
+HPbg			0	580	110	593
+CSbar			0	593	110	606
+CSDKbar			0	606	110	619
+CSDKillusion		0	619	110	632
+CSbg			0	632	110	645
+EXPbar			0	645	110	658
+EXPillusion		0	658	110	671
+EXPbg			0	671	110	684

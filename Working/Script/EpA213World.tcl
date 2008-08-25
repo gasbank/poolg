@@ -2,7 +2,7 @@ namespace eval EpA213World {
 	set modelFilePath	"A213World.arn"
 	set dialogNameList [ list laserDialog openDialog NPC_OldRatDialog NPC_OldCat1Dialog NPC_OldCat10Dialog ]
 	variable pHeroUnit
-	global pNPC_OldRat pEnemy_OldCat1 pEnemy_OldCat10
+	global pNPC_OldRat pEnemy_OldCat1 pEnemy_OldCat10 pEnemy_OldCat11
 	variable gatePos { 14 66 }
 	variable ratholPos { 12 50 }
 	
@@ -20,7 +20,7 @@ namespace eval EpA213World {
 		variable ratholPos
 		variable Box
 		variable Mirror
-		global pNPC_OldRat pEnemy_OldCat1 pEnemy_OldCat10
+		global pNPC_OldRat pEnemy_OldCat1 pEnemy_OldCat10 pEnemy_OldCat11
 		
 		EpOutputDebugString " - [info level 0] called\n"
 		
@@ -140,6 +140,12 @@ namespace eval EpA213World {
 		EpEnemySetTalkable			$pEnemy_OldCat10 1
 		EpUnitSetName				$pEnemy_OldCat10 "No.10 Gatekeeper"
 		EpUnitSetNameVisible		$pEnemy_OldCat10 1
+
+		set	pEnemy_OldCat11			[ createEnemy 21 60 ]
+		EpUnitSetArnMesh			$pEnemy_OldCat11 "GwengYiModel"
+		EpEnemySetTalkable			$pEnemy_OldCat11 1
+		EpUnitSetName				$pEnemy_OldCat11 "No.11 Gatekeeper"
+		EpUnitSetNameVisible		$pEnemy_OldCat11 1
 
 		set Box					[createStructureObject 6 70];
 		EpUnitSetArnMesh			$Box "PushableBox"
@@ -361,6 +367,8 @@ namespace eval EpA213World {
 		set trigger0		[ EpCreateUnitPositionWithTraceTrigger $pHeroUnit $pNPC_OldRat 0x001 ]
 		set action0			[ EpCreateDialogAction "EpA213World::NPC_OldRatDialog" ]
 
+		set action1			[ EpCreateScriptAction "EpEnemySetTalkable pEnemy_OldCat1 1" ]
+
 		set trigger1		[ EpCreateUnitPositionWithTraceTrigger $pHeroUnit $pEnemy_OldCat10 0x001 ]
 		set action1			[ EpCreateDialogAction "EpA213World::NPC_OldCat10Dialog" ]
 		#set action2			[ EpCreateScriptAction "Incident_GateOpen" ]
@@ -399,20 +407,25 @@ namespace eval EpA213World {
 		variable pHeroUnit
 		global pNPC_OldRat pEnemy_OldCat1
 
-		set trigger		[ EpCreateUnitPositionWithTraceTrigger $pHeroUnit $pEnemy_OldCat1 0x001 ]
-		set actions		[ EpCreateDialogAction "EpA213World::NPC_OldCat1Dialog" ]
-		lappend actions		[ EpCreateScriptAction "EpEnemySetTalkable $pEnemy_OldCat1 0" ]
+		set trigger0		[ EpCreateUnitPositionWithTraceTrigger $pHeroUnit $pNPC_OldRat 0x001 ]
+		set trigger1		[ EpCreateUnitPositionWithTraceTrigger $pHeroUnit $pEnemy_OldCat1 0x001 ]
+		set action0		[ EpCreateScriptAction "#" ]
+		set action1		[ EpCreateDialogAction "EpA213World::NPC_OldCat1Dialog" ]
+		set action2		[ EpCreateScriptAction "EpEnemySetTalkable $pEnemy_OldCat1 0" ]
 				
-		set incident	[ EpCreateBlockingActionIncident $trigger 0 1 ]
+		set seqIncident	[ EpCreateSequentialIncident 1 ]
+		EpAddTriggerToSequence $seqIncident $trigger0
+		EpAddActionToSequence $seqIncident $action0
+		EpAddTriggerToSequence $seqIncident $trigger1
+		EpAddActionToSequence $seqIncident $action1
+		EpAddActionToSequence $seqIncident $action2
 
-		foreach act $actions {
-			EpAddActionToIncident $incident $act
-		}
+		EpSequentialIncidentSetName	$seqIncident "pEnemy_OldCat1 sequential incident"
 
-		EpIncidentSetName	$incident "pEnemy_OldCat1 incident"
+		set incCount		[ EpRegisterSequentialIncident $seqIncident ]
 		
-		EpOutputDebugString " - pEnemy_OldCat1 Incident returned $incident\n"
-		return $incident
+		EpOutputDebugString " - pEnemy_OldCat1 Incident returned $seqIncident\n"
+		return $seqIncident
 	}
 	
 	proc leave {} {
@@ -519,7 +532,7 @@ namespace eval EpA213World {
 		set dialog [ list\
 			$npc		"ÀÌ°Ô ¹«½¼ ³¿»õÁö?"\
 			$player		"µÎºÎ"\
-			$npc		"±¥¾ÂÇÏ´Ù! ³­ µÎºÎ°¡ ½ÈÅ¸!"\
+			$npc		"±¥¾ÂÇÏ´Ù! ³»°¡ Á¦ÀÏ ½È¾îÇÏ´Â µÎºÎ¸¦ °¡Á®¿À´Ù´Ï!"\
 		];	
 	}
 }

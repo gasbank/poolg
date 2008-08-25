@@ -654,8 +654,8 @@ HRESULT MenuState::enter()
 
 	if ( ws->getHero() != 0 )
 	{
-		curHp = (float)( (Character*) ws->getHero() )->getCurHp();
 		maxHp = (float)( (Character*) ws->getHero() )->getMaxHp();
+		curHp = (float)( (Character*) ws->getHero() )->getCurHp();
 
 		curCs = (float)( (Character*) ws->getHero() )->getCurCs();
 		maxCs = (float)( (Character*) ws->getHero() )->getMaxCs();

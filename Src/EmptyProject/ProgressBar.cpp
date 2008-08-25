@@ -12,14 +12,14 @@ void ProgressBar::setSize(float width, float height)
 
 void ProgressBar::changeRate(float rateV)
 {
-	if (rateV > m_maxRate)
+	/*if (rateV > m_maxRate)
 		m_currentRate = m_maxRate;
 	else if (rateV < 0)
 		m_currentRate = 0;
 	else
-		m_currentRate = rateV;
+		m_currentRate = rateV;*/
 
-	//m_width = (m_currentRate / m_maxRate) * m_fullWidth;
+	m_width = (m_currentRate / m_maxRate) * m_fullWidth;
 }
 
 void ProgressBar::setRate(float rateV)

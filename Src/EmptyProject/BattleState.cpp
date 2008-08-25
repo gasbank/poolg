@@ -36,11 +36,11 @@ BattleState::BattleState()
 	*/
 	m_sprite = GetSpriteManager().registerSprite( "BattleUI", "Images/BattleUI/BattleUISet.tga" );
 	m_sprite->setCustomRendered( true );
-	m_sprite->registerRect( "StatusBoxBg", 600, 0, 763, 124 );
-	m_sprite->registerRect( "BattleLogBg", 0, 0, 600, 124 );
-	m_sprite->registerRect( "SkillBg", 0, 124, 128, 324 );
-	m_sprite->registerRect( "BarFg", 0, 554, 110, 567 );		// Progress bar foreground
-	m_sprite->registerRect( "BarBg", 0, 580, 110, 593 );	
+	m_sprite->registerRect( "StatusBoxBg", 0, 282, 163, 406 );
+	m_sprite->registerRect( "BattleLogBg", 0, 0, 512, 82 );
+	m_sprite->registerRect( "SkillBg", 0, 82, 128, 282 );
+	m_sprite->registerRect( "BarFg", 333, 282, 443, 296 );		// Progress bar foreground
+	m_sprite->registerRect( "BarBg", 333, 309, 443, 322 );	
 
 
 

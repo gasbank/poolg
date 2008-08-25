@@ -14,3 +14,13 @@ CSbg			0	632	110	645
 EXPbar			0	645	110	658
 EXPillusion		0	658	110	671
 EXPbg			0	671	110	684
+
+
+///MiniSet
+
+DialogBox		0	0	512	82
+SkillBox		0	82	128	282
+SkillContentBox		128	82	418	282
+StatusBox		0	282	163	407
+StatSelectBox		163	282	333	512
+Bars			333	282	

@@ -448,7 +448,7 @@ void Unit::drawName()
 			rc.right = (int)vProj.x - (int)(m_name.size() / 2.0f * tm.tmAveCharWidth);
 			rc.bottom = (int)vProj.y + 30;
 			GetG().m_dev->SetRenderState( D3DRS_LIGHTING, FALSE );
-			m_pd3dxFont->DrawTextA( 0, m_name.c_str(), -1, &rc, DT_NOCLIP, m_textColor );
+			assert( m_pd3dxFont->DrawTextA( 0, m_name.c_str(), -1, &rc, DT_NOCLIP, m_textColor ) );
 			GetG().m_dev->SetRenderState( D3DRS_LIGHTING, TRUE );
 		}
 	}

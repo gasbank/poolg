@@ -1,6 +1,6 @@
 source "Script/EpA213World_MirrorQuest.tcl"
-source "Script/EpQuestLegendOfDinosaur.tcl"
-source "Script/EpQuestOldRatandGatekeeper.tcl"
+source "Script/EpA213World_LegendOfDinosaurQuest.tcl"
+source "Script/EpA213World_OldRatandGatekeeperQuest.tcl"
 
 namespace eval EpA213World {
 	global pNPC_OldRat pEnemy_OldCat1 pEnemy_OldCat10 pEnemy_OldCat11\
@@ -132,59 +132,15 @@ namespace eval EpA213World {
 		EpCharacterSetBoundary			$pEnemyUnit10 78 100 84 106
 		EpUnitSetArnMesh				$pEnemyUnit10 "DinoModel"
 
-		set pNPC_OldRat				[ createEnemy 4 59 ]
-		EpUnitSetArnMesh			$pNPC_OldRat "PoolGModel"
-		EpUnitSetColor				$pNPC_OldRat 128 128 128
-		EpCharacterSetStat			$pNPC_OldRat 4 1 3 1 1 1
-		EpCharacterSetCurHp			$pNPC_OldRat -1
-		EpEnemySetTalkable			$pNPC_OldRat 1
-		EpUnitSetName				$pNPC_OldRat "An Old Rat..."
-		EpUnitSetNameVisible		$pNPC_OldRat 1
-
-		set	pEnemy_OldCat1			[ createEnemy 21 65 ]
-		EpUnitSetArnMesh			$pEnemy_OldCat1 "GwengYiModel"
-		EpUnitSetColor				$pEnemy_OldCat1 128 128 128
-		EpCharacterSetStat			$pEnemy_OldCat1 10 10 10 10 10 10
-		EpCharacterSetCurHp			$pEnemy_OldCat1 100
-		EpEnemySetTalkable			$pEnemy_OldCat1 1
-		EpUnitSetName				$pEnemy_OldCat1 "No.1 Gatekeeper"
-		EpUnitSetNameVisible		$pEnemy_OldCat1 1
-
-		set	pEnemy_OldCat10			[ createEnemy 21 70 ]
-		EpUnitSetArnMesh			$pEnemy_OldCat10 "GwengYiModel"
-		EpUnitSetColor				$pEnemy_OldCat10 128 128 128
-		EpCharacterSetStat			$pEnemy_OldCat10 10 10 10 10 10 10
-		EpCharacterSetCurHp			$pEnemy_OldCat10 100
-		EpEnemySetTalkable			$pEnemy_OldCat10 1
-		EpUnitSetName				$pEnemy_OldCat10 "No.10 Gatekeeper"
-		EpUnitSetNameVisible		$pEnemy_OldCat10 1
-
-		set	pEnemy_OldCat11			[ createEnemy 21 60 ]
-		EpUnitSetArnMesh			$pEnemy_OldCat11 "GwengYiModel"
-		EpEnemySetTalkable			$pEnemy_OldCat11 1
-		EpUnitSetName				$pEnemy_OldCat11 "No.11 Gatekeeper"
-		EpUnitSetNameVisible		$pEnemy_OldCat11 1
-
-		set pNPC_GoodDinosaur		[ createEnemy 43 54 ]
-		EpUnitSetColor				$pNPC_GoodDinosaur 255 128 0
-		EpUnitSetArnMesh			$pNPC_GoodDinosaur "GwengYiModel"
-		EpEnemySetTalkable			$pNPC_GoodDinosaur 1
-		EpUnitSetName				$pNPC_GoodDinosaur "Gentle Dinosaur"
-		EpUnitSetNameVisible		$pNPC_GoodDinosaur 1
-
-		set pEnemy_EvilRat			[ createEnemy 25 45 ]
-		EpUnitSetColor				$pEnemy_EvilRat	255 0 0
-		EpUnitSetArnMesh			$pEnemy_EvilRat "PoolGModel"
-		EpEnemySetTalkable			$pEnemy_EvilRat 1
-		EpUnitSetName				$pEnemy_EvilRat "Evil Rat"
-		EpUnitSetNameVisible		$pEnemy_EvilRat	1
-
 		set Box					[createStructureObject 6 70];
 		EpUnitSetArnMesh			$Box "PushableMirror"
 
 		set Mirror				[createStructureObject 6 60];
 		EpUnitSetArnMesh			$Mirror "PushableMirror"
 
+		# Units	----------------------------------------------------------------
+		registerUnitsOldRatandGatekeeper
+		registerUnitsLegendOfDinosaur
 
 		# Incidents ------------------------------------------------------------
 		#Incident_BossGateOpen

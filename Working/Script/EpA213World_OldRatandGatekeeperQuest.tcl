@@ -5,6 +5,41 @@ namespace eval EpA213World {
 	# 열기 위한 필수 아이템 상한 두부를 얻는다.
 	# registerIncident_TalkWithOldRat
 	# registerIncident_pEnemy_OldCat1 
+	proc registerUnitsOldRatandGatekeeper {} {
+		set pNPC_OldRat				[ createEnemy 4 59 ]
+		EpUnitSetArnMesh			$pNPC_OldRat "PoolGModel"
+		EpUnitSetColor				$pNPC_OldRat 128 128 128
+		EpCharacterSetStat			$pNPC_OldRat 4 1 3 1 1 1
+		EpCharacterSetCurHp			$pNPC_OldRat -1
+		EpEnemySetTalkable			$pNPC_OldRat 1
+		EpUnitSetName				$pNPC_OldRat "An Old Rat..."
+		EpUnitSetNameVisible		$pNPC_OldRat 1
+
+		set	pEnemy_OldCat1			[ createEnemy 21 65 ]
+		EpUnitSetArnMesh			$pEnemy_OldCat1 "GwengYiModel"
+		EpUnitSetColor				$pEnemy_OldCat1 128 128 128
+		EpCharacterSetStat			$pEnemy_OldCat1 10 10 10 10 10 10
+		EpCharacterSetCurHp			$pEnemy_OldCat1 100
+		EpEnemySetTalkable			$pEnemy_OldCat1 1
+		EpUnitSetName				$pEnemy_OldCat1 "No.1 Gatekeeper"
+		EpUnitSetNameVisible		$pEnemy_OldCat1 1
+
+		set	pEnemy_OldCat10			[ createEnemy 21 70 ]
+		EpUnitSetArnMesh			$pEnemy_OldCat10 "GwengYiModel"
+		EpUnitSetColor				$pEnemy_OldCat10 128 128 128
+		EpCharacterSetStat			$pEnemy_OldCat10 10 10 10 10 10 10
+		EpCharacterSetCurHp			$pEnemy_OldCat10 100
+		EpEnemySetTalkable			$pEnemy_OldCat10 1
+		EpUnitSetName				$pEnemy_OldCat10 "No.10 Gatekeeper"
+		EpUnitSetNameVisible		$pEnemy_OldCat10 1
+
+		set	pEnemy_OldCat11			[ createEnemy 21 60 ]
+		EpUnitSetArnMesh			$pEnemy_OldCat11 "GwengYiModel"
+		EpEnemySetTalkable			$pEnemy_OldCat11 1
+		EpUnitSetName				$pEnemy_OldCat11 "No.11 Gatekeeper"
+		EpUnitSetNameVisible		$pEnemy_OldCat11 1
+	}
+
 	proc registerIncident_TalkWithOldRat {} {
 		variable pHeroUnit
 		global pNPC_OldRat pEnemy_OldCat10 pEnemy_OldCat11

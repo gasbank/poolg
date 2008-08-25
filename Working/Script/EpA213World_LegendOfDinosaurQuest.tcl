@@ -7,6 +7,22 @@ namespace eval EpA213World {
 	# Special Package"을 찾아오면 자신이 다시 쥐로 돌아수 있다고 주인공에게 부탁을 한다.
 	# 그리고 이 아이템은 A213 남서쪽 공간의 한 쥐(25, 45)가 가지고 있다.
 	# 주인공은 "Big Rigs..."를 가져오면서 다른 쥐들의 습격(12, 56)도 받는다.
+	proc registerUnitsLegendOfDinosaur {} {
+		set pNPC_GoodDinosaur		[ createEnemy 43 54 ]
+		EpUnitSetColor				$pNPC_GoodDinosaur 255 128 0
+		EpUnitSetArnMesh			$pNPC_GoodDinosaur "GwengYiModel"
+		EpEnemySetTalkable			$pNPC_GoodDinosaur 1
+		EpUnitSetName				$pNPC_GoodDinosaur "Gentle Dinosaur"
+		EpUnitSetNameVisible		$pNPC_GoodDinosaur 1
+
+		set pEnemy_EvilRat			[ createEnemy 25 45 ]
+		EpUnitSetColor				$pEnemy_EvilRat	255 0 0
+		EpUnitSetArnMesh			$pEnemy_EvilRat "PoolGModel"
+		EpEnemySetTalkable			$pEnemy_EvilRat 1
+		EpUnitSetName				$pEnemy_EvilRat "Evil Rat"
+		EpUnitSetNameVisible		$pEnemy_EvilRat	1
+	}
+
 	proc registerIncident_LegendOfDinosaur {} {
 		variable pHeroUnit
 		global	pNPC_GoodDinosaur pEnemy_EvilRat
@@ -21,12 +37,13 @@ namespace eval EpA213World {
 		set actionB1		[ EpCreateScriptAction "EpEnemySetTalkable $pEnemy_EvilRat 0" ]
 
 		set triggerC0		[ EpCreateUnitPositionTrigger $pHeroUnit 10 54 14 53 0x001 ]
-		set actionC1		[ EpCreateScriptAction "createEnemy 11 55" ]
-		set actionC2		[ EpCreateScriptAction "createEnemy 13 55" ]
-		set actionC3		[ EpCreateDialogAction "EpA213World::Dialog_LegendOfDinosaur_BigRigsAssault" ]
+		set actionC1		[ EpCreateDialogAction "EpA213World::Dialog_LegendOfDinosaur_BigRigsAssault" ]
+		set actionC2		[ EpCreateScriptAction "createEnemy 11 55" ]
+		set actionC3		[ EpCreateScriptAction "createEnemy 13 55" ]
 
 		set triggerD0		[ EpCreateUnitPositionWithTraceTrigger $pHeroUnit $pNPC_GoodDinosaur 0x001 ]
 		set actionD0		[ EpCreateDialogAction "EpA213World::Dialog_LegendOfDinosaur_GoodDinosaur1" ]
+		set actionD1		[ EpCreateScriptAction "EpUnitSetRemoveFlag $pNPC_GoodDInosaur 1" ]
 		# TODO: 착한 공룡이 사라지거나 쥐로 변하거나 해야 한다.
 
 		EpAddTriggerToSequence	$seqIncident $triggerA0

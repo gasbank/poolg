@@ -80,6 +80,19 @@ namespace eval EpThreadTest {
 						EpCharacterSetCurCs			[ EpGetHero ] 9999
 						EpCharacterSetMoveDuration	[ EpGetHero ] 0.01
 					}
+					skillCheat {
+						EpAddSkillToHero 0
+						EpAddSkillToHero 1
+						EpAddSkillToHero 2
+						EpAddSkillToHero 3
+						EpAddSkillToHero 4
+					}
+					skillUncheat {
+						EpDeleteSkillFromHero 1
+						EpDeleteSkillFromHero 2
+						EpDeleteSkillFromHero 3
+						EpDeleteSkillFromHero 4							
+					}
 					
 					default {
 						if [string length $data] {

@@ -41,6 +41,8 @@ namespace eval EpA213World::FinalBossQuest {
 		variable boss			[ createEnemy2 $bossPos ]
 		
 		EpUnitSetArnMesh		$boss			"ChimpModel"
+		EpEnemySetFightRange	$boss			10
+		EpEnemySetTalkable		$boss			1
 	}
 	
 	proc registerDialogs {} {
@@ -52,7 +54,8 @@ namespace eval EpA213World::FinalBossQuest {
 		set incident			[ EpCreateBlockingActionIncident 0 0 1 ]
 		
 		EpAddTriggerToIncident	$incident [ createPosTrigTileRegion	[ EpGetHero ]	$bossDialogPos		0x001	]
-		EpAddActionToIncident	$incident [ EpCreateDialogAction	"EpA213World::FinalBossQuest::bossDialog"		]
+		EpAddActionToIncident	$incident [ EpCreateDialogAction	"EpA213World::FinalBossQuest::bossDialog"	]
+		EpAddActionToIncident	$incident [ EpCreateScriptAction	"EpEnemySetTalkable $EpA213World::FinalBossQuest::boss 0" ]
 		
 		EpRegisterIncident $incident
 	}

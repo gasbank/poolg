@@ -35,7 +35,7 @@ namespace eval EpA213World {
 		variable pHeroUnit					[ getHero $startPos ]
 		
 		EpOutputDebugString " - [info level 0] called\n"
-		EpHeroSetEncounterEnemy				0
+		#EpHeroSetEncounterEnemy				0
 		
 		createEnemyDino { 81 70 }
 		createEnemyDino { 82 60 }

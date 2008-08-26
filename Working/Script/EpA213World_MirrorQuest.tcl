@@ -30,7 +30,7 @@ namespace eval EpA213World::MirrorQuest {
 	variable mirrorPos			{ 51 85 }			# 거울 초기 위치
 	variable mirrorTargetPos	{ 51 88 }			# 거울을 최종적으로 둬야할 위치
 	variable laserBoxPos		{ 81 91 }			# 레이저를 켤 수 있는 상자
-	variable laserBoxTargetPos	{ 81 88 }			# 레이저를 결 수 있는 상자를 둬야할 위치
+	variable laserBoxTargetPos	{ 80 88 }			# 레이저를 결 수 있는 상자를 둬야할 위치
 
 	variable mirror
 	variable laserBox
@@ -39,6 +39,8 @@ namespace eval EpA213World::MirrorQuest {
 		registerObjects
 		registerDialogs
 		registerIncidents
+		
+		setAnimEnvironment
 		
 		EpOutputDebugString " - MirrorQuest registered"
 	}
@@ -68,16 +70,26 @@ namespace eval EpA213World::MirrorQuest {
 		EpAddTriggerToIncident	$incident [ createPosTrigOneTile	$laserBox		$laserBoxTargetPos	0x101	]
 		EpAddActionToIncident	$incident [ EpCreateScriptAction	"EpA213World::MirrorQuest::doAnim"			]
 		EpAddActionToIncident	$incident [ EpCreateCameraAction	external BossWallEventCamera 0				]
-		EpAddActionToIncident	$incident [ EpCreateDelayAction		17000										]
+		EpAddActionToIncident	$incident [ EpCreateDelayAction		16000										]
 		EpAddActionToIncident	$incident [ EpCreateCameraAction	attach xxx 0								]
 		
 		EpRegisterIncident $incident
 	}
 	
+	proc setAnimEnvironment {} {
+		EpMeshSetVisible [ EpGetNode Laser1			] 0
+		EpMeshSetVisible [ EpGetNode Laser2			] 0
+		EpMeshSetVisible [ EpGetNode LaserConeDeco	] 0
+	}
 	proc doAnim {} {
+		EpMeshSetVisible [ EpGetNode Laser1			] 1
+		EpMeshSetVisible [ EpGetNode Laser2			] 1
+		EpMeshSetVisible [ EpGetNode LaserConeDeco	] 1
+		
 		EpSetDoAnim [ EpGetNode Laser1					]	1
 		EpSetDoAnim [ EpGetNode Laser2					]	1
 		EpSetDoAnim [ EpGetNode BossWall				]	1
+		EpSetDoAnim [ EpGetNode LaserConeDeco			]	1
 		EpSetDoAnim [ EpGetNode BossWallEventCamera		]	1
 	}
 	

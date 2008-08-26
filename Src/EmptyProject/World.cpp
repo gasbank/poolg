@@ -232,7 +232,9 @@ HRESULT World::frameMove(double fTime, float fElapsedTime)
 		//DebugBreak();
 	}
 
-	battleEventCheck();
+	if ( ((Hero*)getHeroUnit())->isEncounterEnemy() )
+		battleEventCheck();
+
 	wannaTalkingEventCheck();
 
 	// Incidents update
@@ -347,6 +349,10 @@ HRESULT World::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 
 			if ( m_curDialog )
 				proceedCurDialog();
+		}
+		if (wParam == VK_END)
+		{
+			forceCloseCurDialog();
 		}
 	}
 
@@ -615,12 +621,15 @@ void World::proceedCurDialog()
 		{
 			m_curDialog->setRemoveFlag( true );
 			m_curDialog = 0;
-			/*m_scriptedDialog.remove( m_curDialog );
-			EP_SAFE_RELEASE( m_curDialog );*/
 		}
 		else if ( !m_curDialog->isTalking() )
 			m_curDialog = 0;
 	}
+}
+void World::forceCloseCurDialog()
+{
+	while ( m_curDialog )
+		proceedCurDialog();
 }
 
 Dialog* World::getDialogByName( const char* dialogName )
@@ -817,6 +826,7 @@ VOID World::enter()
 	GetEpLight().setBrightness( 0.0f );
 	//GetEpLight().fadeInLightForcedDelayed( 2.0f );
 }
+
 
 //////////////////////////////////////////////////////////////////////////
 

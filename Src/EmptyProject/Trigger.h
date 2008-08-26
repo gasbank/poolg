@@ -19,7 +19,7 @@ public:
 	Trigger();
 	virtual ~Trigger(void);
 
-	virtual bool check() = 0;
+	virtual bool check() const = 0;
 	virtual void release() {}
 
 	virtual void printDebugInfo() const { printf( "Debug Info not implemented on Trigger class\n" ); }
@@ -34,13 +34,13 @@ public:
 	UnitPositionTrigger( Unit* unit, TileRegion* region, UnitPositionTriggerType type );
 	virtual ~UnitPositionTrigger();
 
-	virtual bool check();
+	virtual bool check() const;
 	virtual void printDebugInfo() const;
 
 private:
 	Unit* m_unit;
 	TileRegion* m_region;
-	bool m_lastCheckResult;
+	mutable bool m_lastCheckResult;
 	UnitPositionTriggerType m_type;
 };
 
@@ -52,7 +52,7 @@ public:
 	CharHpTrigger( Character* unit, int min, int max, bool bInclude = true );
 	virtual ~CharHpTrigger() {}
 
-	virtual bool check();
+	virtual bool check() const;
 
 private:
 	Character* m_char;
@@ -68,7 +68,7 @@ class TotalAnnihilationTrigger : public Trigger
 public:
 	TotalAnnihilationTrigger( World* );
 	virtual ~TotalAnnihilationTrigger();
-	virtual bool check();
+	virtual bool check() const;
 
 private:
 	UnitSet* m_pUs;
@@ -81,7 +81,7 @@ class UnTotalAnnihilationTrigger : public Trigger
 public:
 	UnTotalAnnihilationTrigger( World* );
 	virtual ~UnTotalAnnihilationTrigger();
-	virtual bool check();
+	virtual bool check() const;
 
 private:
 	UnitSet* m_pUs;
@@ -94,7 +94,7 @@ class IncidentTrigger : public Trigger
 public:
 	IncidentTrigger( Incident* incident );
 	virtual ~IncidentTrigger();
-	virtual bool check();
+	virtual bool check() const;
 
 private:
 	Incident* m_incident;
@@ -108,14 +108,12 @@ public:
 	UnitPositionWithTraceTrigger( Unit* unitA, Unit* unitB, UnitPositionTriggerType type );
 	virtual ~UnitPositionWithTraceTrigger() {}
 
-	virtual bool check();
-	void reload();
+	virtual bool check() const;
 
 private:
 	Unit* m_unitA;
 	Unit* m_unitB;
-	TileRegion m_region;
-	bool m_lastCheckResult;
+	mutable bool m_lastCheckResult;
 	UnitPositionTriggerType m_type;
 };
 
@@ -127,7 +125,7 @@ public:
 	ReverseTrigger( Trigger* trigger );
 	virtual ~ReverseTrigger() {}
 
-	virtual bool check();
+	virtual bool check() const;
 
 private:
 	Trigger* m_trigger;
@@ -143,7 +141,7 @@ public:
 	ScreenTrigger( ScreenState ss );
 	virtual ~ScreenTrigger() {}
 
-	virtual bool check();
+	virtual bool check() const;
 
 private:
 	ScreenState m_ss;
@@ -156,7 +154,7 @@ class NullTrigger : public Trigger
 public:
 	NullTrigger() {}
 	virtual ~NullTrigger() {}
-	virtual bool check() { return true; }
+	virtual bool check() const { return true; }
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -167,7 +165,7 @@ public:
 	RemoveFlagTrigger( Character* unit );
 	virtual ~RemoveFlagTrigger() {}
 
-	virtual bool check();
+	virtual bool check() const;
 
 private:
 	Character* m_char;

@@ -87,6 +87,7 @@ private:
 	void				handleCollision( Unit* heroUnit, Unit* opponentUnit );
 	void				startTileDefinedDialogIfExist();
 	void				proceedCurDialog();
+	void				forceCloseCurDialog();
 	void				loadWorldModel();
 	void				battleEventCheck();
 	void				wannaTalkingEventCheck();

@@ -29,7 +29,7 @@ UnitPositionTrigger::UnitPositionTrigger( Unit* unit, TileRegion* region, UnitPo
 }
 
 
-bool UnitPositionTrigger::check()
+bool UnitPositionTrigger::check() const
 {
 	bool checkResult = m_region->isExist( m_unit->getTilePos() );
 	bool retValue = false;
@@ -60,6 +60,7 @@ void UnitPositionTrigger::printDebugInfo() const
 	m_unit->printDebugInfo();
 	printf( "lastcheck=%d trigType=0x%x region=", m_lastCheckResult, m_type ); Utility::printValue( *m_region );
 	printf( "\n" );
+	printf( "check() result: %s\n", check()?"true":"false" );
 }
 
 UnitPositionTrigger::~UnitPositionTrigger()
@@ -88,7 +89,7 @@ CharHpTrigger::CharHpTrigger( Character* c, int min, int max, bool bInclude /*= 
 {
 }
 
-bool CharHpTrigger::check()
+bool CharHpTrigger::check() const
 {
 	if ( m_bInclude && m_char->getCurHp() >= m_min && m_char->getCurHp() <= m_max )
 	{
@@ -123,7 +124,7 @@ TotalAnnihilationTrigger::~TotalAnnihilationTrigger()
 
 }
 
-bool TotalAnnihilationTrigger::check()
+bool TotalAnnihilationTrigger::check() const
 {
 	int i = 0;
 	// 말을 못하는 Enemy, 즉 죽일 수 있는 적이 남은 경우 TotalAnnihilation 실패로 간주.
@@ -154,7 +155,7 @@ UnTotalAnnihilationTrigger::~UnTotalAnnihilationTrigger()
 
 }
 
-bool UnTotalAnnihilationTrigger::check()
+bool UnTotalAnnihilationTrigger::check() const
 {
 	int i = 0;
 	// 말을 못하는 Enemy, 즉 죽일 수 있는 적이 남은 경우 TotalAnnihilation 실패로 간주.
@@ -184,7 +185,7 @@ IncidentTrigger::~IncidentTrigger()
 {
 }
 
-bool IncidentTrigger::check()
+bool IncidentTrigger::check() const
 {
 	if ( m_incident->getLeastOnetime() )
 		return true;
@@ -204,16 +205,23 @@ UnitPositionWithTraceTrigger::UnitPositionWithTraceTrigger( Unit* unitA, Unit* u
 	m_unitA		= unitA;
 	m_unitB		= unitB;
 	m_type		= type;
-
-	reload();
 }
 
 
-bool UnitPositionWithTraceTrigger::check()
+bool UnitPositionWithTraceTrigger::check() const
 {
-	reload();
+	TileRegion region;
+	Point2Uint start, end;
 
-	bool checkResult = m_region.isExist( m_unitA->getTilePos() );
+	start.x = m_unitB->getTilePos().x - 1;
+	start.y = m_unitB->getTilePos().y - 1;
+	end.x = m_unitB->getTilePos().x + 1;
+	end.y = m_unitB->getTilePos().y + 1;
+
+	region.setStart( start );
+	region.setEnd( end );
+
+	bool checkResult = region.isExist( m_unitA->getTilePos() );
 	bool retValue = false;
 
 	if ( m_type & UPTT_ENTER )
@@ -236,19 +244,6 @@ bool UnitPositionWithTraceTrigger::check()
 	return retValue;
 }
 
-void UnitPositionWithTraceTrigger::reload()
-{
-	Point2Uint start, end;
-	
-	start.x = m_unitB->getTilePos().x - 1;
-	start.y = m_unitB->getTilePos().y - 1;
-	end.x = m_unitB->getTilePos().x + 1;
-	end.y = m_unitB->getTilePos().y + 1;
-	
-	m_region.setStart( start );
-	m_region.setEnd( end );
-}
-
 Trigger* EpCreateUnitPositionWithTraceTrigger( void* unitA, void* unitB, int type )
 {
 	Unit* uA = reinterpret_cast<Character*>( unitA );
@@ -265,7 +260,7 @@ ReverseTrigger::ReverseTrigger( Trigger* trigger )
 {
 }
 
-bool ReverseTrigger::check()
+bool ReverseTrigger::check() const
 {
 	return !m_trigger->check();
 }
@@ -282,7 +277,7 @@ ScreenTrigger::ScreenTrigger( ScreenState ss )
 	m_ss = ss;
 }
 
-bool ScreenTrigger::check()
+bool ScreenTrigger::check() const
 {
 	switch ( m_ss )
 	{
@@ -314,7 +309,7 @@ RemoveFlagTrigger::RemoveFlagTrigger( Character* unit )
 {
 }
 
-bool RemoveFlagTrigger::check()
+bool RemoveFlagTrigger::check() const
 {
 	return m_char->getRemoveFlag();
 }

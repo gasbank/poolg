@@ -1,204 +1,84 @@
-namespace eval EpA213World {
+#
+# EpA213World_MirrorQuest.tcl
+#
+# 목표:
+# 보스 방문을 열어라.
+#
+# NPC:
+# 없음
+#
+# 오브젝트:
+# 밀 수 있는 거울 1개, 밀 수 있는 상자 1개
+#
+# 개요:
+# 보스가 있는 방의 문을 열기 위해서는 레이저와 상자의 조작이 필요하다.
+# 레이저는 레이저를 켜는 스위치 위에다가 상자를 올려 놓으면 된다.
+# 레이저가 발사되는 것만으로는 보스 방문이 열리지 않는다.
+# 거울을 제 위치로 옮겨 두어야 레이저가 거울에 의해 반사되어 적절히
+# 보스 방문까지 도달하게 된다.
+#
+# 성과물:
+# 없음
+#
 
+proc createPosTrigOneTile { unit tilePos { flags 0x001 } } {
+	return [ EpCreateUnitPositionTrigger $unit [lindex $tilePos 0] [lindex $tilePos 1] -1 -1 $flags ]
+}
 
-	proc registerMirrorQuest {} {
+namespace eval EpA213World::MirrorQuest {
 
+	variable mirrorPos			{ 51 85 }			# 거울 초기 위치
+	variable mirrorTargetPos	{ 51 88 }			# 거울을 최종적으로 둬야할 위치
+	variable laserBoxPos		{ 81 91 }			# 레이저를 켤 수 있는 상자
+	variable laserBoxTargetPos	{ 81 88 }			# 레이저를 결 수 있는 상자를 둬야할 위치
 
-		set Mirror				[createStructureObject 6 60];
-		EpUnitSetArnMesh			$Mirror "PushableMirror"
+	variable mirror
+	variable laserBox
+
+	proc register {} {
+		registerObjects
+		registerDialogs
+		registerIncidents
+		
+		EpOutputDebugString " - MirrorQuest registered"
 	}
 	
-	
-	
-	proc registerIncidentOpen {} {
-		variable world
-		variable Box
-		variable Mirror
-
-		set triggers		[ EpCreateUnitPositionTrigger $Box 9 70 -1 -1 0x100 ]
-		lappend triggers	[ EpCreateUnitPositionTrigger $Mirror 9 60 -1 -1 0x001 ]
-
-		set actions		[ EpCreateScriptAction			"EpSetDoAnim [ EpGetNode Laser1  ] 1" ]
-		lappend actions		[ EpCreateScriptAction			"EpSetDoAnim [ EpGetNode Laser2  ] 1" ]
-		lappend actions		[ EpCreateScriptAction			"EpSetDoAnim [ EpGetNode BossWall  ] 1" ]
-		lappend actions		[ EpCreateScriptAction			"EpSetDoAnim [ EpGetNode BossWallEventCamera ] 1" ]
-		lappend actions		[ EpCreateCameraAction			external BossWallEventCamera 0 ]
-		lappend actions		[ EpCreateDelayAction			17000 ]
-		lappend actions		[ EpCreateCameraAction			attach BossWallEventCamera 1500 ]
-		lappend actions		[ EpCreateDialogAction "EpA213World::openDialog" ]
-		
-		set incident	[ EpCreateBlockingActionIncident 0 0 1 ]
-
-		foreach trig $triggers {
-			EpAddTriggerToIncident $incident $trig
-		}
-
-		foreach act $actions {
-			EpAddActionToIncident $incident $act
-		}
-
-		EpIncidentSetName	$incident "Open incident"
-		
-		set incCount	[ EpRegisterIncident $incident ]
-		EpOutputDebugString " - Incident count: $incCount\n"
-	}
-
-	proc registerIncidentOpen2 {} {
-		variable world
-		variable Box
-		variable Mirror
-
-		set triggers		[ EpCreateUnitPositionTrigger $Box 9 70 -1 -1 0x001 ]
-		lappend triggers		[ EpCreateUnitPositionTrigger $Mirror 9 60 -1 -1 0x100 ]
-		
-		set actions		[ EpCreateScriptAction			"EpSetDoAnim [ EpGetNode LaserConeDeco  ] 1" ]
-		lappend actions		[ EpCreateScriptAction			"EpSetDoAnim [ EpGetNode Laser1  ] 1" ]
-		lappend actions		[ EpCreateScriptAction			"EpSetDoAnim [ EpGetNode Laser2  ] 1" ]
-		lappend actions		[ EpCreateScriptAction			"EpSetDoAnim [ EpGetNode BossWall  ] 1" ]
-		lappend actions		[ EpCreateScriptAction			"EpSetDoAnim [ EpGetNode BossWallEventCamera ] 1" ]
-		lappend actions		[ EpCreateCameraAction			external BossWallEventCamera 0 ]
-		lappend actions		[ EpCreateDelayAction			17000 ]
-		lappend actions		[ EpCreateCameraAction			attach BossWallEventCamera 1500 ]
-		lappend actions		[ EpCreateDialogAction "EpA213World::openDialog" ]
-
-		set incident	[ EpCreateBlockingActionIncident 0 0 1 ]
-
-		foreach trig $triggers {
-			EpAddTriggerToIncident $incident $trig
-		}
-
-		foreach act $actions {
-			EpAddActionToIncident $incident $act
-		}
-
-		EpIncidentSetName	$incident "Open2 incident"
-		
-		set incCount	[ EpRegisterIncident $incident ]
-		EpOutputDebugString " - Incident count: $incCount\n"
-	}
-		
-	proc Incident_GateOpen_NewMethod {} {
-			variable pHeroUnit
-			set animObjectNames [ list Blocking1 Blocking2 Blocking3 GateRight GateLeft GateCamera ]
-			set animObjects [ list ]
-			foreach objName $animObjectNames {
-				lappend xformables [ EpGetNode $objName ]
-			}
-			
-			set trigger			[ EpCreateUnitPositionTrigger	$pHeroUnit 23 75 21 57 0x001 ]
-			set actions			[ EpCreateControllableAction	$pHeroUnit 0 ]
-			lappend actions		[ EpCreateCameraAction			external GateCamera 0 ]
-			lappend actions		[ EpCreateStartAnimationAction	$animObjects ]
-			lappend actions		[ EpCreateCameraAction			attach GateCamera 1500 ]
-			lappend actions		[ EpCreateControllableAction	$pHeroUnit 1 ]
-			
-			set incident		[ EpCreateBlockingActionIncident $trigger 0 1 ]
-			foreach act $actions {
-				EpAddActionToIncident $incident $act
-			}
-	
-			set incCount	[ EpRegisterIncident $incident ]
-			EpOutputDebugString " - Incident count: $incCount\n"
+	proc registerObjects {} {
+		variable mirrorPos
+		variable laserBoxPos
+		variable mirror			[ createStructureObject2		$mirrorPos		]
+		variable laserBox		[ createStructureObject2		$laserBoxPos	]
+				
+		EpUnitSetArnMesh		$mirror			"PushableMirror"
+		EpUnitSetArnMesh		$laserBox		"PushableBox"
 	}
 	
-	proc Incident_BossGateOpen {} {
-		variable pHeroUnit
-		set animObjects [ list Blocking1 Blocking2 Blocking3 GateRight GateLeft GateCamera ]
-		
-		set trigger			[ EpCreateUnitPositionTrigger	$pHeroUnit 42 57 42 71 0x001 ]
-		set actions			[ list ]
-		lappend actions		[ EpCreateScriptAction			"EpSetDoAnim [ EpGetNode LaserConeDeco  ] 1" ]
-		lappend actions		[ EpCreateScriptAction			"EpSetDoAnim [ EpGetNode Laser1  ] 1" ]
-		lappend actions		[ EpCreateScriptAction			"EpSetDoAnim [ EpGetNode Laser2  ] 1" ]
-		lappend actions		[ EpCreateScriptAction			"EpSetDoAnim [ EpGetNode BossWall  ] 1" ]
-		lappend actions		[ EpCreateScriptAction			"EpSetDoAnim [ EpGetNode BossWallEventCamera ] 1" ]
-		lappend actions		[ EpCreateCameraAction			external BossWallEventCamera 0 ]
-		lappend actions		[ EpCreateDelayAction			17000 ]
-		lappend actions		[ EpCreateCameraAction			attach BossWallEventCamera 1500 ]
-		set incident		[ EpCreateBlockingActionIncident $trigger 0 1 ]
-		foreach act $actions {
-			EpAddActionToIncident $incident $act
-		}
-
-		set incCount	[ EpRegisterIncident $incident ]
-		EpOutputDebugString " - Incident count: $incCount\n"
-	}
-
-	proc registerIncidentBox {} {
-		variable world
-		variable Box
-		variable Mirror
-		
-		set triggers		[ EpCreateUnitPositionTrigger $Box 9 70 -1 -1 0x001 ]
-		set trigger	[ EpCreateUnitPositionTrigger $Mirror 9 60 -1 -1 0x100 ]
-		lappend triggers	[ EpCreateReverseTrigger $trigger ]
-		
-		set actions		[ EpCreateScriptAction			"EpSetDoAnim [ EpGetNode LaserConeDeco  ] 1" ]
-		lappend actions		[ EpCreateScriptAction			"EpSetDoAnim [ EpGetNode Laser1  ] 1" ]
-		lappend actions		[ EpCreateScriptAction			"EpSetDoAnim [ EpGetNode BossWallEventCamera ] 1" ]
-		lappend actions		[ EpCreateCameraAction			external BossWallEventCamera 0 ]
-		lappend actions		[ EpCreateDelayAction			10000 ]
-		lappend actions		[ EpCreateCameraAction			attach BossWallEventCamera 1500 ]
-		lappend actions		[ EpCreateDialogAction "EpA213World::laserDialog" ]
-
-		set incident	[ EpCreateBlockingActionIncident 0 0 -1 ]
-
-		foreach trig $triggers {
-			EpAddTriggerToIncident $incident $trig
-		}
-
-		foreach act $actions {
-			EpAddActionToIncident $incident $act
-		}
-
-		EpIncidentSetName	$incident "Box incident"
-		
-		set incCount	[ EpRegisterIncident $incident ]
-		EpOutputDebugString " - Incident count: $incCount\n"
-	}
-
-	proc registerIncidentMirror {} {
-		variable world
-		variable Box
-		variable Mirror
-		
-		set trigger		[ EpCreateUnitPositionTrigger $Mirror 9 60 -1 -1 0x001 ]
-		set actions		[ EpCreateFadeAction out 3500 ]
-		lappend actions		[ EpCreateFadeAction in 3000 ]
-		set incident	[ EpCreateBlockingActionIncident $trigger 0 -1 ]
-
-		foreach act $actions {
-			EpAddActionToIncident $incident $act
-		}
-
-		EpIncidentSetName	$incident "Mirror incident"
-		
-		set incCount	[ EpRegisterIncident $incident ]
-		EpOutputDebugString " - Incident count: $incCount\n"
+	proc registerDialogs {} {	
 	}
 	
-	#######################################################################################################
-	
-	
-	namespace eval laserDialog {	
-		set region [ list 0 0 0 0 ]; ;# left, top, right, bottom
-		set oneTime 0;
-	
-		set player "SYSTEM"
-	
-		set dialog [ list\
-			$player		"레이져가 나오고 있다."\
-		];
+	proc registerIncidents {} {
+		variable mirrorTargetPos
+		variable laserBoxTargetPos
+		variable mirror
+		variable laserBox
+		
+		set incident			[ EpCreateBlockingActionIncident 0 0 1 ]
+		
+		EpAddTriggerToIncident	$incident [ createPosTrigOneTile	$mirror			$mirrorTargetPos	0x101	]
+		EpAddTriggerToIncident	$incident [ createPosTrigOneTile	$laserBox		$laserBoxTargetPos	0x101	]
+		EpAddActionToIncident	$incident [ EpCreateScriptAction	"EpA213World::MirrorQuest::doAnim"			]
+		EpAddActionToIncident	$incident [ EpCreateCameraAction	external BossWallEventCamera 0				]
+		EpAddActionToIncident	$incident [ EpCreateDelayAction		17000										]
+		EpAddActionToIncident	$incident [ EpCreateCameraAction	attach xxx 0								]
+		
+		EpRegisterIncident $incident
 	}
-
-	namespace eval openDialog {	
-		set region [ list 0 0 0 0 ]; ;# left, top, right, bottom
-		set oneTime 0;
 	
-		set player "SYSTEM"
-	
-		set dialog [ list\
-			$player		"레이져가 문을 부셔버렸다!"\
-		];
+	proc doAnim {} {
+		EpSetDoAnim [ EpGetNode Laser1					]	1
+		EpSetDoAnim [ EpGetNode Laser2					]	1
+		EpSetDoAnim [ EpGetNode BossWall				]	1
+		EpSetDoAnim [ EpGetNode BossWallEventCamera		]	1
 	}
+	
 }

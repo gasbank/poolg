@@ -83,6 +83,9 @@ bool ScriptManager::readRect( const char* variableName, TileRegion& rect )
 	int retObjLength;
 
 	retObj = Tcl_GetVar2Ex( m_interp, variableName, 0, 0 );
+	if ( !retObj )
+		throw std::runtime_error( "Requested variable not found on script side" );
+
 	Tcl_ListObjLength( m_interp, retObj, &retObjLength );
 	assert(retObjLength == 4);
 	long x0, y0, x1, y1;

@@ -16,6 +16,7 @@ Hero::Hero(void)
 	m_maxExp = 6;
 	m_expGap = 3;
 	m_level = 1;
+	m_bEncounterEnemy = true;
 }
 
 Hero::~Hero(void)
@@ -142,9 +143,17 @@ int EpDeleteSkillFromHero( int skillNo )
 	return 0;
 } SCRIPT_CALLABLE_I_I( EpDeleteSkillFromHero )
 
+int EpHeroSetEncounterEnemy( int b )
+{
+	Hero* hero = (Hero*)GetWorldManager().getCurWorld()->getHeroUnit();
+	hero->setEncounterEnemy( b?true:false );
+	return 0;
+} SCRIPT_CALLABLE_I_I( EpHeroSetEncounterEnemy )
+
 
 START_SCRIPT_FACTORY(Hero)
 	CREATE_OBJ_COMMAND( EpCreateHero )
 	CREATE_OBJ_COMMAND( EpAddSkillToHero )
 	CREATE_OBJ_COMMAND( EpDeleteSkillFromHero )
+	CREATE_OBJ_COMMAND( EpHeroSetEncounterEnemy )
 END_SCRIPT_FACTORY(Hero)

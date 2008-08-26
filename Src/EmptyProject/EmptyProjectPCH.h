@@ -1,17 +1,31 @@
+#if defined(WIN32)
+	#if (_MSC_VER < 1500) // Lower than VC9.0 (2008)
+		#error "Visual Studio 2008 is minimum requirement of compilation of this project!"
+	#endif
+#else
+	#error "WIN32 environment is minimum requirement of compilation of this project!"
+#endif
+
+
 #pragma warning(disable:4201)
 #pragma warning(disable:4100)
 #pragma warning(disable:4505) // disable 'unreferenced local function has been removed' warning
 #pragma warning(disable:4189) // disable 'local variable is initialized but not referenced' warning
-#include "AranPCH.h"
+
 #include <tchar.h>
-#include <set>
-#include "DXUT.h"
-#include <xact3.h>
-#include "DXUTcamera.h"
-#include "G.h"
-#include "tcl.h"
 #include <string>
 #include <assert.h>
+#include <time.h>
+#include <set>
+
+#include "DXUT.h"
+#include "AranPCH.h"
+#include <xact3.h>
+#include "DXUTcamera.h"
+#include "tcl.h"
+
+#include "G.h"
+
 
 #ifndef EP_SAFE_RELEASE
 #define EP_SAFE_RELEASE(p)      { if (p) { (p)->release(); SAFE_DELETE(p); } }
@@ -33,6 +47,8 @@
 #define new DEBUG_NEW
 #endif
 #endif
+
+//////////////////////////////////////////////////////////////////////////
 
 #define KEY_WAS_DOWN_MASK 0x80
 #define KEY_IS_DOWN_MASK  0x01

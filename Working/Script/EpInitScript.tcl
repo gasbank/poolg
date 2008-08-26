@@ -5,7 +5,7 @@
 #----------------------------------------------------------------------------------#
 
 variable EpStartTopStateName		PlayState
-set EpStartWorldName				EpRoomWorld
+set EpStartWorldName				EpA213World
 set EpWorldList						[ list EpCeilingWorld EpRoomWorld EpA213World EpTestStage ]
 
 proc EpInitApp {} {
@@ -37,7 +37,9 @@ proc getHero { tilePos } {
 	if { $hasHero == 1 } {
 		set	unit [ EpGetHero ]
 	} else {
+		# Hero is created only once
 		set unit [ EpCreateHero $tilePos ];
+		EpCharacterSetMoveDuration	$unit	0.05
 		EpRegisterToWorld $curWorld $unit
 	}
 	EpCharacterSetTilePos $unit $tilePos
@@ -91,7 +93,7 @@ proc createStructureObject2 { tilePos { pushable 1 } } {
 
 proc EpRegisterInitFadeInIncident {} {
 	set trigger		[ EpCreateNullTrigger ]
-	set action		[ EpCreateFadeAction "in" 1500 ]
+	set action		[ EpCreateFadeAction "in" 250 ]
 	set incident	[ EpCreateNonblockingActionIncident $trigger $action 1 ]
 
 	EpIncidentSetName	$incident "init fade incident"

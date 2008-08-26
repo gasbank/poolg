@@ -7,8 +7,9 @@
 //
 //--------------------------------------------------------------------------------------
 #include "EmptyProjectPCH.h"
-#include <time.h>
+#include "EmptyProject.h"
 #include "resource.h"
+
 #include "BattleState.h"
 #include "IntroState.h"
 #include "EpCamera.h"
@@ -728,9 +729,11 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 	// TODO: Perform any application-level cleanup here
 	g_closeConsole = 1;
 
+#if defined(DEBUG) && defined(EP_CONSOLE)
 	g_consoleReleasedEvent = CreateEvent( NULL , TRUE , FALSE , NULL );  
 	ResetEvent( g_consoleReleasedEvent ); 
 	WaitForSingleObject( g_consoleReleasedEvent, INFINITE );
+#endif
 
 	EP_SAFE_RELEASE( g_scriptManager );
 	Tcl_Finalize();

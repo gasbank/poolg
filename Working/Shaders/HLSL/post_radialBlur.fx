@@ -62,7 +62,7 @@ int ParamID = 0x0003;		/* Used by Max to select the correct parser */
 /*** EFFECT-SPECIFIC CODE BEGINS HERE ****************************/
 /*****************************************************************/
 
-#define NSAMPLES 16
+#define NSAMPLES 6
 
 // shared-surface access supported in Cg version
 

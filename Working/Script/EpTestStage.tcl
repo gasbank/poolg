@@ -24,9 +24,17 @@ namespace eval EpTestStage {
 		EpCharacterSetMoveDuration		$pHeroUnit [expr 0.05]
 		EpUnitSetColor					$pHeroUnit 255 128 255
 		
-		set testEnemy					[createEnemy 43 85 1];
+		set testEnemy					[createEnemy 48 86 1];
 		
 		EpCharacterSetStat				$testEnemy 8 1 9999 1 1 1
+		EpCharacterSetCurHp				$testEnemy -1
+		EpEnemySetRandomWalkable		$testEnemy 1
+		EpUnitSetArnMesh				$testEnemy "DinoModel"
+		
+		
+		set testEnemy					[createEnemy 43 86 1];
+		
+		EpCharacterSetStat				$testEnemy 8 1 4 1 1 1
 		EpCharacterSetCurHp				$testEnemy -1
 		EpEnemySetRandomWalkable		$testEnemy 1
 		

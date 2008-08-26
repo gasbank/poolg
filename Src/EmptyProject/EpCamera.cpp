@@ -5,7 +5,9 @@
 #include "WorldManager.h"
 #include "World.h"
 #include "ArnNode.h"
+#include "ShaderWrapper.h"
 
+extern PostRadialBlurShader*			g_postRadialBlurShader;
 
 EpCamera::EpCamera(void)
 {
@@ -208,6 +210,12 @@ void EpCamera::updateSmoothCamera( float fElapsedTime )
 		m_fSmoothCameraTimer += fElapsedTime;
 
 		m_bViewParamsDirty = true;
+
+		const float blurWidth = 0.1f;
+		if ( s < 0.5f )
+			g_postRadialBlurShader->setBlurWidth( (s * 2) * blurWidth );
+		else
+			g_postRadialBlurShader->setBlurWidth( (2.0f + (-s * 2)) * blurWidth );
 	} 
 	else if ( m_bUpdateContinue )
 	{
@@ -218,6 +226,8 @@ void EpCamera::updateSmoothCamera( float fElapsedTime )
 
 		m_bUpdateContinue = false;
 		m_bViewParamsDirty = true;
+
+		g_postRadialBlurShader->setBlurWidth( 0 );
 	}
 }
 

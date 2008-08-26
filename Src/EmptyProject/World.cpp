@@ -692,6 +692,7 @@ void World::battleEventCheck()
 					
 					// No more move!
 					getHeroUnit()->clearKey();
+					oppCharacter->clearKey();
 					getHeroUnit()->setControllable( false );
 
 					// view each other

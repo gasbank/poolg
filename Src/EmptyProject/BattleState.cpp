@@ -674,10 +674,10 @@ HRESULT BattleState::release ()
 void BattleState::renderFixedText(int scrWidth, int scrHeight)
 {
 	// Print battle log
-	const UINT maxDrawLogCount = 7;
+	const UINT maxDrawLogCount = 4;	// This is the number of lines of the battle log.
 	const UINT lineHeight = 15;
 	RECT rc;
-	rc.top		= 110;
+	rc.top		= 55;	// This is the height of the bottom line of the battle log.
 	rc.left		= 25;
 	rc.right	= scrWidth;
 	rc.bottom	= scrHeight;

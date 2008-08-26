@@ -1,4 +1,5 @@
 source "Script/EpA213World_MirrorQuest.tcl"
+source "Script/EpA213World_FinalBossQuest.tcl"
 source "Script/EpA213World_LegendOfDinosaurQuest.tcl"
 source "Script/EpA213World_OldRatandGatekeeperQuest.tcl"
 
@@ -7,10 +8,10 @@ namespace eval EpA213World {
 	variable modelFilePath					"A213World.arn"
 	variable gatePos						{ 14 66 }
 	variable ratholPos						{ 12 50 }
-	variable bossPos						{ 75 124 }
-	variable bossBattleStartPos				{ 69 124 }
+	
+	variable bossBattleStartPos				{ 53 126 }
 	variable mirrorQuestStartPos			{ 51 80 }
-	variable startPos						$mirrorQuestStartPos
+	variable startPos						$bossBattleStartPos
 	variable dialogNameList					[ list	oldRatDialog\
 													oldCat1Dialog oldCat10Dialog\
 													goodDinosaurDialog0 goodDinosaurDialog1\
@@ -48,10 +49,6 @@ namespace eval EpA213World {
 		createEnemyDino { 81 103 }
 		
 		
-		set pFinalBoss		 			[ createEnemy2 $bossPos ];
-		EpUnitSetArnMesh				$pFinalBoss "ChimpModel"
-		
-
 
 
 		# Units	----------------------------------------------------------------
@@ -69,6 +66,7 @@ namespace eval EpA213World {
 		registerIncident_LegendOfDinosaur
 		
 		MirrorQuest::register
+		FinalBossQuest::register
 		
 		EpRegisterInitFadeInIncident
 	}

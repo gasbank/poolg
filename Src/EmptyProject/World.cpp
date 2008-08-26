@@ -640,7 +640,13 @@ Dialog* World::getDialogByName( const char* dialogName )
 		if ( (*it)->getDialogName() == dialogName )
 			return (*it);
 	}
-	throw std::runtime_error( "Requested dialog is not found on dialog list of this world" );
+
+	// Dialog not found!
+	OutputDebugString( _T( "Requested dialog is not found on World. Trying to generate and register new one..." ) );
+	Dialog* newDlg = Dialog::createDialogByScript( dialogName );
+	newDlg->init();
+	addDialog( newDlg );
+	return getDialogByName( dialogName );
 }
 
 UINT World::addIncident( Incident* inc )

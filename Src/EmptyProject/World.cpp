@@ -692,14 +692,15 @@ void World::battleEventCheck()
 	{
 		if ( (*it) != getHeroUnit() )
 		{
-			Enemy* oppCharacter = dynamic_cast<Enemy*>( *it );
-			if ( oppCharacter != NULL && oppCharacter->isTalkable() == false && !oppCharacter->getRemoveFlag() )
+			Enemy* oppCharacter = static_cast<Enemy*>( *it );
+			assert( oppCharacter );
+			if ( oppCharacter->getType() == UT_ENEMY && oppCharacter->isTalkable() == false && !oppCharacter->getRemoveFlag() )
 			{
-				if ( isInEventArea( getHeroUnit() , oppCharacter ) == true)
+				if ( isInEventArea( getHeroUnit(), oppCharacter ) == true)
 				{
 					//////////////////////////////////////////////////////////////////////////
 					// Check whether there is obstacle between hero and enemy.
-					// Shoot ray from hero to enemy, and if distance to the third instersected
+					// Shoot ray from hero to enemy, and if distance to the third intersected
 					// mesh is shorter than distance between hero and enemy, then there exists
 					// at least one obstacle.
 					D3DXVECTOR3 vStartPos( getHero()->getPos() );

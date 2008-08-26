@@ -70,7 +70,11 @@ LPDIRECT3DSURFACE9				g_pFullScreenRenderTargetSurf	= 0;
 LPDIRECT3DTEXTURE9				g_sepiaRenderTarget				= 0;
 LPDIRECT3DSURFACE9				g_sepiaRenderTargetSurf			= 0;
 
+LPDIRECT3DTEXTURE9				g_radialBlurRenderTarget		= 0;
+LPDIRECT3DSURFACE9				g_radialBlurRenderTargetSurf	= 0;
+
 PostSepiaShader*				g_postSepiaShader				= 0;
+PostRadialBlurShader*			g_postRadialBlurShader			= 0;
 
 void SetupFullscreenQuad( const D3DSURFACE_DESC* pBackBufferSurfaceDesc );
 
@@ -193,6 +197,10 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 	g_postSepiaShader->initEffect( pd3dDevice, L"Shaders/HLSL/post_sepia.fx" );
 	g_postSepiaShader->initMainTechnique();
 
+	g_postRadialBlurShader = new PostRadialBlurShader();
+	g_postRadialBlurShader->initEffect( pd3dDevice, L"Shaders/HLSL/post_radialBlur.fx" );
+	g_postRadialBlurShader->initMainTechnique();
+
 	//g_alphaShader = new AlphaShader();
 	//g_alphaShader->initShader( pd3dDevice, L"Shaders/Alpha.vsh" );
 	//g_alphaShader->compileShader( "Alpha", "vs_2_0" );
@@ -287,6 +295,8 @@ HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFA
 		g_bombShader->onResetDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
 	if ( g_postSepiaShader )
 		g_postSepiaShader->onResetDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
+	if ( g_postRadialBlurShader )
+		g_postRadialBlurShader->onResetDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
 	//g_alphaShader->onResetDevice();
 
 	GetG().m_screenFlash.reset( pd3dDevice, pBackBufferSurfaceDesc, pUserContext);
@@ -305,11 +315,18 @@ HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFA
 	V_RETURN( D3DXCreateTexture( pd3dDevice, pBackBufferSurfaceDesc->Width, pBackBufferSurfaceDesc->Height,
 		1, D3DUSAGE_RENDERTARGET, d3dFormat, D3DPOOL_DEFAULT, &g_sepiaRenderTarget ) );
 
+	// Create radial blur render target
+	V_RETURN( D3DXCreateTexture( pd3dDevice, pBackBufferSurfaceDesc->Width, pBackBufferSurfaceDesc->Height,
+		1, D3DUSAGE_RENDERTARGET, d3dFormat, D3DPOOL_DEFAULT, &g_radialBlurRenderTarget ) );
+
 	// Store pointers to surfaces so we can call SetRenderTarget() later
 	V_RETURN( g_pFullScreenRenderTarget->GetSurfaceLevel( 0, &g_pFullScreenRenderTargetSurf ) );
 	V_RETURN( g_sepiaRenderTarget->GetSurfaceLevel( 0, &g_sepiaRenderTargetSurf ) );
+	V_RETURN( g_radialBlurRenderTarget->GetSurfaceLevel( 0, &g_radialBlurRenderTargetSurf ) );
 	
-	g_postSepiaShader->setFullscreenTexture( g_pFullScreenRenderTarget );
+	g_postSepiaShader->setFullscreenTexture( g_sepiaRenderTarget );
+	g_postRadialBlurShader->setFullscreenTexture( g_radialBlurRenderTarget );
+
 	SetupFullscreenQuad( pBackBufferSurfaceDesc );
 	return hr;
 }
@@ -536,7 +553,7 @@ void CALLBACK OnD3D9FrameRender( IDirect3DDevice9* pd3dDevice, double fTime, flo
 
 
 	// Clear the render target and the zbuffer 
-	V( pd3dDevice->SetRenderTarget( 0, g_pFullScreenRenderTargetSurf ) );
+	V( pd3dDevice->SetRenderTarget( 0, g_radialBlurRenderTargetSurf	 ) );
 	V( pd3dDevice->Clear( 0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, g_fillColor, 1.0f, 0 ) );
 	V( pd3dDevice->SetRenderState( D3DRS_ZENABLE, TRUE ) );
 	// Render the scene
@@ -561,19 +578,34 @@ void CALLBACK OnD3D9FrameRender( IDirect3DDevice9* pd3dDevice, double fTime, flo
 		V( pd3dDevice->EndScene() );
 	}
 
-	GetG().m_screenFlash.frameRender();
+	//GetG().m_screenFlash.frameRender();
 
 
-	
-
-	// Now that we have the scene rendered into g_pFullScreenRenderTargetSurf
-	// and the pixel velocity rendered into g_pCurFrameVelocitySurf 
-	// we can do a final pass to render this into the backbuffer and use
-	// a pixel shader to blur the pixels based on the last frame's & current frame's 
-	// per pixel velocity to achieve a motion blur effect
-	V( pd3dDevice->SetRenderTarget( 0, originalRT ) );
-	SAFE_RELEASE( originalRT );
+	V( pd3dDevice->SetRenderTarget( 0, g_sepiaRenderTargetSurf ) );
 	V( pd3dDevice->SetRenderState( D3DRS_ZENABLE, FALSE ) );
+
+	// Clear the render target
+	V( pd3dDevice->Clear( 0L, NULL, D3DCLEAR_TARGET, 0x00000000, 1.0f, 0L ) );
+	if( SUCCEEDED( pd3dDevice->BeginScene() ) )
+	{
+		UINT iPass, cPasses;
+		V( g_postRadialBlurShader->setMainTechnique() );
+		V( g_postRadialBlurShader->begin( &cPasses, 0 ) );
+		for( iPass = 0; iPass < cPasses; iPass++ )
+		{
+			V( g_postRadialBlurShader->beginPass( iPass ) );
+			V( pd3dDevice->SetFVF( SCREEN_VERTEX::FVF ) );
+			V( pd3dDevice->DrawPrimitiveUP( D3DPT_TRIANGLESTRIP, 2, g_Vertex, sizeof( SCREEN_VERTEX ) ) );
+			V( g_postRadialBlurShader->endPass() );
+		}
+		V( g_postRadialBlurShader->end() );
+		//////////////////////////////////////////////////////////////////////////
+		V( pd3dDevice->EndScene() );
+	}
+
+
+	V( pd3dDevice->SetRenderTarget( 0, originalRT ) );
+	
 
 	// Clear the render target
 	V( pd3dDevice->Clear( 0L, NULL, D3DCLEAR_TARGET, 0x00000000, 1.0f, 0L ) );
@@ -593,6 +625,9 @@ void CALLBACK OnD3D9FrameRender( IDirect3DDevice9* pd3dDevice, double fTime, flo
 		//////////////////////////////////////////////////////////////////////////
 		V( pd3dDevice->EndScene() );
 	}
+
+	SAFE_RELEASE( originalRT );
+	
 }
 
 
@@ -652,6 +687,7 @@ void CALLBACK OnD3D9DestroyDevice( void* pUserContext )
 	EP_SAFE_RELEASE( g_motionBlurShader );
 
 	EP_SAFE_RELEASE( g_postSepiaShader );
+	EP_SAFE_RELEASE( g_postRadialBlurShader );
 
 	GetG().m_videoMan.SetDev(0);
 	GetG().m_screenFlash.release();
@@ -660,6 +696,8 @@ void CALLBACK OnD3D9DestroyDevice( void* pUserContext )
 	SAFE_RELEASE( g_pFullScreenRenderTargetSurf );
 	SAFE_RELEASE( g_sepiaRenderTarget );
 	SAFE_RELEASE( g_sepiaRenderTargetSurf );
+	SAFE_RELEASE( g_radialBlurRenderTarget );
+	SAFE_RELEASE( g_radialBlurRenderTargetSurf );
 }
 
 

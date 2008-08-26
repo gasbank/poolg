@@ -530,11 +530,6 @@ HRESULT CALLBACK PostSepiaShader::onResetDevice( IDirect3DDevice9* pd3dDevice, c
 	return S_OK;
 }
 
-HRESULT PostSepiaShader::setWorldViewProj( double fTime, float fElapsedTime, const D3DXMATRIX* mWorld, const D3DXMATRIX* mView, const D3DXMATRIX* mProj )
-{
-	return S_OK;
-}
-
 HRESULT PostSepiaShader::setFullscreenTexture( LPDIRECT3DTEXTURE9 tex )
 {
 	HRESULT hr = S_OK;
@@ -550,4 +545,29 @@ void PostSepiaShader::initMainTechnique()
 void PostSepiaShader::setDesaturation( float desat )
 {
 	m_effect->SetFloat( "gDesat", desat );
+}
+
+//////////////////////////////////////////////////////////////////////////
+
+
+HRESULT CALLBACK PostRadialBlurShader::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext )
+{
+	return S_OK;
+}
+
+void PostRadialBlurShader::initMainTechnique()
+{
+	m_hDefaultTech = m_effect->GetTechniqueByName( "Main" );
+}
+
+HRESULT PostRadialBlurShader::setFullscreenTexture( LPDIRECT3DTEXTURE9 tex )
+{
+	HRESULT hr = S_OK;
+	V_RETURN( m_effect->SetTexture( "gSceneTexture", tex ) );
+	return hr;
+}
+
+void PostRadialBlurShader::setBlurWidth( float blurWidth )
+{
+	m_effect->SetFloat( "gBlurWidth", blurWidth );
 }

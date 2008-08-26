@@ -302,7 +302,7 @@ void EpCamera::beginShoulderLookCamera( const D3DXVECTOR3* pvMePos, const D3DXVE
 
 	// 최종 카메라 상태.
 	D3DXVECTOR3 vDesEye( 0.0f, 0.0f, -10.0f );
-	D3DXVECTOR3 vDesLookAt( vBattlePos );
+	D3DXVECTOR3 vDesLookAt( vBattlePos.x, vBattlePos.y, vBattlePos.z - 2.0f );
 	D3DXVECTOR3 vDesUp( 0.0f, 0.0f, -1.0f );
 
 	// 주인공으로부터 적으로 이어지는 축을 구한다.
@@ -311,16 +311,16 @@ void EpCamera::beginShoulderLookCamera( const D3DXVECTOR3* pvMePos, const D3DXVE
 	vBattleAxis.y = (vEnemyPos.y - vHeroPos.y);
 	vBattleAxis.z = (vEnemyPos.z - vHeroPos.z);
 
-	// z 축에 대고 vBattleAxis를 45도 돌린다.
+	// z 축에 대고 vBattleAxis를 -45도 돌린다.
 	D3DXVECTOR3 zAxis( 0.0f, 0.0f, 1.0f );
-	Utility::rotateAboutAxis( &vBattleAxis, &zAxis, D3DXToRadian( -45.0f ) );
+	Utility::rotateAboutAxis( &vBattleAxis, &zAxis, D3DXToRadian( -30.0f ) );
 
-	// vDesEye를 vBattleAxis에 대고 -45도 만큼 돌린다.
+	// vDesEye를 vBattleAxis에 대고 -60도 만큼 돌린다.
 	Utility::rotateAboutAxis( &vDesEye, &vBattleAxis, D3DXToRadian( -45.0f ) );
 
 	// vDesEye를 주인공 위로 옮긴다.
-	vDesEye.x += vHeroPos.x;
-	vDesEye.y += vHeroPos.y;
+	vDesEye.x += vBattlePos.x;
+	vDesEye.y += vBattlePos.y;
 
 	vDesLookAt.z -= 1.0f;
 

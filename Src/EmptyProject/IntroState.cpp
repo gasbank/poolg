@@ -87,7 +87,7 @@ HRESULT IntroState::frameMove( double fTime, float fElapsedTime )
 			m_pLogo->removeDrawRequest( m_pLogoDrawRequest );
 	}
 
-	if ( 0.0f <= m_fFadeTimer && m_fFadeTimer < 56.0f )
+	if ( 0.0f <= m_fFadeTimer && m_fFadeTimer < 46.0f )
 	{	
 		D3DXMATRIX prologueTrans;
 		D3DXMATRIX prologueScale;
@@ -99,7 +99,7 @@ HRESULT IntroState::frameMove( double fTime, float fElapsedTime )
 		m_pPrologueDrawRequest->xform = prologueScale * prologueTrans;
 
 	}
-	else if ( 56.0f <= m_fFadeTimer )
+	else if ( 46.0f <= m_fFadeTimer )
 	{
 		if ( m_pPrologueDrawRequest != 0 )
 			m_pPrologue->removeDrawRequest( m_pPrologueDrawRequest );

@@ -105,6 +105,7 @@ LRESULT Hero::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 	case 'A' :
 	case 'S' :
 	case 'D' :
+		assert( GetAudioState().pZeroLatencyWalkCue );
 		DWORD dwState;
 		GetAudioState().pZeroLatencyWalkCue->GetState( &dwState );
 		if( ( dwState & ( XACT_CUESTATE_PREPARING | XACT_CUESTATE_PREPARED ) ) != 0 )

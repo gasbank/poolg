@@ -17,7 +17,7 @@ namespace eval EpTestStage {
 		set pHeroUnit				[ getHero { 43 79 } ];
 		EpCharacterSetControllable	$pHeroUnit 1
 		
-		                                      # Health Will Coding Defence Sense Immunity
+		                                           # Health Will Coding Defence Sense Immunity
 		EpCharacterSetStat				$pHeroUnit    10     5     7       5      5      5
 		EpCharacterSetCurHp				$pHeroUnit -1
 		EpCharacterSetCurCs				$pHeroUnit -1

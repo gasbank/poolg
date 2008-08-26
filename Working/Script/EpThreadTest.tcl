@@ -76,9 +76,9 @@ namespace eval EpThreadTest {
 					cheat {
 						                                        # Health Will Coding Defence Sense Immunity
 						EpCharacterSetStat			[ EpGetHero ]  999    999   999    999    999    999
-						EpCharacterSetCurHp			[ EpGetHero ] 9999
-						EpCharacterSetCurCs			[ EpGetHero ] 9999
-						EpCharacterSetMoveDuration	[ EpGetHero ] 0.01
+						EpCharacterSetCurHp			[ EpGetHero ] 0x7fffffff
+						EpCharacterSetCurCs			[ EpGetHero ] 0x7fffffff
+						EpCharacterSetMoveDuration	[ EpGetHero ] 0.025
 					}
 					skillCheat {
 						EpAddSkillToHero 0

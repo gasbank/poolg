@@ -737,7 +737,7 @@ void World::wannaTalkingEventCheck()
 					// View at hero
 					talkingEnemy->setViewAt( &getHero()->getPos() );
 
-					bs->insertEnemy( talkingEnemy );
+					//bs->insertEnemy( talkingEnemy );
 				}
 				else
 				{

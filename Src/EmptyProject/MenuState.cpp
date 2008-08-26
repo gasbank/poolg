@@ -263,37 +263,14 @@ HRESULT MenuState::frameRender(IDirect3DDevice9* pd3dDevice,  double fTime, floa
 	material.Specular = cv2;
 	m_pDev->SetMaterial(&material);
 
-	m_pDev->SetRenderState(D3DRS_ZENABLE, FALSE);
-	m_menu.draw();
-	
-	m_stub.draw();
-	if(GetWorldStateManager().prevStateEnum() == GAME_WORLD_STATE_BATTLE)
-		m_sanub.draw();
-	else m_saub.draw();
-	m_loub.draw();
-	m_seub.draw();
-	m_exub.draw();
-
-	switch ( loc )
-	{
-	case 0 :
-		
-		break;
-	case 1 :
-		break;
-	case 2 :
-		break;
-	case 3 :
-		break;
-	case 4 :
-		break;
-	}
+	m_pDev->SetRenderState( D3DRS_ZENABLE, FALSE );
+	m_pDev->SetRenderState( D3DRS_ALPHABLENDENABLE, TRUE );
 
 	if ( op_st == true )
 	{
 		m_stwin.draw();
 
-		m_hpbg.draw();		
+		m_hpbg.draw();
 		m_mpbg.draw();
 		m_expbg.draw();
 
@@ -421,7 +398,8 @@ HRESULT MenuState::frameRender(IDirect3DDevice9* pd3dDevice,  double fTime, floa
 		}
 	}
 	
-	m_pDev->SetRenderState(D3DRS_ZENABLE, TRUE);
+	m_pDev->SetRenderState( D3DRS_ZENABLE, TRUE );
+	m_pDev->SetRenderState( D3DRS_ALPHABLENDENABLE, FALSE );
 	return S_OK;
 	
 }

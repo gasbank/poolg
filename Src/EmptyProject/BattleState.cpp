@@ -183,24 +183,7 @@ HRESULT BattleState::enter()
 
 	GetAudioState().enterBattle();
 
-	m_hpBarPlayer.initRate((float)getHero()->getMaxHp());
-	m_hpIllusionPlayer.initRate((float)getHero()->getMaxHp());
-	m_hpBarEnemy.initRate((float)getFirstEnemy()->getMaxHp());
-	m_hpIllusionEnemy.initRate((float)getFirstEnemy()->getMaxHp());
-	m_mpBarPlayer.initRate((float)getHero()->getMaxCs());
-	m_mpIllusionPlayer.initRate((float)getHero()->getMaxCs());
-	m_expBarPlayer.initRate( (float) ( (Hero*)getHero() )->getMaxExp() );
-	m_expIllusionPlayer.initRate( (float) ( (Hero*)getHero() )->getMaxExp() );
-
-	m_hpBarPlayer.setRate((float)getHero()->getCurHp());
-	m_hpBarEnemy.setRate((float)getFirstEnemy()->getCurHp());
-	m_mpBarPlayer.setRate((float)getHero()->getCurCs());
-	m_expBarPlayer.setRate ( (float) ( (Hero*)getHero() )->getCurExp() );
-	m_hpIllusionPlayer.setRate((float)getHero()->getCurHp());
-	m_hpIllusionEnemy.setRate((float)getFirstEnemy()->getCurHp());
-	m_mpIllusionPlayer.setRate((float)getHero()->getCurCs());
-	m_expIllusionPlayer.setRate( (float) ( (Hero*)getHero() )->getCurExp() );
-
+	updateBarRate();
 
 	/*스킬 대상 설정*/
 	SkillSet* skillSet = getHero()->getSkillSet();
@@ -239,6 +222,8 @@ HRESULT BattleState::leave()
 	GetAudioState().leaveBattle();
 
 	getHero()->setControllable( true );
+
+	m_enemies.clear();
 	
 	ArnMesh* guardBallNode = (ArnMesh*)(getHero()->getArnMesh()->getNodeByName("GuardBall"));
 	guardBallNode->setVisible( false );
@@ -1030,4 +1015,25 @@ void BattleState::statSelectMove (char choice)
 		m_statSelect = SS_EXIT;
 	}
 
+}
+
+void BattleState::updateBarRate()
+{
+	m_hpBarPlayer.initRate((float)getHero()->getMaxHp());
+	m_hpIllusionPlayer.initRate((float)getHero()->getMaxHp());
+	m_hpBarEnemy.initRate((float)getFirstEnemy()->getMaxHp());
+	m_hpIllusionEnemy.initRate((float)getFirstEnemy()->getMaxHp());
+	m_mpBarPlayer.initRate((float)getHero()->getMaxCs());
+	m_mpIllusionPlayer.initRate((float)getHero()->getMaxCs());
+	m_expBarPlayer.initRate( (float) ( (Hero*)getHero() )->getMaxExp() );
+	m_expIllusionPlayer.initRate( (float) ( (Hero*)getHero() )->getMaxExp() );
+
+	m_hpBarPlayer.setRate((float)getHero()->getCurHp());
+	m_hpBarEnemy.setRate((float)getFirstEnemy()->getCurHp());
+	m_mpBarPlayer.setRate((float)getHero()->getCurCs());
+	m_expBarPlayer.setRate ( (float) ( (Hero*)getHero() )->getCurExp() );
+	m_hpIllusionPlayer.setRate((float)getHero()->getCurHp());
+	m_hpIllusionEnemy.setRate((float)getFirstEnemy()->getCurHp());
+	m_mpIllusionPlayer.setRate((float)getHero()->getCurCs());
+	m_expIllusionPlayer.setRate( (float) ( (Hero*)getHero() )->getCurExp() );
 }

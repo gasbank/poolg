@@ -51,9 +51,9 @@ private:
 	void doComputerAction();
 	Character* getHero();
 	void setupCamera();
+	void updateBarRate();
 
-
-	EnemyList			m_enemies;
+	EnemyList			m_enemies;			// Enemy pool of this battle session. Should be cleared at BattleState::leave
 
 	/*이곳부터가 컴포넌트*/
 	Sprite*				m_sprite;

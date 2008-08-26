@@ -38,9 +38,9 @@ Unit* Enemy::createEnemy( LPD3DXMESH mesh, int tileX, int tileY, float posZ )
 	return u;
 }
 
-HRESULT Enemy::frameRender()
+HRESULT Enemy::frameRender( double dTime, float fElapsedTime )
 {
-	return Character::frameRender();
+	return Character::frameRender( dTime, fElapsedTime );
 }
 
 bool Enemy::frameMove( float fElapsedTime )

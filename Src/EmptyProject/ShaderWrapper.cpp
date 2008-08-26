@@ -185,45 +185,6 @@ HRESULT MotionBlurShader::initShader( LPDIRECT3DDEVICE9 pd3dDevice, const WCHAR*
 
 
 
-//-----------------------------------------------------------------------------
-// Name: SetupFullscreenQuad()
-// Desc: Sets up a full screen quad.  First we render to a fullscreen render 
-//       target texture, and then we render that texture using this quad to 
-//       apply a pixel shader on every pixel of the scene.
-//-----------------------------------------------------------------------------
-void MotionBlurShader::SetupFullscreenQuad( const D3DSURFACE_DESC* pBackBufferSurfaceDesc )
-{
-	D3DSURFACE_DESC desc;
-
-	g_pFullScreenRenderTargetSurf->GetDesc( &desc );
-
-	// Ensure that we're directly mapping texels to pixels by offset by 0.5
-	// For more info see the doc page titled "Directly Mapping Texels to Pixels"
-	FLOAT fWidth5 = ( FLOAT )pBackBufferSurfaceDesc->Width - 0.5f;
-	FLOAT fHeight5 = ( FLOAT )pBackBufferSurfaceDesc->Height - 0.5f;
-
-	FLOAT fTexWidth1 = ( FLOAT )pBackBufferSurfaceDesc->Width / ( FLOAT )desc.Width;
-	FLOAT fTexHeight1 = ( FLOAT )pBackBufferSurfaceDesc->Height / ( FLOAT )desc.Height;
-
-	// Fill in the vertex values
-	g_Vertex[0].pos = D3DXVECTOR4( fWidth5, -0.5f, 0.0f, 1.0f );
-	g_Vertex[0].clr = D3DXCOLOR( 0.5f, 0.5f, 0.5f, 0.66666f );
-	g_Vertex[0].tex1 = D3DXVECTOR2( fTexWidth1, 0.0f );
-
-	g_Vertex[1].pos = D3DXVECTOR4( fWidth5, fHeight5, 0.0f, 1.0f );
-	g_Vertex[1].clr = D3DXCOLOR( 0.5f, 0.5f, 0.5f, 0.66666f );
-	g_Vertex[1].tex1 = D3DXVECTOR2( fTexWidth1, fTexHeight1 );
-
-	g_Vertex[2].pos = D3DXVECTOR4( -0.5f, -0.5f, 0.0f, 1.0f );
-	g_Vertex[2].clr = D3DXCOLOR( 0.5f, 0.5f, 0.5f, 0.66666f );
-	g_Vertex[2].tex1 = D3DXVECTOR2( 0.0f, 0.0f );
-
-	g_Vertex[3].pos = D3DXVECTOR4( -0.5f, fHeight5, 0.0f, 1.0f );
-	g_Vertex[3].clr = D3DXCOLOR( 0.5f, 0.5f, 0.5f, 0.66666f );
-	g_Vertex[3].tex1 = D3DXVECTOR2( 0.0f, fTexHeight1 );
-}
-
-
 HRESULT CALLBACK MotionBlurShader::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext )
 {
 	HRESULT hr;
@@ -298,7 +259,6 @@ HRESULT CALLBACK MotionBlurShader::onResetDevice( IDirect3DDevice9* pd3dDevice, 
 	g_pCurFrameRTSet = &g_aRTSet[0];
 	g_pLastFrameRTSet = &g_aRTSet[1];
 
-	SetupFullscreenQuad( pBackBufferSurfaceDesc );
 
 	D3DXCOLOR colorWhite( 1.0f, 1.0f, 1.0f, 1.0f );
 	D3DXCOLOR colorBlack( 0.0f, 0.0f, 0.0f, 1.0f );
@@ -551,4 +511,43 @@ void MotionBlurShader::onFrameRender( IDirect3DDevice9* pd3dDevice, double dTime
 
 		V( pd3dDevice->EndScene() );
 	}
+}
+
+//////////////////////////////////////////////////////////////////////////()
+
+PostSepiaShader::PostSepiaShader()
+{
+
+}
+
+PostSepiaShader::~PostSepiaShader()
+{
+
+}
+
+HRESULT CALLBACK PostSepiaShader::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext )
+{
+	return S_OK;
+}
+
+HRESULT PostSepiaShader::setWorldViewProj( double fTime, float fElapsedTime, const D3DXMATRIX* mWorld, const D3DXMATRIX* mView, const D3DXMATRIX* mProj )
+{
+	return S_OK;
+}
+
+HRESULT PostSepiaShader::setFullscreenTexture( LPDIRECT3DTEXTURE9 tex )
+{
+	HRESULT hr = S_OK;
+	V_RETURN( m_effect->SetTexture( "gSceneTexture", tex ) );
+	return hr;
+}
+
+void PostSepiaShader::initMainTechnique()
+{
+	m_hDefaultTech = m_effect->GetTechniqueByName( "Main" );
+}
+
+void PostSepiaShader::setDesaturation( float desat )
+{
+	m_effect->SetFloat( "gDesat", desat );
 }

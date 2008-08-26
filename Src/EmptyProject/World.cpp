@@ -118,7 +118,7 @@ HRESULT World::init()
 }
 
 
-HRESULT World::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, float fElapsedTime)
+HRESULT World::frameRender(IDirect3DDevice9* pd3dDevice, double dTime, float fElapsedTime)
 {		
 	EpCamera& camera = GetG().m_camera;
 	
@@ -154,23 +154,23 @@ HRESULT World::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, float fEl
 	for ( ; it != m_unitSet.end(); ++it )
 	{
 		if ( !(*it)->getRemoveFlag() )
-			(*it)->frameRender();
+			(*it)->frameRender( dTime, fElapsedTime );
 	}
 	
 	DialogList::iterator itDialog = m_scriptedDialog.begin();
 	for ( ; itDialog != m_scriptedDialog.end(); ++itDialog )
 	{
-		(*itDialog)->frameRender(pd3dDevice, fTime, fElapsedTime);
+		(*itDialog)->frameRender(pd3dDevice, dTime, fElapsedTime);
 	}
 
 	WorldStateManager& wsm = WorldStateManager::getSingleton();
-	wsm.getCurState()->frameRender(pd3dDevice, fTime, fElapsedTime);
+	wsm.getCurState()->frameRender(pd3dDevice, dTime, fElapsedTime);
 
 	return S_OK;
 
 }
 
-HRESULT World::frameMove(double fTime, float fElapsedTime)
+HRESULT World::frameMove( double dTime, float fElapsedTime )
 {
 	EpCamera& camera = GetG().m_camera;
 
@@ -194,7 +194,7 @@ HRESULT World::frameMove(double fTime, float fElapsedTime)
 	DialogList::iterator itDialog = m_scriptedDialog.begin();
 	for ( ; itDialog != m_scriptedDialog.end(); ++itDialog )
 	{
-		(*itDialog)->frameMove( fTime, fElapsedTime );
+		(*itDialog)->frameMove( dTime, fElapsedTime );
 	}
 	
 	//GetG().m_camera.frameMove( fElapsedTime );
@@ -202,9 +202,9 @@ HRESULT World::frameMove(double fTime, float fElapsedTime)
 	m_sampleTeapotMeshRot += fElapsedTime * D3DXToRadian(35); // 35 degrees per second
 
 	GetWorldStateManager().transit();
-	GetWorldStateManager().getCurState()->frameMove(fTime, fElapsedTime);
+	GetWorldStateManager().getCurState()->frameMove(dTime, fElapsedTime);
 
-	m_modelSg->getSceneRoot()->update(fTime, fElapsedTime);
+	m_modelSg->getSceneRoot()->update(dTime, fElapsedTime);
 	
 
 	WCHAR msg[128];
@@ -241,14 +241,14 @@ HRESULT World::frameMove(double fTime, float fElapsedTime)
 	IncidentList::iterator itInc = m_incidents.begin();
 	for ( ; itInc != m_incidents.end(); ++itInc )
 	{
-		(*itInc)->update( fTime, fElapsedTime );
+		(*itInc)->update( dTime, fElapsedTime );
 	}
 
 	// SequentialIncidents update
 	SequentialIncidentList::iterator itseqInc = m_sequentialIncidents.begin();
 	for ( ; itseqInc != m_sequentialIncidents.end(); ++itseqInc )
 	{
-		(*itseqInc)->update( fTime, fElapsedTime );
+		(*itseqInc)->update( dTime, fElapsedTime );
 	}
 
 	UnitSet::iterator it2 = m_unitSet.begin();

@@ -28,6 +28,8 @@
 #include "EpLight.h"
 
 
+SCREEN_VERTEX g_Vertex[4];
+
 G								g_g;
 WorldManager*					g_wm					= 0;
 TopStateManager*				g_tsm					= 0;
@@ -60,6 +62,17 @@ LPD3DXSPRITE					g_d3dxSprite			= 0;
 LPDIRECT3DTEXTURE9				g_tex					= 0;
 
 MotionBlurShader*				g_motionBlurShader		= 0;
+
+
+LPDIRECT3DTEXTURE9				g_pFullScreenRenderTarget		= 0;
+LPDIRECT3DSURFACE9				g_pFullScreenRenderTargetSurf	= 0;
+
+LPDIRECT3DTEXTURE9				g_sepiaRenderTarget				= 0;
+LPDIRECT3DSURFACE9				g_sepiaRenderTargetSurf			= 0;
+
+PostSepiaShader*				g_postSepiaShader				= 0;
+
+void SetupFullscreenQuad( const D3DSURFACE_DESC* pBackBufferSurfaceDesc );
 
 //--------------------------------------------------------------------------------------
 // Rejects any D3D9 devices that aren't acceptable to the app by returning false
@@ -176,6 +189,9 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 	g_motionBlurShader = new MotionBlurShader();
 	g_motionBlurShader->initShader( pd3dDevice, L"" );
 
+	g_postSepiaShader = new PostSepiaShader();
+	g_postSepiaShader->initEffect( pd3dDevice, L"Shaders/HLSL/post_sepia.fx" );
+	g_postSepiaShader->initMainTechnique();
 
 	//g_alphaShader = new AlphaShader();
 	//g_alphaShader->initShader( pd3dDevice, L"Shaders/Alpha.vsh" );
@@ -249,6 +265,8 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
 								   void* pUserContext )
 {
+	HRESULT hr = S_OK;
+
 	pd3dDevice->SetRenderState( D3DRS_DITHERENABLE, TRUE );
 	pd3dDevice->SetRenderState( D3DRS_SPECULARENABLE, TRUE );
 
@@ -267,12 +285,33 @@ HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFA
 
 	if ( g_bombShader )
 		g_bombShader->onResetDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
+	if ( g_postSepiaShader )
+		g_postSepiaShader->onResetDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
 	//g_alphaShader->onResetDevice();
 
 	GetG().m_screenFlash.reset( pd3dDevice, pBackBufferSurfaceDesc, pUserContext);
 
 	g_d3dxSprite->OnResetDevice();
-	return S_OK;
+
+
+	D3DFORMAT d3dFormat = D3DFMT_A8R8G8B8;
+
+	// Create a A8R8G8B8 render target texture.  This will be used to render 
+	// the full screen and then rendered to the backbuffer using a quad.
+	V_RETURN( D3DXCreateTexture( pd3dDevice, pBackBufferSurfaceDesc->Width, pBackBufferSurfaceDesc->Height,
+		1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &g_pFullScreenRenderTarget ) );
+
+	// Create sepia render target
+	V_RETURN( D3DXCreateTexture( pd3dDevice, pBackBufferSurfaceDesc->Width, pBackBufferSurfaceDesc->Height,
+		1, D3DUSAGE_RENDERTARGET, d3dFormat, D3DPOOL_DEFAULT, &g_sepiaRenderTarget ) );
+
+	// Store pointers to surfaces so we can call SetRenderTarget() later
+	V_RETURN( g_pFullScreenRenderTarget->GetSurfaceLevel( 0, &g_pFullScreenRenderTargetSurf ) );
+	V_RETURN( g_sepiaRenderTarget->GetSurfaceLevel( 0, &g_sepiaRenderTargetSurf ) );
+	
+	g_postSepiaShader->setFullscreenTexture( g_pFullScreenRenderTarget );
+	SetupFullscreenQuad( pBackBufferSurfaceDesc );
+	return hr;
 }
 
 
@@ -453,6 +492,37 @@ HRESULT renderTileGrid()
 
 	return hr;
 }
+void SetupFullscreenQuad( const D3DSURFACE_DESC* pBackBufferSurfaceDesc )
+{
+	D3DSURFACE_DESC desc;
+
+	g_pFullScreenRenderTargetSurf->GetDesc( &desc );
+
+	// Ensure that we're directly mapping texels to pixels by offset by 0.5
+	// For more info see the doc page titled "Directly Mapping Texels to Pixels"
+	FLOAT fWidth5 = ( FLOAT )pBackBufferSurfaceDesc->Width - 0.5f;
+	FLOAT fHeight5 = ( FLOAT )pBackBufferSurfaceDesc->Height - 0.5f;
+
+	FLOAT fTexWidth1 = ( FLOAT )pBackBufferSurfaceDesc->Width / ( FLOAT )desc.Width;
+	FLOAT fTexHeight1 = ( FLOAT )pBackBufferSurfaceDesc->Height / ( FLOAT )desc.Height;
+
+	// Fill in the vertex values
+	g_Vertex[0].pos = D3DXVECTOR4( fWidth5, -0.5f, 0.0f, 1.0f );
+	g_Vertex[0].clr = D3DXCOLOR( 0.5f, 0.5f, 0.5f, 0.66666f );
+	g_Vertex[0].tex1 = D3DXVECTOR2( fTexWidth1, 0.0f );
+
+	g_Vertex[1].pos = D3DXVECTOR4( fWidth5, fHeight5, 0.0f, 1.0f );
+	g_Vertex[1].clr = D3DXCOLOR( 0.5f, 0.5f, 0.5f, 0.66666f );
+	g_Vertex[1].tex1 = D3DXVECTOR2( fTexWidth1, fTexHeight1 );
+
+	g_Vertex[2].pos = D3DXVECTOR4( -0.5f, -0.5f, 0.0f, 1.0f );
+	g_Vertex[2].clr = D3DXCOLOR( 0.5f, 0.5f, 0.5f, 0.66666f );
+	g_Vertex[2].tex1 = D3DXVECTOR2( 0.0f, 0.0f );
+
+	g_Vertex[3].pos = D3DXVECTOR4( -0.5f, fHeight5, 0.0f, 1.0f );
+	g_Vertex[3].clr = D3DXCOLOR( 0.5f, 0.5f, 0.5f, 0.66666f );
+	g_Vertex[3].tex1 = D3DXVECTOR2( 0.0f, fTexHeight1 );
+}
 
 //--------------------------------------------------------------------------------------
 // Render the scene using the D3D9 device
@@ -461,13 +531,18 @@ void CALLBACK OnD3D9FrameRender( IDirect3DDevice9* pd3dDevice, double fTime, flo
 {
 	HRESULT hr;
 
-	// Clear the render target and the zbuffer 
-	V( pd3dDevice->Clear( 0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, g_fillColor, 1.0f, 0 ) );
+	LPDIRECT3DSURFACE9 originalRT = 0;
+	V( pd3dDevice->GetRenderTarget( 0, &originalRT ) );
 
+
+	// Clear the render target and the zbuffer 
+	V( pd3dDevice->SetRenderTarget( 0, g_pFullScreenRenderTargetSurf ) );
+	V( pd3dDevice->Clear( 0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, g_fillColor, 1.0f, 0 ) );
+	V( pd3dDevice->SetRenderState( D3DRS_ZENABLE, TRUE ) );
 	// Render the scene
 	if( SUCCEEDED( pd3dDevice->BeginScene() ) )
 	{
-		drawBurningTeapot( fTime, fElapsedTime );
+		//drawBurningTeapot( fTime, fElapsedTime );
 
 		if ( g_bTileGrid )
 			renderTileGrid();
@@ -480,11 +555,44 @@ void CALLBACK OnD3D9FrameRender( IDirect3DDevice9* pd3dDevice, double fTime, flo
 
 		g_spriteManager->frameRender();
 		
+
+
 		//////////////////////////////////////////////////////////////////////////
 		V( pd3dDevice->EndScene() );
 	}
 
 	GetG().m_screenFlash.frameRender();
+
+
+	
+
+	// Now that we have the scene rendered into g_pFullScreenRenderTargetSurf
+	// and the pixel velocity rendered into g_pCurFrameVelocitySurf 
+	// we can do a final pass to render this into the backbuffer and use
+	// a pixel shader to blur the pixels based on the last frame's & current frame's 
+	// per pixel velocity to achieve a motion blur effect
+	V( pd3dDevice->SetRenderTarget( 0, originalRT ) );
+	SAFE_RELEASE( originalRT );
+	V( pd3dDevice->SetRenderState( D3DRS_ZENABLE, FALSE ) );
+
+	// Clear the render target
+	V( pd3dDevice->Clear( 0L, NULL, D3DCLEAR_TARGET, 0x00000000, 1.0f, 0L ) );
+	if( SUCCEEDED( pd3dDevice->BeginScene() ) )
+	{
+		UINT iPass, cPasses;
+		V( g_postSepiaShader->setMainTechnique() );
+		V( g_postSepiaShader->begin( &cPasses, 0 ) );
+		for( iPass = 0; iPass < cPasses; iPass++ )
+		{
+			V( g_postSepiaShader->beginPass( iPass ) );
+			V( pd3dDevice->SetFVF( SCREEN_VERTEX::FVF ) );
+			V( pd3dDevice->DrawPrimitiveUP( D3DPT_TRIANGLESTRIP, 2, g_Vertex, sizeof( SCREEN_VERTEX ) ) );
+			V( g_postSepiaShader->endPass() );
+		}
+		V( g_postSepiaShader->end() );
+		//////////////////////////////////////////////////////////////////////////
+		V( pd3dDevice->EndScene() );
+	}
 }
 
 
@@ -543,8 +651,15 @@ void CALLBACK OnD3D9DestroyDevice( void* pUserContext )
 
 	EP_SAFE_RELEASE( g_motionBlurShader );
 
+	EP_SAFE_RELEASE( g_postSepiaShader );
+
 	GetG().m_videoMan.SetDev(0);
 	GetG().m_screenFlash.release();
+
+	SAFE_RELEASE( g_pFullScreenRenderTarget );
+	SAFE_RELEASE( g_pFullScreenRenderTargetSurf );
+	SAFE_RELEASE( g_sepiaRenderTarget );
+	SAFE_RELEASE( g_sepiaRenderTargetSurf );
 }
 
 

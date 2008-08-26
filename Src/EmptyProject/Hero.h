@@ -11,7 +11,6 @@ public:
 	virtual						~Hero( void );
 
 	// Virtual Methods
-	virtual HRESULT				frameRender();
 	virtual bool				frameMove( float fElapsedTime );
 	virtual LRESULT				handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 

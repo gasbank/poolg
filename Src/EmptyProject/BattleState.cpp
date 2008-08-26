@@ -13,6 +13,9 @@
 #include "ArnMesh.h"
 #include "SpriteManager.h"
 #include "Sprite.h"
+#include "ShaderWrapper.h"
+
+extern PostSepiaShader*				g_postSepiaShader;
 
 BattleState::BattleState()
 {
@@ -222,6 +225,9 @@ HRESULT BattleState::enter()
 	ArnNode* guardBallNode = getHero()->getArnMesh()->getNodeByName("GuardBall");
 	((ArnMesh*)guardBallNode)->setDoAnim( true );
 	((ArnMesh*)guardBallNode)->setVisible( true );
+
+	m_desaturation = 0;
+
 	return S_OK;
 }
 
@@ -358,6 +364,17 @@ HRESULT BattleState::frameMove(double fTime, float fElapsedTime)
 	if ( m_battleWinner != PS_NOTSET )
 		GetWorldStateManager().setNextState(GAME_WORLD_STATE_FIELD);
 
+	if ( getHero()->getCurHp() <= 0 )
+	{
+		g_postSepiaShader->setDesaturation( m_desaturation );
+		if ( m_desaturation >= 1.0f )
+		{
+		}
+		else
+		{
+			m_desaturation += fElapsedTime * 0.5f;
+		}
+	}
 	return S_OK;
 }
 

@@ -132,14 +132,14 @@ To learn more about shading, shaders, and to bounce ideas off other shader
 #define QUAD_REAL3x4 float3x4
 #define QUAD_REAL4x4 float4x4
 #else /* ! QUAD_FLOAT */
-#define QUAD_REAL half
-#define QUAD_REAL2 half2
-#define QUAD_REAL3 half3
-#define QUAD_REAL4 half4
-#define QUAD_REAL3x3 half3x3
-#define QUAD_REAL4x3 half4x3
-#define QUAD_REAL3x4 half3x4
-#define QUAD_REAL4x4 half4x4
+#define QUAD_REAL float
+#define QUAD_REAL2 float2
+#define QUAD_REAL3 float3
+#define QUAD_REAL4 float4
+#define QUAD_REAL3x3 float3x3
+#define QUAD_REAL4x3 float4x3
+#define QUAD_REAL3x4 float3x4
+#define QUAD_REAL4x4 float4x4
 #endif /* ! QUAD_FLOAT */
 #endif /* ! QUAD_REAL */
 

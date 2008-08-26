@@ -26,7 +26,7 @@ namespace eval EpTestStage {
 		
 		set testEnemy					[createEnemy 43 85 1];
 		
-		EpCharacterSetStat				$testEnemy 8 1 3 1 1 1
+		EpCharacterSetStat				$testEnemy 8 1 9999 1 1 1
 		EpCharacterSetCurHp				$testEnemy -1
 		EpEnemySetRandomWalkable		$testEnemy 1
 		

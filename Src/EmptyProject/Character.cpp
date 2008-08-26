@@ -210,14 +210,14 @@ bool Character::frameMove( float fElapsedTime )
 	return Unit::frameMove( fElapsedTime );
 }
 
-HRESULT Character::frameRender()
+HRESULT Character::frameRender( double dTime, float fElapsedTime )
 {
 	SkillObjectList::iterator it = m_skillObjectList.begin();
 	for ( ; it != m_skillObjectList.end(); ++it )
 	{
-		(*it)->frameRender();
+		(*it)->frameRender( dTime, fElapsedTime );
 	}
-	Unit::frameRender();
+	Unit::frameRender( dTime, fElapsedTime );
 	return S_OK;
 }
 

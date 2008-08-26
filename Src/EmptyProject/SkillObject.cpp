@@ -5,6 +5,9 @@
 #include "Character.h"
 #include "DynamicMotion.h"
 #include "Sound.h"
+#include "ShaderWrapper.h"
+
+extern BombShader*						g_bombShader;
 
 SkillObject::~SkillObject(void)
 {
@@ -17,10 +20,27 @@ bool SkillObject::frameMove ( float fElapsedTime )
 	return this->m_effectObject->frameMove(fElapsedTime);
 }
 
-HRESULT SkillObject::frameRender ()
+HRESULT SkillObject::frameRender ( double dTime, float fElapsedTime )
 {
+	HRESULT f = 0;
 	D3DPERF_BeginEvent(0, L"SkillObjRender");
-	HRESULT f = this->m_effectObject->frameRender();
+
+	HRESULT hr = S_OK;
+	D3DXMATRIX mWorld;
+	D3DXMatrixIdentity( &mWorld );
+	UINT iPass, cPasses;
+	V( g_bombShader->setMainTechnique() );
+	V( g_bombShader->setWorldViewProj( dTime, fElapsedTime, &this->m_effectObject->getLocalXform(), GetG().m_camera.GetViewMatrix(), GetG().m_camera.GetProjMatrix() ) );
+
+	V( g_bombShader->begin( &cPasses, 0 ) );
+	for( iPass = 0; iPass < cPasses; iPass++ )
+	{
+		V( g_bombShader->beginPass( iPass ) );
+		f = this->m_effectObject->getMesh()->DrawSubset( 0 );
+		V( g_bombShader->endPass() );
+	}
+	V( g_bombShader->end() );
+	
 	D3DPERF_EndEvent ();
 	return f;
 }

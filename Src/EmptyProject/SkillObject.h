@@ -7,7 +7,7 @@ class SkillObject
 {
 public:
 	virtual ~SkillObject();
-	virtual HRESULT frameRender ();
+	virtual HRESULT frameRender ( double dTime, float fElapsedTime );
 	virtual bool frameMove ( float fElapsedTime );
 
 	static SkillObject* createSOnormalAttack	(Character* user, Character* target, Unit* effectObject);

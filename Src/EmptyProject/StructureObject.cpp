@@ -26,16 +26,6 @@ Unit* StructureObject::createStructureObject( LPD3DXMESH mesh, int tileX, int ti
 	return u;
 }
 
-HRESULT StructureObject::frameRender()
-{
-	return Unit::frameRender();
-}
-
-LRESULT StructureObject::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
-{
-	return Unit::handleMessages( hWnd, uMsg, wParam, lParam );
-}
-
 bool StructureObject::frameMove( float fElapsedTime )
 {
 	if (m_bMoving == false)

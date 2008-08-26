@@ -87,11 +87,6 @@ int Hero::gainExp( int expPoint )
 }
 
 
-HRESULT Hero::frameRender()
-{
-	return Character::frameRender();
-}
-
 bool Hero::frameMove( float fElapsedTime )
 {
 	//printf( "Tile X, Y : %d, %d \n", getTilePosX(), getTilePosY() );

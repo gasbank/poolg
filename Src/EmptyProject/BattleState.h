@@ -99,4 +99,6 @@ private:
 	//StatSelect ฐüทร
 	StatSelect		m_statSelect;
 	int				m_statCount;
+
+	float			m_desaturation; // Screen goes to grayscale when player defeated.
 };

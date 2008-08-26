@@ -62,6 +62,30 @@ private:
 
 //////////////////////////////////////////////////////////////////////////
 
+class PostSepiaShader : public Shader
+{
+public:
+	PostSepiaShader();
+	~PostSepiaShader();
+	virtual HRESULT CALLBACK		onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext );
+
+	void							initMainTechnique();
+	HRESULT							setMainTechnique() { return m_effect->SetTechnique( m_hDefaultTech ); }
+	HRESULT							begin( UINT* passes, DWORD flags ) { return m_effect->Begin( passes, flags ); }
+	HRESULT							beginPass( UINT pass ) { return m_effect->BeginPass( pass ); }
+	HRESULT							endPass() { return m_effect->EndPass(); }
+	HRESULT							end() { return m_effect->End(); }
+	void							onLostDevice() { m_effect->OnLostDevice(); }
+	HRESULT							setWorldViewProj( double fTime, float fElapsedTime, const D3DXMATRIX* mWorld, const D3DXMATRIX* mView, const D3DXMATRIX* mProj );
+	HRESULT							setFullscreenTexture( LPDIRECT3DTEXTURE9 tex );
+	void							setDesaturation( float desat );
+private:
+	D3DXHANDLE						m_hDefaultTech;
+	D3DXHANDLE						m_hDesaturation;
+	LPDIRECT3DTEXTURE9				m_tex;
+};
+//////////////////////////////////////////////////////////////////////////
+
 class AlphaShader : public Shader
 {
 public:
@@ -101,7 +125,6 @@ public:
 	void							onFrameRender( IDirect3DDevice9* pd3dDevice, double dTime, float fElapsedTime );
 private:
 	
-	void SetupFullscreenQuad( const D3DSURFACE_DESC* pBackBufferSurfaceDesc );
 	LPD3DXSPRITE					m_textSprite;
 	
 	LPDIRECT3DTEXTURE9          g_pFullScreenRenderTarget;

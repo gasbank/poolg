@@ -31,8 +31,8 @@ public:
 						~World(void);
 
 	HRESULT				init();
-	HRESULT				frameRender(IDirect3DDevice9* pd3dDevice, double fTime, float fElapsedTime);
-	HRESULT				frameMove(double fTime, float fElapsedTime);
+	HRESULT				frameRender(IDirect3DDevice9* pd3dDevice, double dTime, float fElapsedTime);
+	HRESULT				frameMove(double dTime, float fElapsedTime);
 	HRESULT				handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	HRESULT				release();
 	VOID				enter();

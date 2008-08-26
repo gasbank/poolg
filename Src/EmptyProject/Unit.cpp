@@ -97,7 +97,7 @@ void Unit::setTilePos( const Point2Uint& newPos )
 	setTilePos( newPos.x, newPos.y );
 }
 
-HRESULT Unit::frameRender()
+HRESULT Unit::frameRender( double dTime, float fElapsedTime )
 {
 	HRESULT hr = S_OK;
 

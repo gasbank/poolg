@@ -35,7 +35,7 @@ public:
 	virtual							~Unit();
 
 	// Virtual Methods
-	virtual HRESULT					frameRender();
+	virtual HRESULT					frameRender( double dTime, float fElapsedTime );
 	virtual LRESULT					handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 	virtual bool					frameMove( float fElapsedTime );
 	virtual const D3DXVECTOR3&		getPos() const { return m_vPos; }

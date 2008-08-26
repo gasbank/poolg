@@ -52,7 +52,9 @@ proc createEnemy { tileX tileY { registerWorld 1 } } {
 	}
 	return $unit
 }
-
+proc createEnemy2 { tilePos { registerWorld 1 } } {
+	return [ createEnemy [lindex $tilePos 0] [lindex $tilePos 1] $registerWorld ]
+}
 # enum UnitPositionTriggerType {
 # 	UPTT_ENTER  = 0x001,
 #	UPTT_LEAVE  = 0x010,

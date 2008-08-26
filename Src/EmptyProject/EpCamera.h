@@ -33,7 +33,8 @@ public:
 	void beginShoulderLookCamera( const D3DXVECTOR3* pvMePos, const D3DXVECTOR3* pvOppPos );
 	void begin( RunningCamera rc );
 	D3DXVECTOR3* GetUpPt();
-
+	bool getShake() const { return m_bShake; }
+	void setShake(bool val) { m_bShake = val; }
 protected:
 	virtual D3DUtil_CameraKeys MapKey( UINT nKey );
 	void updateSmoothCamera( float fElapsedTime );
@@ -46,6 +47,7 @@ protected:
 		D3DXVECTOR3* pvEye2, D3DXVECTOR3* pvLookAt2, D3DXVECTOR3* pvUp2,
 		float s	);
 	void pulledEye( D3DXVECTOR3* vPulledEye, D3DXVECTOR3* vLookAt, D3DXVECTOR3* vEye, int nth );
+	void processShake( float fElapsedTime );
 
 	D3DXVECTOR3		m_vUp;
 	ArnCamera*		m_pArnCam;
@@ -59,6 +61,8 @@ protected:
 	D3DXVECTOR3		m_vDesLookAt;
 	D3DXVECTOR3		m_vDesUp;
 
+	D3DXVECTOR3		m_vEyeShake, m_vLookAtShake, m_vUpShake;
+
 	const D3DXVECTOR3*	m_vPos;
 
 	float			m_fSmoothCameraTimer;
@@ -67,4 +71,7 @@ protected:
 	bool			m_bViewParamsDirty;
 	bool			m_bCamManualMovement;
 	bool			m_bUpdateContinue;
+
+	bool			m_bShake;
+	float			m_nextShakeTime;	
 };

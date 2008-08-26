@@ -13,6 +13,11 @@ EpCamera::EpCamera(void)
 	m_fSmoothCameraDuration = 1.0f;
 	m_bViewParamsDirty = false;
 	m_bCamManualMovement = false;
+
+	m_bShake = false;
+	m_nextShakeTime = 0;
+
+	m_vEyeShake = m_vUpShake = m_vLookAtShake = DX_CONSTS::D3DXVEC3_ZERO;
 }
 
 void EpCamera::frameMove( FLOAT fElapsedTime )
@@ -40,9 +45,23 @@ void EpCamera::frameMove( FLOAT fElapsedTime )
 
 	//printf("Eye, At %f %f %f, %f %f %f \n", m_vEye.x, m_vEye.y, m_vEye.z, m_vLookAt.x, m_vLookAt.y, m_vLookAt.z );
 
-	if ( m_bViewParamsDirty && !m_bCamManualMovement )
+	processShake( fElapsedTime );
+	
+	if ( ( m_bViewParamsDirty && !m_bCamManualMovement ) || m_bShake )
 	{
-		setViewParamsWithUp( &m_vEye, &m_vLookAt, &m_vUp );
+		if ( m_bShake )
+		{
+			D3DXVECTOR3 eye, lookAt, up;
+			eye		= m_vEye + m_vEyeShake;
+			lookAt	= m_vLookAt + m_vLookAtShake;
+			up		= m_vUp + m_vUpShake;
+			setViewParamsWithUp( &eye, &lookAt, &up );
+		}
+		else
+		{
+			setViewParamsWithUp( &m_vEye, &m_vLookAt, &m_vUp );
+		}
+		
 		m_bViewParamsDirty = false;
 	}
 }
@@ -366,4 +385,40 @@ void EpCamera::pulledEye( D3DXVECTOR3* vPulledEye, D3DXVECTOR3* vLookAt, D3DXVEC
 	}
 
 	//printf( "camDist, obsDist %f %f \n", camDist, obsDist );
+}
+
+void EpCamera::processShake( float fElapsedTime )
+{
+	if ( m_bShake )
+	{
+		const float shakeIntervalMax	= 0.075f;
+
+		const float eyeShakeAmount		= 0.5f;
+		const float lookAtShakeAmount	= 0.2f;
+		const float upShakeAmount		= 0.075f;
+
+		if ( m_nextShakeTime <= 0 )
+		{
+			m_vEyeShake = D3DXVECTOR3(
+				( (float)rand()/RAND_MAX - 0.5f ) * eyeShakeAmount,
+				( (float)rand()/RAND_MAX - 0.5f ) * eyeShakeAmount,
+				( (float)rand()/RAND_MAX - 0.5f ) * eyeShakeAmount );
+			m_vLookAtShake = D3DXVECTOR3(
+				( (float)rand()/RAND_MAX - 0.5f ) * lookAtShakeAmount,
+				( (float)rand()/RAND_MAX - 0.5f ) * lookAtShakeAmount,
+				( (float)rand()/RAND_MAX - 0.5f ) * lookAtShakeAmount );
+			m_vUpShake = D3DXVECTOR3(
+				( (float)rand()/RAND_MAX - 0.5f ) * upShakeAmount,
+				( (float)rand()/RAND_MAX - 0.5f ) * upShakeAmount,
+				( (float)rand()/RAND_MAX - 0.5f ) * upShakeAmount );
+
+			m_bViewParamsDirty = true;
+
+			m_nextShakeTime = (float)rand()/RAND_MAX * shakeIntervalMax;
+		}
+		else
+		{
+			m_nextShakeTime -= fElapsedTime;
+		}
+	}
 }

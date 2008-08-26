@@ -580,6 +580,9 @@ void CALLBACK KeyboardProc( UINT nChar, bool bKeyDown, bool bAltDown, void* pUse
 		case VK_F3:
 			g_bTileGrid = !g_bTileGrid;
 			break;
+		case VK_F4:
+			GetG().m_camera.setShake( !GetG().m_camera.getShake() );
+			break;
 		}
 	}
 }

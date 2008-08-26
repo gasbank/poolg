@@ -324,10 +324,6 @@ HRESULT World::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 
 	if (uMsg == WM_KEYDOWN)
 	{
-		if (wParam == VK_F4)
-		{
-
-		}
 		if (wParam == VK_ESCAPE)
 		{
 			if ( GetWorldStateManager().curStateEnum() != GAME_WORLD_STATE_BATTLE )
@@ -932,6 +928,12 @@ int EpCurWorldDebugInfoOfIncident( int idx )
 	return 0;
 } SCRIPT_CALLABLE_I_I( EpCurWorldDebugInfoOfIncident )
 
+int EpCameraSetShake( int b )
+{
+	GetG().m_camera.setShake( b?true:false );
+	return 0;
+} SCRIPT_CALLABLE_I_I( EpCameraSetShake )
+
 
 START_SCRIPT_FACTORY( World )
 	CREATE_OBJ_COMMAND( EpGetHero )
@@ -945,4 +947,5 @@ START_SCRIPT_FACTORY( World )
 	CREATE_OBJ_COMMAND( EpCurWorldDebugInfoOfIncident )
 	CREATE_OBJ_COMMAND( EpMeshSetVisible )
 	CREATE_OBJ_COMMAND( EpMeshSetCollide )
+	CREATE_OBJ_COMMAND( EpCameraSetShake )
 END_SCRIPT_FACTORY( World )

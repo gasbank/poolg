@@ -45,10 +45,6 @@ HRESULT FieldState::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 {
 	if (uMsg == WM_KEYDOWN)
 	{
-		if (wParam == VK_F4)
-		{
-			GetWorldStateManager().setNextState(GAME_WORLD_STATE_BATTLE);
-		}
 		if ( wParam == VK_F6 )
 		{
 			m_bCamManualMovement = !m_bCamManualMovement;

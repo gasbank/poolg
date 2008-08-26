@@ -7,11 +7,14 @@ namespace eval EpA213World {
 	variable pHeroUnit
 	variable modelFilePath					"A213World.arn"
 	variable gatePos						{ 14 66 }
-	variable ratholPos						{ 12 50 }
 	
+	# Start Positions
+	variable ratholPos						{ 12 50 }
 	variable bossBattleStartPos				{ 53 126 }
 	variable mirrorQuestStartPos			{ 51 80 }
-	variable startPos						$bossBattleStartPos
+	
+	variable startPos						$ratholPos
+	
 	variable dialogNameList					[ list	oldRatDialog\
 													oldCat1Dialog oldCat10Dialog\
 													goodDinosaurDialog0 goodDinosaurDialog1\

@@ -170,3 +170,21 @@ public:
 private:
 	Character* m_char;
 };
+
+//////////////////////////////////////////////////////////////////////////
+
+// 적이 일정 수에 도달하면 발동되는 트리거
+class EnemyCountTrigger : public Trigger
+{
+public:
+	EnemyCountTrigger( World* pWorld, int numOfEnemyToTrigger );
+	virtual ~EnemyCountTrigger() {}
+
+	virtual bool check() const;
+
+private:
+	UnitSet* m_pUnitSet;
+	int m_numOfEnemyToTrigger;
+};
+
+//////////////////////////////////////////////////////////////////////////

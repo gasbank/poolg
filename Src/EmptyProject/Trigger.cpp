@@ -319,6 +319,39 @@ Trigger* EpRemoveFlagTrigger( void* unit )
 	return new RemoveFlagTrigger( reinterpret_cast<Character*>( unit ) );
 } SCRIPT_CALLABLE_PV_PV( EpRemoveFlagTrigger )
 
+//////////////////////////////////////////////////////////////////////////
+
+EnemyCountTrigger::EnemyCountTrigger( World* pWorld, int numOfEnemyToTrigger )
+{
+	m_pUnitSet = pWorld->getUnitSet();
+	m_numOfEnemyToTrigger = numOfEnemyToTrigger;
+}
+
+bool EnemyCountTrigger::check() const
+{
+	int count = 0;
+
+	UnitSet::iterator it = m_pUnitSet->begin();
+	for ( ; it != m_pUnitSet->end(); it++ )
+	{
+		Enemy* pEnemy = static_cast<Enemy*>( *it );
+
+		// 현재로써 남은 적을 판단하는 방법은 말을 할 수 없고 Remove Flag가 false인 적을 남은
+		// 적으로 간주하는 것이다.
+		if ( !pEnemy->isTalkable() && !pEnemy->getRemoveFlag() )
+			count++;
+	}
+
+	if ( count == m_numOfEnemyToTrigger )
+		return true;
+	else
+		return false;
+}
+
+Trigger* EpCreateEnemyCountTrigger( void* ptr, int numOfEnemyToTrigger )
+{
+	return new EnemyCountTrigger( reinterpret_cast<World*>( ptr ), numOfEnemyToTrigger );
+} SCRIPT_CALLABLE_PV_PV_I( EpCreateEnemyCountTrigger )
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -333,4 +366,5 @@ START_SCRIPT_FACTORY( Trigger )
 	CREATE_OBJ_COMMAND( EpCreateScreenTrigger )
 	CREATE_OBJ_COMMAND( EpCreateNullTrigger )
 	CREATE_OBJ_COMMAND( EpRemoveFlagTrigger )
+	CREATE_OBJ_COMMAND( EpCreateEnemyCountTrigger )
 END_SCRIPT_FACTORY( Trigger )

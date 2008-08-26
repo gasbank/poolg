@@ -114,26 +114,6 @@ namespace eval EpRoomWorld {
 		set incCount	[ EpRegisterIncident $incident ]
 		EpOutputDebugString " - Incident count: $incCount\n"
 	}
-	
-	proc registerIncidentSwitch {} {
-		variable world
-		variable TestStObject
-		variable pTestEnemyUnit
-		
-		set trigger		[ EpCreateUnitPositionTrigger $TestStObject 50 39 -1 -1 0x101 ]
-		set action1		[ EpCreateStartAnimationAction [ EpGetNode Door ] ]
-		set action2		[ EpCreateStartAnimationAction [ EpGetNode TofuMan ] ]
-		
-		set incident	[ EpCreateBlockingActionIncident $trigger 0 1 ]
-		EpAddActionToIncident $incident $action1
-		EpAddActionToIncident $incident $action2
-		
-		EpIncidentSetName	$incident "Switch incident"
-		EpIncidentSetControlDuringAction $incident 1
-		
-		set incCount	[ EpRegisterIncident $incident ]
-		EpOutputDebugString " - Incident count: $incCount\n"
-	}
 
 	proc registerIncidentCamera {} {
 		variable pHeroUnit
@@ -172,6 +152,17 @@ namespace eval EpRoomWorld {
 
 		set incCount	[ EpRegisterIncident			$incident ]
 		EpOutputDebugString " - Incident count: $incCount\n"
+	}
+
+	proc registerIncidentEnemyCountTriggerTest {} {
+		variable world
+
+		set incident	[ EpCreateNonblockingActionIncident		0 0 1 ]
+		
+		EpAddTriggerToIncident $incident [ EpCreateEnemyCountTrigger $world 3 ]
+		EpAddActionToIncident $incident [ EpCreateFlickerAction 10000 500 0 255 0 ]
+
+		EpRegisterIncident $incident
 	}
 
 	proc enter {} {
@@ -277,15 +268,16 @@ namespace eval EpRoomWorld {
 
 		
 		# Incidents ------------------------------------------------------------
+		EpRegisterInitFadeInIncident		
 		registerIncidentHeal
 		registerIncidentClear
 		registerIncidentHidden
 		#registerIncidentUnClear
 		#Incident_TofuManEnter
-		registerIncidentSwitch
+		#registerIncidentSwitch
 		registerIncidentControl
 		registerAlertIncident
-		EpRegisterInitFadeInIncident
+		registerIncidentEnemyCountTriggerTest
 		
 		# Warp Positions -------------------------------------------------------
 		createWarpPosition			"EpA213World" GO 49 28 61 30

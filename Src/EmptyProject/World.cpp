@@ -33,7 +33,6 @@ World::World( const char* worldName, const TCHAR* modelFilePath )
 	m_sampleTeapotMeshRot	= 0;
 	m_aTile					= 0;
 	m_heroUnit				= 0;
-	m_curEnemyUnit			= 0;
 	m_curDialog				= 0;
 	m_sound					= 0;
 	m_bNotEntered			= true;
@@ -430,18 +429,6 @@ UINT World::addUnit( Unit* u )
 	return m_unitSet.size();
 }
 
-const D3DXVECTOR3& World::getEnemyPos()
-{
-	if ( m_curEnemyUnit != NULL )
-	{
-		return m_curEnemyUnit->getPos();
-	} else {
-		UnitSet::iterator it = m_unitSet.begin();
-		it++;
-		return (*it)->getPos();
-	}
-}
-
 const D3DXVECTOR3& World::getHeroPos()
 {
 	assert( m_heroUnit );
@@ -511,26 +498,6 @@ Dialog* World::startDialog( const char* dialogName )
 		throw std::runtime_error( "Current dialog already exists! Cannot start a new dialog" );
 }
 
-void World::handleCollision( Unit* heroUnit, Unit* opponentUnit )
-{
-	// 상대방이 대화 불가능하면 적으로 간주한다.
-	if ( !dynamic_cast<Enemy*>(opponentUnit)->isTalkable() )
-	{
-		m_curEnemyUnit = dynamic_cast<Character*>(opponentUnit);
-	}
-
-	// 전투는 타일 진입시 일어나는 것으로 한다.
-	// 상대방이 이야기 가능한 상대가 아니면 적으로 간주한다.
-	//if ( !dynamic_cast<Character*>(opponentUnit)->isTalkable() )
-	//{
-
-	//	m_curEnemyUnit = dynamic_cast<Character*>( opponentUnit );
-	//	m_curEnemyUnit->setAttack (30);
-
-	//	if ( GetWorldStateManager().curStateEnum() == GAME_WORLD_STATE_FIELD )
-	//		GetWorldStateManager().setNextState( GAME_WORLD_STATE_BATTLE );
-	//}
-}
 
 // 유닛의 포인터를 받아서, UnitSet에서 해당 유닛을 찾아 지운다.
 UnitSet::iterator World::removeUnit( Unit* pUnit )
@@ -684,6 +651,9 @@ ArnNode* World::getNode( const char* nodeName ) const
 
 void World::battleEventCheck()
 {
+	BattleState* bs = static_cast<BattleState*>( GetWorldStateManager().getState( GAME_WORLD_STATE_BATTLE ) );
+	assert( bs );
+
 	// Detect battle event.
 	// If current selected unit isn't hero unit, and isn't talkable,
 	// regard as enemy. And if hero is in the fight area of enemy, start battle.
@@ -719,17 +689,17 @@ void World::battleEventCheck()
 						continue;
 					//////////////////////////////////////////////////////////////////////////
 
-					setCurEnemy( oppCharacter );
 					
 					// No more move!
-					getCurEnemyUnit()->clearKey(); 					
 					getHeroUnit()->clearKey();
 					getHeroUnit()->setControllable( false );
 
-
 					// view each other
-					getHero()->setViewAt( &getCurEnemyUnit()->getPos() );
-					getCurEnemyUnit()->setViewAt( &getHero()->getPos() );
+					getHero()->setViewAt( &oppCharacter->getPos() );
+					oppCharacter->setViewAt( &getHero()->getPos() );
+
+					// Insert to enemy pool at BattleState
+					bs->insertEnemy( oppCharacter );
 					
 					if ( GetWorldStateManager().curStateEnum() == GAME_WORLD_STATE_FIELD )
 						GetWorldStateManager().setNextState( GAME_WORLD_STATE_BATTLE );
@@ -741,6 +711,9 @@ void World::battleEventCheck()
 
 void World::wannaTalkingEventCheck()
 {
+	BattleState* bs = static_cast<BattleState*>( GetWorldStateManager().getState( GAME_WORLD_STATE_BATTLE ) );
+	assert( bs );
+
 	// Check if hero is in the talking enemy's fight area. If true, the enemy look at hero.
 	// This work is almost same as battle event check.
 	UnitSet::iterator it = m_unitSet.begin();
@@ -757,13 +730,13 @@ void World::wannaTalkingEventCheck()
 
 				if ( isInEventArea( getHeroUnit() , talkingEnemy ) == true )
 				{
-					setCurEnemy( talkingEnemy );
-
 					// no more move!
-					getCurEnemyUnit()->clearKey();
+					talkingEnemy->clearKey();
 
 					// View at hero
-					getCurEnemyUnit()->setViewAt( &getHero()->getPos() );					
+					talkingEnemy->setViewAt( &getHero()->getPos() );
+
+					bs->insertEnemy( talkingEnemy );
 				}
 				else
 				{

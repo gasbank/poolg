@@ -185,26 +185,26 @@ HRESULT BattleState::enter()
 
 	m_hpBarPlayer.initRate((float)getHero()->getMaxHp());
 	m_hpIllusionPlayer.initRate((float)getHero()->getMaxHp());
-	m_hpBarEnemy.initRate((float)getEnemy()->getMaxHp());
-	m_hpIllusionEnemy.initRate((float)getEnemy()->getMaxHp());
+	m_hpBarEnemy.initRate((float)getFirstEnemy()->getMaxHp());
+	m_hpIllusionEnemy.initRate((float)getFirstEnemy()->getMaxHp());
 	m_mpBarPlayer.initRate((float)getHero()->getMaxCs());
 	m_mpIllusionPlayer.initRate((float)getHero()->getMaxCs());
 	m_expBarPlayer.initRate( (float) ( (Hero*)getHero() )->getMaxExp() );
 	m_expIllusionPlayer.initRate( (float) ( (Hero*)getHero() )->getMaxExp() );
 
 	m_hpBarPlayer.setRate((float)getHero()->getCurHp());
-	m_hpBarEnemy.setRate((float)getEnemy()->getCurHp());
+	m_hpBarEnemy.setRate((float)getFirstEnemy()->getCurHp());
 	m_mpBarPlayer.setRate((float)getHero()->getCurCs());
 	m_expBarPlayer.setRate ( (float) ( (Hero*)getHero() )->getCurExp() );
 	m_hpIllusionPlayer.setRate((float)getHero()->getCurHp());
-	m_hpIllusionEnemy.setRate((float)getEnemy()->getCurHp());
+	m_hpIllusionEnemy.setRate((float)getFirstEnemy()->getCurHp());
 	m_mpIllusionPlayer.setRate((float)getHero()->getCurCs());
 	m_expIllusionPlayer.setRate( (float) ( (Hero*)getHero() )->getCurExp() );
 
 
 	/*스킬 대상 설정*/
 	SkillSet* skillSet = getHero()->getSkillSet();
-	skillSet->setCharacter (getHero(), getEnemy());
+	skillSet->setCharacter (getHero(), getFirstEnemy());
 	skillSet->setBattleState(this);
 	m_noneSkillSelectedCount = 0;
 	m_levelProgress = false;
@@ -332,9 +332,9 @@ HRESULT BattleState::frameMove(double fTime, float fElapsedTime)
 	m_mpBarEnemy.frameMove(fElapsedTime);
 
 	m_hpBarPlayer.changeRate((float)getHero()->getCurHp());
-	m_hpBarEnemy.changeRate((float)getEnemy()->getCurHp());
+	m_hpBarEnemy.changeRate((float)getFirstEnemy()->getCurHp());
 	m_hpIllusionPlayer.changeRate((float)getHero()->getCurHp());
-	m_hpIllusionEnemy.changeRate((float)getEnemy()->getCurHp());
+	m_hpIllusionEnemy.changeRate((float)getFirstEnemy()->getCurHp());
 	m_mpBarPlayer.changeRate((float)getHero()->getCurCs());
 	m_mpIllusionPlayer.changeRate((float)getHero()->getCurCs());
 	m_expBarPlayer.changeRate( (float) ( (Hero*)getHero() )->getCurExp() );
@@ -456,7 +456,7 @@ HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 					break;
 				case SS_EXIT:
 					GetWorldStateManager().setNextState(GAME_WORLD_STATE_FIELD);
-					getEnemy()->setRemoveFlag( true ); 
+					getFirstEnemy()->setRemoveFlag( true ); 
 					return S_OK;
 				}
 
@@ -465,12 +465,12 @@ HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 			return S_OK;
 		}
 		/*죽었을 시 enter 키를 입력하면 대상 파괴, 아니면 다른 키 안 받고 메시지 핸들링 종료*/
-		if ( getEnemy()->getCurHp() <= 0 && !getEnemy()->getSoulAnimation() )
+		if ( getFirstEnemy()->getCurHp() <= 0 && !getFirstEnemy()->getSoulAnimation() )
 		{
 			if (wParam == VK_RETURN)
 			{
 				Hero* hero = ( Hero* )getHero();
-				Enemy* enemy = ( Enemy* )getEnemy();
+				Enemy* enemy = ( Enemy* )getFirstEnemy();
 
 				if (m_levelUpFlag == true)
 				{
@@ -490,7 +490,7 @@ HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 				if (expReward == 0)
 				{
 					GetWorldStateManager().setNextState(GAME_WORLD_STATE_FIELD);
-					getEnemy()->setRemoveFlag( true ); // Should be deleted before next frame update
+					getFirstEnemy()->setRemoveFlag( true ); // Should be deleted before next frame update
 				}
 
 				int remainExp = hero->gainExp( expReward );
@@ -539,7 +539,7 @@ HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 		}
 
 		SkillSet* skillSet = this->getHero()->getSkillSet();
-		skillSet->setCharacter( getHero(), getEnemy() );
+		skillSet->setCharacter( getHero(), getFirstEnemy() );
 
 		/*화살표에 따라 기술 분기*/
 		if (wParam == VK_UP)
@@ -947,17 +947,12 @@ void BattleState::passTurn()
 
 void BattleState::doComputerAction()
 {
-	getEnemy()->doNormalAttack(0, getHero());
+	getFirstEnemy()->doNormalAttack(0, getHero());
 }
 
 Character* BattleState::getHero()
 {
 	return getCurWorld()->getHeroUnit();
-}
-
-Character* BattleState::getEnemy()
-{
-	return getCurWorld()->getCurEnemyUnit();
 }
 
 void BattleState::setupCamera()
@@ -968,7 +963,7 @@ void BattleState::setupCamera()
 	// WorldState에 접근하기 위한 코드.
 	TopStateManager& tsm = TopStateManager::getSingleton();
 	World* ws = GetWorldManager().getCurWorld();
-	const D3DXVECTOR3& vEnemyPos = GetWorldManager().getCurWorld()->getEnemyPos();
+	const D3DXVECTOR3& vEnemyPos = getFirstEnemy()->getPos();
 	const D3DXVECTOR3& vHeroPos = ws->getHeroPos();
 
 	GetG().m_camera.beginShoulderLookCamera( &vHeroPos, &vEnemyPos );

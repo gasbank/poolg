@@ -11,10 +11,13 @@ class SkillSet;
 class World;
 class Action;
 class Sprite;
+class Enemy;
 
 enum TurnType { TT_NATURAL, TT_COMPUTER, TT_PLAYER };
 enum PlayerSide { PS_NOTSET, PS_COMPUTER, PS_PLAYER };
 enum StatSelect { SS_HEALTH, SS_WILL, SS_CODING, SS_DEF, SS_SENSE, SS_IMMUNITY, SS_EXIT };
+
+typedef std::set<Enemy*> EnemyList;
 
 class BattleState : public State
 {
@@ -40,13 +43,17 @@ public:
 	void pushBattleLog( const char* log ) { m_battleLog.push_back( log ); }	
 	void statSelectMove (char choice);
 	
+	void insertEnemy( Enemy* enemy ) { m_enemies.insert( enemy ); }
+	Enemy* getFirstEnemy() { assert( m_enemies.size() ); return *m_enemies.begin(); } // TODO Only one enemy supported yet!
 
 private:
 
 	void doComputerAction();
 	Character* getHero();
-	Character* getEnemy();
 	void setupCamera();
+
+
+	EnemyList			m_enemies;
 
 	/*이곳부터가 컴포넌트*/
 	Sprite*				m_sprite;

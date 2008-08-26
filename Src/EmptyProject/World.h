@@ -47,17 +47,17 @@ public:
 
 	UnitSet::iterator	removeUnit( Unit* pUnit );
 	
-	void				setCurEnemy( Character* enemy ) { m_curEnemyUnit = enemy; }
+	//void				setCurEnemy( Character* enemy ) { m_curEnemyUnit = enemy; }
 	
-	const D3DXVECTOR3&	getEnemyPos();
+	//const D3DXVECTOR3&	getEnemyPos();
 	const D3DXVECTOR3&	getHeroPos();
 	bool				isCollide( const D3DXVECTOR3* vec0, const D3DXVECTOR3* vec1 );
 
 	Unit*				getHero() { return m_heroUnit; }
 	Character*			getHeroUnit() { return m_heroUnit; }
 
-	Unit*				getCurEnemy() { return m_curEnemyUnit; }
-	Character*			getCurEnemyUnit() { return m_curEnemyUnit; }
+	//Unit*				getCurEnemy() { return m_curEnemyUnit; }
+	//Character*			getCurEnemyUnit() { return m_curEnemyUnit; }
 	UnitSet*			getUnitSet() { return &m_unitSet; }
 	
 	bool				isInEventArea( Character* heroPt, Character* enemyPt );
@@ -84,7 +84,6 @@ public:
 private:
 						World( const char* worldName, const TCHAR* modelFilePath );
 	void				setupLight();
-	void				handleCollision( Unit* heroUnit, Unit* opponentUnit );
 	void				startTileDefinedDialogIfExist();
 	void				proceedCurDialog();
 	void				forceCloseCurDialog();
@@ -112,7 +111,7 @@ private:
 	LPD3DXMESH						m_aTile;
 
 	Character*						m_heroUnit;
-	Character*						m_curEnemyUnit;
+	//Character*						m_curEnemyUnit;
 	
 	UnitSet							m_unitSet;
 

@@ -18,6 +18,7 @@ EpCamera::EpCamera(void)
 
 	m_bShake = false;
 	m_nextShakeTime = 0;
+	m_minPullDist = 5.0f;
 
 	m_vEyeShake = m_vUpShake = m_vLookAtShake = DX_CONSTS::D3DXVEC3_ZERO;
 }
@@ -390,8 +391,13 @@ void EpCamera::pulledEye( D3DXVECTOR3* vPulledEye, D3DXVECTOR3* vLookAt, D3DXVEC
 		*vPulledEye = *vEye;
 	else
 	{
-		vNormRayDir *= obsDist;
-		*vPulledEye = *vLookAt + vNormRayDir;
+		if ( obsDist <= m_minPullDist )
+			pulledEye( vPulledEye, vLookAt, vEye, ++nth );
+		else
+		{
+			vNormRayDir *= obsDist;
+			*vPulledEye = *vLookAt + vNormRayDir;
+		}
 	}
 
 	//printf( "camDist, obsDist %f %f \n", camDist, obsDist );

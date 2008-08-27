@@ -74,4 +74,6 @@ protected:
 
 	bool			m_bShake;
 	float			m_nextShakeTime;	
+
+	float			m_minPullDist;
 };

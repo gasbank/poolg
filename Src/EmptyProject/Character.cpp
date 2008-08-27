@@ -332,7 +332,10 @@ void Character::setMaxAndCurCs( int maxCs, int curCs )
 // 지정된 사각형 경계 위에 캐릭터가 있을 때 경계 바깥으로 나가려고 하면 움직일 수 없게 한다.
 void Character::boundaryTesting( UnitInput mappedKey )
 {
-	if ( !m_boundaryTileRect.isExist( getTilePos() ) )
+	Point2Uint nextPos( 
+		getTilePos().x + g_moveAmount[ (UINT)mappedKey ].x, 
+		getTilePos().y + g_moveAmount[ (UINT)mappedKey ].y );
+	if ( !m_boundaryTileRect.isExist( nextPos ) )
 		setMovable( false );
 }
 
@@ -461,6 +464,14 @@ int EpCharacterSetBoundary( void* ptr, int left, int top, int right, int bottom 
 	return 0;
 } SCRIPT_CALLABLE_I_PV_I_I_I_I( EpCharacterSetBoundary )
 
+int EpCharacterSetAutoBoundary( void* ptr, int range )
+{
+	Character* instance = reinterpret_cast<Character*>( ptr );
+	UINT x = instance->getTilePosX();
+	UINT y = instance->getTilePosY();
+	instance->Character::setBoundaryRect( x - range, y + range, x + range, y - range );
+	return 0;
+} SCRIPT_CALLABLE_I_PV_I( EpCharacterSetAutoBoundary )
 
 int EpCharacterSetStat( void* ptr, int statHealth, int statWill, int statCoding, int statDef, int statSen, int statImmu )
 {
@@ -495,4 +506,5 @@ START_SCRIPT_FACTORY(Character)
 	CREATE_OBJ_COMMAND( EpCharacterSetStat )
 	CREATE_OBJ_COMMAND( EpCharacterSetControllable )
 	CREATE_OBJ_COMMAND( EpCharacterSetTilePos )
+	CREATE_OBJ_COMMAND( EpCharacterSetAutoBoundary )
 END_SCRIPT_FACTORY(Character)

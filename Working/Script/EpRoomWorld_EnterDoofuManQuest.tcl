@@ -1,4 +1,3 @@
-# Not Implemented Yet
 #
 # EpRoomWorld_EnterDoofuManQuest.tcl
 #
@@ -25,7 +24,6 @@
 # Loot:
 # 없음
 #
-# Not Implemented Yet
 namespace eval EpRoomWorld::EnterDoofuManQuest {
 	variable world
 	variable pHeroUnit
@@ -102,8 +100,9 @@ namespace eval EpRoomWorld::EnterDoofuManQuest {
 		set player "PoolG"
 		
 		set dialog [ list\
-			$player		"음.. 누군가 들어온 것 같은데.."\
-			$player		"문 쪽으로 가봐야겠군."\
+			$player		"음.. 남동쪽에서 무슨 소리가 난 것 같은데.."\
+			$player		"누군가 들어온건가?"\
+			$player		"문 쪽으로 가봐야겠군."
 		];	
 	}
 }

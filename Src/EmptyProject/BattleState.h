@@ -12,6 +12,8 @@ class World;
 class Action;
 class Sprite;
 class Enemy;
+class DrawRequest;
+class ProgressUi;
 
 enum TurnType { TT_NATURAL, TT_COMPUTER, TT_PLAYER };
 enum PlayerSide { PS_NOTSET, PS_COMPUTER, PS_PLAYER };
@@ -61,24 +63,34 @@ private:
 	SkillDescBox		m_SkillContentBox;
 	SkillDescBox		m_StatSelectBox;
 
-	Picture				m_hpBgPlayer;
-	Picture				m_mpBgPlayer;
-	Picture				m_expBgPlayer;
+	DrawRequest*		m_hpBarPlayer;
+	DrawRequest*		m_csBarPlayer;
+	DrawRequest*		m_expBarPlayer;
 
-	Picture				m_hpBgEnemy;
-	Picture				m_mpBgEnemy;
+	DrawRequest*		m_hpBarEnemy;
+	DrawRequest*		m_csBarEnemy;
 
-	IllusionBar			m_hpIllusionPlayer;
-	IllusionBar			m_hpIllusionEnemy;
-	IllusionBar			m_mpIllusionPlayer;
-	IllusionBar			m_expIllusionPlayer;
+	DrawRequest*		m_hpIllusionPlayer;
+	DrawRequest*		m_csIllusionPlayer;
+	DrawRequest*		m_expIllusionPlayer;
 
-	ProgressBar			m_hpBarPlayer;
-	ProgressBar			m_mpBarPlayer;
-	ProgressBar			m_expBarPlayer;
-	
-	ProgressBar			m_hpBarEnemy;
-	ProgressBar			m_mpBarEnemy;
+	DrawRequest*		m_hpIllusionEnemy;
+	DrawRequest*		m_csIllusionEnemy;
+
+
+	ProgressUi*			m_hpBarPlayerProg;
+	ProgressUi*			m_csBarPlayerProg;
+	ProgressUi*			m_expBarPlayerProg;
+	ProgressUi*			m_hpBarEnemyProg;
+	ProgressUi*			m_csBarEnemyProg;
+
+	ProgressUi*			m_hpIllusionPlayerProg;
+	ProgressUi*			m_csIllusionPlayerProg;
+	ProgressUi*			m_expIllusionPlayerProg;
+	ProgressUi*			m_hpIllusionEnemyProg;
+	ProgressUi*			m_csIllusionEnemyProg;
+
+
 
 	LPD3DXFONT			m_lblHYnamL;
 	LPD3DXFONT			m_lblREB;

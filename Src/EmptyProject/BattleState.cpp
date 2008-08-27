@@ -14,6 +14,7 @@
 #include "SpriteManager.h"
 #include "Sprite.h"
 #include "ShaderWrapper.h"
+#include "ProgressUi.h"
 
 extern PostSepiaShader*				g_postSepiaShader;
 
@@ -77,10 +78,21 @@ BattleState::BattleState()
 	m_sprite->drawRequest( "BarBg", 0, statusBoxEnemyPosX + 45, statusBoxEnemyPosY + 10, 0, D3DCOLOR_RGBA(130, 0, 0, 255));
 	m_sprite->drawRequest( "BarBg", 0, statusBoxEnemyPosX + 45, statusBoxEnemyPosY + 30, 0, D3DCOLOR_RGBA(0, 0, 130, 255));
 
-	m_sprite->resizeRect( "BarFg", 333, 283, 350, 296 );
-	m_sprite->drawRequest( "BarFg", 0, statusBoxPlayerPosX + 45, statusBoxPlayerPosY + 10, 0, D3DCOLOR_RGBA(255, 0, 0, 255));
-	m_sprite->resizeRect( "BarFg", 333, 283, 400, 296 );
-	m_sprite->drawRequest( "BarFg", 0, statusBoxPlayerPosX + 45, statusBoxPlayerPosY + 30, 0, D3DCOLOR_RGBA(0, 0, 255, 255));
+
+	m_hpIllusionPlayer = m_sprite->drawRequest( "BarFg", 0, statusBoxPlayerPosX + 45, statusBoxPlayerPosY + 10, 0, D3DCOLOR_RGBA(255, 150, 150, 255));
+	m_csIllusionPlayer = m_sprite->drawRequest( "BarFg", 0, statusBoxPlayerPosX + 45, statusBoxPlayerPosY + 30, 0, D3DCOLOR_RGBA(180, 150, 255, 255));
+	m_expIllusionPlayer = m_sprite->drawRequest( "BarFg", 0, statusBoxPlayerPosX + 45, statusBoxPlayerPosY + 50, 0, D3DCOLOR_RGBA(100, 255, 100, 255));
+
+	m_hpIllusionEnemy = m_sprite->drawRequest( "BarFg", 0, statusBoxEnemyPosX + 45, statusBoxEnemyPosY + 10, 0, D3DCOLOR_RGBA(255, 150, 150, 255));
+	m_csIllusionEnemy = m_sprite->drawRequest( "BarFg", 0, statusBoxEnemyPosX + 45, statusBoxEnemyPosY + 30, 0, D3DCOLOR_RGBA(180, 180, 255, 255));
+
+
+	m_hpBarPlayer = m_sprite->drawRequest( "BarFg", 0, statusBoxPlayerPosX + 45, statusBoxPlayerPosY + 10, 0, D3DCOLOR_RGBA(255, 0, 0, 255));
+	m_csBarPlayer = m_sprite->drawRequest( "BarFg", 0, statusBoxPlayerPosX + 45, statusBoxPlayerPosY + 30, 0, D3DCOLOR_RGBA(100, 50, 255, 255));
+	m_expBarPlayer = m_sprite->drawRequest( "BarFg", 0, statusBoxPlayerPosX + 45, statusBoxPlayerPosY + 50, 0, D3DCOLOR_RGBA(0, 200, 0, 255));
+
+	m_hpBarEnemy = m_sprite->drawRequest( "BarFg", 0, statusBoxEnemyPosX + 45, statusBoxEnemyPosY + 10, 0, D3DCOLOR_RGBA(255, 0, 0, 255));
+	m_csBarEnemy = m_sprite->drawRequest( "BarFg", 0, statusBoxEnemyPosX + 45, statusBoxEnemyPosY + 30, 0, D3DCOLOR_RGBA(0, 0, 255, 255));
 
 
 	m_sprite->drawRequest( "BarBg", 0, 200, 200, 0, 0xffffffff );
@@ -129,66 +141,12 @@ BattleState::BattleState()
 
 	float statusBarWidth = statusBoxWidth * 0.67f;
 	float statusBarHeight = statusBarWidth * 0.1f;
-	m_hpBgPlayer.init(L"Images/BattleUI/HPbg.jpg", m_pDev);
-	m_hpBgPlayer.setPos (statusBoxPlayersPositionX + statusBoxWidth*0.23f, statusBoxPlayersPositionY + statusBoxHeight * 0.82f, 5);
-	m_hpBgPlayer.setSize(statusBarWidth, statusBarHeight);
-	m_mpBgPlayer.init(L"Images/BattleUI/MPbg.jpg", m_pDev);
-	m_mpBgPlayer.setPos (statusBoxPlayersPositionX + statusBoxWidth*0.23f, statusBoxPlayersPositionY + statusBoxHeight * 0.65f, 5);
-	m_mpBgPlayer.setSize(statusBarWidth, statusBarHeight);
-	m_expBgPlayer.init(L"Images/BattleUI/EXPbg.jpg", m_pDev);
-	m_expBgPlayer.setPos (statusBoxPlayersPositionX + statusBoxWidth*0.23f, statusBoxPlayersPositionY + statusBoxHeight * 0.48f, 5);
-	m_expBgPlayer.setSize(statusBarWidth, statusBarHeight);
 
-	m_hpBgEnemy.init(L"Images/BattleUI/HPbg.jpg", m_pDev);
-	m_hpBgEnemy.setPos (statusBoxEnemysPositionX + statusBoxWidth*0.23f, statusBoxEnemysPositionY + statusBoxHeight * 0.82f, 5);
-	m_hpBgEnemy.setSize(statusBarWidth, statusBarHeight);
-	m_mpBgEnemy.init(L"Images/BattleUI/MPbg.jpg", m_pDev);
-	m_mpBgEnemy.setPos (statusBoxEnemysPositionX + statusBoxWidth*0.23f, statusBoxEnemysPositionY + statusBoxHeight * 0.65f, 5);
-	m_mpBgEnemy.setSize(statusBarWidth, statusBarHeight);
-
-	m_hpIllusionPlayer.init(L"Images/BattleUI/HPillusion.jpg", m_pDev);
-	m_hpIllusionPlayer.setSize(statusBarWidth, statusBarHeight);
-	m_hpIllusionPlayer.setPos (statusBoxPlayersPositionX + statusBoxWidth*0.23f, statusBoxPlayersPositionY + statusBoxHeight * 0.82f, 4.8f);
-
-	m_hpIllusionEnemy.init(L"Images/BattleUI/HPillusion.jpg", m_pDev);
-	m_hpIllusionEnemy.setSize(statusBarWidth, statusBarHeight);
-	m_hpIllusionEnemy.setPos (statusBoxEnemysPositionX + statusBoxWidth*0.23f, statusBoxEnemysPositionY + statusBoxHeight * 0.82f, 4.8f);
-
-	m_mpIllusionPlayer.init(L"Images/BattleUI/DKillusion.jpg", m_pDev);
-	m_mpIllusionPlayer.setSize(statusBarWidth, statusBarHeight);
-	m_mpIllusionPlayer.setPos (statusBoxPlayersPositionX + statusBoxWidth*0.23f, statusBoxPlayersPositionY + statusBoxHeight * 0.65f, 4.8f);
-
-	m_expIllusionPlayer.init(L"Images/BattleUI/EXPillusion.jpg", m_pDev);
-	m_expIllusionPlayer.setSize(statusBarWidth, statusBarHeight);
-	m_expIllusionPlayer.setPos (statusBoxPlayersPositionX + statusBoxWidth*0.23f, statusBoxPlayersPositionY + statusBoxHeight * 0.48f, 4.8f);
-
-
-	m_hpBarPlayer.init(L"Images/BattleUI/HPbar.jpg", m_pDev);
-	m_hpBarPlayer.setSize(statusBarWidth, statusBarHeight);
-	m_hpBarPlayer.setPos (statusBoxPlayersPositionX + statusBoxWidth*0.23f, statusBoxPlayersPositionY + statusBoxHeight * 0.82f, 4.5f);
-	
 	m_innerFire.init (L"Images/BattleUI/BGchecker.jpg", m_pDev, 0.8f, 3, 9);
 	m_innerFire.setPos (0, 0, 0);
 
 
-	m_mpBarPlayer.init(L"Images/BattleUI/DKbar.jpg", m_pDev);
-	m_mpBarPlayer.initRate();
-	m_mpBarPlayer.setPos (statusBoxPlayersPositionX + statusBoxWidth*0.23f, statusBoxPlayersPositionY + statusBoxHeight * 0.65f, 4.5f);
-	m_mpBarPlayer.setSize(statusBarWidth, statusBarHeight);
 
-	m_expBarPlayer.init(L"Images/BattleUI/EXPbar.jpg", m_pDev);
-	m_expBarPlayer.initRate();
-	m_expBarPlayer.setPos (statusBoxPlayersPositionX + statusBoxWidth*0.23f, statusBoxPlayersPositionY + statusBoxHeight * 0.48f, 4.5f);
-	m_expBarPlayer.setSize(statusBarWidth, statusBarHeight);
-
-	m_hpBarEnemy.init(L"Images/BattleUI/HPbar.jpg", m_pDev);
-	m_hpBarEnemy.setPos (statusBoxEnemysPositionX + statusBoxWidth*0.23f, statusBoxEnemysPositionY + statusBoxHeight * 0.82f, 4.5f);
-	m_hpBarEnemy.setSize(statusBarWidth, statusBarHeight);
-
-	m_mpBarEnemy.init(L"Images/BattleUI/MPbar.jpg", m_pDev);
-	m_mpBarEnemy.setSize(statusBarWidth, statusBarHeight);
-	m_mpBarEnemy.setPos (statusBoxEnemysPositionX + statusBoxWidth*0.23f, statusBoxEnemysPositionY + statusBoxHeight * 0.65f, 4.5f);
-	
 	D3DXCreateFont(m_pDev, 17, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblHYnamL);
 	D3DXCreateFont(m_pDev, 18, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Rockwell Extra Bold"), &m_lblREB);
 	D3DXCreateFont(m_pDev, 20, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblSkill);
@@ -203,6 +161,19 @@ BattleState::BattleState()
 
 	m_curTurnType = TT_NATURAL;
 	m_nextTurnType = TT_NATURAL;
+
+	//////ProgressUi Assigning
+	m_hpBarPlayerProg = new ProgressUi( PM_BAR );
+	m_csBarPlayerProg = new ProgressUi( PM_BAR );
+	m_expBarPlayerProg = new ProgressUi( PM_BAR );
+	m_hpBarEnemyProg = new ProgressUi( PM_BAR );
+	m_csBarEnemyProg = new ProgressUi( PM_BAR );
+
+	m_hpIllusionPlayerProg = new ProgressUi( PM_ILLUSION );
+	m_csIllusionPlayerProg = new ProgressUi( PM_ILLUSION );
+	m_expIllusionPlayerProg = new ProgressUi( PM_ILLUSION );
+	m_hpIllusionEnemyProg = new ProgressUi( PM_ILLUSION );
+	m_csIllusionEnemyProg = new ProgressUi( PM_ILLUSION );
 }
 
 BattleState::~BattleState()
@@ -298,28 +269,6 @@ HRESULT BattleState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, flo
 
 	m_pDev->SetRenderState(D3DRS_ZENABLE, FALSE);
 	
-	m_StatSelectBox.draw();
-	m_SkillContentBox.draw();
-	
-	//m_hpBgPlayer.draw();
-	//m_mpBgPlayer.draw();
-	//m_expBgPlayer.draw();
-	m_hpBgEnemy.draw();
-	m_mpBgEnemy.draw();
-
-	//m_hpIllusionPlayer.draw();
-	//m_hpIllusionEnemy.draw();
-	//m_mpIllusionPlayer.draw();
-	//m_expIllusionPlayer.draw();
-
-
-	//m_hpBarPlayer.draw();
-	//m_mpBarPlayer.draw();
-	//m_expBarPlayer.draw();
-	m_hpBarEnemy.draw();
-	m_mpBarEnemy.draw();
-
-	
 
 	m_pDev->SetRenderState(D3DRS_ZENABLE, TRUE);
 	pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
@@ -338,6 +287,55 @@ HRESULT BattleState::frameMove(double fTime, float fElapsedTime)
 {
 	double fStateTime = getStateTime(fTime);
 
+	//현재 수치 적용
+	m_hpBarPlayerProg->setCurVal( getHero()->getCurHp() );
+	m_csBarPlayerProg->setCurVal( getHero()->getCurCs() );
+	m_expBarPlayerProg->setCurVal( ((Hero*)getHero() )->getCurExp() );
+	m_hpBarEnemyProg->setCurVal( getFirstEnemy()->getCurHp() );
+	m_csBarEnemyProg->setCurVal( getFirstEnemy()->getCurCs() );
+
+	m_hpIllusionPlayerProg->setCurVal( getHero()->getCurHp() );
+	m_csIllusionPlayerProg->setCurVal( getHero()->getCurCs() );
+	m_expIllusionPlayerProg->setCurVal( ((Hero*)getHero() )->getCurExp() );
+	m_hpIllusionEnemyProg->setCurVal( getFirstEnemy()->getCurHp() );
+	m_csIllusionEnemyProg->setCurVal( getFirstEnemy()->getCurCs() );
+
+	//수치 이동
+	m_hpBarPlayerProg->setRate( fElapsedTime );
+	m_csBarPlayerProg->setRate( fElapsedTime );
+	m_expBarPlayerProg->setRate( fElapsedTime );
+	m_hpBarEnemyProg->setRate( fElapsedTime );
+	m_csBarEnemyProg->setRate( fElapsedTime );
+
+	m_hpIllusionPlayerProg->setRate( fElapsedTime );
+	m_csIllusionPlayerProg->setRate( fElapsedTime );
+	m_expIllusionPlayerProg->setRate( fElapsedTime );
+	m_hpIllusionEnemyProg->setRate( fElapsedTime );
+	m_csIllusionEnemyProg->setRate( fElapsedTime );
+
+
+	//수치를 그림에 적용
+	//원 크기는 333에서 443까지.
+	//따라서 right = 333 + 110 * rate;
+	int barLeftBound = 333;
+	int	barLength = 110;
+
+	m_hpBarPlayer->srcRect.right = barLeftBound + (int)( barLength*( m_hpBarPlayerProg->getRate() ) );
+	m_csBarPlayer->srcRect.right = barLeftBound + (int)( barLength*( m_csBarPlayerProg->getRate() ) );
+	m_expBarPlayer->srcRect.right = barLeftBound + (int)( barLength*( m_expBarPlayerProg->getRate() ) );
+
+	m_hpBarEnemy->srcRect.right = barLeftBound + (int)( barLength*( m_hpBarEnemyProg->getRate() ) );
+	m_csBarEnemy->srcRect.right = barLeftBound + (int)( barLength*( m_hpBarEnemyProg->getRate() ) );
+
+
+	m_hpIllusionPlayer->srcRect.right = barLeftBound + (int)( barLength*( m_hpIllusionPlayerProg->getRate() ) );
+	m_csIllusionPlayer->srcRect.right = barLeftBound + (int)( barLength*( m_csIllusionPlayerProg->getRate() ) );
+	m_expIllusionPlayer->srcRect.right = barLeftBound + (int)( barLength*( m_expIllusionPlayerProg->getRate() ) );
+
+	m_hpIllusionEnemy->srcRect.right = barLeftBound + (int)( barLength*( m_hpIllusionEnemyProg->getRate() ) );
+	m_csIllusionEnemy->srcRect.right = barLeftBound + (int)( barLength*( m_csIllusionEnemyProg->getRate() ) );
+
+/*
 	m_SkillContentBox.frameMove(fElapsedTime);
 	m_StatSelectBox.frameMove( fElapsedTime );
 	m_hpBgPlayer.frameMove(fElapsedTime);
@@ -369,7 +367,7 @@ HRESULT BattleState::frameMove(double fTime, float fElapsedTime)
 	m_mpIllusionPlayer.changeRate((float)getHero()->getCurCs());
 	m_expBarPlayer.changeRate( (float) ( (Hero*)getHero() )->getCurExp() );
 	m_expIllusionPlayer.changeRate( (float) ( (Hero*)getHero() )->getCurExp() );
-
+*/
 
 	// TODO Anim test
 
@@ -410,12 +408,6 @@ HRESULT BattleState::frameMove(double fTime, float fElapsedTime)
 
 HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	//m_hpBarPlayer.handleMessages(hWnd, uMsg, wParam, lParam);
-	//m_mpBarPlayer.handleMessages(hWnd, uMsg, wParam, lParam);
-	//m_expBarPlayer.handleMessages(hWnd, uMsg, wParam, lParam);
-	//m_mpBarEnemy.handleMessages(hWnd, uMsg, wParam, lParam);
-
-
 
 
 
@@ -505,11 +497,21 @@ HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 				if (m_levelUpFlag == true)
 				{
 					hero->levelUp();
+					m_expBarPlayerProg->setMaxVal (( (Hero*)getHero() )->getMaxExp() );
+					m_expIllusionPlayerProg->setMaxVal (( (Hero*)getHero())->getMaxExp() );
+					m_expBarPlayerProg->setCurVal (( (Hero*)getHero() )->getMaxExp() );
+					m_expIllusionPlayerProg->setCurVal (( (Hero*)getHero())->getMaxExp() );
+					m_expBarPlayerProg->init();
+					m_expIllusionPlayerProg->init();
+
+					//m_expBarPlayerProg->setRatePerforce();
+					//m_expIllusionPlayerProg->setRatePerforce();
+					/*
 					m_expBarPlayer.initRate( (float) ( (Hero*)getHero() )->getMaxExp() );
 					m_expIllusionPlayer.initRate( (float) ( (Hero*)getHero() )->getMaxExp() );
 					m_expIllusionPlayer.setRate( (float) ( (Hero*)getHero() )->getCurExp() );
 					m_expBarPlayer.setRate ( (float) ( (Hero*)getHero() )->getCurExp() );
-
+*/
 					m_statCount += 5;
 				}
 
@@ -595,7 +597,8 @@ HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 
 			if (!(skillSet->useSkill()))
 			{
-				/*이부분에 스킬이 없습니다 라는 다이얼로그를 추가할수도.*/
+				//이부분에 스킬이 없습니다 라는 다이얼로그를 추가할수도.
+				//이스터 에그입니다. 마음껏 추가하시죠.
 				switch (m_noneSkillSelectedCount)
 				{
 				case 0:
@@ -688,23 +691,6 @@ HRESULT BattleState::release ()
 
 	m_SkillContentBox.release();
 	m_StatSelectBox.release();
-	m_hpBgPlayer.release();
-	m_mpBgPlayer.release();
-	m_expBgPlayer.release();
-	m_hpBgEnemy.release();
-	m_mpBgEnemy.release();
-
-	m_hpIllusionPlayer.release();
-	m_hpIllusionEnemy.release();
-	m_mpIllusionPlayer.release();
-	m_expIllusionPlayer.release ();
-
-	m_hpBarPlayer.release();
-	m_mpBarPlayer.release();
-	m_expBarPlayer.release();
-
-	m_hpBarEnemy.release();
-	m_mpBarEnemy.release();
 
 	m_innerFire.release();
 
@@ -714,6 +700,18 @@ HRESULT BattleState::release ()
 	SAFE_RELEASE( m_lblSkill );
 	SAFE_RELEASE( m_lblSkillDescription );
 	SAFE_RELEASE( m_lblStatSelect );
+
+	delete			m_hpBarPlayerProg;
+	delete			m_csBarPlayerProg;
+	delete			m_expBarPlayerProg;
+	delete			m_hpBarEnemyProg;
+	delete			m_csBarEnemyProg;
+
+	delete			m_hpIllusionPlayerProg;
+	delete			m_csIllusionPlayerProg;
+	delete			m_expIllusionPlayerProg;
+	delete			m_hpIllusionEnemyProg;
+	delete			m_csIllusionEnemyProg;
 
 	return S_OK;
 }
@@ -1064,6 +1062,45 @@ void BattleState::statSelectMove (char choice)
 
 void BattleState::updateBarRate()
 {
+
+	m_hpBarPlayerProg->setMaxVal( getHero()->getMaxHp() );
+	m_csBarPlayerProg->setMaxVal( getHero()->getMaxCs() );
+	m_expBarPlayerProg->setMaxVal( ( (Hero*)getHero() )->getMaxExp() );
+	m_hpBarEnemyProg->setMaxVal( getFirstEnemy()->getMaxHp() );
+	m_csBarEnemyProg->setMaxVal( getFirstEnemy()->getMaxCs() );
+
+	m_hpIllusionPlayerProg->setMaxVal( getHero()->getMaxHp() );
+	m_csIllusionPlayerProg->setMaxVal( getHero()->getMaxCs() );
+	m_expIllusionPlayerProg->setMaxVal( ( (Hero*)getHero() )->getMaxExp() );
+	m_hpIllusionEnemyProg->setMaxVal( getFirstEnemy()->getMaxHp() );
+	m_csIllusionEnemyProg->setMaxVal( getFirstEnemy()->getMaxCs() );
+
+	m_hpBarPlayerProg->setCurVal( getHero()->getCurHp() );
+	m_csBarPlayerProg->setCurVal( getHero()->getCurCs() );
+	m_expBarPlayerProg->setCurVal( ((Hero*)getHero() )->getCurExp() );
+	m_hpBarEnemyProg->setCurVal( getFirstEnemy()->getCurHp() );
+	m_csBarEnemyProg->setCurVal( getFirstEnemy()->getCurCs() );
+
+	m_hpIllusionPlayerProg->setCurVal( getHero()->getCurHp() );
+	m_csIllusionPlayerProg->setCurVal( getHero()->getCurCs() );
+	m_expIllusionPlayerProg->setCurVal( ((Hero*)getHero() )->getCurExp() );
+	m_hpIllusionEnemyProg->setCurVal( getFirstEnemy()->getCurHp() );
+	m_csIllusionEnemyProg->setCurVal( getFirstEnemy()->getCurCs() );
+
+
+	m_hpBarPlayerProg->setRatePerforce();
+	m_csBarPlayerProg->setRatePerforce();
+	m_expBarPlayerProg->setRatePerforce();
+	m_hpBarEnemyProg->setRatePerforce();
+	m_csBarEnemyProg->setRatePerforce();
+
+	m_hpIllusionPlayerProg->setRatePerforce();
+	m_csIllusionPlayerProg->setRatePerforce();
+	m_expIllusionPlayerProg->setRatePerforce();
+	m_hpIllusionEnemyProg->setRatePerforce();
+	m_csIllusionEnemyProg->setRatePerforce();
+
+	/*
 	m_hpBarPlayer.initRate((float)getHero()->getMaxHp());
 	m_hpIllusionPlayer.initRate((float)getHero()->getMaxHp());
 	m_hpBarEnemy.initRate((float)getFirstEnemy()->getMaxHp());
@@ -1080,5 +1117,5 @@ void BattleState::updateBarRate()
 	m_hpIllusionPlayer.setRate((float)getHero()->getCurHp());
 	m_hpIllusionEnemy.setRate((float)getFirstEnemy()->getCurHp());
 	m_mpIllusionPlayer.setRate((float)getHero()->getCurCs());
-	m_expIllusionPlayer.setRate( (float) ( (Hero*)getHero() )->getCurExp() );
+	m_expIllusionPlayer.setRate( (float) ( (Hero*)getHero() )->getCurExp() );*/
 }

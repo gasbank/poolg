@@ -10,10 +10,10 @@ public:
 	void setCurVal (int val)					{ m_curVal = val; }
 	void setMaxVal (int val)					{ m_maxVal = val; }
 	void setProgressMode (ProgressMode pm)		{ m_progressMode = pm; }
-	void init () { m_rate = 100; }
-	void setRatePerforce ()						{ m_rate = ( float )m_curVal / m_maxVal * 100; }
+	void init () { m_rate = 0; }
+	void setRatePerforce ()						{ m_rate = m_curVal / ( float )m_maxVal; }
 	void setRate (float fElapsedTime);
-	float getRate ()							{ return m_rate; }
+	float getRate ();
 
 
 private:

@@ -35,15 +35,22 @@ proc getHero { tilePos } {
 	set curWorld [ EpGetCurWorld ];
 	set hasHero [ EpHasHero ];
 	if { $hasHero == 1 } {
-		set	unit [ EpGetHero ]
+		set	pHeroUnit [ EpGetHero ]
 	} else {
 		# Hero is created only once
-		set unit [ EpCreateHero $tilePos ];
-		EpCharacterSetMoveDuration	$unit	0.05
-		EpRegisterToWorld $curWorld $unit
+		set pHeroUnit [ EpCreateHero $tilePos ];
+		EpCharacterSetMoveDuration	$pHeroUnit 0.05		
+		EpCharacterSetStat			$pHeroUnit 7 5 7 5 5 5 ;# Health Will Coding Defence Sense Immunity
+		EpCharacterSetCurHp			$pHeroUnit 10
+		EpCharacterSetCurCs			$pHeroUnit -1
+		EpCharacterSetMoveDuration	$pHeroUnit [expr 0.2]
+		EpUnitSetColor				$pHeroUnit 255 0 255
+		EpUnitSetPosZ				$pHeroUnit -[EpUnitGetUpperRightZ $pHeroUnit]
+		EpUnitSetArnMesh			$pHeroUnit "PoolGModel"
+		EpRegisterToWorld			$curWorld $pHeroUnit
 	}
-	EpCharacterSetTilePos $unit $tilePos
-	return $unit
+	EpCharacterSetTilePos $pHeroUnit $tilePos
+	return $pHeroUnit
 }
 
 proc createEnemy { tileX tileY { registerWorld 1 } } {

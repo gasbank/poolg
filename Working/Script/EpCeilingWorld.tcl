@@ -18,16 +18,6 @@ namespace eval EpCeilingWorld {
 		set world					$curWorld;
 		
 		set pHeroUnit				[ getHero $startPos ];
-		                                      # Health Will Coding Defence Sense Immunity
-		EpCharacterSetStat			$pHeroUnit    7     5     7       5      5      5
-		EpCharacterSetCurHp			$pHeroUnit 10
-		EpCharacterSetCurCs			$pHeroUnit -1
-		EpCharacterSetMoveDuration	$pHeroUnit [expr 0.2]
-		EpUnitSetColor				$pHeroUnit 255 0 255
-		#EpUnitSetRotX				$pHeroUnit [ToRadian -90]
-		#EpUnitSetRotZ				$pHeroUnit [ToRadian 90]
-		EpUnitSetPosZ				$pHeroUnit -[EpUnitGetUpperRightZ $pHeroUnit]
-		EpUnitSetArnMesh			$pHeroUnit "PoolGModel"
         
 		set npcGetg					[ createEnemy 34 79 ];
 		EpUnitSetColor				$npcGetg 128 128 0

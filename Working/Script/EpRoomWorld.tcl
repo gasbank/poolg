@@ -64,12 +64,6 @@ namespace eval EpRoomWorld {
 				
 		set pHeroUnit				[getHero $heroStartPos];
 		EpCharacterSetControllable	$pHeroUnit 1
-		EpUnitSetPosZ				$pHeroUnit -[EpUnitGetUpperRightZ $pHeroUnit]                                          
-		EpCharacterSetStat			$pHeroUnit 100 5 7 5 5 5 ;# Health Will Coding Defence Sense Immunity
-		EpCharacterSetCurHp			$pHeroUnit 100
-		EpCharacterSetCurCs			$pHeroUnit -1
-		EpCharacterSetMoveDuration	$pHeroUnit [expr 0.15]
-		EpUnitSetColor				$pHeroUnit 255 0 255
 
 		createEnemyGwengYi { 25 89 }
 		createEnemyGwengYi { 37 88 }

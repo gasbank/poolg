@@ -78,7 +78,7 @@ namespace eval EpA213World::LegendOfDinosaurQuest {
 		EpAddActionToSequence	$seqIncident $actionD0
 		EpAddActionToSequence	$seqIncident $actionD1
 
-		EpSequentialIncidentSetName	$seqIncident "LegendOfDinsaur sequential incident"
+		EpIncidentSetName	$seqIncident "LegendOfDinsaur sequential incident"
 
 		set incCount		[ EpRegisterSequentialIncident $seqIncident ]
 		

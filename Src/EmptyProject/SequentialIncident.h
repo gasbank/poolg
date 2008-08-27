@@ -1,4 +1,5 @@
 #pragma once
+#include "Incident.h"
 
 class Action;
 class Trigger;
@@ -6,41 +7,32 @@ class BlockingActionIncident;
 
 typedef std::list<BlockingActionIncident*> BlockingActionIncidentList;
 
-// Note that SequentialIncident is not a Incident-derived class!
-class SequentialIncident
+class SequentialIncident : public Incident
 {
 public:
-	SequentialIncident( int trigCount );
-	~SequentialIncident();
+								SequentialIncident( int trigCount );
+								~SequentialIncident();
+	
+	virtual bool				update( double dTime, float fElapsedTime );
+	virtual bool				isFinished() const { return ( getLeastOnetime() && !isActivated() && m_curSequence == m_sequencer.end() ); }
+	virtual void				printDebugInfo() const;
+	virtual void				printDebugInfoDetailed() const;
+	virtual void				release();
 
-	void addTriggerSequence( Trigger* trigger );
-	void addActionSequence( Action* action );
-	void addIncident( BlockingActionIncident* incident ) { m_sequencer.push_back( incident ); }
-
-	bool update( double dTime, float fElapsedTime );
-	bool isFinished() { return ( m_LeastOnetime && !isActivated() && m_curSequence == m_sequencer.end() ); }
-
-	bool isActivated() const { return m_bActivated; }
-
-	void setName( const char* name ) { m_incidentName = name; }
-	const char* getName() const { return m_incidentName.c_str(); }
-
-	void release();
+	void 						addTriggerSequence( Trigger* trigger );
+	void 						addActionSequence( Action* action );
+	
 protected:
-	void activate();
-	void deactivate();
-private:
-	bool checkTrigCountRemained() const { return ( m_trigCount == -1 || m_trigCount > 0 ); }
-	void decreaseTrigCount() { if ( m_trigCount > 0 ) m_trigCount -= 1; }
+	virtual void				activate();
+	virtual void				deactivate();
 
-	BlockingActionIncidentList m_sequencer;
-	BlockingActionIncident* m_curIncident;
-	BlockingActionIncidentList::iterator m_curSequence;
-	bool m_bActivated;
-	bool m_LeastOnetime;
-	int m_trigCount;
-	int m_lastCheck;
-	std::string m_incidentName;
+private:
+	void						addIncident( BlockingActionIncident* incident ) { m_sequencer.push_back( incident ); }
+
+	BlockingActionIncidentList				m_sequencer;
+	BlockingActionIncident*					m_curIncident;
+	BlockingActionIncidentList::iterator	m_curSequence;
+	int										m_lastCheck;
 };
 
 SCRIPT_FACTORY( SequentialIncident )

@@ -102,7 +102,7 @@ namespace eval EpA213World::OldRatandGatekeeperQuest {
 		set action					[ EpCreateScriptAction	"EpUnitSetRemoveFlag $pOldCat10 1" ]
 		EpAddActionToSequence		$sqIncident $action
 		
-		EpSequentialIncidentSetName	$sqIncident "TalkWithRat incident"
+		EpIncidentSetName	$sqIncident "TalkWithRat incident"
 		
 		set incCount		[ EpRegisterSequentialIncident $sqIncident ]
 		EpOutputDebugString " - Incident count: $incCount\n"
@@ -128,7 +128,7 @@ namespace eval EpA213World::OldRatandGatekeeperQuest {
 		set action					[ EpCreateScriptAction	"EpEnemySetTalkable $pOldCat11 0" ]
 		EpAddActionToSequence		$seqIncident	$action
 
-		EpSequentialIncidentSetName	$seqIncident "pOldCat1 sequential incident"
+		EpIncidentSetName	$seqIncident "pOldCat1 sequential incident"
 
 		set incCount		[ EpRegisterSequentialIncident $seqIncident ]
 		

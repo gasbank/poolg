@@ -48,7 +48,7 @@ namespace eval EpCeilingWorld {
 		EpAddTriggerToSequence	$incident	[ EpCreateUnitPositionWithTraceTrigger $pHeroUnit $npcGloop 0x001 ]
 		EpAddActionToSequence	$incident	[ EpCreateDialogAction "EpCeilingWorld::GlooPDialog2" ]
 
-		EpSequentialIncidentSetName	$incident "mainQuest incident"
+		EpIncidentSetName	$incident "mainQuest incident"
 		
 		set incCount	[ EpRegisterSequentialIncident $incident ]
 		EpOutputDebugString " - Incident count: $incCount\n"

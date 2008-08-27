@@ -6,7 +6,7 @@
 #include "BlockingActionIncident.h"
 
 SequentialIncident::SequentialIncident( int trigCount )
-: m_trigCount ( trigCount ), m_bActivated ( false )
+: Incident( trigCount )
 {
 	m_curIncident = 0;
 	m_lastCheck = 1;
@@ -46,7 +46,7 @@ bool SequentialIncident::update( double dTime, float fElapsedTime )
 void SequentialIncident::addTriggerSequence( Trigger* trigger )
 {
 	if ( m_lastCheck == 1 )
-		m_curIncident = new BlockingActionIncident( m_trigCount );
+		m_curIncident = new BlockingActionIncident( getTrigCount() );
 				
 	m_curIncident->addTrigger( trigger );
 	m_lastCheck = 0;
@@ -66,16 +66,12 @@ void SequentialIncident::addActionSequence( Action* action )
 
 void SequentialIncident::activate()
 {
-	if ( isActivated() )
-		throw std::runtime_error( "Incident::activate() is called after prior activation" );
-	m_bActivated = true;
+	Incident::activate();
 }
 
 void SequentialIncident::deactivate()
 {
-	if ( !isActivated() )
-		throw std::runtime_error( "Incident::deactivate() is called during not activated state" );
-	m_bActivated = false;
+	Incident::deactivate();
 }
 
 SequentialIncident::~SequentialIncident()
@@ -86,26 +82,39 @@ SequentialIncident::~SequentialIncident()
 void SequentialIncident::release()
 {
 	EpSafeReleaseAll( m_sequencer );
+
+	Incident::release();
 }
+
+void SequentialIncident::printDebugInfo() const
+{
+	throw std::runtime_error( "Not implemented yet" );
+}
+
+void SequentialIncident::printDebugInfoDetailed() const
+{
+	throw std::runtime_error( "Not implemented yet" );
+}
+
 //////////////////////////////////////////////////////////////////////////
 
-int EpAddTriggerToSequence( void* pv1, void* pv2 )
+int EpSequentialIncidentAddTrigger( void* pv1, void* pv2 )
 {
 	SequentialIncident* inci = reinterpret_cast<SequentialIncident*>( pv1 );
 	Trigger* trig = reinterpret_cast<Trigger*>( pv2 );
 	inci->addTriggerSequence( trig );
 
 	return 0;
-} SCRIPT_CALLABLE_I_PV_PV( EpAddTriggerToSequence )
+} SCRIPT_CALLABLE_I_PV_PV( EpSequentialIncidentAddTrigger )
 
-int EpAddActionToSequence( void* pv1, void* pv2 )
+int EpSequentialIncidentAddAction( void* pv1, void* pv2 )
 {
 	SequentialIncident* inci = reinterpret_cast<SequentialIncident*>( pv1 );
 	Action* act = reinterpret_cast<Action*>( pv2 );
 	inci->addActionSequence( act );
 
 	return 0;
-} SCRIPT_CALLABLE_I_PV_PV( EpAddActionToSequence )
+} SCRIPT_CALLABLE_I_PV_PV( EpSequentialIncidentAddAction )
 
 SequentialIncident* EpCreateSequentialIncident( int trigCount )
 {
@@ -115,16 +124,9 @@ SequentialIncident* EpCreateSequentialIncident( int trigCount )
 	return new SequentialIncident( trigCount );
 } SCRIPT_CALLABLE_PV_I( EpCreateSequentialIncident )
 
-int EpSequentialIncidentSetName( void* pv1, const char* pv2 )
-{
-	SequentialIncident* inci = reinterpret_cast<SequentialIncident*>( pv1 );
-	inci->setName( pv2 );
-	return 0;
-} SCRIPT_CALLABLE_I_PV_PC( EpSequentialIncidentSetName )
 
 START_SCRIPT_FACTORY( SequentialIncident )
-	CREATE_OBJ_COMMAND( EpAddTriggerToSequence )
-	CREATE_OBJ_COMMAND( EpAddActionToSequence )
 	CREATE_OBJ_COMMAND( EpCreateSequentialIncident )
-	CREATE_OBJ_COMMAND( EpSequentialIncidentSetName )
+	CREATE_OBJ_COMMAND_NEWNAME( EpSequentialIncidentAddTrigger,		"EpAddTriggerToSequence" )
+	CREATE_OBJ_COMMAND_NEWNAME( EpSequentialIncidentAddAction,		"EpAddActionToSequence" )
 END_SCRIPT_FACTORY( SequentialIncident )

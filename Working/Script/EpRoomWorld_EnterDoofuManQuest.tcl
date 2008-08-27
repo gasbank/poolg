@@ -57,7 +57,7 @@ namespace eval EpRoomWorld::EnterDoofuManQuest {
 		EpAddTriggerToSequence	$incident [ EpCreateUnitPositionTrigger $EpRoomWorld::pHeroUnit 51 47 58 38 0x001 ]
 		EpAddActionToSequence	$incident [ EpCreateDialogAction "EpRoomWorld::EnterDoofuManQuest::tufu" ]
 		
-		EpRegisterSequentialIncident $incident
+		EpRegisterIncident $incident
 	}
 
 	namespace eval warmingUp {} {

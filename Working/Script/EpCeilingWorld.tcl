@@ -50,7 +50,7 @@ namespace eval EpCeilingWorld {
 
 		EpIncidentSetName	$incident "mainQuest incident"
 		
-		set incCount	[ EpRegisterSequentialIncident $incident ]
+		set incCount	[ EpRegisterIncident $incident ]
 		EpOutputDebugString " - Incident count: $incCount\n"
 	}
 

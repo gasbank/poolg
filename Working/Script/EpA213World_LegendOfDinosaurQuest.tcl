@@ -80,7 +80,7 @@ namespace eval EpA213World::LegendOfDinosaurQuest {
 
 		EpIncidentSetName	$seqIncident "LegendOfDinsaur sequential incident"
 
-		set incCount		[ EpRegisterSequentialIncident $seqIncident ]
+		set incCount		[ EpRegisterIncident $seqIncident ]
 		
 		EpOutputDebugString " - LegendOfDinsaur Incident returned $seqIncident\n"
 		return $seqIncident

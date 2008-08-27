@@ -104,7 +104,7 @@ namespace eval EpA213World::OldRatandGatekeeperQuest {
 		
 		EpIncidentSetName	$sqIncident "TalkWithRat incident"
 		
-		set incCount		[ EpRegisterSequentialIncident $sqIncident ]
+		set incCount		[ EpRegisterIncident $sqIncident ]
 		EpOutputDebugString " - Incident count: $incCount\n"
 	}
 
@@ -130,7 +130,7 @@ namespace eval EpA213World::OldRatandGatekeeperQuest {
 
 		EpIncidentSetName	$seqIncident "pOldCat1 sequential incident"
 
-		set incCount		[ EpRegisterSequentialIncident $seqIncident ]
+		set incCount		[ EpRegisterIncident $seqIncident ]
 		
 		EpOutputDebugString " - pOldCat1 Incident returned $seqIncident\n"
 		return $seqIncident

@@ -17,81 +17,74 @@ class Dialog;
 class Sound;
 class ArnMesh;
 class Hero;
-class SequentialIncident;
 
 typedef std::set<Unit*> UnitSet;
 typedef std::list<Dialog*> DialogList;
 typedef std::list<Incident*> IncidentList;
-typedef std::list<SequentialIncident*> SequentialIncidentList;
 
 class World
 {
 public:
-	static World*		createWorld( const char* worldName, TCHAR* modelFilePath );
-						~World(void);
+	static World*					createWorld( const char* worldName, TCHAR* modelFilePath );
+									~World(void);
 
-	HRESULT				init();
-	HRESULT				frameRender(IDirect3DDevice9* pd3dDevice, double dTime, float fElapsedTime);
-	HRESULT				frameMove(double dTime, float fElapsedTime);
-	HRESULT				handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-	HRESULT				release();
-	VOID				enter();
+	HRESULT							init();
+	HRESULT							frameRender(IDirect3DDevice9* pd3dDevice, double dTime, float fElapsedTime);
+	HRESULT							frameMove(double dTime, float fElapsedTime);
+	HRESULT							handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	HRESULT							release();
+	VOID							enter();
 
-	const std::string&	getWorldName() { return m_worldName; }
-	UINT				addUnit( Unit* u );
-	UINT				addIncident( Incident* inc );
-	UINT				addSequentialIncident( SequentialIncident* inc );
-	UINT				addDialog( Dialog* dlg ) { m_scriptedDialog.push_back( dlg ); return m_scriptedDialog.size(); }
+	const std::string&				getWorldName() { return m_worldName; }
+	UINT							addUnit( Unit* u );
+	UINT							addIncident( Incident* inc );
+	UINT							addDialog( Dialog* dlg ) { m_scriptedDialog.push_back( dlg ); return m_scriptedDialog.size(); }
 
-	Incident*			getIncident( UINT idx ) const;
+	Incident*						getIncident( UINT idx ) const;
 
-	UnitSet::iterator	removeUnit( Unit* pUnit );
+	UnitSet::iterator				removeUnit( Unit* pUnit );
 	
-	//void				setCurEnemy( Character* enemy ) { m_curEnemyUnit = enemy; }
 	
-	//const D3DXVECTOR3&	getEnemyPos();
-	const D3DXVECTOR3&	getHeroPos();
-	bool				isCollide( const D3DXVECTOR3* vec0, const D3DXVECTOR3* vec1 );
+	const D3DXVECTOR3&				getHeroPos();
+	bool							isCollide( const D3DXVECTOR3* vec0, const D3DXVECTOR3* vec1 );
 
-	Unit*				getHero() { return m_heroUnit; }
-	Character*			getHeroUnit() { return m_heroUnit; }
+	Unit*							getHero() { return m_heroUnit; }
+	Character*						getHeroUnit() { return m_heroUnit; }
 
-	//Unit*				getCurEnemy() { return m_curEnemyUnit; }
-	//Character*			getCurEnemyUnit() { return m_curEnemyUnit; }
-	UnitSet*			getUnitSet() { return &m_unitSet; }
+	UnitSet*						getUnitSet() { return &m_unitSet; }
 	
-	bool				isInEventArea( Character* heroPt, Character* enemyPt );
+	bool							isInEventArea( Character* heroPt, Character* enemyPt );
 
-	Dialog*				getDialogByName( const char* dialogName );	
-	ArnSceneGraph*		getArnSceneGraphPt() { return m_modelSg; }
+	Dialog*							getDialogByName( const char* dialogName );	
+	ArnSceneGraph*					getArnSceneGraphPt() { return m_modelSg; }
 
-	Dialog*				startDialog( const char* dialogName );
-	Unit*				findUnitAtTile( UINT x, UINT y );
-	const Dialog*		getCurDialog() const { return m_curDialog; }
+	Dialog*							startDialog( const char* dialogName );
+	Unit*							findUnitAtTile( UINT x, UINT y );
+	const Dialog*					getCurDialog() const { return m_curDialog; }
 
 
 
-	void				setModelFilePath( const TCHAR* modelFilePath ) { m_modelFilePath = modelFilePath; }
-	const std::tstring& getModelFilePath() const { return m_modelFilePath; }
+	void							setModelFilePath( const TCHAR* modelFilePath ) { m_modelFilePath = modelFilePath; }
+	const std::tstring& 			getModelFilePath() const { return m_modelFilePath; }
 	
-	ArnNode*			getNode( const char* nodeName ) const;
+	ArnNode*						getNode( const char* nodeName ) const;
 
-	void				printDebugInfo() const;
-	void				printDebugInfoOfIncident( UINT index ) const;
+	void							printDebugInfo() const;
+	void							printDebugInfoOfIncident( UINT index ) const;
 	
-	Hero*				pullOutHero();
+	Hero*							pullOutHero();
 
 private:
-						World( const char* worldName, const TCHAR* modelFilePath );
-	void				setupLight();
-	void				startTileDefinedDialogIfExist();
-	void				proceedCurDialog();
-	void				forceCloseCurDialog();
-	void				loadWorldModel();
-	void				battleEventCheck();
-	void				wannaTalkingEventCheck();
+									World( const char* worldName, const TCHAR* modelFilePath );
+	void							setupLight();
+	void							startTileDefinedDialogIfExist();
+	void							proceedCurDialog();
+	void							forceCloseCurDialog();
+	void							loadWorldModel();
+	void							battleEventCheck();
+	void							wannaTalkingEventCheck();
 
-	void				addCollisionMesh( ArnMesh* collisionMesh );
+	void							addCollisionMesh( ArnMesh* collisionMesh );
 
 	ArnFileData*					m_modelArnFile;
 	ArnSceneGraph*					m_modelSg;
@@ -104,14 +97,12 @@ private:
 
 	DialogList						m_scriptedDialog;
 	IncidentList					m_incidents;
-	SequentialIncidentList			m_sequentialIncidents;
 
 
 	float							m_sampleTeapotMeshRot;
 	LPD3DXMESH						m_aTile;
 
 	Character*						m_heroUnit;
-	//Character*						m_curEnemyUnit;
 	
 	UnitSet							m_unitSet;
 

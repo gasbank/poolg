@@ -243,13 +243,6 @@ HRESULT World::frameMove( double dTime, float fElapsedTime )
 		(*itInc)->update( dTime, fElapsedTime );
 	}
 
-	// SequentialIncidents update
-	SequentialIncidentList::iterator itseqInc = m_sequentialIncidents.begin();
-	for ( ; itseqInc != m_sequentialIncidents.end(); ++itseqInc )
-	{
-		(*itseqInc)->update( dTime, fElapsedTime );
-	}
-
 	UnitSet::iterator it2 = m_unitSet.begin();
 	for ( ; it2 != m_unitSet.end(); )
 	{
@@ -618,12 +611,6 @@ UINT World::addIncident( Incident* inc )
 	return m_incidents.size();
 }
 
-UINT World::addSequentialIncident( SequentialIncident* inc )
-{
-	m_sequentialIncidents.push_back( inc );
-	return m_sequentialIncidents.size();
-}
-
 void World::loadWorldModel()
 {
 	// World model init and loading
@@ -828,12 +815,6 @@ int EpRegisterIncident( void* ptr )
 
 } SCRIPT_CALLABLE_I_PV( EpRegisterIncident )
 
-int EpRegisterSequentialIncident( void* ptr )
-{
-	SequentialIncident* inc = reinterpret_cast<SequentialIncident*>( ptr );
-	return GetWorldManager().getCurWorld()->addSequentialIncident( inc );
-
-} SCRIPT_CALLABLE_I_PV( EpRegisterSequentialIncident )
 
 ArnNode* EpGetNode( const char* nodeName )
 {
@@ -914,7 +895,6 @@ START_SCRIPT_FACTORY( World )
 	CREATE_OBJ_COMMAND( EpGetHero )
 	CREATE_OBJ_COMMAND( EpHasHero )
 	CREATE_OBJ_COMMAND( EpRegisterIncident )
-	CREATE_OBJ_COMMAND( EpRegisterSequentialIncident )
 	CREATE_OBJ_COMMAND( EpGetNode )
 	CREATE_OBJ_COMMAND( EpSetDoAnim )
 	CREATE_OBJ_COMMAND( EpSetAnimTime )

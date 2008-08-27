@@ -20,9 +20,9 @@
 
 
 namespace eval EpA213World::FinalBossQuest {
-	variable bossPos			{ 75 124 }			# 최종 보스 위치
+	variable bossPos			{ 75 124 }					# 최종 보스 위치
 	variable bossDialogPos		{ 70 118 70 130 }			# 최종 보스와의 대화 위치
-	
+	variable exitPos			{ 8 51 17 51 }				# 출구 위치
 	variable boss
 
 	proc register {} {
@@ -65,24 +65,47 @@ namespace eval EpA213World::FinalBossQuest {
 		EpAddTriggerToIncident	$incident [ EpCreateCharHpTrigger	$boss -9999 0 1 ]
 		EpAddActionToIncident	$incident [ EpCreateDialogAction	"EpA213World::FinalBossQuest::bossDeadDialog"		]
 		EpAddActionToIncident	$incident [ EpCreateScriptAction	"EpA213World::FinalBossQuest::makeMazeIncidents"	]
-		
-		EpRegisterIncident $incident
+		EpAddActionToIncident	$incident [ EpCreateScriptAction	"EpA213World::FinalBossQuest::endingIncidents"	]
+		EpRegisterIncident		$incident
 	}
 	
 	
 	proc makeMazeIncidents {} {
-		set maze1Pos			{ 51 87 }
-		set maze2Pos			{ 0 0 }
-		set maze3Pos			{ 0 0 }
+		set mazePos			{ 51 87 }
 		
 		set incident			[ EpCreateBlockingActionIncident 0 0 1 ]
-		EpAddTriggerToIncident	$incident [ createPosTrigOneTile	[ EpGetHero ] $maze1Pos ]
-		EpAddActionToIncident	$incident [ EpCreateScriptAction	"EpSetDoAnim [ EpGetNode Maze1 ] 1" ]
-		EpAddActionToIncident	$incident [ EpCreateScriptAction	"EpSetDoAnim [ EpGetNode Maze1Blinder ] 1" ]
-		EpRegisterIncident $incident
-		
+		EpAddTriggerToIncident	$incident [ createPosTrigOneTile	[ EpGetHero ] $mazePos						]
+		EpAddActionToIncident	$incident [ EpCreateScriptAction	"EpA213World::FinalBossQuest::doMazeAnim"	]
+		EpAddActionToIncident	$incident [ EpCreateCameraAction	external MazeCamera 500						]
+		EpAddActionToIncident	$incident [ EpCreateDelayAction		13000										]
+		EpAddActionToIncident	$incident [ EpCreateCameraAction	attach xxx 0								]
+		EpAddActionToIncident	$incident [ EpCreateScriptAction	"EpCameraSetShake 1"						]
+		EpRegisterIncident		$incident
+	}
+
+	proc doMazeAnim {} {
+		EpSetDoAnim [ EpGetNode Maze1			]	1
+		EpSetDoAnim [ EpGetNode PopupChair		]	1
+		EpSetDoAnim [ EpGetNode PopupDesk		]	1
+		EpSetDoAnim [ EpGetNode PopupServer1	]	1
+		EpSetDoAnim [ EpGetNode PopupServer2	]	1
+		EpSetDoAnim [ EpGetNode MazeCamera		]	1
 		
 	}
+	
+	
+	proc endingIncidents {} {
+		variable exitPos
+		
+		set incident			[ EpCreateBlockingActionIncident 0 0 1 ]
+		EpAddTriggerToIncident	$incident [ createPosTrigTileRegion	[ EpGetHero ] $exitPos							]
+		EpAddActionToIncident	$incident [ EpCreateDialogAction	"EpA213World::FinalBossQuest::exitA213Dialog"	]
+		EpAddActionToIncident	$incident [ EpCreateFadeAction		"out" 3500										]
+		EpAddActionToIncident	$incident [ EpCreateScriptAction	"EpCameraSetShake 0"							]
+		EpAddActionToIncident	$incident [ EpCreateScriptAction	"EpChangeWorld EpCeilingWorld"					]
+		EpRegisterIncident		$incident
+	}	
+
 	
 	namespace eval bossDialog {
 		set region [ list 0 0 0 0 ] ;# left, top, right, bottom
@@ -148,6 +171,17 @@ namespace eval EpA213World::FinalBossQuest {
 			$player		"...이런 쉩... 갑자기 왜 할리우드 스타일로 바뀌고 난리야!"\
 			$player		"어쨌든 여길 빨리 빠져나가야겠다."\
 			$npc		"크으.. 넌 죽어야만 해... 으으읔.."\
+		];
+	}
+	
+	namespace eval exitA213Dialog {
+		set region [ list 0 0 0 0 ] ;# left, top, right, bottom
+		set oneTime 1;
+
+		set player "PoolG"
+
+		set dialog [ list\
+			$player		"이제 모든 것이 끝이구나..."\
 		];
 	}
 }

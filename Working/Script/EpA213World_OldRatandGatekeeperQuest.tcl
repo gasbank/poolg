@@ -82,10 +82,10 @@ namespace eval EpA213World::OldRatandGatekeeperQuest {
 		lappend actions		[ EpCreateScriptAction			"EpSetDoAnim [ EpGetNode GateLeft   ] 1"	]
 		lappend actions		[ EpCreateScriptAction			"EpSetDoAnim [ EpGetNode GateCamera ] 1"	]
 		lappend actions		[ EpCreateCameraAction			external GateCamera 0						]
-		lappend actions		[ EpCreateScriptAction			"EpCameraSetShake 1"						]
+		#lappend actions		[ EpCreateScriptAction			"EpCameraSetShake 1"						]
 		lappend actions		[ EpCreateDelayAction			10000										]
 		lappend actions		[ EpCreateCameraAction			attach xxx 1500								]
-		lappend actions		[ EpCreateScriptAction			"EpCameraSetShake 0"						]
+		#lappend actions		[ EpCreateScriptAction			"EpCameraSetShake 0"						]
 		lappend actions		[ EpCreateControllableAction	$EpA213World::pHeroUnit 1								]
 
 		foreach act $actions {

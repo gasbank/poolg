@@ -15,7 +15,7 @@ BlockingActionIncident::BlockingActionIncident( Trigger* trigger, Action* action
 
 void BlockingActionIncident::activate()
 {
-	Incident::activate();
+	SingleIncident::activate();
 
 	m_curActionIt = m_action.begin();
 }

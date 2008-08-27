@@ -190,10 +190,12 @@ void EpLight::fadeInLightForcedDelayed( float delay )
 
 void EpLight::fadeOutLight()
 {
-	if ( m_fFadeTimer > m_fFadeDuration)
+	m_fFadeTimer = m_fFadeDuration - 0.01f;
+	/*if ( m_fFadeTimer > m_fFadeDuration)
 		m_fFadeTimer = m_fFadeDuration - 0.01f;
 	else
-		m_fFadeTimer -= 0.01f;
+		m_fFadeTimer -= 0.01f;*/
+
 	m_fFadeTimerSign = -1.0f;
 
 	m_bInFading = true;
@@ -235,8 +237,8 @@ void EpLight::updateFadeBrightness( float fElapsedTime )
 	m_fBrightness = abs( sin( D3DXToRadian( m_fFadeTimer / m_fFadeDuration * 90.0f ) ) );
 
 	
-	/*printf( "FadeTimer = %f \n", m_fFadeTimer );
-	printf( "Brightness = %f \n", m_fBrightness );*/
+	//printf( "FadeTimer = %f \n", m_fFadeTimer );
+	//printf( "Brightness = %f \n", m_fBrightness );
 }
 
 void EpLight::updateFlicker( float fElapsedTime )

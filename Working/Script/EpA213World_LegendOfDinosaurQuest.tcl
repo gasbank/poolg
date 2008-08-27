@@ -59,8 +59,7 @@ namespace eval EpA213World::LegendOfDinosaurQuest {
 
 		set triggerD0		[ EpCreateUnitPositionWithTraceTrigger $EpA213World::pHeroUnit $pGoodDinosaur 0x001 ]
 		set actionD0		[ EpCreateDialogAction "EpA213World::LegendOfDinosaurQuest::goodDinosaurDialog1" ]
-		set actionD1		[ EpCreateScriptAction "EpUnitSetRemoveFlag $pGoodDinosaur 1" ]
-		# TODO: 착한 공룡이 사라지거나 쥐로 변하거나 해야 한다.
+		set actionD1		[ EpCreateScriptAction "EpUnitSetArnMesh $pGoodDinosaur \"PoolGModel\"" ]
 
 		EpAddTriggerToSequence	$seqIncident $triggerA0
 		EpAddActionToSequence	$seqIncident $actionA0

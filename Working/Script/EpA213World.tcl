@@ -16,10 +16,6 @@ namespace eval EpA213World {
 	variable startPos						$ratholPos
 	
 	variable dialogNameList					[ list ]
-#	oldRatDialog\
-#													oldCat1Dialog oldCat10Dialog\
-#													goodDinosaurDialog0 goodDinosaurDialog1\
-#													evilRatDialog bigRigsAssaultDialog]
 
 	proc init { curWorld } {
 		EpOutputDebugString " - [info level 0] called / curWorld: $curWorld\n"

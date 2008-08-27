@@ -112,6 +112,9 @@ HRESULT World::init()
 	Incident* inc2 = new Incident( trigger, action );
 	m_incidents.push_back( inc2 );*/
 
+	GetG().m_camera.setAttachPos( &getHeroPos() );
+	GetG().m_camera.begin( CAMERA_ATTACH );
+
 	m_curDialog = 0;
 	return hr;
 }

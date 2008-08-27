@@ -261,6 +261,17 @@ HRESULT BattleState::leave()
 	
 	ArnMesh* guardBallNode = (ArnMesh*)(getHero()->getArnMesh()->getNodeByName("GuardBall"));
 	guardBallNode->setVisible( false );
+
+	// return to original camera
+	EpCamera& camera = G::getSingleton().m_camera;
+
+	// Get hero position
+	const D3DXVECTOR3& vHeroPos = getCurWorld()->getHeroPos();
+
+	camera.setAttachPos( &vHeroPos );
+	camera.setSmoothCameraDuration( 1.0f );
+	camera.begin( CAMERA_SMOOTH_ATTACH );
+
 	return S_OK;
 }
 

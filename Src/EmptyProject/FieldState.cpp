@@ -17,8 +17,6 @@ FieldState::~FieldState(void)
 
 HRESULT FieldState::enter()
 {
-	setupCamera();
-
 	return S_OK;
 }
 
@@ -57,16 +55,4 @@ HRESULT FieldState::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 HRESULT FieldState::release()
 {
 	return S_OK;
-}
-
-void FieldState::setupCamera()
-{
-	EpCamera& camera = G::getSingleton().m_camera;
-
-	// Get hero position
-	const D3DXVECTOR3& vHeroPos = getCurWorld()->getHeroPos();
-
-	camera.setAttachPos( &vHeroPos );
-	camera.setSmoothCameraDuration( 1.0f );
-	camera.begin( CAMERA_SMOOTH_ATTACH );
 }

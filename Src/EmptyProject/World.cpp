@@ -598,7 +598,7 @@ Dialog* World::getDialogByName( const char* dialogName )
 	}
 
 	// Dialog not found!
-	OutputDebugString( _T( "Requested dialog is not found on World. Trying to generate and register new one..." ) );
+	OutputDebugString( _T( " - INFO: Requested dialog is not found on World. Trying to generate and register new one...\n" ) );
 	Dialog* newDlg = Dialog::createDialogByScript( dialogName );
 	newDlg->init();
 	addDialog( newDlg );

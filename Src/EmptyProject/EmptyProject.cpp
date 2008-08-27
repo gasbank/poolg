@@ -1056,21 +1056,26 @@ void EpConsoleThreadMain( void* cd )
 
 	CREATE_OBJ_COMMAND( EpOutputDebugString );
 
+
 	SetEvent( g_scriptBindingFinishedEvent );
+
+#if defined(DEBUG) && defined(EP_CONSOLE)
 	if ( Tcl_LinkVar( g_consoleInterp, "closeConsole", (char*)&g_closeConsole, TCL_LINK_INT ) != TCL_OK )
 	{
 		DebugBreak();
 	}
-#if defined(DEBUG) && defined(EP_CONSOLE)
+
 	if ( Tcl_EvalFile( g_consoleInterp, "Script/EpThreadTest.tcl" ) != TCL_OK )
 		ScriptManager::throwScriptErrorWithMessage( g_consoleInterp );
-#endif
+
 
 	// Could not reach here...
 	Tcl_DeleteInterp( g_consoleInterp );
 	g_consoleInterp = 0;
 
 	SetEvent( g_consoleReleasedEvent );
+
+#endif
 	return;
 }
 

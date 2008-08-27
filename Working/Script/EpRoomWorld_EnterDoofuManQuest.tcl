@@ -43,7 +43,7 @@ namespace eval EpRoomWorld::EnterDoofuManQuest {
 		EpAddTriggerToSequence	$incident [ EpCreateUnitPositionTrigger $EpRoomWorld::pHeroUnit 25 91 29 91 0x001 ]
 		EpAddActionToSequence	$incident [ EpCreateDialogAction "EpRoomWorld::EnterDoofuManQuest::warmingUp" ]
 		
-		EpAddTriggerToSequence	$incident [ EpCreateEnemyCountTrigger $EpRoomWorld::world 6 ]
+		EpAddTriggerToSequence	$incident [ EpCreateEnemyCountTrigger $EpRoomWorld::world 3 ]
 		EpAddActionToSequence	$incident [ EpCreateControllableAction $EpRoomWorld::pHeroUnit 0 ]
 		EpAddActionToSequence	$incident [ EpCreateFadeAction out 2000 ]
 		EpAddActionToSequence	$incident [ EpCreateCameraAction attach xxx 0 ]
@@ -69,7 +69,7 @@ namespace eval EpRoomWorld::EnterDoofuManQuest {
 		set player "PoolG"
 
 		set dialog [ list\
-			$player		"괭이 냄세가 나는군..."\
+			$player		"괭이 냄새가 나는군..."\
 			$player		"그것도 아주 많이!!!"\
 			$player		"괭이를 잡으면서 몸을 좀 풀어야겠다."\
 		];
@@ -89,6 +89,9 @@ namespace eval EpRoomWorld::EnterDoofuManQuest {
 			$player		"순순히 말하지 않으면 널 Overflow 시켜버리겠어!"\
 			$npc		"대청소를 한 미화부장이라면, A213이라는 신비의 장소에서 코딩을 즐겨 한다고 하더군"\
 			$player		"말이 통해서 다행이군"\
+			$player		"A213은 어떻게 갈 수 있지?"\
+			$npc		"일단 남쪽의 문 밖으로 나가보게"\
+			$player		"ㄱㅅ"\
 		];	
 	}
 

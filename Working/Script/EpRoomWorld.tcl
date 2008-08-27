@@ -58,16 +58,11 @@ namespace eval EpRoomWorld {
 	}	
 
 	proc enter {} {
-		variable testEnemy
 		variable pHeroUnit
-		variable pTestEnemyUnit
-		variable TestStObject
 		variable heroStartPos
 		
 		EpOutputDebugString " - [info level 0] called\n"
-		
-		set testEnemy				[createEnemy 46 75 1];
-		
+				
 		set pHeroUnit				[getHero $heroStartPos];
 		EpCharacterSetControllable	$pHeroUnit 1
 		
@@ -80,13 +75,6 @@ namespace eval EpRoomWorld {
 		set pEnemyUnit7				[createEnemy 36 53 1];
 		set pEnemyUnit8				[createEnemy 42 44 1];
 		set pNPCUnit1				[createEnemy 47 65 1];
-		set pTestEnemyUnit			[createEnemy 55 40 1];
-		set testEnemy				[createEnemy 47 45 1];
-
-		set TestStObject			[createStructureObject 50 40];
-		EpUnitSetArnMesh			$TestStObject "PushableBox"
-
-		
 		
 		EpUnitSetPosZ				$pHeroUnit -[EpUnitGetUpperRightZ $pHeroUnit]                                          
 		EpCharacterSetStat			$pHeroUnit 100 5 7 5 5 5 ;# Health Will Coding Defence Sense Immunity
@@ -94,7 +82,6 @@ namespace eval EpRoomWorld {
 		EpCharacterSetCurCs			$pHeroUnit -1
 		EpCharacterSetMoveDuration	$pHeroUnit [expr 0.15]
 		EpUnitSetColor				$pHeroUnit 255 0 255
-		
 		
 		EpUnitSetColor				$pEnemyUnit1 128 128 0
 		EpCharacterSetStat			$pEnemyUnit1 4 1 3 1 1 1
@@ -107,7 +94,6 @@ namespace eval EpRoomWorld {
 		EpCharacterSetCurHp			$pEnemyUnit2 -1
 		EpEnemySetRandomWalkable	$pEnemyUnit2 1
 		EpCharacterSetBoundary		$pEnemyUnit2 35 90 39 86
-
 		
 		EpUnitSetColor				$pEnemyUnit3 255 255 0
 		EpCharacterSetStat			$pEnemyUnit3 5 1 2 1 1 1
@@ -146,14 +132,7 @@ namespace eval EpRoomWorld {
 		EpCharacterSetBoundary		$pEnemyUnit8 40 46 44 42
 		
 		EpUnitSetColor				$pNPCUnit1 0 255 0
-		
-		# Setting Test Enemy Unit
-		EpUnitSetColor				$pTestEnemyUnit 255 255 255
-		EpEnemySetRandomWalkable	$pTestEnemyUnit	0
-		EpCharacterSetBoundary		$pTestEnemyUnit 3 -22 5 -25  ;# left, top, right, bottom
-		EpEnemySetTalkable			$pTestEnemyUnit	1
-
-		
+	
 		# Incidents ------------------------------------------------------------
 		EpRegisterInitFadeInIncident		
 		registerIncidentHeal
@@ -168,9 +147,5 @@ namespace eval EpRoomWorld {
 	
 	proc leave {} {
 		EpOutputDebugString " - [info level 0] called\n"
-	}
-
-	proc printDialogText {} {
-		EpWriteDialog "ÇÑ±ÛÁ«¶óarlsdgklgtulsdu;asjd;tjhklsaerlushldfhlzxcvhxhjzvbkjzxcfjha;srhqwieutpuiwetp;oiweoptyiisauhljkdflkhzx"
 	}
 }

@@ -3,6 +3,7 @@
 #include "Trigger.h"
 #include "Action.h"
 #include "ScriptManager.h"
+#include "BlockingActionIncident.h"
 
 SequentialIncident::SequentialIncident( int trigCount )
 : m_trigCount ( trigCount ), m_bActivated ( false )

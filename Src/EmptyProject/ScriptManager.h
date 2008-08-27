@@ -383,6 +383,11 @@ static const DWORD _trait_OBJ_PV		= AT_OBJ | (AT_PV << 4);
 	Tcl_CreateObjCommand(GetScriptManager().getInterp(), #funcName, _tcl_wrap_##funcName, (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL);	\
 	if (g_consoleInterp) Tcl_CreateObjCommand(g_consoleInterp, #funcName, _tcl_wrap_##funcName, (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL);
 
+#define CREATE_OBJ_COMMAND_NEWNAME(funcName, commandName)																								\
+	Tcl_CreateObjCommand(GetScriptManager().getInterp(), commandName, _tcl_wrap_##funcName, (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL);			\
+	if (g_consoleInterp) Tcl_CreateObjCommand(g_consoleInterp, commandName, _tcl_wrap_##funcName, (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL);
+
+
 #define START_SCRIPT_FACTORY(className)											\
 	void _script_factory_##className::init()									\
 	{

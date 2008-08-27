@@ -1,70 +1,43 @@
 #pragma once
 
-class Trigger;
-class Action;
-class StartIncidentAction;
-
-typedef std::list<Trigger*> TriggerList;
-typedef std::list<Action*> ActionList;
 
 class Incident
 {
 public:
-	friend class StartIncidentAction;
+							Incident( int trigCount );
+	virtual					~Incident(void);
 
-	Incident( int trigCount );
-	Incident( Trigger* trigger, Action* action, int trigCount );
-	virtual ~Incident(void);
+	virtual bool			update( double dTime, float fElapsedTime )		= 0;
+	virtual bool			isFinished() const								= 0;
+	virtual void			printDebugInfo() const							= 0;
+	virtual void			printDebugInfoDetailed() const					= 0;
 
-	// Incident::update() returns false when there are some remaining
-	// updates of action or one of triggers are not satisfied.
-	// Returns true when all actions are finished.
-	virtual bool update( double dTime, float fElapsedTime );
-	virtual bool isFinished() const  = 0;
-
-	void release();
+	virtual void			release();
 	
-	void addTrigger( Trigger* trigger );
-	void addAction( Action* action );
+	bool					getLeastOnetime() const { return m_LeastOnetime; }
+	void					setLeastOneTime(bool b) { m_LeastOnetime = b; }
+	void					setName( const char* name ) { m_incidentName = name; }
+	const char*				getName() const { return m_incidentName.c_str(); }
+	int						getTrigCount() const { return m_trigCount; }
 
-	TriggerList getTriggerList() { return m_trigger; }
-	ActionList getActionList() { return m_action; }
-	
-	bool getLeastOnetime() { return m_LeastOnetime; }
-	
-
-	void setName( const char* name ) { m_incidentName = name; }
-	const char* getName() const { return m_incidentName.c_str(); }
-
-	void printDebugInfo() const;
-	void printDebugInfoDetailed() const;
-	bool getControlDuringAction() const { return m_bControlDuringAction; }
-	void setControlDuringAction(bool val) { m_bControlDuringAction = val; }
-
-	
 protected:
-	virtual void activate();
-	virtual void deactivate();
+	virtual void			activate()						= 0;
+	virtual void			deactivate()					= 0;
 
-	bool checkTrigCountRemained() const { return ( m_trigCount == -1 || m_trigCount > 0 ); }
-	void decreaseTrigCount() { if ( m_trigCount > 0 ) m_trigCount -= 1; }
-	bool isActivated() const { return m_bActivated; }
+	bool					checkTrigCountRemained() const { return ( m_trigCount == -1 || m_trigCount > 0 ); }
+	void					decreaseTrigCount() { if ( m_trigCount > 0 ) m_trigCount -= 1; }
+	bool					isActivated() const { return m_bActivated; }
 	
-	TriggerList m_trigger;
-	ActionList m_action;
-	bool m_LeastOnetime;
-
-
 private:
-	std::string m_incidentName;
-	bool m_bActivated;
-	bool m_bControlDuringAction; // Indicates the capability of controlling player when actions in progress.
-	
+	std::string				m_incidentName;
+	bool					m_bActivated;
+	bool					m_LeastOnetime;			// Indicates the incident was activated & deactivated at least one time.
 
 	// Indicates the remaining occurrence count of this incident.
 	// 0 means no more trigger testing(and no more action)
 	// and -1 means infinite occurrence incident.
-	int m_trigCount;
+	int						m_trigCount;
+
 };
 
 

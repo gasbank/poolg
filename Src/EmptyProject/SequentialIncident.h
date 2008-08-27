@@ -1,12 +1,12 @@
 #pragma once
 
-#include "BlockingActionIncident.h"
-
 class Action;
 class Trigger;
+class BlockingActionIncident;
 
-typedef std::list<BlockingActionIncident*> SequenceList;
+typedef std::list<BlockingActionIncident*> BlockingActionIncidentList;
 
+// Note that SequentialIncident is not a Incident-derived class!
 class SequentialIncident
 {
 public:
@@ -33,9 +33,9 @@ private:
 	bool checkTrigCountRemained() const { return ( m_trigCount == -1 || m_trigCount > 0 ); }
 	void decreaseTrigCount() { if ( m_trigCount > 0 ) m_trigCount -= 1; }
 
-	SequenceList m_sequencer;
+	BlockingActionIncidentList m_sequencer;
 	BlockingActionIncident* m_curIncident;
-	SequenceList::iterator m_curSequence;
+	BlockingActionIncidentList::iterator m_curSequence;
 	bool m_bActivated;
 	bool m_LeastOnetime;
 	int m_trigCount;

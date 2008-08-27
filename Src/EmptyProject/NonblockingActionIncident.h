@@ -1,14 +1,14 @@
 #pragma once
-#include "Incident.h"
+#include "SingleIncident.h"
 
-class NonblockingActionIncident : public Incident
+class NonblockingActionIncident : public SingleIncident
 {
 public:
 	NonblockingActionIncident( int trigCount );
 	NonblockingActionIncident( Trigger* trigger, Action* action, int trigCount );
 
 	virtual bool update( double dTime, float fElapsedTime );
-	virtual bool isFinished() const { return m_LeastOnetime; }
+	virtual bool isFinished() const { return getLeastOnetime(); }
 
 };
 

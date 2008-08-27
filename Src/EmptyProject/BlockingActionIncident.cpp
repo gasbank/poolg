@@ -4,12 +4,12 @@
 #include "ScriptManager.h"
 
 BlockingActionIncident::BlockingActionIncident( int trigCount )
-: Incident( trigCount )
+: SingleIncident( trigCount )
 {
 }
 
 BlockingActionIncident::BlockingActionIncident( Trigger* trigger, Action* action, int trigCount )
-: Incident( trigger, action, trigCount )
+: SingleIncident( trigger, action, trigCount )
 {
 }
 
@@ -21,7 +21,7 @@ void BlockingActionIncident::activate()
 }
 bool BlockingActionIncident::update( double dTime, float fElapsedTime )
 {
-	if ( Incident::update( dTime, fElapsedTime ) == false )
+	if ( SingleIncident::update( dTime, fElapsedTime ) == false )
 		return false;
 
 	assert( isActivated() );
@@ -34,7 +34,7 @@ bool BlockingActionIncident::update( double dTime, float fElapsedTime )
 		++m_curActionIt;
 		if ( m_curActionIt == m_action.end() )
 		{
-			m_LeastOnetime = true;
+			setLeastOneTime( true );
 			deactivate();
 			decreaseTrigCount();
 			// All actions are finished.

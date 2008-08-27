@@ -694,6 +694,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\SingleIncident.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SingleIncident.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Trigger.cpp"
 				>
 			</File>

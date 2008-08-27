@@ -163,6 +163,7 @@ void ScriptManager::initScriptBindings()
 	INIT_BINDING( Hero );
 	INIT_BINDING( Enemy );
 	INIT_BINDING( Incident );
+	INIT_BINDING( SingleIncident );
 	INIT_BINDING( NonblockingActionIncident );
 	INIT_BINDING( BlockingActionIncident );
 	INIT_BINDING( Action );

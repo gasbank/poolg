@@ -4,18 +4,18 @@
 #include "ScriptManager.h"
 
 NonblockingActionIncident::NonblockingActionIncident( int trigCount )
-: Incident( trigCount )
+: SingleIncident( trigCount )
 {
 }
 
 NonblockingActionIncident::NonblockingActionIncident( Trigger* trigger, Action* action, int trigCount )
-: Incident( trigger, action, trigCount )
+: SingleIncident( trigger, action, trigCount )
 {
 }
 
 bool NonblockingActionIncident::update( double dTime, float fElapsedTime )
 {
-	if ( Incident::update( dTime, fElapsedTime ) == false )
+	if ( SingleIncident::update( dTime, fElapsedTime ) == false )
 		return false;
 
 	assert( isActivated() );

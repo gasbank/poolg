@@ -21,9 +21,6 @@
 # ¾øÀ½
 #
 
-proc createPosTrigOneTile { unit tilePos { flags 0x001 } } {
-	return [ EpCreateUnitPositionTrigger $unit [lindex $tilePos 0] [lindex $tilePos 1] -1 -1 $flags ]
-}
 
 namespace eval EpA213World::MirrorQuest {
 

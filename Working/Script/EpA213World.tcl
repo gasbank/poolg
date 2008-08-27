@@ -13,7 +13,7 @@ namespace eval EpA213World {
 	variable bossBattleStartPos				{ 53 126 }
 	variable mirrorQuestStartPos			{ 51 80 }
 	
-	variable startPos						$ratholPos
+	variable startPos						$mirrorQuestStartPos
 	
 	variable dialogNameList					[ list	oldRatDialog\
 													oldCat1Dialog oldCat10Dialog\

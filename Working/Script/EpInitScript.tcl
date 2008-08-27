@@ -5,7 +5,7 @@
 #----------------------------------------------------------------------------------#
 
 variable EpStartTopStateName		PlayState
-set EpStartWorldName				EpCeilingWorld
+set EpStartWorldName				EpA213World
 set EpWorldList						[ list EpCeilingWorld EpRoomWorld EpA213World EpTestStage ]
 
 proc EpInitApp {} {
@@ -100,6 +100,15 @@ proc EpRegisterInitFadeInIncident {} {
 
 	set incCount	[ EpRegisterIncident	$incident ]
 	EpOutputDebugString " - Incident count: $incCount\n"
+}
+
+
+proc createPosTrigTileRegion { unit tileRegion { flags 0x001 } } {
+	return [ EpCreateUnitPositionTrigger $unit [lindex $tileRegion 0] [lindex $tileRegion 1] [lindex $tileRegion 2] [lindex $tileRegion 3] $flags ]
+}
+
+proc createPosTrigOneTile { unit tilePos { flags 0x001 } } {
+	return [ EpCreateUnitPositionTrigger $unit [lindex $tilePos 0] [lindex $tilePos 1] -1 -1 $flags ]
 }
 
 #----------------------------------------------------------------------------------#

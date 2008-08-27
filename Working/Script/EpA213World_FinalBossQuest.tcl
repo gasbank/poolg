@@ -18,9 +18,6 @@
 # 세계의 평화
 #
 
-proc createPosTrigTileRegion { unit tileRegion { flags 0x001 } } {
-	return [ EpCreateUnitPositionTrigger $unit [lindex $tileRegion 0] [lindex $tileRegion 1] [lindex $tileRegion 2] [lindex $tileRegion 3] $flags ]
-}
 
 namespace eval EpA213World::FinalBossQuest {
 	variable bossPos			{ 75 124 }			# 최종 보스 위치
@@ -50,7 +47,9 @@ namespace eval EpA213World::FinalBossQuest {
 	
 	proc registerIncidents {} {
 		variable bossDialogPos
+		variable boss
 		
+		#### INCIDENT 1: Final Boss Rendezvous ####
 		set incident			[ EpCreateBlockingActionIncident 0 0 1 ]
 		
 		EpAddTriggerToIncident	$incident [ createPosTrigTileRegion	[ EpGetHero ]	$bossDialogPos		0x001	]
@@ -58,6 +57,31 @@ namespace eval EpA213World::FinalBossQuest {
 		EpAddActionToIncident	$incident [ EpCreateScriptAction	"EpEnemySetTalkable $EpA213World::FinalBossQuest::boss 0" ]
 		
 		EpRegisterIncident $incident
+		
+		
+		#### INCIDENT 2: Final Boss Dead ####
+		set incident			[ EpCreateBlockingActionIncident 0 0 1 ]
+		
+		EpAddTriggerToIncident	$incident [ EpCreateCharHpTrigger	$boss -9999 0 1 ]
+		EpAddActionToIncident	$incident [ EpCreateDialogAction	"EpA213World::FinalBossQuest::bossDeadDialog"		]
+		EpAddActionToIncident	$incident [ EpCreateScriptAction	"EpA213World::FinalBossQuest::makeMazeIncidents"	]
+		
+		EpRegisterIncident $incident
+	}
+	
+	
+	proc makeMazeIncidents {} {
+		set maze1Pos			{ 51 87 }
+		set maze2Pos			{ 0 0 }
+		set maze3Pos			{ 0 0 }
+		
+		set incident			[ EpCreateBlockingActionIncident 0 0 1 ]
+		EpAddTriggerToIncident	$incident [ createPosTrigOneTile	[ EpGetHero ] $maze1Pos ]
+		EpAddActionToIncident	$incident [ EpCreateScriptAction	"EpSetDoAnim [ EpGetNode Maze1 ] 1" ]
+		EpAddActionToIncident	$incident [ EpCreateScriptAction	"EpSetDoAnim [ EpGetNode Maze1Blinder ] 1" ]
+		EpRegisterIncident $incident
+		
+		
 	}
 	
 	namespace eval bossDialog {
@@ -95,6 +119,35 @@ namespace eval EpA213World::FinalBossQuest {
 			$npc		"아까부터 평화 평화 해대는대 진정한 평화가 뭔지는 너희 설치류가 이 지구상에서 말끔히\
 						사라지는 날에 알게 될 것이다."\
 			$player		"닥쳐라!"
+		];
+	}
+	
+	namespace eval bossDeadDialog {
+		set region [ list 0 0 0 0 ] ;# left, top, right, bottom
+		set oneTime 1;
+
+		set player "PoolG"
+		set npc "Boss"
+		set system "System"
+
+		set dialog [ list\
+			$player		"이야압~~~~~~~"\
+			$npc		"으읔.으......."\
+			$player		"죽어라!!!!"\
+			$npc		"크으으으으읔..."\
+			$npc		"이 원...수는 반..드..시 갚아주마.."\
+			$player		"내가 그렇게도 평화적으로 해결하려고 했거늘... 아쉽구나.."\
+			$npc		"다... 찌..ㅈ어 버리..겠.... 읔"\
+			$player		"마지막 가는 길이라도 편안하게 가거라. 인간이여."\
+			$npc		"나..는... 혼.자 죽을 수... 없다.. 크으으흐흐흐"\
+			$player		"인간이나 쥐나 어차피 한번 죽는 생이거늘 너무 슬퍼하지는 말거라."\
+			$npc		"이..렇게 된 이상.. 너도 이 컴실과 함께 죽을 수 밖에 없다..."\
+			$player		"뭐라고!"\
+			$npc		"후..후... 내세에서 다시 보자꾸나.."\
+			$system		"폭파 5분 전입니다."\
+			$player		"...이런 쉩... 갑자기 왜 할리우드 스타일로 바뀌고 난리야!"\
+			$player		"어쨌든 여길 빨리 빠져나가야겠다."\
+			$npc		"크으.. 넌 죽어야만 해... 으으읔.."\
 		];
 	}
 }

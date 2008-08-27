@@ -77,8 +77,9 @@ LPDIRECT3DSURFACE9				g_radialBlurRenderTargetSurf	= 0;
 PostSepiaShader*				g_postSepiaShader				= 0;
 PostRadialBlurShader*			g_postRadialBlurShader			= 0;
 
-int g_nActiveSystem = 4;
-CParticleSystem *g_pParticleSystems[6];
+int								g_nActiveSystem = 0;
+CParticleSystem					*g_pParticleSystems[6];
+bool							g_bParticleVisible = true;
 
 void SetupFullscreenQuad( const D3DSURFACE_DESC* pBackBufferSurfaceDesc );
 
@@ -231,7 +232,7 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 	g_pParticleSystems[0]->SetVelocity( D3DXVECTOR3( 0.0f, 0.0f, 0.0f) );
 	g_pParticleSystems[0]->SetGravity( D3DXVECTOR3( 0.0f, 0.0f, 0.0f) );
 	g_pParticleSystems[0]->SetWind( D3DXVECTOR3( 0.0f, 0.0f, 0.0f) );
-	g_pParticleSystems[0]->SetVelocityVar( 10.0f );
+	g_pParticleSystems[0]->SetVelocityVar( 10.0f );	
 
 	g_pParticleSystems[0]->Init( pd3dDevice );
 
@@ -798,77 +799,80 @@ void CALLBACK OnD3D9FrameRender( IDirect3DDevice9* pd3dDevice, double fTime, flo
 	SAFE_RELEASE( originalRT );
 
 
+	if ( g_bParticleVisible )
+	{
 
-	//////////////////////////////////////////////////////////////////////////
-	//
-	// Transform for particle systems
-	//
+		//////////////////////////////////////////////////////////////////////////
+		//
+		// Transform for particle systems
+		//
 
-	pd3dDevice->SetTransform( D3DTS_VIEW, GetG().m_camera.GetViewMatrix() );
-	pd3dDevice->SetTransform( D3DTS_PROJECTION, GetG().m_camera.GetProjMatrix() );
-	D3DXMATRIX world;	
-	D3DXMATRIX scale;
-	D3DXMATRIX rotate;
-	D3DXMATRIX trans;
-	D3DXMatrixScaling( &scale, 0.5f, 0.5f, 0.5f );
-	D3DXMatrixRotationX( &rotate, D3DXToRadian( -90.0f ) );	
-	D3DXMatrixTranslation( &trans, -30.0f, -4.0f, 0.0f );
-	world = rotate * scale * trans;
-	pd3dDevice->SetTransform( D3DTS_WORLD, &world );
+		pd3dDevice->SetTransform( D3DTS_VIEW, GetG().m_camera.GetViewMatrix() );
+		pd3dDevice->SetTransform( D3DTS_PROJECTION, GetG().m_camera.GetProjMatrix() );
+		D3DXMATRIX world;	
+		D3DXMATRIX scale;
+		D3DXMATRIX rotate;
+		D3DXMATRIX trans;
+		D3DXMatrixScaling( &scale, 0.5f, 0.5f, 0.5f );
+		D3DXMatrixRotationX( &rotate, D3DXToRadian( -90.0f ) );	
+		D3DXMatrixTranslation( &trans, -30.0f, -4.0f, 0.0f );
+		world = rotate * scale * trans;
+		pd3dDevice->SetTransform( D3DTS_WORLD, &world );
 
-	pd3dDevice->SetRenderState( D3DRS_ZENABLE, TRUE );
-	
-	//////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////
-	//
-	// Render particle systems
-	//
-	// The particle system will need to know how much time has passed since 
-	// the last time it was updated, so we'll need to keep track of how much   
-	// time has elapsed since the last frame update...
-	//
+		pd3dDevice->SetRenderState( D3DRS_ZENABLE, TRUE );
+		
+		//////////////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////
+		//
+		// Render particle systems
+		//
+		// The particle system will need to know how much time has passed since 
+		// the last time it was updated, so we'll need to keep track of how much   
+		// time has elapsed since the last frame update...
+		//
 
-	g_pParticleSystems[g_nActiveSystem]->Update( (float)fElapsedTime );
+		g_pParticleSystems[g_nActiveSystem]->Update( (float)fElapsedTime );
 
-	pd3dDevice->BeginScene();
+		pd3dDevice->BeginScene();
 
-	//
-	// Prepare to render particle system
-	//
+		//
+		// Prepare to render particle system
+		//
 
-	//
-	// Setting D3DRS_ZWRITEENABLE to FALSE makes the Z-Buffer read-only, which 
-	// helps remove graphical artifacts generated from  rendering a list of 
-	// particles that haven't been sorted by distance to the eye.
-	//
-	// Setting D3DRS_ALPHABLENDENABLE to TRUE allows particles, which overlap, 
-	// to alpha blend with each other correctly.
-	//
+		//
+		// Setting D3DRS_ZWRITEENABLE to FALSE makes the Z-Buffer read-only, which 
+		// helps remove graphical artifacts generated from  rendering a list of 
+		// particles that haven't been sorted by distance to the eye.
+		//
+		// Setting D3DRS_ALPHABLENDENABLE to TRUE allows particles, which overlap, 
+		// to alpha blend with each other correctly.
+		//
 
-	pd3dDevice->SetRenderState( D3DRS_ZWRITEENABLE, FALSE );
+		pd3dDevice->SetRenderState( D3DRS_ZWRITEENABLE, FALSE );
 
-	pd3dDevice->SetRenderState( D3DRS_ALPHABLENDENABLE, TRUE );
-	pd3dDevice->SetRenderState( D3DRS_DESTBLEND, D3DBLEND_ONE );
+		pd3dDevice->SetRenderState( D3DRS_ALPHABLENDENABLE, TRUE );
+		pd3dDevice->SetRenderState( D3DRS_DESTBLEND, D3DBLEND_ONE );
 
-	//
-	// Render particle system
-	//
+		//
+		// Render particle system
+		//
 
-	pd3dDevice->SetTexture( 0, g_pParticleSystems[g_nActiveSystem]->GetTextureObject() );
-	g_pParticleSystems[g_nActiveSystem]->Render( pd3dDevice );
+		pd3dDevice->SetTexture( 0, g_pParticleSystems[g_nActiveSystem]->GetTextureObject() );
+		g_pParticleSystems[g_nActiveSystem]->Render( pd3dDevice );
 
-	//
-	// Reset render states...
-	//
+		//
+		// Reset render states...
+		//
 
-	pd3dDevice->SetRenderState( D3DRS_ZWRITEENABLE, TRUE );
-	pd3dDevice->SetRenderState( D3DRS_ALPHABLENDENABLE, FALSE );
+		pd3dDevice->SetRenderState( D3DRS_ZWRITEENABLE, TRUE );
+		pd3dDevice->SetRenderState( D3DRS_ALPHABLENDENABLE, FALSE );
 
-	pd3dDevice->EndScene();
-	pd3dDevice->Present( NULL, NULL, NULL, NULL );
+		pd3dDevice->EndScene();
+		pd3dDevice->Present( NULL, NULL, NULL, NULL );
 
-	//////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////
+	}
 }
 
 
@@ -888,11 +892,17 @@ LRESULT CALLBACK MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
 		GetTopStateManager().getCurState()->handleMessages(hWnd, uMsg, wParam, lParam);
 
 	if ( uMsg == WM_KEYDOWN )
+	{
 		if ( wParam == 'P' )
 		{
 			g_nActiveSystem++;
 			g_nActiveSystem %= 6;	
 		}
+		else if ( wParam == 'L' )
+		{
+			g_bParticleVisible = g_bParticleVisible?false:true;
+		}
+	}
 
 	return 0;
 }

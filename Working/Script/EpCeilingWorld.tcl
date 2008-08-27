@@ -7,50 +7,7 @@ namespace eval EpCeilingWorld {
 	variable pHeroUnit
 	variable startPos { 30 77 }
 	variable mainQuest1_incident
-	variable mainQuest2_incident
-
-	proc registerIncidentInitTalk {} {
-		global world hero npcGetg npcGloop
-		variable pHeroUnit
-		
-		set trigger		[ EpCreateUnitPositionTrigger $pHeroUnit 30 77 30 77 0x100 ]
-		set actions		[ EpCreateFadeAction "in" 3000 ]
-		lappend actions [ EpCreateDialogAction "EpCeilingWorld::introDialog" ]
-				
-		set incident	[ EpCreateBlockingActionIncident $trigger 0 1 ]
-		
-		EpIncidentSetName $incident "Init Talk"
-		EpIncidentSetControlDuringAction $incident 0
-		
-		foreach act $actions {
-			EpAddActionToIncident $incident $act
-		}
-
-		EpIncidentSetName	$incident "InitTalk incident"
-		
-		set incCount	[ EpRegisterIncident $incident ]
-		EpOutputDebugString " - Incident count: $incCount\n"
-	}	
-
-	proc Quest4 {} {
-		global world hero npcGetg npcGloop npcSetg
-		variable pHeroUnit
-
-		set trigger			[ EpCreateUnitPositionWithTraceTrigger $pHeroUnit $npcSetg 0x001 ]
-		set action			[ EpCreateDialogAction "EpCeilingWorld::SetGDialog" ]
-		set incident		[ EpCreateBlockingActionIncident $trigger $action -1 ]
-		EpIncidentSetName	$incident "Quest4 incident"
-
-		## --------------------------------------------
-		## Do not register a incident planned
-		## to be invoked by EpCreateStartIncidentAndWaitAction!!!
-		## --------------------------------------------
-		##set incCount	[ EpRegisterIncident $incident ]
-		##EpOutputDebugString " - Incident count: $incCount\n"
-		
-		EpOutputDebugString " - Quest3 Incident returned $incident\n"
-		return $incident
-	}
+	variable mainQuest2_incident	
 
 	proc init { curWorld } {
 		global world hero npcGetg npcGloop npcSetg weakCat
@@ -105,6 +62,49 @@ namespace eval EpCeilingWorld {
 		EpOutputDebugString " - [info level 0] called\n"
 	}
 
+	proc registerIncidentInitTalk {} {
+		global world hero npcGetg npcGloop
+		variable pHeroUnit
+		
+		set trigger		[ EpCreateUnitPositionTrigger $pHeroUnit 30 77 30 77 0x100 ]
+		set actions		[ EpCreateFadeAction "in" 3000 ]
+		lappend actions [ EpCreateDialogAction "EpCeilingWorld::introDialog" ]
+				
+		set incident	[ EpCreateBlockingActionIncident $trigger 0 1 ]
+		
+		EpIncidentSetName $incident "Init Talk"
+		EpIncidentSetControlDuringAction $incident 0
+		
+		foreach act $actions {
+			EpAddActionToIncident $incident $act
+		}
+
+		EpIncidentSetName	$incident "InitTalk incident"
+		
+		set incCount	[ EpRegisterIncident $incident ]
+		EpOutputDebugString " - Incident count: $incCount\n"
+	}	
+
+	proc Quest4 {} {
+		global world hero npcGetg npcGloop npcSetg
+		variable pHeroUnit
+
+		set trigger			[ EpCreateUnitPositionWithTraceTrigger $pHeroUnit $npcSetg 0x001 ]
+		set action			[ EpCreateDialogAction "EpCeilingWorld::SetGDialog" ]
+		set incident		[ EpCreateBlockingActionIncident $trigger $action -1 ]
+		EpIncidentSetName	$incident "Quest4 incident"
+
+		## --------------------------------------------
+		## Do not register a incident planned
+		## to be invoked by EpCreateStartIncidentAndWaitAction!!!
+		## --------------------------------------------
+		##set incCount	[ EpRegisterIncident $incident ]
+		##EpOutputDebugString " - Incident count: $incCount\n"
+		
+		EpOutputDebugString " - Quest3 Incident returned $incident\n"
+		return $incident
+	}
+
 	namespace eval introDialog {
 		
 		set region [ list 0 0 -1 -1 ]; ;# left, top, right, bottom
@@ -121,6 +121,9 @@ namespace eval EpCeilingWorld {
 			$player		"맙소사! 난 가만히 있을 수 없어"\
 			$npc2		"제발 그들을 말려주게"\
 			$player		"이대로 가만히 있을 순 없지. 다녀오겠네"\
+			$npc1		"떠나기 전에 나에게 좀 가까이 와보겠나?"\
+			$npc1		"긴히 할 얘기가 있네"\
+			$player		"알겠네"\
 		];
 	}
 

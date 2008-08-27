@@ -65,8 +65,6 @@ namespace eval EpA213World::OldRatandGatekeeperQuest {
 		set trigger0		[ EpCreateUnitPositionWithTraceTrigger $EpA213World::pHeroUnit $pOldRat 0x001 ]
 		set action0			[ EpCreateDialogAction "EpA213World::OldRatandGatekeeperQuest::oldRatDialog" ]
 
-		set action1			[ EpCreateScriptAction "EpEnemySetTalkable pOldCat1 1" ]
-
 		set trigger1		[ EpCreateUnitPositionWithTraceTrigger $EpA213World::pHeroUnit $pOldCat10 0x001 ]
 		set action1			[ EpCreateDialogAction "EpA213World::OldRatandGatekeeperQuest::oldCat10Dialog" ]
 		#set action2			[ EpCreateScriptAction "Incident_GateOpen" ]

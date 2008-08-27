@@ -330,7 +330,7 @@ void EpCamera::beginShoulderLookCamera( const D3DXVECTOR3* pvMePos, const D3DXVE
 	vBattlePos.z = (vEnemyPos.z + vHeroPos.z) / 2.0f;
 
 	// 최종 카메라 상태.
-	D3DXVECTOR3 vDesEye( 0.0f, 0.0f, -10.0f );
+	D3DXVECTOR3 vDesEye( 0.0f, 0.0f, -15.0f );
 	D3DXVECTOR3 vDesLookAt( vBattlePos.x, vBattlePos.y, vBattlePos.z - 2.0f );
 	D3DXVECTOR3 vDesUp( 0.0f, 0.0f, -1.0f );
 

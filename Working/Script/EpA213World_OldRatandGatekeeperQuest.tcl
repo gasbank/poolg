@@ -67,13 +67,11 @@ namespace eval EpA213World::OldRatandGatekeeperQuest {
 
 		set trigger1		[ EpCreateUnitPositionWithTraceTrigger $EpA213World::pHeroUnit $pOldCat10 0x001 ]
 		set action1			[ EpCreateDialogAction "EpA213World::OldRatandGatekeeperQuest::oldCat10Dialog" ]
-		#set action2			[ EpCreateScriptAction "Incident_GateOpen" ]
 
 		EpAddTriggerToSequence		$sqIncident $trigger0
 		EpAddActionToSequence		$sqIncident	$action0
 		EpAddTriggerToSequence		$sqIncident	$trigger1
 		EpAddActionToSequence		$sqIncident	$action1
-		#EpAddActionToSequence		$sqIncident	$action2
 
 		# ¹® ¿­±â ---------------------------------------------------------------------------------
 		set actions			[ EpCreateControllableAction	$EpA213World::pHeroUnit 0								]

@@ -71,26 +71,24 @@ namespace eval EpCeilingWorld::FirstMeetingQuest {
 		EpRegisterIncident $incident
 	}
 
+	# Not Used
 	proc registerIncident2 {} {
 		variable pHeroUnit
 		variable npcGloop
 
-		set trigger	 [ EpCreateUnitPositionWithTraceTrigger $EpCeilingWorld::pHeroUnit $npcGloop 0x001 ]
-		set actions	 [ EpCreateDialogAction "EpCeilingWorld::FirstMeetingQuest::GlooPDialog" ]
+		set incident	 [ EpCreateSequentialIncident -1 ]
 
-		set incident	 [ EpCreateBlockingActionIncident $trigger 0 -1 ]
-		EpIncidentSetName	$incident "Quest3 incident"
-		foreach act $actions {
-			EpAddActionToIncident $incident $act
-		}
+		EpAddTriggerToSequence	$incident [ EpCreateUnitPositionWithTraceTrigger $EpCeilingWorld::pHeroUnit $npcGloop 0x010 ]
+		EpAddActionToSequence	$incident [ EpCreateScriptAction "#" ]
+		EpAddTriggerToSequence	$incident [ EpCreateUnitPositionWithTraceTrigger $EpCeilingWorld::pHeroUnit $npcGloop 0x001 ]
+		EpAddActionToSequence	$incident [ EpCreateDialogAction "EpCeilingWorld::FirstMeetingQuest::GlooPDialog" ]
 
-		#EpIncidentSetName	$incident "Quest2 incident"
+		EpRegisterIncident $incident
 
 		## --------------------------------------------
 		## Do not register a incident planned
 		## to be invoked by EpCreateStartIncidentAndWaitAction!!!
 		## --------------------------------------------
-		#set incCount	[ EpRegisterIncident $incident ]
 		#EpOutputDebugString " - Incident count: $incCount\n"
 
 		#EpOutputDebugString " - Quest2 Incident returned $incident\n"
@@ -110,7 +108,7 @@ namespace eval EpCeilingWorld::FirstMeetingQuest {
 			$player		"뭐하는 녀석인가?"\
 			$npc		"KKK라고 불리는 사람이 그린 고양이라고 하던데...."\
 			$player		"그림이 돌아다닐리가 없잖아"\
-			$npc		"저~기에 있으니 한번 물어보시게"\
+			$npc		"저기~ 동쪽에 있으니 한번 물어보시게"\
 		];	
 	}
 

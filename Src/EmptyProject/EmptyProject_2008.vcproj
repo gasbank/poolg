@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="Windows-1252"?>
+<?xml version="1.0" encoding="ks_c_5601-1987"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
@@ -952,6 +952,14 @@
 		</File>
 		<File
 			RelativePath=".\InnerFire.h"
+			>
+		</File>
+		<File
+			RelativePath=".\particlesystem.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\particlesystem.h"
 			>
 		</File>
 		<File

@@ -13,12 +13,13 @@ namespace eval EpA213World {
 	variable bossBattleStartPos				{ 53 126 }
 	variable mirrorQuestStartPos			{ 51 80 }
 	
-	variable startPos						$mirrorQuestStartPos
+	variable startPos						$ratholPos
 	
-	variable dialogNameList					[ list	oldRatDialog\
-													oldCat1Dialog oldCat10Dialog\
-													goodDinosaurDialog0 goodDinosaurDialog1\
-													evilRatDialog bigRigsAssaultDialog]
+	variable dialogNameList					[ list ]
+#	oldRatDialog\
+#													oldCat1Dialog oldCat10Dialog\
+#													goodDinosaurDialog0 goodDinosaurDialog1\
+#													evilRatDialog bigRigsAssaultDialog]
 
 	proc init { curWorld } {
 		EpOutputDebugString " - [info level 0] called / curWorld: $curWorld\n"
@@ -51,12 +52,7 @@ namespace eval EpA213World {
 		createEnemyDino { 45 109 }
 		createEnemyDino { 81 103 }
 		
-		
-
-
 		# Units	----------------------------------------------------------------
-		registerUnitsOldRatandGatekeeper
-		registerUnitsLegendOfDinosaur
 
 		# Incidents ------------------------------------------------------------
 		#registerIncidentBox
@@ -64,10 +60,8 @@ namespace eval EpA213World {
 		#registerIncidentOpen
 		#registerIncidentOpen2
 		
-		registerIncident_TalkWithOldRat
-		registerIncident_pOldCat1
-		registerIncident_LegendOfDinosaur
-		
+		OldRatandGatekeeperQuest::register
+		LegendOfDinosaurQuest::register
 		MirrorQuest::register
 		FinalBossQuest::register
 		

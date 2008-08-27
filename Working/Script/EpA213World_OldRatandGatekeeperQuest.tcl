@@ -1,12 +1,22 @@
-namespace eval EpA213World {
+#
+# EpA213World_OldRatandGatekeeperQuest.tcl
+#
+# 제목 : 늙은 쥐의 전설과 문지기
+#
+# 설명 : 늙은 쥐와의 대화를 통해 A213에 얽힌 전설을 듣게 되고, 문지기를 해치우고 A213의 문을
+# 열기 위한 필수 아이템 상한 두부를 얻는다.
+#
+
+namespace eval EpA213World::OldRatandGatekeeperQuest {
 	global pOldRat pOldCat1 pOldCat10 pOldCat11\
 			pGoodDinosaur pEvilRat
-# -----------------------------------------------------------------------------------------
-	# 제목 : 늙은 쥐의 전설과 문지기
-	# 설명 : 늙은 쥐와의 대화를 통해 A213에 얽힌 전설을 듣게 되고, 문지기를 해치우고 A213의 문을
-	# 열기 위한 필수 아이템 상한 두부를 얻는다.
-	# registerIncident_TalkWithOldRat
-	# registerIncident_pOldCat1 
+
+	proc register {} {
+		registerUnitsOldRatandGatekeeper
+		registerIncident_TalkWithOldRat
+		registerIncident_pOldCat1
+	}
+
 	proc registerUnitsOldRatandGatekeeper {} {
 		global pOldRat pOldCat1 pOldCat10 pOldCat11\
 		pGoodDinosaur pEvilRat
@@ -52,13 +62,13 @@ namespace eval EpA213World {
 
 		set sqIncident		[ EpCreateSequentialIncident 1 ]
 
-		set trigger0		[ EpCreateUnitPositionWithTraceTrigger $pHeroUnit $pOldRat 0x001 ]
-		set action0			[ EpCreateDialogAction "EpA213World::oldRatDialog" ]
+		set trigger0		[ EpCreateUnitPositionWithTraceTrigger $EpA213World::pHeroUnit $pOldRat 0x001 ]
+		set action0			[ EpCreateDialogAction "EpA213World::OldRatandGatekeeperQuest::oldRatDialog" ]
 
 		set action1			[ EpCreateScriptAction "EpEnemySetTalkable pOldCat1 1" ]
 
-		set trigger1		[ EpCreateUnitPositionWithTraceTrigger $pHeroUnit $pOldCat10 0x001 ]
-		set action1			[ EpCreateDialogAction "EpA213World::oldCat10Dialog" ]
+		set trigger1		[ EpCreateUnitPositionWithTraceTrigger $EpA213World::pHeroUnit $pOldCat10 0x001 ]
+		set action1			[ EpCreateDialogAction "EpA213World::OldRatandGatekeeperQuest::oldCat10Dialog" ]
 		#set action2			[ EpCreateScriptAction "Incident_GateOpen" ]
 
 		EpAddTriggerToSequence		$sqIncident $trigger0
@@ -68,7 +78,7 @@ namespace eval EpA213World {
 		#EpAddActionToSequence		$sqIncident	$action2
 
 		# 문 열기 ---------------------------------------------------------------------------------
-		set actions			[ EpCreateControllableAction	$pHeroUnit 0								]
+		set actions			[ EpCreateControllableAction	$EpA213World::pHeroUnit 0								]
 		lappend actions		[ EpCreateScriptAction			"EpSetDoAnim [ EpGetNode Blocking1  ] 1"	]
 		lappend actions		[ EpCreateScriptAction			"EpSetDoAnim [ EpGetNode Blocking2  ] 1"	]
 		lappend actions		[ EpCreateScriptAction			"EpSetDoAnim [ EpGetNode Blocking3  ] 1"	]
@@ -80,7 +90,7 @@ namespace eval EpA213World {
 		lappend actions		[ EpCreateDelayAction			10000										]
 		lappend actions		[ EpCreateCameraAction			attach xxx 1500								]
 		lappend actions		[ EpCreateScriptAction			"EpCameraSetShake 0"						]
-		lappend actions		[ EpCreateControllableAction	$pHeroUnit 1								]
+		lappend actions		[ EpCreateControllableAction	$EpA213World::pHeroUnit 1								]
 
 		foreach act $actions {
 			EpAddActionToSequence $sqIncident $act
@@ -102,10 +112,10 @@ namespace eval EpA213World {
 		variable pHeroUnit
 		global pOldRat pOldCat1 pOldCat11
 
-		set trigger0		[ EpCreateUnitPositionWithTraceTrigger $pHeroUnit $pOldRat 0x001 ]
-		set trigger1		[ EpCreateUnitPositionWithTraceTrigger $pHeroUnit $pOldCat1 0x001 ]
+		set trigger0		[ EpCreateUnitPositionWithTraceTrigger $EpA213World::pHeroUnit $pOldRat 0x001 ]
+		set trigger1		[ EpCreateUnitPositionWithTraceTrigger $EpA213World::pHeroUnit $pOldCat1 0x001 ]
 		set action0		[ EpCreateScriptAction "#" ]
-		set action1		[ EpCreateDialogAction "EpA213World::oldCat1Dialog" ]
+		set action1		[ EpCreateDialogAction "EpA213World::OldRatandGatekeeperQuest::oldCat1Dialog" ]
 		set action2		[ EpCreateScriptAction "EpEnemySetTalkable $pOldCat1 0" ]
 				
 		set seqIncident	[ EpCreateSequentialIncident 1 ]
@@ -126,7 +136,7 @@ namespace eval EpA213World {
 		return $seqIncident
 	}
 
-		namespace eval oldRatDialog {} {
+	namespace eval oldRatDialog {} {
 	
 		set region [ list 0 0 0 0 ]; ;# left, top, right, bottom
 		set oneTime 0;

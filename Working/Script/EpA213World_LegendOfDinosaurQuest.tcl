@@ -1,14 +1,25 @@
-namespace eval EpA213World {
+#
+# EpA213World_LegendOfDinosaurQuest.tcl
+#
+# 제목 : 공룡의 전설
+#
+# 설명 : A213의 공룡들은 사실 원래 쥐였다. 이 쥐들은 A213에 들어왔다가 최재영을 만나서
+# 본디의 코딩 스피릿의 어두운 면을 모두 잃고서 A213을 배회하는 괴물들이 되고 말았다.
+# 하지만 아직 코딩 스피릿의 어두운 면을 다 잃지 않은 한 공룡(43, 54)이 주인공에게 "Big Rigs Limited
+# Special Package"을 찾아오면 자신이 다시 쥐로 돌아수 있다고 주인공에게 부탁을 한다.
+# 그리고 이 아이템은 A213 남서쪽 공간의 한 쥐(25, 45)가 가지고 있다.
+# 주인공은 "Big Rigs..."를 가져오면서 다른 쥐들의 습격(12, 56)도 받는다.
+#
+
+namespace eval EpA213World::LegendOfDinosaurQuest {
 	global pOldRat pOldCat1 pOldCat10 pOldCat11\
 			pGoodDinosaur pEvilRat
-	# -----------------------------------------------------------------------------------------
-	# 제목 : 공룡의 전설
-	# 설명 : A213의 공룡들은 사실 원래 쥐였다. 이 쥐들은 A213에 들어왔다가 최재영을 만나서
-	# 본디의 코딩 스피릿의 어두운 면을 모두 잃고서 A213을 배회하는 괴물들이 되고 말았다.
-	# 하지만 아직 코딩 스피릿의 어두운 면을 다 잃지 않은 한 공룡(43, 54)이 주인공에게 "Big Rigs Limited
-	# Special Package"을 찾아오면 자신이 다시 쥐로 돌아수 있다고 주인공에게 부탁을 한다.
-	# 그리고 이 아이템은 A213 남서쪽 공간의 한 쥐(25, 45)가 가지고 있다.
-	# 주인공은 "Big Rigs..."를 가져오면서 다른 쥐들의 습격(12, 56)도 받는다.
+
+	proc register {} {
+		registerUnitsLegendOfDinosaur		
+		registerIncident_LegendOfDinosaur
+	}
+
 	proc registerUnitsLegendOfDinosaur {} {
 		global pOldRat pOldCat1 pOldCat10 pOldCat11\
 		pGoodDinosaur pEvilRat
@@ -34,20 +45,20 @@ namespace eval EpA213World {
 
 		set seqIncident		[ EpCreateSequentialIncident 1 ]
 
-		set triggerA0		[ EpCreateUnitPositionWithTraceTrigger $pHeroUnit $pGoodDinosaur 0x001 ]
-		set actionA0		[ EpCreateDialogAction "EpA213World::goodDinosaurDialog0" ]
+		set triggerA0		[ EpCreateUnitPositionWithTraceTrigger $EpA213World::pHeroUnit $pGoodDinosaur 0x001 ]
+		set actionA0		[ EpCreateDialogAction "EpA213World::LegendOfDinosaurQuest::goodDinosaurDialog0" ]
 
-		set triggerB0		[ EpCreateUnitPositionWithTraceTrigger $pHeroUnit $pEvilRat 0x001 ]
-		set actionB0		[ EpCreateDialogAction "EpA213World::evilRatDialog" ]
+		set triggerB0		[ EpCreateUnitPositionWithTraceTrigger $EpA213World::pHeroUnit $pEvilRat 0x001 ]
+		set actionB0		[ EpCreateDialogAction "EpA213World::LegendOfDinosaurQuest::evilRatDialog" ]
 		set actionB1		[ EpCreateScriptAction "EpEnemySetTalkable $pEvilRat 0" ]
 
-		set triggerC0		[ EpCreateUnitPositionTrigger $pHeroUnit 10 54 14 53 0x001 ]
-		set actionC1		[ EpCreateDialogAction "EpA213World::bigRigsAssaultDialog" ]
+		set triggerC0		[ EpCreateUnitPositionTrigger $EpA213World::pHeroUnit 10 54 14 53 0x001 ]
+		set actionC1		[ EpCreateDialogAction "EpA213World::LegendOfDinosaurQuest::bigRigsAssaultDialog" ]
 		set actionC2		[ EpCreateScriptAction "createEnemy 11 55" ]
 		set actionC3		[ EpCreateScriptAction "createEnemy 13 55" ]
 
-		set triggerD0		[ EpCreateUnitPositionWithTraceTrigger $pHeroUnit $pGoodDinosaur 0x001 ]
-		set actionD0		[ EpCreateDialogAction "EpA213World::goodDinosaurDialog1" ]
+		set triggerD0		[ EpCreateUnitPositionWithTraceTrigger $EpA213World::pHeroUnit $pGoodDinosaur 0x001 ]
+		set actionD0		[ EpCreateDialogAction "EpA213World::LegendOfDinosaurQuest::goodDinosaurDialog1" ]
 		set actionD1		[ EpCreateScriptAction "EpUnitSetRemoveFlag $pGoodDinosaur 1" ]
 		# TODO: 착한 공룡이 사라지거나 쥐로 변하거나 해야 한다.
 

@@ -42,6 +42,7 @@ public:
 	void release();
 	void registerRect( const char* rectName, const RECT& rect );
 	void registerRect( const char* rectName, long left, long top, long right, long bottom );
+	void resizeRect( const char* rectName, long left, long top, long right, long bottom );
 	DrawRequest* drawRequest( const char* rectName, const D3DXVECTOR3* center, const D3DXVECTOR3* position, D3DCOLOR color );
 	DrawRequest* drawRequest( const char* rectName, const D3DXVECTOR3* center, int posX, int posY, int posZ, D3DCOLOR color );
 	DrawRequest* drawRequest( const char* rectName, ScreenPosition spe, D3DCOLOR color );

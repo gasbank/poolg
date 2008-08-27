@@ -26,6 +26,21 @@ void Sprite::registerRect( const char* rectName, const RECT& rect )
 		throw std::runtime_error( "Duplicate rectName already exist" );
 }
 
+void Sprite::resizeRect( const char* rectName, long left, long top, long right, long bottom )
+{
+	RECT rect;
+	rect.left	= left;
+	rect.top	= top;
+	rect.right	= right;
+	rect.bottom = bottom;
+
+	if ( m_rectMap.find( rectName ) == m_rectMap.end() )
+		throw std::runtime_error( "There`s no rectName exist" );
+	else
+		m_rectMap[ rectName ] = rect;
+
+}
+
 void Sprite::registerRect( const char* rectName, long left, long top, long right, long bottom )
 {
 	RECT rect;

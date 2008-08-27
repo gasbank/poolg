@@ -23,4 +23,5 @@ SkillBox		0	82	128	282
 SkillContentBox		128	82	418	282
 StatusBox		0	282	163	407
 StatSelectBox		163	282	333	512
-Bars			333	282	
+Bars			333	283	443	296
+BarBG			333	296	443	309

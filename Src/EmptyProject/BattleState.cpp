@@ -23,8 +23,7 @@ BattleState::BattleState()
 	assert( m_pDev );
 
 	/*UI 초기화 부분입니다.*/
-	float statusBoxWidth = 163;
-	float statusBoxHeight = 124;
+
 
 	int scrWidth = GetG().m_scrWidth;
 	int scrHeight = GetG().m_scrHeight;
@@ -37,23 +36,59 @@ BattleState::BattleState()
 	m_sprite->registerRect( "BarFg", 163, 150, 163+220, 150+22 );		// Progress bar foreground
 	m_sprite->registerRect( "BarBg", 163, 172, 163+220, 172+22 );		// Progress bar background
 	*/
+
 	m_sprite = GetSpriteManager().registerSprite( "BattleUI", "Images/BattleUI/BattleUISet.tga" );
 	m_sprite->setCustomRendered( true );
-	m_sprite->registerRect( "StatusBoxBg", 0, 282, 163, 406 );
-	m_sprite->registerRect( "BattleLogBg", 0, 0, 512, 82 );
-	m_sprite->registerRect( "SkillBg", 0, 82, 128, 282 );
-	m_sprite->registerRect( "BarFg", 333, 282, 443, 296 );		// Progress bar foreground
-	m_sprite->registerRect( "BarBg", 333, 309, 443, 322 );	
+	m_sprite->registerRect( "StatusBox", 0, 282, 163, 406 );
+	m_sprite->registerRect( "BattleLogBox", 0, 0, 512, 82 );
+	m_sprite->registerRect( "SkillBox", 0, 82, 128, 282 );
+	m_sprite->registerRect( "BarFg", 333, 283, 443, 296 );		// Progress bar foreground
+	m_sprite->registerRect( "BarBg", 333, 296, 443, 309 );
+	//m_sprite->registerRect( "HPbarPlayer", 333, 283, 443, 296 );
+	
+
+	
+
+
+	int margin = 5;
+	int statusBoxWidth = 163;
+	int statusBoxHeight = 124;
+	int skillBoxWidth = 128;
+	int skillBoxHeight = 200;
+
+	int statusBoxPlayerPosX = margin;
+	int statusBoxPlayerPosY = scrHeight - statusBoxHeight - margin;
+	int statusBoxEnemyPosX = scrWidth - statusBoxWidth - margin;
+	int statusBoxEnemyPosY = margin;
+
+	m_sprite->drawRequest( "StatusBox", 0, statusBoxPlayerPosX, statusBoxPlayerPosY, 0, 0xffffffff );
+	m_sprite->drawRequest( "StatusBox", 0, statusBoxEnemyPosX, statusBoxEnemyPosY, 0, 0xffffffff );
+	m_sprite->drawRequest( "BattleLogBox", 0, margin, margin, 0, 0xffffffff );
+	m_sprite->drawRequest( "SkillBox", 0, scrWidth - skillBoxWidth - margin, scrHeight - skillBoxHeight - margin, 0, 0xffffffff );
 
 
 
-	m_sprite->drawRequest( "StatusBoxBg", Sprite::RIGHT_TOP, 0xffffffff );
-	m_sprite->drawRequest( "StatusBoxBg", Sprite::LEFT_BOTTOM, 0xffffffff );
-	m_sprite->drawRequest( "BattleLogBg", Sprite::LEFT_TOP, D3DCOLOR_RGBA(255, 0, 0, 255) );
-	m_sprite->drawRequest( "SkillBg", Sprite::RIGHT_BOTTOM, 0xffffffff );
+	//아군 bar 배경
+	m_sprite->drawRequest( "BarBg", 0, statusBoxPlayerPosX + 45, statusBoxPlayerPosY + 10, 0, D3DCOLOR_RGBA(130, 0, 0, 255));
+	m_sprite->drawRequest( "BarBg", 0, statusBoxPlayerPosX + 45, statusBoxPlayerPosY + 30, 0, D3DCOLOR_RGBA(0, 0, 130, 255));
+	m_sprite->drawRequest( "BarBg", 0, statusBoxPlayerPosX + 45, statusBoxPlayerPosY + 50, 0, D3DCOLOR_RGBA(0, 130, 0, 255));
+	//m_sprite->drawRequest( "HPbarPlayer", 0, statusBoxPlayerPosX + 45, statusBoxPlayerPosY + 10, 0, D3DCOLOR_RGBA(130, 0, 0, 255));
+	//적군 bar 배경
+	m_sprite->drawRequest( "BarBg", 0, statusBoxEnemyPosX + 45, statusBoxEnemyPosY + 10, 0, D3DCOLOR_RGBA(130, 0, 0, 255));
+	m_sprite->drawRequest( "BarBg", 0, statusBoxEnemyPosX + 45, statusBoxEnemyPosY + 30, 0, D3DCOLOR_RGBA(0, 0, 130, 255));
+
+	m_sprite->resizeRect( "BarFg", 333, 283, 350, 296 );
+	m_sprite->drawRequest( "BarFg", 0, statusBoxPlayerPosX + 45, statusBoxPlayerPosY + 10, 0, D3DCOLOR_RGBA(255, 0, 0, 255));
+	m_sprite->resizeRect( "BarFg", 333, 283, 400, 296 );
+	m_sprite->drawRequest( "BarFg", 0, statusBoxPlayerPosX + 45, statusBoxPlayerPosY + 30, 0, D3DCOLOR_RGBA(0, 0, 255, 255));
+
 
 	m_sprite->drawRequest( "BarBg", 0, 200, 200, 0, 0xffffffff );
 	DrawRequest* dr = m_sprite->drawRequest( "BarFg", 0, 200, 200, 0, D3DCOLOR_RGBA(255, 0, 0, 255) );
+
+
+	//DrawRequest* dr =
+	//m_sprite->drawRequest( "BagFr", 
 
 	dr->srcRect.right -= 50;
 	
@@ -67,8 +102,7 @@ BattleState::BattleState()
 	float statusBoxEnemysPositionX = (float)scrWidth/2 - statusBoxWidth - 10;
 	float statusBoxEnemysPositionY = (float)scrHeight/2 - statusBoxHeight - 10;
 
-	int skillBoxHeight = 200;
-	int skillBoxWidth = skillBoxHeight * 593 / 933;
+
 	int skillBoxPositionX = scrWidth/2 -skillBoxWidth - 3;
 	int skillBoxPositionY =  -scrHeight/2 + 3;
 
@@ -256,21 +290,21 @@ HRESULT BattleState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, flo
 	m_StatSelectBox.draw();
 	m_SkillContentBox.draw();
 	
-	m_hpBgPlayer.draw();
-	m_mpBgPlayer.draw();
-	m_expBgPlayer.draw();
+	//m_hpBgPlayer.draw();
+	//m_mpBgPlayer.draw();
+	//m_expBgPlayer.draw();
 	m_hpBgEnemy.draw();
 	m_mpBgEnemy.draw();
 
-	m_hpIllusionPlayer.draw();
-	m_hpIllusionEnemy.draw();
-	m_mpIllusionPlayer.draw();
-	m_expIllusionPlayer.draw();
+	//m_hpIllusionPlayer.draw();
+	//m_hpIllusionEnemy.draw();
+	//m_mpIllusionPlayer.draw();
+	//m_expIllusionPlayer.draw();
 
 
-	m_hpBarPlayer.draw();
-	m_mpBarPlayer.draw();
-	m_expBarPlayer.draw();
+	//m_hpBarPlayer.draw();
+	//m_mpBarPlayer.draw();
+	//m_expBarPlayer.draw();
 	m_hpBarEnemy.draw();
 	m_mpBarEnemy.draw();
 

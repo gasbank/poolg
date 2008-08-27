@@ -763,26 +763,6 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="Tile"
-			>
-			<File
-				RelativePath=".\Tile.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Tile.h"
-				>
-			</File>
-			<File
-				RelativePath=".\TileManager.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\TileManager.h"
-				>
-			</File>
-		</Filter>
-		<Filter
 			Name="State"
 			>
 			<File
@@ -830,6 +810,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ProgressUi.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ProgressUi.h"
+				>
+			</File>
+			<File
 				RelativePath=".\SkillDescBox.cpp"
 				>
 			</File>
@@ -863,6 +851,26 @@
 			</File>
 			<File
 				RelativePath=".\PictureMap.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Tile"
+			>
+			<File
+				RelativePath=".\Tile.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Tile.h"
+				>
+			</File>
+			<File
+				RelativePath=".\TileManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\TileManager.h"
 				>
 			</File>
 		</Filter>

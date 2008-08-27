@@ -334,12 +334,14 @@ bool EnemyCountTrigger::check() const
 	UnitSet::iterator it = m_pUnitSet->begin();
 	for ( ; it != m_pUnitSet->end(); it++ )
 	{
-		Enemy* pEnemy = static_cast<Enemy*>( *it );
-
 		// 현재로써 남은 적을 판단하는 방법은 말을 할 수 없고 Remove Flag가 false인 적을 남은
 		// 적으로 간주하는 것이다.
-		if ( !pEnemy->isTalkable() && !pEnemy->getRemoveFlag() )
-			count++;
+		if ( (*it)->getType() == UT_ENEMY )
+		{
+			Enemy* pEnemy = static_cast<Enemy*>( *it );
+			if ( !pEnemy->isTalkable() && !pEnemy->getRemoveFlag() )
+				count++;
+		}
 	}
 
 	if ( count == m_numOfEnemyToTrigger )

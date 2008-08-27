@@ -177,7 +177,7 @@ private:
 class EnemyCountTrigger : public Trigger
 {
 public:
-	EnemyCountTrigger( World* pWorld, int numOfEnemyToTrigger );
+	EnemyCountTrigger( World* pWorld, int _numOfEnemyToTrigger );
 	virtual ~EnemyCountTrigger() {}
 
 	virtual bool check() const;

@@ -17,6 +17,7 @@
 #include <assert.h>
 #include <time.h>
 #include <set>
+#include <process.h>
 
 #include "DXUT.h"
 #include "AranPCH.h"

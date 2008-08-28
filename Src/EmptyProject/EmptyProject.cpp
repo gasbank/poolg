@@ -33,7 +33,6 @@
 #include "TileManager.h"
 #include "World.h"
 #include "Dialog.h"
-#include <process.h>
 #include "SpriteManager.h"
 #include "Sprite.h"
 #include "EpLight.h"
@@ -131,9 +130,6 @@ bool CALLBACK ModifyDeviceSettings( DXUTDeviceSettings* pDeviceSettings, void* p
 
 	return true;
 }
-
-DrawRequest* g_dr;
-DrawRequest* g_dr2;
 
 //--------------------------------------------------------------------------------------
 // Create any D3D9 resources that will live through a device reset (D3DPOOL_MANAGED)
@@ -319,28 +315,6 @@ void CALLBACK OnFrameMove( double fTime, float fElapsedTime, void* pUserContext 
 {
 	HRESULT hr;
 
-	
-	if ( g_dr )
-	{
-		if (g_dr->srcRect.right < 50)
-		{
-			g_spriteManager->getSprite( "GUI" )->removeDrawRequest( g_dr );
-		}
-		else
-		{
-			g_dr->srcRect.right -= 1;
-		}
-	}
-
-	if ( g_dr2 )
-	{
-		D3DXMATRIX mRotX, mRotZ;
-		D3DXMatrixRotationX( &mRotX, (float)(fTime / 3.0 * D3DX_PI) );
-		D3DXMatrixRotationZ( &mRotZ, D3DXToRadian( 0 ) );
-		g_dr2->xform = mRotX * mRotZ;
-
-	}
-	
 	UNREFERENCED_PARAMETER( hr );
 
 	GetWorldManager().changeToNextWorldIfExist();

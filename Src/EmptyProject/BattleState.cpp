@@ -721,18 +721,18 @@ HRESULT BattleState::release ()
 	SAFE_RELEASE( m_lblSkillDescription );
 	SAFE_RELEASE( m_lblStatSelect );
 
-	delete			m_hpBarPlayerProg;
-	delete			m_csBarPlayerProg;
-	delete			m_expBarPlayerProg;
-	delete			m_hpBarEnemyProg;
-	delete			m_csBarEnemyProg;
-	delete			m_hpIllusionPlayerProg;
-	delete			m_csIllusionPlayerProg;
-	delete			m_expIllusionPlayerProg;
-	delete			m_hpIllusionEnemyProg;
-	delete			m_csIllusionEnemyProg;
-	delete			m_skillContentBoxMover;
-	delete			m_statSelectBoxMover;
+	SAFE_DELETE( m_hpBarPlayerProg );
+	SAFE_DELETE( m_csBarPlayerProg );
+	SAFE_DELETE( m_expBarPlayerProg );
+	SAFE_DELETE( m_hpBarEnemyProg );
+	SAFE_DELETE( m_csBarEnemyProg );
+	SAFE_DELETE( m_hpIllusionPlayerProg );
+	SAFE_DELETE( m_csIllusionPlayerProg );
+	SAFE_DELETE( m_expIllusionPlayerProg );
+	SAFE_DELETE( m_hpIllusionEnemyProg );
+	SAFE_DELETE( m_csIllusionEnemyProg );
+	SAFE_DELETE( m_skillContentBoxMover );
+	SAFE_DELETE( m_statSelectBoxMover );
 
 	return S_OK;
 }

@@ -14,6 +14,7 @@ class Sprite;
 class Enemy;
 class DrawRequest;
 class ProgressUi;
+class WindowMover;
 
 enum TurnType { TT_NATURAL, TT_COMPUTER, TT_PLAYER };
 enum PlayerSide { PS_NOTSET, PS_COMPUTER, PS_PLAYER };
@@ -60,8 +61,12 @@ private:
 	/*이곳부터가 컴포넌트*/
 	Sprite*				m_sprite;
 
-	SkillDescBox		m_SkillContentBox;
-	SkillDescBox		m_StatSelectBox;
+	DrawRequest*		m_skillContentBox;
+	DrawRequest*		m_statSelectBox;
+
+	WindowMover*		m_skillContentBoxMover;
+	WindowMover*		m_statSelectBoxMover;
+
 
 	DrawRequest*		m_hpBarPlayer;
 	DrawRequest*		m_csBarPlayer;

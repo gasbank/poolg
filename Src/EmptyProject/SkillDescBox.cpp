@@ -45,7 +45,7 @@ void SkillDescBox::frameMove( float fElapsedTime )
 	/*왼쪽으로 움직인다.*/
 	if (m_movingDirect == true && m_isOn == false)
 	{
-		if (curDistance <= 0.01f)
+		if (curDistance <= 5)
 		{
 			m_vPos.x = m_onPosX;
 			m_isOn = true;

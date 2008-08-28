@@ -27,11 +27,12 @@ void WindowMover::setOff()
 {
 	m_isOn = false;
 	m_movingDirect = false;
+	m_curPos = m_offPos;
 }
 
 void WindowMover::frameMove( float fElapsedTime )
 {
-	float movingRate = 0.2f;
+	float movingRate = 3.0f * fElapsedTime;
 
 
 	/*왼쪽(활성화 쪽)으로 움직인다.*/
@@ -39,14 +40,16 @@ void WindowMover::frameMove( float fElapsedTime )
 	{
 		const D3DXVECTOR3 gap = m_onPos - m_curPos;
 		float curDistance = D3DXVec3Length( &gap );
+		D3DXVECTOR3 normalizedVector;
+		D3DXVec3Normalize (&normalizedVector, &gap);
 
-		if (curDistance <= 0.01f)
+		if (curDistance <= 5)
 		{
 			m_curPos = m_onPos;
 			m_isOn = true;
 		}
 		else
-			m_curPos += ( m_onPos - m_curPos ) * movingRate + movingRate * ( m_onPos - m_offPos );
+			m_curPos += ( m_onPos - m_curPos ) * movingRate ;// + movingRate * ( m_onPos - m_offPos );
 	}
 	/*오른쪽(비활성화 쪽)으로 움직인다.*/
 	else if (m_movingDirect == false && m_isOn == true)
@@ -54,13 +57,13 @@ void WindowMover::frameMove( float fElapsedTime )
 		const D3DXVECTOR3 gap = m_offPos - m_curPos;
 		float curDistance = D3DXVec3Length( &gap );
 
-		if (curDistance <= 0.01f)
+		if (curDistance <= 5)
 		{
 			m_curPos = m_offPos;
 			m_isOn = false;
 		}
 		else
-			m_curPos += ( m_offPos - m_curPos ) * movingRate + movingRate * ( m_offPos - m_onPos );
+			m_curPos += ( m_offPos - m_curPos ) * movingRate;// + movingRate * ( m_offPos - m_onPos );
 	}
 
 

@@ -6,7 +6,7 @@ public:
 	void setPos (D3DXVECTOR3 onPos, D3DXVECTOR3 offPos);
 	void onBox();
 	void offBox();
-	bool isOn();
+	bool isOn() {return m_isOn;}
 
 	void setOff ();
 

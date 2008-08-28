@@ -15,6 +15,7 @@
 #include "Sprite.h"
 #include "ShaderWrapper.h"
 #include "ProgressUi.h"
+#include "WindowMover.h"
 
 extern PostSepiaShader*				g_postSepiaShader;
 
@@ -71,9 +72,19 @@ BattleState::BattleState()
 	m_sprite->drawRequest( "StatusBox", 0, statusBoxPlayerPosX, statusBoxPlayerPosY, 0, 0xffffffff );
 	m_sprite->drawRequest( "StatusBox", 0, statusBoxEnemyPosX, statusBoxEnemyPosY, 0, 0xffffffff );
 	m_sprite->drawRequest( "BattleLogBox", 0, margin, margin, 0, 0xffffffff );
-	m_sprite->drawRequest( "SkillContentBox", 0, scrWidth - skillBoxWidth - margin - skillContentBoxWidth,  scrHeight - skillBoxHeight - margin, 0,  0xffffffff );
+	m_skillContentBox = m_sprite->drawRequest( "SkillContentBox", 0, scrWidth - skillBoxWidth - margin - skillContentBoxWidth, scrHeight - skillBoxHeight - margin, 0,  0xffffffff );
 	m_sprite->drawRequest( "SkillBox", 0, scrWidth - skillBoxWidth - margin, scrHeight - skillBoxHeight - margin, 0, 0xffffffff );
-	m_sprite->drawRequest( "StatSelectBox",0, scrWidth/2, margin * 2 + statusBoxHeight, 0, 0xffffffff );
+	m_statSelectBox = m_sprite->drawRequest( "StatSelectBox",0, scrWidth/2, margin * 2 + statusBoxHeight, 0, 0xffffffff );
+
+	m_skillContentBoxMover = new WindowMover();
+	m_statSelectBoxMover = new WindowMover();
+	m_skillContentBoxMover->
+		setPos( D3DXVECTOR3((float)scrWidth - skillBoxWidth - margin - skillContentBoxWidth, (float)scrHeight - skillBoxHeight - margin, 0),
+				D3DXVECTOR3((float)scrWidth - skillBoxWidth - margin - skillContentBoxWidth, (float)scrHeight + 10, 0));
+	m_statSelectBoxMover->
+		setPos( D3DXVECTOR3((float)scrWidth/2, (float)margin * 2 + statusBoxHeight, 0),
+				D3DXVECTOR3((float)scrWidth + 10, (float)margin * 2 + statusBoxHeight, 0));
+
 
 
 
@@ -103,14 +114,6 @@ BattleState::BattleState()
 	m_csBarEnemy = m_sprite->drawRequest( "BarFg", 0, statusBoxEnemyPosX + 45, statusBoxEnemyPosY + 30, 0, D3DCOLOR_RGBA(0, 0, 255, 255));
 
 
-	m_sprite->drawRequest( "BarBg", 0, 200, 200, 0, 0xffffffff );
-	DrawRequest* dr = m_sprite->drawRequest( "BarFg", 0, 200, 200, 0, D3DCOLOR_RGBA(255, 0, 0, 255) );
-
-
-	//DrawRequest* dr =
-	//m_sprite->drawRequest( "BagFr", 
-
-	dr->srcRect.right -= 50;
 	
 	
 
@@ -126,6 +129,7 @@ BattleState::BattleState()
 	int skillBoxPositionX = scrWidth/2 -skillBoxWidth - 3;
 	int skillBoxPositionY =  -scrHeight/2 + 3;
 
+	/*
 	int skillContentBoxHeight = 200;
 	//int skillContentBoxWidth = skillContentBoxHeight * 390 / 269;
 	m_SkillContentBox.init(L"Images/BattleUI/SkillContentBox.png", m_pDev);
@@ -142,13 +146,9 @@ BattleState::BattleState()
 	m_StatSelectBox.setOff();
 	m_StatSelectBox.setOnPos( 0 , (float)skillBoxPositionY + StatSelectBoxHeight, 7);
 	m_StatSelectBox.setSize((float)StatSelectBoxWidth, (float)StatSelectBoxHeight);
+	*/
 
 
-	float dialogBoxWidth = (float)(int)(scrWidth - statusBoxWidth - 30);
-	float dialogBoxHeight = 124;
-
-	float statusBarWidth = statusBoxWidth * 0.67f;
-	float statusBarHeight = statusBarWidth * 0.1f;
 
 	m_innerFire.init (L"Images/BattleUI/BGchecker.jpg", m_pDev, 0.8f, 3, 9);
 	m_innerFire.setPos (0, 0, 0);
@@ -208,8 +208,10 @@ HRESULT BattleState::enter()
 	m_noneSkillSelectedCount = 0;
 	m_levelProgress = false;
 	m_levelUpFlag = false;
-	m_SkillContentBox.setOff();
-	m_StatSelectBox.setOff();
+	m_skillContentBoxMover->setOff();
+	m_statSelectBoxMover->setOff();
+	//m_SkillContentBox.setOff();
+	//m_StatSelectBox.setOff();
 
 	setupCamera();
 	
@@ -298,6 +300,15 @@ HRESULT BattleState::frameMove(double fTime, float fElapsedTime)
 {
 	double fStateTime = getStateTime(fTime);
 
+	//박스 위치 갱신
+	m_skillContentBoxMover->frameMove( fElapsedTime );
+	m_statSelectBoxMover->frameMove( fElapsedTime );
+
+	m_skillContentBox->position = m_skillContentBoxMover->getPos();
+	m_statSelectBox->position = m_statSelectBoxMover->getPos();
+
+
+
 	//현재 수치 적용
 	m_hpBarPlayerProg->setCurVal( getHero()->getCurHp() );
 	m_csBarPlayerProg->setCurVal( getHero()->getCurCs() );
@@ -323,6 +334,7 @@ HRESULT BattleState::frameMove(double fTime, float fElapsedTime)
 	m_expIllusionPlayerProg->setRate( fElapsedTime );
 	m_hpIllusionEnemyProg->setRate( fElapsedTime );
 	m_csIllusionEnemyProg->setRate( fElapsedTime );
+
 
 
 	//수치를 그림에 적용
@@ -424,7 +436,7 @@ HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 
 	if (uMsg == WM_KEYUP)
 	{
-		if ( m_StatSelectBox.isOn() )
+		if ( m_statSelectBoxMover->isOn() )
 		{
 			if (wParam == VK_UP)
 			{
@@ -558,13 +570,11 @@ HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 					enemy->setExpReward( 0 );
 					if (m_levelUpFlag == true)
 					{
-						m_StatSelectBox.onBox();
+						m_statSelectBoxMover->onBox();
 						m_levelUpFlag = false;
 						return S_OK;
 					}
-
 					return S_OK;
-
 				}
 			}
 			return S_OK;
@@ -595,11 +605,11 @@ HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 		}
 		if (wParam == VK_LEFT)
 		{
-			m_SkillContentBox.onBox();
+			m_skillContentBoxMover->onBox();
 		}
 		if (wParam == VK_RIGHT)
 		{
-			m_SkillContentBox.offBox();
+			m_skillContentBoxMover->offBox();
 		}
 		if (wParam == VK_RETURN)
 		{
@@ -700,8 +710,7 @@ HRESULT BattleState::release ()
 {
 	m_sprite->release();
 
-	m_SkillContentBox.release();
-	m_StatSelectBox.release();
+
 
 	m_innerFire.release();
 
@@ -717,12 +726,13 @@ HRESULT BattleState::release ()
 	delete			m_expBarPlayerProg;
 	delete			m_hpBarEnemyProg;
 	delete			m_csBarEnemyProg;
-
 	delete			m_hpIllusionPlayerProg;
 	delete			m_csIllusionPlayerProg;
 	delete			m_expIllusionPlayerProg;
 	delete			m_hpIllusionEnemyProg;
 	delete			m_csIllusionEnemyProg;
+	delete			m_skillContentBoxMover;
+	delete			m_statSelectBoxMover;
 
 	return S_OK;
 }
@@ -854,11 +864,11 @@ void BattleState::renderFixedText(int scrWidth, int scrHeight)
 		break;
 	}
 
-	if (m_SkillContentBox.isOn())
+	//if (m_SkillContentBox.isOn())
 		m_lblSkillDescription->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 0.8f, 0.8f, 1.0f, 1.0f ) );
 
 
-	if ( m_StatSelectBox.isOn() )
+	//if ( m_StatSelectBox.isOn() )
 	{
 		int statSelectX = scrWidth/2 + 10;
 		int statSelectY = scrHeight/2 - 150;

@@ -147,22 +147,8 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 		WCHAR mfp[128];
 		size_t numOfConvert;
 		mbstowcs_s( &numOfConvert, mfp, 128, modelFilePath, 512 );
-		World* world = World::createWorld( worldName, mfp );
+		World* world = World::createWorld( worldName, mfp, false );
 		GetWorldManager().addWorld( world );
-
-		ConstCharList dialogNameList;
-		StringCchPrintfA( scriptCommand, 512, "%s::dialogNameList", worldName );
-		GetScriptManager().readCharPtrList( scriptCommand, dialogNameList );
-
-		ConstCharList::iterator itDlg = dialogNameList.begin();
-		for ( ; itDlg != dialogNameList.end(); ++itDlg )
-		{
-			StringCchPrintfA( scriptCommand, 512, "%s::%s", worldName, *itDlg );
-			Dialog* newDlg = Dialog::createDialogByScript( scriptCommand );
-			newDlg->init();
-			world->addDialog( newDlg );
-		}
-
 	}
 
 	g_spriteManager = new SpriteManager( pd3dDevice );

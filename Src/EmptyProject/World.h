@@ -25,7 +25,7 @@ typedef std::list<Incident*> IncidentList;
 class World
 {
 public:
-	static World*					createWorld( const char* worldName, TCHAR* modelFilePath );
+	static World*					createWorld( const char* worldName, TCHAR* modelFilePath, bool preloadDlg );
 									~World(void);
 
 	HRESULT							init();
@@ -85,6 +85,7 @@ private:
 	void							wannaTalkingEventCheck();
 
 	void							addCollisionMesh( ArnMesh* collisionMesh );
+	UINT							preloadDialogs();
 
 	ArnFileData*					m_modelArnFile;
 	ArnSceneGraph*					m_modelSg;

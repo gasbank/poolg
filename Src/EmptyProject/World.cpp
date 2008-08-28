@@ -622,9 +622,11 @@ void World::loadWorldModel()
 	m_modelSg = new ArnSceneGraph( *m_modelArnFile );
 }
 
-World* World::createWorld( const char* worldName, TCHAR* modelFilePath )
+World* World::createWorld( const char* worldName, TCHAR* modelFilePath, bool preloadDlg )
 {
 	World* ret = new World( worldName, modelFilePath );
+	if ( preloadDlg )
+		ret->preloadDialogs();
 
 	return ret;
 }
@@ -794,6 +796,24 @@ VOID World::enter()
 	//GetEpLight().fadeInLightForcedDelayed( 2.0f );
 }
 
+UINT World::preloadDialogs()
+{
+	char scriptCommand[512];
+	ConstCharList dialogNameList;
+	StringCchPrintfA( scriptCommand, 512, "%s::dialogNameList", m_worldName );
+	GetScriptManager().readCharPtrList( scriptCommand, dialogNameList );
+
+	ConstCharList::iterator itDlg = dialogNameList.begin();
+	for ( ; itDlg != dialogNameList.end(); ++itDlg )
+	{
+		StringCchPrintfA( scriptCommand, 512, "%s::%s", m_worldName, *itDlg );
+		Dialog* newDlg = Dialog::createDialogByScript( scriptCommand );
+		newDlg->init();
+		addDialog( newDlg );
+	}
+
+	return dialogNameList.size();
+}
 
 //////////////////////////////////////////////////////////////////////////
 

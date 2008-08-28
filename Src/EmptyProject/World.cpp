@@ -600,7 +600,7 @@ Dialog* World::getDialogByName( const char* dialogName )
 			return (*it);
 	}
 
-	// Dialog not found!
+	// Dialog not found! Configure at runtime.
 	OutputDebugString( _T( " - INFO: Requested dialog is not found on World. Trying to generate and register new one...\n" ) );
 	Dialog* newDlg = Dialog::createDialogByScript( dialogName );
 	newDlg->init();

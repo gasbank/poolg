@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ks_c_5601-1987"?>
+<?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
@@ -839,6 +839,14 @@
 			</File>
 			<File
 				RelativePath=".\StatusBar.h"
+				>
+			</File>
+			<File
+				RelativePath=".\WindowMover.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\WindowMover.h"
 				>
 			</File>
 		</Filter>

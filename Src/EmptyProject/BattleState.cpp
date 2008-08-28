@@ -43,6 +43,8 @@ BattleState::BattleState()
 	m_sprite->registerRect( "StatusBox", 0, 282, 163, 406 );
 	m_sprite->registerRect( "BattleLogBox", 0, 0, 512, 82 );
 	m_sprite->registerRect( "SkillBox", 0, 82, 128, 282 );
+	m_sprite->registerRect( "SkillContentBox", 128,	82,	418, 282 );
+	m_sprite->registerRect( "StatSelectBox", 163, 282 ,333 ,512 );
 	m_sprite->registerRect( "BarFg", 333, 283, 443, 296 );		// Progress bar foreground
 	m_sprite->registerRect( "BarBg", 333, 296, 443, 309 );
 	//m_sprite->registerRect( "HPbarPlayer", 333, 283, 443, 296 );
@@ -61,11 +63,17 @@ BattleState::BattleState()
 	int statusBoxPlayerPosY = scrHeight - statusBoxHeight - margin;
 	int statusBoxEnemyPosX = scrWidth - statusBoxWidth - margin;
 	int statusBoxEnemyPosY = margin;
+	
+	int battleLogBoxHeight = 82;
+
+	int skillContentBoxWidth = 290;
 
 	m_sprite->drawRequest( "StatusBox", 0, statusBoxPlayerPosX, statusBoxPlayerPosY, 0, 0xffffffff );
 	m_sprite->drawRequest( "StatusBox", 0, statusBoxEnemyPosX, statusBoxEnemyPosY, 0, 0xffffffff );
 	m_sprite->drawRequest( "BattleLogBox", 0, margin, margin, 0, 0xffffffff );
+	m_sprite->drawRequest( "SkillContentBox", 0, scrWidth - skillBoxWidth - margin - skillContentBoxWidth,  scrHeight - skillBoxHeight - margin, 0,  0xffffffff );
 	m_sprite->drawRequest( "SkillBox", 0, scrWidth - skillBoxWidth - margin, scrHeight - skillBoxHeight - margin, 0, 0xffffffff );
+	m_sprite->drawRequest( "StatSelectBox",0, scrWidth/2, margin * 2 + statusBoxHeight, 0, 0xffffffff );
 
 
 
@@ -119,7 +127,7 @@ BattleState::BattleState()
 	int skillBoxPositionY =  -scrHeight/2 + 3;
 
 	int skillContentBoxHeight = 200;
-	int skillContentBoxWidth = skillContentBoxHeight * 390 / 269;
+	//int skillContentBoxWidth = skillContentBoxHeight * 390 / 269;
 	m_SkillContentBox.init(L"Images/BattleUI/SkillContentBox.png", m_pDev);
 	m_SkillContentBox.setDistance(500);
 	m_SkillContentBox.setOff();
@@ -152,6 +160,7 @@ BattleState::BattleState()
 	D3DXCreateFont(m_pDev, 20, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblSkill);
 	D3DXCreateFont(m_pDev, 15, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblSkillDescription);
 	D3DXCreateFont(m_pDev, 17, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblStatSelect);
+
 
 
 	m_noneSkillSelectedCount = 0;
@@ -187,6 +196,8 @@ HRESULT BattleState::enter()
 	getHero()->clearKey();
 
 	GetAudioState().enterBattle();
+
+
 
 	updateBarRate();
 

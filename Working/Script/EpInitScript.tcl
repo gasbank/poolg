@@ -8,6 +8,9 @@ variable EpStartTopStateName		IntroState
 set EpStartWorldName				EpCeilingWorld
 set EpWorldList						[ list EpCeilingWorld EpRoomWorld EpA213World EpTestStage ]
 
+
+# This callback procedure is called when the D3D device is not created yet.
+# Application level one-time initialization and constants are defined here.
 proc EpInitApp {} {
 	# Screen Resolution
 	set w1 4
@@ -16,13 +19,16 @@ proc EpInitApp {} {
 	EpSetWindowSize [expr $w1 * $multiplier] [expr $h1 * $multiplier]
 }
 
-proc EpInitGame {} {
+# This callback procedure is called immediately after the creation of D3D device.
+# It is not 'one-time', since D3D device can be recreated during the runtime.
+# (By lost device event, for example.)
+proc EpOnCreateDevice {} {
 	variable EpStartTopStateName
 	
 	set TOP_STATE(IntroState)		1000
 	set TOP_STATE(PlayState)		1001
 	set TOP_STATE(CreditState)		1002
-		
+	
 	EpSetNextState $TOP_STATE($EpStartTopStateName)
 	EpOutputDebugString "<Script> EpInitGame called\n"
 }

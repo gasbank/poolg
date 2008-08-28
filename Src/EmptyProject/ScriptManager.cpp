@@ -127,7 +127,10 @@ bool ScriptManager::readCharPtrList( const char* variableName, ConstCharList& st
 	Tcl_Obj* aObj;	
 	int retObjLength;	
 	retObj = Tcl_GetVar2Ex( m_interp, variableName, 0, 0 );
-	Tcl_ListObjLength( m_interp, retObj, &retObjLength );
+	if ( Tcl_ListObjLength( m_interp, retObj, &retObjLength ) != TCL_OK )
+	{
+		throw std::runtime_error( "Requested string list not found on script file" );
+	}
 	assert( strList.size() == 0 );
 	UINT i;
 	for ( i = 0; i < (UINT)retObjLength; ++i )

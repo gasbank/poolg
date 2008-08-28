@@ -59,8 +59,6 @@ std::wstring g_debugBuffer;
 bool							g_bTileGrid				= false;
 
 
-LPD3DXSPRITE					g_d3dxSprite			= 0;
-LPDIRECT3DTEXTURE9				g_tex					= 0;
 
 MotionBlurShader*				g_motionBlurShader		= 0;
 
@@ -81,7 +79,15 @@ int								g_nActiveSystem = 0;
 CParticleSystem					*g_pParticleSystems[6];
 bool							g_bParticleVisible = true;
 
+//////////////////////////////////////////////////////////////////////////
+
+void ConfigureShaders( LPDIRECT3DDEVICE9 pd3dDevice );
+void ConfigureParticleSystem( LPDIRECT3DDEVICE9 pd3dDevice );
+void ConfigureTileGridGeometry( LPDIRECT3DDEVICE9 pd3dDevice );
+void ConfigureTestGeometry( LPDIRECT3DDEVICE9 pd3dDevice );			// TODO Not necessary on release build
+
 void SetupFullscreenQuad( const D3DSURFACE_DESC* pBackBufferSurfaceDesc );
+
 
 //--------------------------------------------------------------------------------------
 // Rejects any D3D9 devices that aren't acceptable to the app by returning false
@@ -121,17 +127,28 @@ DrawRequest* g_dr2;
 //--------------------------------------------------------------------------------------
 // Create any D3D9 resources that will live through a device reset (D3DPOOL_MANAGED)
 // and aren't tied to the back buffer size
+//
+//	PREREQUISITIES
+//
+//		- VideoMan			class instance
+//		- G					struct instance
+//		- WorldManager		class instance
+//		- ScriptManager		class instance
 //--------------------------------------------------------------------------------------
 HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
 									void* pUserContext )
 {
 	HRESULT hr;
+
+	// (1) Set D3D device global variable which is shared through the whole application lifetime.
+	assert( GetG().m_dev == 0 );
+	assert( VideoMan::getSingleton().GetDev() == 0 );
 	GetG().m_dev = pd3dDevice;
 	VideoMan::getSingleton().SetDev( pd3dDevice );
-	//pd3dDevice->SetRenderState( D3DRS_STENCILENABLE, TRUE );
-	//////////////////////////////////////////////////////////////////////////
 
-	// Configure worlds
+	// (2) Read all world script files
+	// TODO: IS THIS NEEDED ON EVERY OnCreateDevice()?
+	assert( GetWorldManager().getWorldCount() == 0 );
 	ConstCharList worldList;
 	GetScriptManager().readCharPtrList( "EpWorldList", worldList );
 	char scriptCommand[512];
@@ -151,273 +168,63 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 		GetWorldManager().addWorld( world );
 	}
 
+	// (3) Sprite manager
+	assert( g_spriteManager == 0 );
 	g_spriteManager = new SpriteManager( pd3dDevice );
 
-	Sprite* sprite = g_spriteManager->registerSprite( "GUI", "Images/UI.png" );
-	sprite->registerRect( "BlueCircle", 0, 0, 127, 127 );
-
-	// State Manager Initialization
+	// (4) Top State Manager (tsm)
+	// TODO: State preservation is needed!!! NO CREATION ON EVERY OnCreateDevice()!
+	assert( g_tsm == 0 );
 	g_tsm = new TopStateManager();
-	ConstCharList startWorldName;
-	GetScriptManager().readCharPtrList( "EpStartWorldName", startWorldName );
-	assert( startWorldName.size() == 1 );
-	ConstCharList::iterator startWorldNameIt = startWorldName.begin();
-	GetWorldManager().setNextWorld( *startWorldNameIt );
-	
-	g_wsm = new WorldStateManager();
-
 	g_tsm->init();
+	
+	// (5) World State Manager (wsm)
+	// TODO: State preservation is needed!!! NO CREATION ON EVERY OnCreateDevice()!
+	assert( g_wsm == 0 );
+	g_wsm = new WorldStateManager();
 	g_wsm->init();
 
+	// (6) Set the first world
+	// TODO: This is 'DO ONCE THROUGH THE WHOLE LIFETIME job.. not on every OnCreateDevice()!
+	const char* startWorldName = GetScriptManager().readString( "EpStartWorldName" );
+	GetWorldManager().setNextWorld( startWorldName );
 
-
-	// InitGame: State init completed and WorldState instances are allocated in pool area
-	// (world loading is not done yet)
-	GetScriptManager().execute( "EpInitGame" );
-
-	// Shader
+	// (7) Configure shaders and particle system
+	ConfigureShaders( pd3dDevice );
+	ConfigureParticleSystem( pd3dDevice );
 	
-	g_bombShader = new BombShader();
-	g_bombShader->initEffect( pd3dDevice, L"Shaders/HLSL/vbomb.fx" );
-	g_bombShader->initMainTechnique();
+	// (8) Configure geometries (Vertex and index buffer manipulation)
+	ConfigureTileGridGeometry( pd3dDevice );
+	ConfigureTestGeometry( pd3dDevice );
 
-	g_motionBlurShader = new MotionBlurShader();
-	g_motionBlurShader->initShader( pd3dDevice, L"" );
-
-	g_postSepiaShader = new PostSepiaShader();
-	g_postSepiaShader->initEffect( pd3dDevice, L"Shaders/HLSL/post_sepia.fx" );
-	g_postSepiaShader->initMainTechnique();
-
-	g_postRadialBlurShader = new PostRadialBlurShader();
-	g_postRadialBlurShader->initEffect( pd3dDevice, L"Shaders/HLSL/post_radialBlur.fx" );
-	g_postRadialBlurShader->initMainTechnique();
-
-	//g_alphaShader = new AlphaShader();
-	//g_alphaShader->initShader( pd3dDevice, L"Shaders/Alpha.vsh" );
-	//g_alphaShader->compileShader( "Alpha", "vs_2_0" );
-
-
-
-	//////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////
-	// Particle systems initialize
-	//
-	// Exploding burst
-	//
-
-	g_pParticleSystems[0] = new CParticleSystem();
-
-	g_pParticleSystems[0]->SetTexture( "Images/particle.bmp" );
-	g_pParticleSystems[0]->SetMaxParticles( 100 );
-	g_pParticleSystems[0]->SetNumToRelease( 100 );
-	g_pParticleSystems[0]->SetReleaseInterval( 0.05f );
-	g_pParticleSystems[0]->SetLifeCycle( 0.5f );
-	g_pParticleSystems[0]->SetSize( 1.0f );
-	g_pParticleSystems[0]->SetColor( D3DXCOLOR( 1.0f, 0.0f, 0.0f, 1.0f ));
-	g_pParticleSystems[0]->SetPosition( D3DXVECTOR3( 0.0f, 5.0f, 0.0f) );
-	g_pParticleSystems[0]->SetVelocity( D3DXVECTOR3( 0.0f, 0.0f, 0.0f) );
-	g_pParticleSystems[0]->SetGravity( D3DXVECTOR3( 0.0f, 0.0f, 0.0f) );
-	g_pParticleSystems[0]->SetWind( D3DXVECTOR3( 0.0f, 0.0f, 0.0f) );
-	g_pParticleSystems[0]->SetVelocityVar( 10.0f );	
-
-	g_pParticleSystems[0]->Init( pd3dDevice );
-
-	//
-	// Wind blown fountain
-	//
-
-	g_pParticleSystems[1] = new CParticleSystem();
-
-	g_pParticleSystems[1]->SetTexture( "Images/particle.bmp" );
-	g_pParticleSystems[1]->SetMaxParticles( 500 );
-	g_pParticleSystems[1]->SetNumToRelease( 5 );
-	g_pParticleSystems[1]->SetReleaseInterval( 0.05f );
-	g_pParticleSystems[1]->SetLifeCycle( 4.0f );
-	g_pParticleSystems[1]->SetSize( 0.5f );
-	g_pParticleSystems[1]->SetColor( D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ));
-	g_pParticleSystems[1]->SetPosition( D3DXVECTOR3( 0.0f, 0.0f, 0.0f ) );
-	g_pParticleSystems[1]->SetVelocity( D3DXVECTOR3( 0.0f, 5.0f, 0.0f ) );
-	g_pParticleSystems[1]->SetGravity( D3DXVECTOR3( 0.0f, 0.0f, 0.0f ) );
-	g_pParticleSystems[1]->SetWind( D3DXVECTOR3( 2.0f, 0.0f, 0.0f ) );
-	g_pParticleSystems[1]->SetVelocityVar( 1.5f );
-
-	g_pParticleSystems[1]->Init( pd3dDevice );
-
-	//
-	// Omni-directiional emission expanding into space with no air resistence
-	//
-
-	g_pParticleSystems[2] = new CParticleSystem();
-
-	g_pParticleSystems[2]->SetTexture( "Images/particle.bmp" );
-	g_pParticleSystems[2]->SetMaxParticles( 2048 );
-	g_pParticleSystems[2]->SetNumToRelease( 10 );
-	g_pParticleSystems[2]->SetReleaseInterval( 0.05f );
-	g_pParticleSystems[2]->SetLifeCycle( 5.0f );
-	g_pParticleSystems[2]->SetSize( 0.5f );
-	g_pParticleSystems[2]->SetColor( D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ));
-	g_pParticleSystems[2]->SetPosition( D3DXVECTOR3( 0.0f, 0.0f, 0.0f) );
-	g_pParticleSystems[2]->SetVelocity( D3DXVECTOR3( 0.0f, 0.0f, 0.0f) );
-	g_pParticleSystems[2]->SetGravity( D3DXVECTOR3( 0.0f, 0.0f, 0.0f) );
-
-	g_pParticleSystems[2]->SetWind( D3DXVECTOR3( 0.0f, 0.0f, 0.0f) );
-	g_pParticleSystems[2]->SetAirResistence( false );
-
-	g_pParticleSystems[2]->SetVelocityVar(2.0f);
-
-	g_pParticleSystems[2]->Init( pd3dDevice );
-
-	//
-	// Fountain particles behave like paint spots when striking a plane as 
-	// the wind blowing them towards us
-	//
-
-	g_pParticleSystems[3] = new CParticleSystem();
-
-	g_pParticleSystems[3]->SetTexture( "Images/particle.bmp" );
-	g_pParticleSystems[3]->SetMaxParticles( 100 );
-	g_pParticleSystems[3]->SetNumToRelease( 10 );
-	g_pParticleSystems[3]->SetReleaseInterval( 0.05f );
-	g_pParticleSystems[3]->SetLifeCycle( 3.0f );
-	g_pParticleSystems[3]->SetSize( 0.5f );
-	g_pParticleSystems[3]->SetColor( D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ));
-	g_pParticleSystems[3]->SetPosition( D3DXVECTOR3( 0.0f, 0.0f, 0.0f ) );
-	g_pParticleSystems[3]->SetVelocity( D3DXVECTOR3( 0.0f, 5.0f, 0.0f ) );
-	g_pParticleSystems[3]->SetGravity( D3DXVECTOR3( 0.0f, 0.0f, 0.0f ) );
-	g_pParticleSystems[3]->SetWind( D3DXVECTOR3( 0.0f, 0.0f, -20.0f ) );
-	g_pParticleSystems[3]->SetVelocityVar( 2.5f );
-
-	g_pParticleSystems[3]->SetCollisionPlane( D3DXVECTOR3( 0.0f, 0.0f,1.0f ), 
-		D3DXVECTOR3( 0.0f, 0.0f, -5.0f ),
-		1.0f, CR_STICK );
-
-	g_pParticleSystems[3]->Init( pd3dDevice );
-
-	//
-	// Fountain using a single collision plane acting as a floor
-	//
-
-	g_pParticleSystems[4] = new CParticleSystem();
-
-	g_pParticleSystems[4]->SetTexture( "Images/particle.bmp" );
-	g_pParticleSystems[4]->SetMaxParticles( 200 );
-	g_pParticleSystems[4]->SetNumToRelease( 10 );
-	g_pParticleSystems[4]->SetReleaseInterval( 0.05f );
-	g_pParticleSystems[4]->SetLifeCycle( 5.0f );
-	g_pParticleSystems[4]->SetSize( 1.5f );
-	g_pParticleSystems[4]->SetColor( D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ));
-	g_pParticleSystems[4]->SetPosition( D3DXVECTOR3( 0.0f, 0.0f, 0.0f ) );
-	g_pParticleSystems[4]->SetVelocity( D3DXVECTOR3( 0.0f, 0.0f, 0.0f ) );
-	g_pParticleSystems[4]->SetGravity( D3DXVECTOR3( 0.0f, -9.8f, 0.0f ) );
-	g_pParticleSystems[4]->SetWind( D3DXVECTOR3( 0.0f, 0.0f, 0.0f ) );
-	g_pParticleSystems[4]->SetVelocityVar( 20.0f );
-
-	g_pParticleSystems[4]->SetCollisionPlane( D3DXVECTOR3( 0.0f, 1.0f, 0.0f ), 
-		D3DXVECTOR3( 0.0f, 0.0f, 0.0f ) );
-
-	g_pParticleSystems[4]->Init( pd3dDevice );
-
-	//
-	// Fountain boxed-in by 6 collision planes
-	//
-
-	g_pParticleSystems[5] = new CParticleSystem();
-
-	g_pParticleSystems[5]->SetTexture( "Images/particle.bmp" );
-	g_pParticleSystems[5]->SetMaxParticles( 100 );
-	g_pParticleSystems[5]->SetNumToRelease( 5 );
-	g_pParticleSystems[5]->SetReleaseInterval( 0.05f );
-	g_pParticleSystems[5]->SetLifeCycle( 5.0f );
-	g_pParticleSystems[5]->SetSize( 1.0f );
-	g_pParticleSystems[5]->SetColor( D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ));
-	g_pParticleSystems[5]->SetPosition( D3DXVECTOR3( 0.0f, 0.0f, 0.0f ) );
-	g_pParticleSystems[5]->SetVelocity( D3DXVECTOR3( 0.0f, 0.0f, 0.0f ) );
-	g_pParticleSystems[5]->SetGravity( D3DXVECTOR3( 0.0f, -9.8f, 0.0f ) );
-	g_pParticleSystems[5]->SetWind( D3DXVECTOR3( 0.0f, 0.0f, 0.0f ) );
-	g_pParticleSystems[5]->SetVelocityVar( 20.0f );
-
-	// Create a series of planes to collide with
-	g_pParticleSystems[5]->SetCollisionPlane( D3DXVECTOR3( 0.0f, 1.0f, 0.0f ), 
-		D3DXVECTOR3( 0.0f, 0.0f, 0.0f ) ); // Floor
-
-	g_pParticleSystems[5]->SetCollisionPlane( D3DXVECTOR3( 1.0f, 0.0f, 0.0f ), 
-		D3DXVECTOR3(-3.0f, 0.0f, 0.0f ) ); // Left Wall
-
-	g_pParticleSystems[5]->SetCollisionPlane( D3DXVECTOR3(-1.0f, 0.0f, 0.0f ), 
-		D3DXVECTOR3( 3.0f, 0.0f, 0.0f ) ); // Right Wall
-
-	g_pParticleSystems[5]->SetCollisionPlane( D3DXVECTOR3( 0.0f, 0.0f, 1.0f ), 
-		D3DXVECTOR3( 0.0f, 0.0f,-3.0f ) ); // Front Wall
-
-	g_pParticleSystems[5]->SetCollisionPlane( D3DXVECTOR3( 0.0f, 0.0f,-1.0f ), 
-		D3DXVECTOR3( 0.0f, 0.0f, 3.0f ) ); // Back Wall
-
-	g_pParticleSystems[5]->SetCollisionPlane( D3DXVECTOR3( 0.0f,-1.0f, 0.0f ), 
-		D3DXVECTOR3( 0.0f, 5.0f, 0.0f ) ); // Ceiling
-
-	g_pParticleSystems[5]->Init( pd3dDevice );
-
-	//////////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////////
-
-
-
-
-	D3DXCreateTeapot( pd3dDevice, &g_testTeapot, 0 );
-	//D3DXCreatePolygon( pd3dDevice, 0.1f, 32, &g_testPolygon, 0 );
-
-	//g_testPolygon->CloneMesh( 0, g_alphaShader->getDecl(), pd3dDevice, &g_testPolygonCloned );
-
-
-	V_RETURN( pd3dDevice->CreateVertexBuffer( sizeof( MY_COLOR_VERTEX ) * 2, D3DUSAGE_WRITEONLY, D3DFVF_XYZ | D3DFVF_DIFFUSE, D3DPOOL_MANAGED, &g_lineElement, 0 ) );
-
-	const D3DCOLOR gridColor = D3DCOLOR_ARGB( 255, 32, 128, 128 );
-	MY_COLOR_VERTEX data[] = {
-		{ -0.5f, 0.0f, -0.2f, gridColor },
-		{ +0.5f, 0.0f, -0.2f, gridColor }
-	};
-
-	void* pVB = 0;
-	V_RETURN( g_lineElement->Lock( 0, 0, &pVB, 0 ) );
-	memcpy( pVB, data, sizeof( data ) );
-	g_lineElement->Unlock();
-
+	
+	
 	//////////////////////////////////////////////////////////////////////////
 
 	EpCamera& g_camera = GetG().m_camera;
 
-	// Runtime error at here. I cannot deal with this.. by KYS
-	GetG().m_videoMan.SetDev(pd3dDevice);
 
 	//화면의 크기를 변환할 때마다 화면의 크기를 나타내는 전역변수 갱신.
 	GetG().m_scrWidth = pBackBufferSurfaceDesc->Width;
 	GetG().m_scrHeight = pBackBufferSurfaceDesc->Height;
 
-	//[윤욱]
-	//g_menubox.init(pd3dDevice, GetG().m_scrWidth, GetG().m_scrHeight);
 
 	V( D3DXCreateFont( pd3dDevice, 12, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Gulimche"), &g_pFont) );
-
+	
 	// Orthogonal and fixed view xforms for GUI or fixed element rendering
 	D3DXVECTOR3 eye(0, 0, -50.0f), at(0, 0, 0), up(0, 1.0f, 0);
 	D3DXMatrixOrthoLH(&GetG().g_orthoProjMat, (FLOAT)pBackBufferSurfaceDesc->Width, (FLOAT)pBackBufferSurfaceDesc->Height, 0.1f, 100.0f);
 	D3DXMatrixLookAtLH(&GetG().g_fixedViewMat,	&eye, &at, &up);
 
 	float fAspectRatio = pBackBufferSurfaceDesc->Width / ( FLOAT )pBackBufferSurfaceDesc->Height;
-	g_camera.SetProjParams( D3DX_PI / 4, fAspectRatio, 1.0f, 100000.0f );
+	g_camera.SetProjParams( D3DX_PI / 4, fAspectRatio, 1.0f, 1000.0f );
 
 	GetG().m_screenFlash.setup();
 	GetEpLight().setupLight();
 
 
-	V( D3DXCreateSprite( pd3dDevice, &g_d3dxSprite ) );
-	D3DXCreateTextureFromFile( pd3dDevice, L"Images/UI.png", &g_tex );
-
-	/*
-	g_dr = sprite->drawRequest( "BlueCircle", 0, 0, D3DCOLOR_RGBA( 255, 255, 255, 255 ) );
-	g_dr2 = sprite->drawRequestXformable( "BlueCircle" );
-	*/
-
+	// Script side callback invocation (Do at the end of this function.)
+	GetScriptManager().execute( "EpOnCreateDevice" );
 
 	return S_OK;
 }
@@ -457,7 +264,6 @@ HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFA
 
 	GetG().m_screenFlash.reset( pd3dDevice, pBackBufferSurfaceDesc, pUserContext);
 
-	g_d3dxSprite->OnResetDevice();
 
 
 	D3DFORMAT d3dFormat = D3DFMT_A8R8G8B8;
@@ -484,6 +290,10 @@ HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFA
 	g_postRadialBlurShader->setFullscreenTexture( g_radialBlurRenderTarget );
 
 	SetupFullscreenQuad( pBackBufferSurfaceDesc );
+
+	if ( g_pFont )
+		g_pFont->OnResetDevice();
+
 	return hr;
 }
 
@@ -901,8 +711,8 @@ void CALLBACK OnD3D9LostDevice( void* pUserContext )
 {
 	if ( g_bombShader )
 		g_bombShader->onLostDevice();
-	if ( g_d3dxSprite )
-		g_d3dxSprite->OnLostDevice();
+	if ( g_pFont )
+		g_pFont->OnLostDevice();
 }
 
 
@@ -920,8 +730,6 @@ void CALLBACK OnD3D9DestroyDevice( void* pUserContext )
 
 	SAFE_RELEASE( g_lineElement );
 
-	SAFE_RELEASE( g_d3dxSprite );
-	SAFE_RELEASE( g_tex );
 
 	EP_SAFE_RELEASE( g_wm );
 	delete g_epLight;
@@ -1155,3 +963,226 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 	return DXUTGetExitCode();
 }
 
+
+void ConfigureParticleSystem( LPDIRECT3DDEVICE9 pd3dDevice )
+{
+	UINT i;
+	for ( i = 0; i < 6; ++i )
+	{
+		assert( g_pParticleSystems[i] == 0 );
+	}
+	//////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
+	// Particle systems initialize
+	//
+	// Exploding burst
+	//
+	g_pParticleSystems[0] = new CParticleSystem();
+
+	g_pParticleSystems[0]->SetTexture( "Images/particle.bmp" );
+	g_pParticleSystems[0]->SetMaxParticles( 100 );
+	g_pParticleSystems[0]->SetNumToRelease( 100 );
+	g_pParticleSystems[0]->SetReleaseInterval( 0.05f );
+	g_pParticleSystems[0]->SetLifeCycle( 0.5f );
+	g_pParticleSystems[0]->SetSize( 1.0f );
+	g_pParticleSystems[0]->SetColor( D3DXCOLOR( 1.0f, 0.0f, 0.0f, 1.0f ));
+	g_pParticleSystems[0]->SetPosition( D3DXVECTOR3( 0.0f, 5.0f, 0.0f) );
+	g_pParticleSystems[0]->SetVelocity( D3DXVECTOR3( 0.0f, 0.0f, 0.0f) );
+	g_pParticleSystems[0]->SetGravity( D3DXVECTOR3( 0.0f, 0.0f, 0.0f) );
+	g_pParticleSystems[0]->SetWind( D3DXVECTOR3( 0.0f, 0.0f, 0.0f) );
+	g_pParticleSystems[0]->SetVelocityVar( 10.0f );	
+
+	g_pParticleSystems[0]->Init( pd3dDevice );
+
+	//
+	// Wind blown fountain
+	//
+
+	
+	g_pParticleSystems[1] = new CParticleSystem();
+
+	g_pParticleSystems[1]->SetTexture( "Images/particle.bmp" );
+	g_pParticleSystems[1]->SetMaxParticles( 500 );
+	g_pParticleSystems[1]->SetNumToRelease( 5 );
+	g_pParticleSystems[1]->SetReleaseInterval( 0.05f );
+	g_pParticleSystems[1]->SetLifeCycle( 4.0f );
+	g_pParticleSystems[1]->SetSize( 0.5f );
+	g_pParticleSystems[1]->SetColor( D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ));
+	g_pParticleSystems[1]->SetPosition( D3DXVECTOR3( 0.0f, 0.0f, 0.0f ) );
+	g_pParticleSystems[1]->SetVelocity( D3DXVECTOR3( 0.0f, 5.0f, 0.0f ) );
+	g_pParticleSystems[1]->SetGravity( D3DXVECTOR3( 0.0f, 0.0f, 0.0f ) );
+	g_pParticleSystems[1]->SetWind( D3DXVECTOR3( 2.0f, 0.0f, 0.0f ) );
+	g_pParticleSystems[1]->SetVelocityVar( 1.5f );
+
+	g_pParticleSystems[1]->Init( pd3dDevice );
+
+	//
+	// Omni-directiional emission expanding into space with no air resistence
+	//
+
+	g_pParticleSystems[2] = new CParticleSystem();
+
+	g_pParticleSystems[2]->SetTexture( "Images/particle.bmp" );
+	g_pParticleSystems[2]->SetMaxParticles( 2048 );
+	g_pParticleSystems[2]->SetNumToRelease( 10 );
+	g_pParticleSystems[2]->SetReleaseInterval( 0.05f );
+	g_pParticleSystems[2]->SetLifeCycle( 5.0f );
+	g_pParticleSystems[2]->SetSize( 0.5f );
+	g_pParticleSystems[2]->SetColor( D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ));
+	g_pParticleSystems[2]->SetPosition( D3DXVECTOR3( 0.0f, 0.0f, 0.0f) );
+	g_pParticleSystems[2]->SetVelocity( D3DXVECTOR3( 0.0f, 0.0f, 0.0f) );
+	g_pParticleSystems[2]->SetGravity( D3DXVECTOR3( 0.0f, 0.0f, 0.0f) );
+
+	g_pParticleSystems[2]->SetWind( D3DXVECTOR3( 0.0f, 0.0f, 0.0f) );
+	g_pParticleSystems[2]->SetAirResistence( false );
+
+	g_pParticleSystems[2]->SetVelocityVar(2.0f);
+
+	g_pParticleSystems[2]->Init( pd3dDevice );
+
+	//
+	// Fountain particles behave like paint spots when striking a plane as 
+	// the wind blowing them towards us
+	//
+
+	g_pParticleSystems[3] = new CParticleSystem();
+
+	g_pParticleSystems[3]->SetTexture( "Images/particle.bmp" );
+	g_pParticleSystems[3]->SetMaxParticles( 100 );
+	g_pParticleSystems[3]->SetNumToRelease( 10 );
+	g_pParticleSystems[3]->SetReleaseInterval( 0.05f );
+	g_pParticleSystems[3]->SetLifeCycle( 3.0f );
+	g_pParticleSystems[3]->SetSize( 0.5f );
+	g_pParticleSystems[3]->SetColor( D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ));
+	g_pParticleSystems[3]->SetPosition( D3DXVECTOR3( 0.0f, 0.0f, 0.0f ) );
+	g_pParticleSystems[3]->SetVelocity( D3DXVECTOR3( 0.0f, 5.0f, 0.0f ) );
+	g_pParticleSystems[3]->SetGravity( D3DXVECTOR3( 0.0f, 0.0f, 0.0f ) );
+	g_pParticleSystems[3]->SetWind( D3DXVECTOR3( 0.0f, 0.0f, -20.0f ) );
+	g_pParticleSystems[3]->SetVelocityVar( 2.5f );
+
+	g_pParticleSystems[3]->SetCollisionPlane( D3DXVECTOR3( 0.0f, 0.0f,1.0f ), 
+		D3DXVECTOR3( 0.0f, 0.0f, -5.0f ),
+		1.0f, CR_STICK );
+
+	g_pParticleSystems[3]->Init( pd3dDevice );
+
+	//
+	// Fountain using a single collision plane acting as a floor
+	//
+
+	g_pParticleSystems[4] = new CParticleSystem();
+
+	g_pParticleSystems[4]->SetTexture( "Images/particle.bmp" );
+	g_pParticleSystems[4]->SetMaxParticles( 200 );
+	g_pParticleSystems[4]->SetNumToRelease( 10 );
+	g_pParticleSystems[4]->SetReleaseInterval( 0.05f );
+	g_pParticleSystems[4]->SetLifeCycle( 5.0f );
+	g_pParticleSystems[4]->SetSize( 1.5f );
+	g_pParticleSystems[4]->SetColor( D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ));
+	g_pParticleSystems[4]->SetPosition( D3DXVECTOR3( 0.0f, 0.0f, 0.0f ) );
+	g_pParticleSystems[4]->SetVelocity( D3DXVECTOR3( 0.0f, 0.0f, 0.0f ) );
+	g_pParticleSystems[4]->SetGravity( D3DXVECTOR3( 0.0f, -9.8f, 0.0f ) );
+	g_pParticleSystems[4]->SetWind( D3DXVECTOR3( 0.0f, 0.0f, 0.0f ) );
+	g_pParticleSystems[4]->SetVelocityVar( 20.0f );
+
+	g_pParticleSystems[4]->SetCollisionPlane( D3DXVECTOR3( 0.0f, 1.0f, 0.0f ), 
+		D3DXVECTOR3( 0.0f, 0.0f, 0.0f ) );
+
+	g_pParticleSystems[4]->Init( pd3dDevice );
+
+	//
+	// Fountain boxed-in by 6 collision planes
+	//
+
+	g_pParticleSystems[5] = new CParticleSystem();
+
+	g_pParticleSystems[5]->SetTexture( "Images/particle.bmp" );
+	g_pParticleSystems[5]->SetMaxParticles( 100 );
+	g_pParticleSystems[5]->SetNumToRelease( 5 );
+	g_pParticleSystems[5]->SetReleaseInterval( 0.05f );
+	g_pParticleSystems[5]->SetLifeCycle( 5.0f );
+	g_pParticleSystems[5]->SetSize( 1.0f );
+	g_pParticleSystems[5]->SetColor( D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ));
+	g_pParticleSystems[5]->SetPosition( D3DXVECTOR3( 0.0f, 0.0f, 0.0f ) );
+	g_pParticleSystems[5]->SetVelocity( D3DXVECTOR3( 0.0f, 0.0f, 0.0f ) );
+	g_pParticleSystems[5]->SetGravity( D3DXVECTOR3( 0.0f, -9.8f, 0.0f ) );
+	g_pParticleSystems[5]->SetWind( D3DXVECTOR3( 0.0f, 0.0f, 0.0f ) );
+	g_pParticleSystems[5]->SetVelocityVar( 20.0f );
+
+	// Create a series of planes to collide with
+	g_pParticleSystems[5]->SetCollisionPlane( D3DXVECTOR3( 0.0f, 1.0f, 0.0f ), 
+		D3DXVECTOR3( 0.0f, 0.0f, 0.0f ) ); // Floor
+
+	g_pParticleSystems[5]->SetCollisionPlane( D3DXVECTOR3( 1.0f, 0.0f, 0.0f ), 
+		D3DXVECTOR3(-3.0f, 0.0f, 0.0f ) ); // Left Wall
+
+	g_pParticleSystems[5]->SetCollisionPlane( D3DXVECTOR3(-1.0f, 0.0f, 0.0f ), 
+		D3DXVECTOR3( 3.0f, 0.0f, 0.0f ) ); // Right Wall
+
+	g_pParticleSystems[5]->SetCollisionPlane( D3DXVECTOR3( 0.0f, 0.0f, 1.0f ), 
+		D3DXVECTOR3( 0.0f, 0.0f,-3.0f ) ); // Front Wall
+
+	g_pParticleSystems[5]->SetCollisionPlane( D3DXVECTOR3( 0.0f, 0.0f,-1.0f ), 
+		D3DXVECTOR3( 0.0f, 0.0f, 3.0f ) ); // Back Wall
+
+	g_pParticleSystems[5]->SetCollisionPlane( D3DXVECTOR3( 0.0f,-1.0f, 0.0f ), 
+		D3DXVECTOR3( 0.0f, 5.0f, 0.0f ) ); // Ceiling
+
+	g_pParticleSystems[5]->Init( pd3dDevice );
+
+}
+
+void ConfigureShaders( LPDIRECT3DDEVICE9 pd3dDevice )
+{
+	// Shader
+	assert( g_bombShader == 0 );
+	g_bombShader = new BombShader();
+	g_bombShader->initEffect( pd3dDevice, L"Shaders/HLSL/vbomb.fx" );
+	g_bombShader->initMainTechnique();
+
+	assert( g_motionBlurShader == 0 );
+	g_motionBlurShader = new MotionBlurShader();
+	g_motionBlurShader->initShader( pd3dDevice, L"" );
+
+	assert( g_postSepiaShader == 0 );
+	g_postSepiaShader = new PostSepiaShader();
+	g_postSepiaShader->initEffect( pd3dDevice, L"Shaders/HLSL/post_sepia.fx" );
+	g_postSepiaShader->initMainTechnique();
+
+	assert( g_postRadialBlurShader == 0 );
+	g_postRadialBlurShader = new PostRadialBlurShader();
+	g_postRadialBlurShader->initEffect( pd3dDevice, L"Shaders/HLSL/post_radialBlur.fx" );
+	g_postRadialBlurShader->initMainTechnique();
+
+	//assert( g_alphaShader == 0 );
+	//g_alphaShader = new AlphaShader();
+	//g_alphaShader->initShader( pd3dDevice, L"Shaders/Alpha.vsh" );
+	//g_alphaShader->compileShader( "Alpha", "vs_2_0" );
+
+}
+
+void ConfigureTileGridGeometry( LPDIRECT3DDEVICE9 pd3dDevice )
+{
+	HRESULT hr = S_OK;
+
+	assert( g_lineElement == 0 );
+
+	V( pd3dDevice->CreateVertexBuffer( sizeof( MY_COLOR_VERTEX ) * 2, D3DUSAGE_WRITEONLY, D3DFVF_XYZ | D3DFVF_DIFFUSE, D3DPOOL_MANAGED, &g_lineElement, 0 ) );
+
+	const D3DCOLOR gridColor = D3DCOLOR_ARGB( 255, 32, 128, 128 );
+	MY_COLOR_VERTEX data[] = {
+		{ -0.5f, 0.0f, -0.2f, gridColor },
+		{ +0.5f, 0.0f, -0.2f, gridColor }
+	};
+
+	void* pVB = 0;
+	V( g_lineElement->Lock( 0, 0, &pVB, 0 ) );
+	memcpy( pVB, data, sizeof( data ) );
+	g_lineElement->Unlock();
+}
+
+void ConfigureTestGeometry( LPDIRECT3DDEVICE9 pd3dDevice )
+{
+	assert( g_testTeapot == 0 );
+	D3DXCreateTeapot( pd3dDevice, &g_testTeapot, 0 );
+}

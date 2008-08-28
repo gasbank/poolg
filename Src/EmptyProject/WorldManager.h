@@ -17,6 +17,7 @@ public:
 	void setNextWorld( World* nextWorld );
 	void setNextWorld( const char* nextWorldName );
 	void changeToNextWorldIfExist();
+	UINT getWorldCount() const { return m_worlds.size(); }
 private:
 	void detachAllWorlds();
 	std::map<std::string, World*> m_worlds; // WorldState pool

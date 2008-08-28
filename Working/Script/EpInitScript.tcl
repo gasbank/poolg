@@ -7,7 +7,7 @@
 variable EpStartTopStateName		IntroState
 set EpStartWorldName				EpCeilingWorld
 set EpWorldList						[ list EpCeilingWorld EpRoomWorld EpA213World EpTestStage ]
-
+set EpWindowMode					1
 
 # This callback procedure is called when the D3D device is not created yet.
 # Application level one-time initialization and constants are defined here.

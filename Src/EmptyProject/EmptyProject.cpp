@@ -5,6 +5,17 @@
 //
 // Modified PoolG Team, a Division of PoolC
 //
+//
+// Lifetime of the application
+//
+// Window and full screen Mode: Launch and Terminate
+//		(1) WinMain
+//		(2) OnCreateDevice
+//		(3) OnResetDevice
+//		(4) OnFrameMove / OnFrameRender loop
+//		(5) OnLostDevice
+//		(6) OnDestroyDevice
+//
 //--------------------------------------------------------------------------------------
 #include "EmptyProjectPCH.h"
 #include "EmptyProject.h"
@@ -77,7 +88,7 @@ PostRadialBlurShader*			g_postRadialBlurShader			= 0;
 
 int								g_nActiveSystem = 0;
 CParticleSystem					*g_pParticleSystems[6];
-bool							g_bParticleVisible = true;
+bool							g_bParticleVisible = false;
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -138,6 +149,8 @@ DrawRequest* g_dr2;
 HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
 									void* pUserContext )
 {
+	OutputDebugString( _T( " - INFO: OnCreateDevice called.\n" ) );
+
 	HRESULT hr;
 
 	// (1) Set D3D device global variable which is shared through the whole application lifetime.
@@ -197,33 +210,32 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 	ConfigureTileGridGeometry( pd3dDevice );
 	ConfigureTestGeometry( pd3dDevice );
 
-	
-	
-	//////////////////////////////////////////////////////////////////////////
+	// (9) Debugging information rendering font
+	V( D3DXCreateFont( pd3dDevice, 12, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Gulimche"), &g_pFont) );
 
-	EpCamera& g_camera = GetG().m_camera;
-
+	// (10) Camera and Light configuration
 
 	//화면의 크기를 변환할 때마다 화면의 크기를 나타내는 전역변수 갱신.
 	GetG().m_scrWidth = pBackBufferSurfaceDesc->Width;
 	GetG().m_scrHeight = pBackBufferSurfaceDesc->Height;
 
+	TCHAR scrSizeString[64];
+	StringCchPrintf( scrSizeString, 64, _T( "- INFO: Window width: %d / height: %d\n" ), GetG().m_scrWidth, GetG().m_scrHeight );
+	OutputDebugString( scrSizeString );
 
-	V( D3DXCreateFont( pd3dDevice, 12, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Gulimche"), &g_pFont) );
-	
 	// Orthogonal and fixed view xforms for GUI or fixed element rendering
 	D3DXVECTOR3 eye(0, 0, -50.0f), at(0, 0, 0), up(0, 1.0f, 0);
 	D3DXMatrixOrthoLH(&GetG().g_orthoProjMat, (FLOAT)pBackBufferSurfaceDesc->Width, (FLOAT)pBackBufferSurfaceDesc->Height, 0.1f, 100.0f);
 	D3DXMatrixLookAtLH(&GetG().g_fixedViewMat,	&eye, &at, &up);
 
 	float fAspectRatio = pBackBufferSurfaceDesc->Width / ( FLOAT )pBackBufferSurfaceDesc->Height;
-	g_camera.SetProjParams( D3DX_PI / 4, fAspectRatio, 1.0f, 1000.0f );
+	GetG().m_camera.SetProjParams( D3DX_PI / 4, fAspectRatio, 1.0f, 1000.0f );
 
 	GetG().m_screenFlash.setup();
 	GetEpLight().setupLight();
 
 
-	// Script side callback invocation (Do at the end of this function.)
+	// (11) Script side callback invocation (Do at the end of this function.)
 	GetScriptManager().execute( "EpOnCreateDevice" );
 
 	return S_OK;
@@ -236,6 +248,8 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
 								   void* pUserContext )
 {
+	OutputDebugString( _T(" - INFO: OnResetDevice() called.\n") );
+
 	HRESULT hr = S_OK;
 
 	pd3dDevice->SetRenderState( D3DRS_DITHERENABLE, TRUE );
@@ -709,6 +723,8 @@ LRESULT CALLBACK MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
 //--------------------------------------------------------------------------------------
 void CALLBACK OnD3D9LostDevice( void* pUserContext )
 {
+	OutputDebugString( _T( " - INFO: OnLostDevice() called.\n" ) );
+
 	if ( g_bombShader )
 		g_bombShader->onLostDevice();
 	if ( g_pFont )
@@ -721,6 +737,8 @@ void CALLBACK OnD3D9LostDevice( void* pUserContext )
 //--------------------------------------------------------------------------------------
 void CALLBACK OnD3D9DestroyDevice( void* pUserContext )
 {
+	OutputDebugString( _T( " - INFO: OnDestroyDevice() called.\n" ) );
+
 	SAFE_RELEASE( g_pFont );
 	SAFE_RELEASE( g_testTeapot );
 
@@ -939,12 +957,24 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 	ResetEvent( g_scriptBindingFinishedEvent ); 
 	WaitForSingleObject( g_scriptBindingFinishedEvent, INFINITE );
 
+	const char* windowMode = GetScriptManager().readString( "EpWindowMode" );
+	bool bWindowMode = (*windowMode)=='1'?true:false;
+
 	// Initialize DXUT and create the desired Win32 window and Direct3D device for the application
 	DXUTInit( true, true ); // Parse the command line and show msgboxes
 	DXUTSetHotkeyHandling( true, false, true );  // handle the default hotkeys
 	DXUTSetCursorSettings( true, true ); // Show the cursor and clip it when in full screen
 	DXUTCreateWindow( L"EmptyProject" );
-	DXUTCreateDevice( true, GetG().m_scrWidth, GetG().m_scrHeight );
+	if ( bWindowMode )
+	{
+		// Window size is determined by script
+		DXUTCreateDevice( true, GetG().m_scrWidth, GetG().m_scrHeight );
+	}
+	else
+	{
+		// Window size is determined by monitor resolution.
+		DXUTCreateDevice( false );
+	}
 
 	DXUTMainLoop();
 

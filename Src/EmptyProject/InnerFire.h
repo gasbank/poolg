@@ -6,11 +6,14 @@ class InnerFire : public Unit
 {
 public:
 	InnerFire();
-	void init (const TCHAR* imgFileName, LPDIRECT3DDEVICE9 d3dDev, float radius, float height, int angleNumber);
+
+	void init (const TCHAR* imgFileName, float radius, float height, int angleNumber);
 	void release ();
 	HRESULT draw (bool textured = true);
 	virtual bool frameMove (float fElapsedTime);
-	
+	virtual HRESULT onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
+		void* pUserContext );
+	virtual void onLostDevice();
 protected:
 	//D3DXMATRIX m_localXform;
 	//LPDIRECT3DDEVICE9 m_d3dDev;
@@ -32,6 +35,10 @@ protected:
 	float m_texWidth, m_texHeight;
 
 	bool m_bInit;
+
+private:
+	
+	std::tstring m_imgFileName;
 };
 
 

@@ -16,16 +16,18 @@
 #include "ShaderWrapper.h"
 #include "ProgressUi.h"
 #include "WindowMover.h"
+#include "InnerFire.h"
 
 extern PostSepiaShader*				g_postSepiaShader;
 
 BattleState::BattleState()
 {
-	m_pDev = GetG().m_dev;
-	assert( m_pDev );
+	// We don't need dev in this step. Any objects using dev will be configured during onDeviceReset() call.
+	//m_pDev = GetG().m_dev;
+	//assert( m_pDev );
 
 	/*UI 초기화 부분입니다.*/
-
+	
 
 	int scrWidth = GetG().m_scrWidth;
 	int scrHeight = GetG().m_scrHeight;
@@ -149,17 +151,9 @@ BattleState::BattleState()
 	*/
 
 
-
-	m_innerFire.init (L"Images/BattleUI/BGchecker.jpg", m_pDev, 0.8f, 3, 9);
-	m_innerFire.setPos (0, 0, 0);
-
-
-
-	D3DXCreateFont(m_pDev, 17, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblHYnamL);
-	D3DXCreateFont(m_pDev, 18, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Rockwell Extra Bold"), &m_lblREB);
-	D3DXCreateFont(m_pDev, 20, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblSkill);
-	D3DXCreateFont(m_pDev, 15, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblSkillDescription);
-	D3DXCreateFont(m_pDev, 17, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblStatSelect);
+	m_innerFire = new InnerFire();
+	m_innerFire->init( _T( "Images/BattleUI/BGchecker.jpg" ), 0.8f, 3.0f, 9 );
+	m_innerFire->setPos (0, 0, 0);
 
 
 
@@ -265,7 +259,7 @@ HRESULT BattleState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, flo
 	pd3dDevice->SetTransform(D3DTS_VIEW, &GetG().g_fixedViewMat);
 	pd3dDevice->SetTransform(D3DTS_PROJECTION, &GetG().g_orthoProjMat);
 
-	m_pDev->SetRenderState(D3DRS_LIGHTING, FALSE);
+	pd3dDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
 
 	GetSpriteManager().frameRenderSpecificSprite( "BattleUI" );
 
@@ -278,18 +272,18 @@ HRESULT BattleState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, flo
 	material.Emissive = cv;
 	material.Power = 1.0f;
 	material.Specular = cv2;
-	m_pDev->SetMaterial(&material);
+	pd3dDevice->SetMaterial(&material);
 
-	m_pDev->SetRenderState(D3DRS_ZENABLE, FALSE);
+	pd3dDevice->SetRenderState(D3DRS_ZENABLE, FALSE);
 	
 
-	m_pDev->SetRenderState(D3DRS_ZENABLE, TRUE);
+	pd3dDevice->SetRenderState(D3DRS_ZENABLE, TRUE);
 	pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
 	pd3dDevice->SetTransform(D3DTS_VIEW, GetG().m_camera.GetViewMatrix());
 	pd3dDevice->SetTransform(D3DTS_PROJECTION, GetG().m_camera.GetProjMatrix());
 
 	if (this->m_curTurnType == TT_PLAYER)
-		m_innerFire.draw();
+		m_innerFire->draw();
 
 	renderFixedText(GetG().m_scrWidth, GetG().m_scrHeight);
 
@@ -711,9 +705,7 @@ HRESULT BattleState::release ()
 	m_sprite->release();
 
 
-
-	m_innerFire.release();
-
+	EP_SAFE_RELEASE( m_innerFire );
 	
 	SAFE_RELEASE( m_lblHYnamL );
 	SAFE_RELEASE( m_lblREB );
@@ -1139,4 +1131,29 @@ void BattleState::updateBarRate()
 	m_hpIllusionEnemy.setRate((float)getFirstEnemy()->getCurHp());
 	m_mpIllusionPlayer.setRate((float)getHero()->getCurCs());
 	m_expIllusionPlayer.setRate( (float) ( (Hero*)getHero() )->getCurExp() );*/
+}
+
+HRESULT BattleState::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext )
+{
+
+	D3DXCreateFont( pd3dDevice, 17, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblHYnamL );
+	D3DXCreateFont( pd3dDevice, 18, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Rockwell Extra Bold"), &m_lblREB );
+	D3DXCreateFont( pd3dDevice, 20, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblSkill );
+	D3DXCreateFont( pd3dDevice, 15, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblSkillDescription );
+	D3DXCreateFont( pd3dDevice, 17, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblStatSelect );
+
+	m_innerFire->onResetDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
+
+	return S_OK;
+}
+
+void BattleState::onLostDevice()
+{
+
+}
+
+HRESULT BattleState::onCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext )
+{
+	m_pDev = pd3dDevice;
+	return S_OK;
 }

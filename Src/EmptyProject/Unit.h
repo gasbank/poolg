@@ -38,6 +38,9 @@ public:
 	virtual HRESULT					frameRender( double dTime, float fElapsedTime );
 	virtual LRESULT					handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 	virtual bool					frameMove( float fElapsedTime );
+	virtual HRESULT onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
+									void* pUserContext );
+	virtual void onLostDevice();
 	virtual const D3DXVECTOR3&		getPos() const { return m_vPos; }
 
 
@@ -174,7 +177,6 @@ private:
 
 	// For name drawing
 	std::string						m_name;
-	LPD3DXFONT						m_pd3dxFont;
 	bool							m_bNameVisible;
 };
 

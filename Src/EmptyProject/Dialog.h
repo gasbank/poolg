@@ -53,8 +53,6 @@ private:
 	bool m_bOneTime;
 	bool m_bTalking;
 	
-	LPD3DXFONT m_nameFont;
-	LPD3DXFONT m_contentFont;
 	RECT m_contentRect;
 	RECT m_nameRect;
 

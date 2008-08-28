@@ -12,8 +12,8 @@
 #include "Utility.h"
 #include "EpLight.h"
 
-extern TileManager tileManager;
-
+extern TileManager		tileManager;
+extern LPD3DXFONT		g_unitNameFont;
 //////////////////////////////////////////////////////////////////////////
 
 Unit::Unit( UnitType type )
@@ -23,7 +23,6 @@ Unit::Unit( UnitType type )
 	m_arnMesh			= 0;
 	m_pd3dDevice		= 0;
 	m_d3dTex			= 0;
-	m_pd3dxFont			= 0;
 
 	m_fSoulAnimationDuration	= 1.0f;
 	m_fSoulAnimationHeight		= 10.0f;
@@ -72,12 +71,6 @@ HRESULT Unit::init( LPDIRECT3DDEVICE9 pd3dDevice, LPD3DXMESH mesh )
 	m_d3dxMesh->LockVertexBuffer(0, (void**)&v);
 	V(D3DXComputeBoundingBox((const D3DXVECTOR3*)v, m_d3dxMesh->GetNumVertices(), sizeof(float)*6, &m_lowerLeft, &m_upperRight));
 	m_d3dxMesh->UnlockVertexBuffer();
-
-	D3DXCreateFont( 
-		GetG().m_dev, 26, 0, 
-		FW_NORMAL, 1, 
-		FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, 
-		DEFAULT_PITCH | FF_DONTCARE, _T( "Arial Black"), &m_pd3dxFont );
 
 	return hr;
 }
@@ -441,7 +434,7 @@ void Unit::drawName()
 			printf ( "%f %f %f\n", vProj.x, vProj.y, vProj.z );*/
 
 			TEXTMETRICA tm;
-			m_pd3dxFont->GetTextMetricsA( &tm );
+			g_unitNameFont->GetTextMetricsA( &tm );
 
 			D3DXCOLOR m_textColor = D3DXCOLOR( 1.0f, 0.8f, 0.0f, 1.0f );
 			RECT rc;
@@ -450,7 +443,7 @@ void Unit::drawName()
 			rc.right = (int)vProj.x - (int)(m_name.size() / 2.0f * tm.tmAveCharWidth);
 			rc.bottom = (int)vProj.y + 30;
 			GetG().m_dev->SetRenderState( D3DRS_LIGHTING, FALSE );
-			m_pd3dxFont->DrawTextA( 0, m_name.c_str(), -1, &rc, DT_NOCLIP, m_textColor );
+			g_unitNameFont->DrawTextA( 0, m_name.c_str(), -1, &rc, DT_NOCLIP, m_textColor );
 			GetG().m_dev->SetRenderState( D3DRS_LIGHTING, TRUE );
 		}
 	}
@@ -461,7 +454,15 @@ void Unit::release()
 	SAFE_DELETE( m_dm );
 
 	SAFE_RELEASE( m_d3dxMesh );
-	SAFE_RELEASE( m_pd3dxFont );
+}
+
+HRESULT Unit::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext )
+{
+	return S_OK;
+}
+
+void Unit::onLostDevice()
+{
 }
 //////////////////////////////////////////////////////////////////////////
 //

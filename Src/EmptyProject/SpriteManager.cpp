@@ -4,8 +4,8 @@
 
 IMPLEMENT_SINGLETON( SpriteManager )
 
-SpriteManager::SpriteManager( LPDIRECT3DDEVICE9 dev )
-: m_dev( dev ), m_d3dxSprite( 0 ), m_d3dxObjectSprite( 0 )
+SpriteManager::SpriteManager()
+: m_d3dxSprite( 0 ), m_d3dxObjectSprite( 0 )
 {
 	init();
 }
@@ -18,8 +18,7 @@ SpriteManager::~SpriteManager(void)
 
 void SpriteManager::init()
 {
-	D3DXCreateSprite( m_dev, &m_d3dxSprite );
-	D3DXCreateSprite( m_dev, &m_d3dxObjectSprite );
+	
 }
 
 void SpriteManager::release()
@@ -96,13 +95,12 @@ void SpriteManager::frameRender()
 Sprite* SpriteManager::registerSprite( const char* spriteName, const char* spriteFileName )
 {
 	HRESULT hr;
+	UNREFERENCED_PARAMETER( hr );
 
 	SpriteMap::iterator it = m_spriteMap.find( spriteName );
 	if ( it == m_spriteMap.end() )
 	{
-		LPDIRECT3DTEXTURE9 d3dTex = 0;
-		V( D3DXCreateTextureFromFileA( m_dev, spriteFileName, &d3dTex ) );
-		Sprite* sprite = new Sprite( d3dTex );
+		Sprite* sprite = new Sprite( spriteFileName );
 		m_spriteMap[ spriteName ] = sprite;
 		return sprite;
 	}	
@@ -139,4 +137,31 @@ void SpriteManager::frameRenderSpecificSprite( const char* spriteName )
 	}
 	m_d3dxSprite->End();
 
+}
+
+HRESULT SpriteManager::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
+									 void* pUserContext )
+{
+	HRESULT hr = S_OK;
+
+	m_dev = pd3dDevice;
+	
+	D3DXCreateSprite( m_dev, &m_d3dxSprite );
+	D3DXCreateSprite( m_dev, &m_d3dxObjectSprite );
+
+	V_RETURN( m_d3dxSprite->OnResetDevice() );
+	V_RETURN( m_d3dxObjectSprite->OnResetDevice() );
+
+	SpriteMap::iterator it = m_spriteMap.begin();
+	for ( ; it != m_spriteMap.end(); ++it )
+	{
+		it->second->onResetDevice( m_dev, pBackBufferSurfaceDesc, pUserContext );
+	}
+	return hr;
+}
+
+void SpriteManager::onLostDevice()
+{
+	m_d3dxSprite->OnLostDevice();
+	m_d3dxObjectSprite->OnLostDevice();
 }

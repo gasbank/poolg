@@ -33,6 +33,11 @@ public:
 	HRESULT							frameMove(double dTime, float fElapsedTime);
 	HRESULT							handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	HRESULT							release();
+	HRESULT							onCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
+													void* pUserContext );
+	HRESULT							onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
+													void* pUserContext );
+	void							onLostDevice();
 	VOID							enter();
 
 	const std::string&				getWorldName() { return m_worldName; }
@@ -81,6 +86,7 @@ private:
 	void							proceedCurDialog();
 	void							forceCloseCurDialog();
 	void							loadWorldModel();
+	void							unloadWorldModel();
 	void							battleEventCheck();
 	void							wannaTalkingEventCheck();
 
@@ -101,7 +107,6 @@ private:
 
 
 	float							m_sampleTeapotMeshRot;
-	LPD3DXMESH						m_aTile;
 
 	Character*						m_heroUnit;
 	

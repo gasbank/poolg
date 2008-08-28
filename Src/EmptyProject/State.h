@@ -14,12 +14,19 @@ public:
 	virtual HRESULT frameMove(double fTime, float fElapsedTime) = 0;
 
 	virtual HRESULT handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) = 0;
+	
+	virtual HRESULT onCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
+									void* pUserContext ) = 0;
+	virtual HRESULT onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
+									void* pUserContext ) = 0;
+	virtual void onLostDevice() = 0;
 
 	virtual HRESULT release() = 0;
 
 	double getStateTime(double fTime);
 	World* getCurWorld() { return GetWorldManager().getCurWorld(); }
 
+	
 protected:
 	double m_startTime;
 };

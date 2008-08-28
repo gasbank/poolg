@@ -1,14 +1,12 @@
 #include "EmptyProjectPCH.h"
 #include "Sprite.h"
 
-Sprite::Sprite( LPDIRECT3DTEXTURE9 d3dTex )
-: m_d3dTex( d3dTex ), m_bCustomRendered( false )
+Sprite::Sprite( const char* texFileName )
+: m_d3dTex( 0 ), m_bCustomRendered( false ), m_texFileName( texFileName )
 {
-
 }
 Sprite::~Sprite(void)
 {
-	
 }
 
 void Sprite::release()
@@ -132,4 +130,18 @@ void Sprite::removeDrawRequest( DrawRequest*& dr )
 		m_drawReqXformableList.remove( dr );
 
 	EP_SAFE_RELEASE( dr );
+}
+
+HRESULT Sprite::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
+							   void* pUserContext)
+{
+	HRESULT hr = S_OK;
+	assert( m_d3dTex == 0 );
+	V_RETURN( D3DXCreateTextureFromFileA( pd3dDevice, m_texFileName.c_str(), &m_d3dTex ) );
+	return hr;
+}
+
+void Sprite::onLostDevice()
+{
+	SAFE_RELEASE( m_d3dTex );
 }

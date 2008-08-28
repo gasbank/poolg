@@ -12,6 +12,33 @@ IntroState::IntroState(void)
 	m_pLogoDrawRequest = 0;
 	m_pGalaxy = 0;
 	m_pGalaxyDrawRequest = 0;
+
+
+
+	m_pLogo = GetSpriteManager().registerSprite( "PoolCLogo", "Images/PoolC_Square.png" );
+	m_pLogo->registerRect( "PoolCLogo", 0, 0, 248, 129 );
+
+	D3DXVECTOR3 logoPos( GetG().m_scrWidth / 2.0f - 124.0f, GetG().m_scrHeight / 2.0f - 64.5f, 0.0f );
+	D3DXCOLOR logoColor( 1.0f, 1.0f, 1.0f, 0.0f );
+	m_pLogoDrawRequest = m_pLogo->drawRequest( "PoolCLogo", 0, &logoPos, logoColor );
+
+
+	m_pGalaxy = GetSpriteManager().registerSprite( "Galaxy", "Images/the_Whirlpool_Galaxy_M51.jpg" );
+	m_pGalaxy->registerRect( "Galaxy", 0, 0, 1280, 1280 );
+
+	D3DXVECTOR3 galaxyPos( 0.0f, 0.0f, 3.0f );
+	D3DXCOLOR galaxyColor( 1.0f, 1.0f, 1.0f, 0.0f );
+	m_pGalaxyDrawRequest = m_pGalaxy->drawRequest( "Galaxy", 0, &galaxyPos, galaxyColor );
+
+
+	m_pPrologue = GetSpriteManager().registerSprite( "Prologue", "Images/PoolG_Prologue.png" );
+	m_pPrologue->registerRect( "Prologue", 0, 0, 512, 1024 );
+
+	D3DXVECTOR3 prologuePos( 0.0f, 0.0f, 0.0f );
+	D3DXCOLOR prologueColor( 1.0f, 1.0f, 1.0f, 1.0f );
+	m_pPrologueDrawRequest = m_pPrologue->drawRequestXformable( "Prologue" );
+
+
 }
 
 IntroState::~IntroState(void)
@@ -34,30 +61,6 @@ HRESULT IntroState::enter()
 	//m_sound.init(); // 사운드 초기화
 
 	//pd3dDevice->SetTransform( D3DTS_WORLD, &DX_CONSTS::D3DXMAT_IDENTITY );
-
-
-	m_pLogo = GetSpriteManager().registerSprite( "PoolCLogo", "Images/PoolC_Square.png" );
-	m_pLogo->registerRect( "PoolCLogo", 0, 0, 248, 129 );
-
-	D3DXVECTOR3 logoPos( GetG().m_scrWidth / 2.0f - 124.0f, GetG().m_scrHeight / 2.0f - 64.5f, 0.0f );
-	D3DXCOLOR logoColor( 1.0f, 1.0f, 1.0f, 0.0f );
-	m_pLogoDrawRequest = m_pLogo->drawRequest( "PoolCLogo", 0, &logoPos, logoColor );
-
-
-	m_pGalaxy = GetSpriteManager().registerSprite( "Galaxy", "Images/the_Whirlpool_Galaxy_M51.jpg" );
-	m_pGalaxy->registerRect( "Galaxy", 0, 0, 1280, 1280 );
-
-	D3DXVECTOR3 galaxyPos( 0.0f, 0.0f, 3.0f );
-	D3DXCOLOR galaxyColor( 1.0f, 1.0f, 1.0f, 0.0f );
-	m_pGalaxyDrawRequest = m_pGalaxy->drawRequest( "Galaxy", 0, &galaxyPos, galaxyColor );
-
-
-	m_pPrologue = GetSpriteManager().registerSprite( "Prologue", "Images/PoolG_Prologue.png" );
-	m_pPrologue->registerRect( "Prologue", 0, 0, 512, 1024 );
-	
-	D3DXVECTOR3 prologuePos( 0.0f, 0.0f, 0.0f );
-	D3DXCOLOR prologueColor( 1.0f, 1.0f, 1.0f, 1.0f );
-	m_pPrologueDrawRequest = m_pPrologue->drawRequestXformable( "Prologue" );
 
 
 
@@ -174,4 +177,19 @@ void IntroState::setupCamera()
 	D3DXVECTOR3 vecAt( 0.0f, 0.0f, 0.0f );
 	D3DXVECTOR3 vecUp( 0.0f, 1.0f, 0.0f );
 	GetG().m_camera.setViewParamsWithUp( &vecEye, &vecAt, &vecUp );
+}
+
+HRESULT IntroState::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext )
+{
+	return S_OK;
+}
+
+void IntroState::onLostDevice()
+{
+
+}
+
+HRESULT IntroState::onCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext )
+{
+	return S_OK;
 }

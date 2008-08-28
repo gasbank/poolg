@@ -9,8 +9,6 @@ PlayState::PlayState(void)
 {
 	m_CharactersArnFile			= 0;
 	m_CharactersSg				= 0;
-
-	loadArnModels();
 }
 
 PlayState::~PlayState(void)
@@ -59,10 +57,7 @@ HRESULT PlayState::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 
 HRESULT PlayState::release()
 {
-	assert( m_CharactersArnFile && m_CharactersSg );
-	release_arnfile(*m_CharactersArnFile);
-	delete m_CharactersArnFile;
-	delete m_CharactersSg;
+	unloadArnModels();
 
 	return S_OK;
 }
@@ -78,4 +73,28 @@ void PlayState::loadArnModels()
 	m_CharactersArnFile = new ArnFileData;
 	load_arnfile( _T("Characters.arn"), *m_CharactersArnFile );
 	m_CharactersSg = new ArnSceneGraph( *m_CharactersArnFile );
+}
+
+void PlayState::unloadArnModels()
+{
+	assert( m_CharactersArnFile && m_CharactersSg );
+	release_arnfile(*m_CharactersArnFile);
+	delete m_CharactersArnFile;
+	delete m_CharactersSg;
+}
+
+HRESULT PlayState::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext )
+{
+	loadArnModels();
+	return S_OK;
+}
+
+void PlayState::onLostDevice()
+{
+	unloadArnModels();
+}
+
+HRESULT PlayState::onCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext )
+{
+	return S_OK;
 }

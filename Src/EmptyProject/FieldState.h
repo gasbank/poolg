@@ -16,6 +16,11 @@ public:
 
 	virtual HRESULT handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
+	virtual HRESULT onCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
+		void* pUserContext );
+	virtual HRESULT onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
+		void* pUserContext );
+	virtual void onLostDevice();
 	virtual HRESULT release();
 
 private:

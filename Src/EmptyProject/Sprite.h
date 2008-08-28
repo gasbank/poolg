@@ -30,7 +30,7 @@ private:
 class Sprite
 {
 public:
-	Sprite( LPDIRECT3DTEXTURE9 d3dTex );
+	Sprite( const char* texFileName );
 	~Sprite(void);
 
 	enum ScreenPosition {
@@ -53,9 +53,12 @@ public:
 
 	bool isCustomRendered() const { return m_bCustomRendered; }
 	void setCustomRendered(bool val) { m_bCustomRendered = val; }
+
+	HRESULT onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
+		                   void* pUserContext);
+	void onLostDevice();
 private:
 	friend class SpriteManager;
-
 	
 	typedef std::list<DrawRequest*> DrawRequestList;
 
@@ -69,5 +72,8 @@ private:
 	DrawRequestList m_drawReqList;				// Screen space sprite drawing
 	DrawRequestList m_drawReqXformableList;		// Object(3D) space sprite drawing
 	bool m_bCustomRendered;
-	
+
+	const std::string m_texFileName;
+
+	Sprite& operator = ( const Sprite& );
 };

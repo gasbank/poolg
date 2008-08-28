@@ -482,8 +482,6 @@ HRESULT MenuState::release()
 
 MenuState::MenuState()
 {
-
-	HRESULT hr;
 	m_pDev = GetG().m_dev;
 
 	const UINT menuBoxWidth = 200;
@@ -563,6 +561,11 @@ MenuState::MenuState()
 	m_exdb.setPos ( (float)scrWidth/2 - menuButtonWidth - 20, (float)scrHeight/2 - menuButtonHeight - 230, 2.7f);
 	m_exdb.setSize( menuButtonWidth, menuButtonHeight);*/
 
+
+	//////////////////////////////////////////////////////////////////////////
+	// [START] It is commented since Picture class is deprecated!
+
+	/*
 	m_stwin.init(L"Images/status_window.png", m_pDev);
 	m_stwin.setPos ( 0 - scrWidth_f / 2, 0 - scrHeight_f / 2, 2.6f);
 	m_stwin.setSize(scrWidth_f, scrHeight_f);
@@ -611,12 +614,11 @@ MenuState::MenuState()
 	m_slb3.init(L"Images/save_load_selected.png", m_pDev);
 	m_slb3.setPos ( -342, 86 - 366, 2.5f);
 	m_slb3.setSize(684, 112);
+	*/
 	
+	// [END] It is commented since Picture class is deprecated!
+	//////////////////////////////////////////////////////////////////////////
 
-
-	V( D3DXCreateFont(m_pDev, 17, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblHYnamL) );
-	V( D3DXCreateFont(m_pDev, 26, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Gulim"), &m_lblREB) );
-	V( D3DXCreateFont(m_pDev, 16, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Gulim"), &m_lblsREB) );
 }
 
 MenuState::~MenuState()
@@ -656,4 +658,26 @@ HRESULT MenuState::leave()
 {
 
 	return S_OK;
+}
+
+HRESULT MenuState::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext )
+{
+
+	
+	return S_OK;
+}
+
+void MenuState::onLostDevice()
+{
+	
+}
+
+HRESULT MenuState::onCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext )
+{
+	HRESULT hr = S_OK;
+	V_RETURN( D3DXCreateFont( pd3dDevice, 17, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblHYnamL ) );
+	V_RETURN( D3DXCreateFont( pd3dDevice, 26, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Gulim"), &m_lblREB ) );
+	V_RETURN( D3DXCreateFont( pd3dDevice, 16, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Gulim"), &m_lblsREB ) );
+
+	return hr;
 }

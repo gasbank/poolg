@@ -7,13 +7,28 @@
 #include "EpLight.h"
 #include "Hero.h"
 #include "Unit.h"
+#include "Dialog.h"
 
 IMPLEMENT_SINGLETON( WorldManager )
 
 WorldManager::WorldManager(void)
 {
+	assert( ScriptManager::getSingletonPtr() );
+
 	m_curWorld = 0;
 	m_nextWorld = 0;
+
+
+	// Load dialogs from script
+	ConstCharList dialogList;
+	GetScriptManager().readCharPtrList( "EpDialogList", dialogList );
+	ConstCharList::iterator itDialogList = dialogList.begin();
+	for ( ; itDialogList != dialogList.end(); ++itDialogList )
+	{
+		Dialog* newDlg = Dialog::createDialogByScript( *itDialogList );
+		newDlg->init();
+		m_globalDialogs.push_back( newDlg );
+	}
 }
 
 WorldManager::~WorldManager(void)
@@ -81,6 +96,29 @@ void WorldManager::release()
 	detachAllWorlds();
 }
 
+HRESULT WorldManager::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
+									 void* pUserContext )
+{
+	if ( m_curWorld )
+		m_curWorld->onResetDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
+
+	return S_OK;
+}
+
+void WorldManager::onLostDevice()
+{
+	if ( m_curWorld )
+		m_curWorld->onLostDevice();
+}
+
+HRESULT WorldManager::onCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext )
+{
+	if ( m_curWorld )
+		m_curWorld->onCreateDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
+
+	return S_OK;
+}
+//////////////////////////////////////////////////////////////////////////
 
 World* EpGetCurWorld()
 {

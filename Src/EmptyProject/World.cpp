@@ -31,7 +31,6 @@ World::World( const char* worldName, const TCHAR* modelFilePath )
 	m_modelArnFile			= 0;
 	m_modelSg				= 0;
 	m_sampleTeapotMeshRot	= 0;
-	m_aTile					= 0;
 	m_heroUnit				= 0;
 	m_curDialog				= 0;
 	m_sound					= 0;
@@ -44,6 +43,8 @@ World::~World(void)
 
 HRESULT World::init()
 {
+	assert( GetG().m_dev );
+
 	HRESULT hr = S_OK;
 
 	loadWorldModel();
@@ -54,20 +55,6 @@ HRESULT World::init()
 
 	LPDIRECT3DDEVICE9& pd3dDevice =  GetG().m_dev;
 	
-	// Load sample image (vertex and index buffer creation with texture)
-	const UINT mapSegments = 32;
-	const UINT mapSize = 32;
-	m_pic.init(L"Images/graytile.tga", pd3dDevice, mapSegments);
-	m_pic.setSize((float)mapSize, (float)mapSize);
-	m_pic.setPos(D3DXVECTOR3(m_pic.getPos()->x - mapSize/2, m_pic.getPos()->y - mapSize/2, m_pic.getPos()->z));
-	
-	m_picRhw.initRhw(L"Images/smiley.png", pd3dDevice);
-	m_picSmiley.init(L"Images/smiley.png", pd3dDevice);
-	//g_picSmiley.setSizeToTexture();
-
-	m_avatar.init(L"Images/smiley.png", pd3dDevice);
-	m_avatar.setSize(1, 1);
-
 	if ( !m_sound )
 	{
 		m_sound = new Sound;
@@ -76,9 +63,6 @@ HRESULT World::init()
 	else
 		throw std::runtime_error( "Sound should not be init twice or more" );
 
-
-	
-	D3DXCreateBox(pd3dDevice, 1.0f, 1.0f, 1.0f, &m_aTile, 0);
 	
 	setupLight();
 
@@ -89,28 +73,9 @@ HRESULT World::init()
 	
 	// Hero and enemies are defined afterwards
 	
-	// Load dialogs from script
-	ConstCharList dialogList;
-	GetScriptManager().readCharPtrList( "EpDialogList", dialogList );
-	ConstCharList::iterator itDialogList = dialogList.begin();
-	for ( ; itDialogList != dialogList.end(); ++itDialogList )
-	{
-		Dialog* newDlg = Dialog::createDialogByScript( *itDialogList );
-		newDlg->init();
-		m_scriptedDialog.push_back( newDlg );
-	}
+	
 
 	assert( m_heroUnit );
-
-	// Incidents construction
-	/*Trigger* trigger = new UnitPositionTrigger( m_heroUnit, TileRegion( 26, 80, 27, 82 ) );
-	Action* action = new DialogAction( "EpDialog4" );
-	Incident* inc = new Incident( trigger, action );
-	m_incidents.push_back( inc );*/
-
-	/*trigger = new CharHpTrigger( m_heroUnit, 1, 100, true );
-	Incident* inc2 = new Incident( trigger, action );
-	m_incidents.push_back( inc2 );*/
 
 	GetG().m_camera.setAttachPos( &getHeroPos() );
 	GetG().m_camera.begin( CAMERA_ATTACH );
@@ -277,12 +242,7 @@ HRESULT World::release()
 	EpSafeReleaseAll( m_unitSet );
 	EpSafeReleaseAll( m_incidents );
 
-	if (m_modelArnFile)
-		release_arnfile(*m_modelArnFile);
-	SAFE_DELETE(m_modelArnFile);
-	SAFE_DELETE(m_modelSg);
-
-	SAFE_RELEASE(m_aTile);
+	unloadWorldModel();
 
 	return S_OK;
 }
@@ -616,12 +576,30 @@ UINT World::addIncident( Incident* inc )
 
 void World::loadWorldModel()
 {
-	// World model init and loading
-	m_modelArnFile = new ArnFileData;
-	load_arnfile( m_modelFilePath.c_str(), *m_modelArnFile );
-	m_modelSg = new ArnSceneGraph( *m_modelArnFile );
+	if ( m_modelArnFile == 0 && m_modelSg == 0 )
+	{
+		// World model init and loading
+		m_modelArnFile = new ArnFileData;
+		load_arnfile( m_modelFilePath.c_str(), *m_modelArnFile );
+		m_modelSg = new ArnSceneGraph( *m_modelArnFile );
+	}
+	else if ( m_modelArnFile && m_modelSg )
+	{
+		// Already loaded
+	}
+	else
+	{
+		// Partially loaded?!
+		throw std::runtime_error( "Arn file loading corrupted!" );
+	}
 }
-
+void World::unloadWorldModel()
+{
+	if ( m_modelArnFile )
+		release_arnfile( *m_modelArnFile );
+	SAFE_DELETE( m_modelArnFile );
+	SAFE_DELETE( m_modelSg );
+}
 World* World::createWorld( const char* worldName, TCHAR* modelFilePath, bool preloadDlg )
 {
 	World* ret = new World( worldName, modelFilePath );
@@ -815,6 +793,26 @@ UINT World::preloadDialogs()
 	return dialogNameList.size();
 }
 
+HRESULT World::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
+							  void* pUserContext )
+{
+	OutputDebugString( _T( " - INFO: World::onResetDevice called.\n" ) );
+	loadWorldModel();
+	return S_OK;
+}
+
+void World::onLostDevice()
+{
+	OutputDebugString( _T( " - INFO: World::onLostDevice called.\n" ) );
+	unloadWorldModel();
+}
+
+HRESULT World::onCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext )
+{
+	OutputDebugString( _T( " - INFO: World::onCreateDevice called.\n" ) );
+
+	return S_OK;
+}
 //////////////////////////////////////////////////////////////////////////
 
 Unit* EpGetHero()

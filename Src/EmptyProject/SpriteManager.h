@@ -7,7 +7,7 @@ typedef std::map<std::string, Sprite*> SpriteMap;
 class SpriteManager : public Singleton<SpriteManager>
 {
 public:
-	SpriteManager( LPDIRECT3DDEVICE9 dev );
+	SpriteManager();
 	~SpriteManager(void);
 	
 	void frameRender();
@@ -17,6 +17,10 @@ public:
 	Sprite* getSprite( const char* spriteName ) const;
 
 	LPD3DXSPRITE getSpriteRenerer() const { return m_d3dxSprite; }
+
+	HRESULT onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
+							void* pUserContext );
+	void onLostDevice();
 private:
 	void init();
 	void release();

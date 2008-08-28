@@ -1,7 +1,6 @@
 #pragma once
 
 #include "State.h"
-#include "InnerFire.h"
 
 class SkillSet;
 class World;
@@ -11,6 +10,7 @@ class Enemy;
 class DrawRequest;
 class ProgressUi;
 class WindowMover;
+class InnerFire;
 
 enum TurnType { TT_NATURAL, TT_COMPUTER, TT_PLAYER };
 enum PlayerSide { PS_NOTSET, PS_COMPUTER, PS_PLAYER };
@@ -25,15 +25,21 @@ public:
 	BattleState();
 	~BattleState();
 
-	HRESULT enter();
-	HRESULT leave();
+	virtual HRESULT enter();
+	virtual HRESULT leave();
 
-	HRESULT frameRender (IDirect3DDevice9* pd3dDevice, double fTime, float fElapsedTime);
-	HRESULT frameMove (double fTime, float fElapsedTime);
+	virtual HRESULT frameRender (IDirect3DDevice9* pd3dDevice, double fTime, float fElapsedTime);
+	virtual HRESULT frameMove (double fTime, float fElapsedTime);
 
-	HRESULT handleMessages (HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	virtual HRESULT handleMessages (HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	
+	virtual HRESULT onCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
+		void* pUserContext );
+	virtual HRESULT onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
+		void* pUserContext );
+	virtual void onLostDevice();
 
-	HRESULT release ();
+	virtual HRESULT release ();
 
 	void renderFixedText (int scrWidth, int scrHeight);
 
@@ -110,7 +116,7 @@ private:
 	PlayerSide		m_battleWinner;
 
 
-	InnerFire		m_innerFire;
+	InnerFire*		m_innerFire;
 
 	int				m_noneSkillSelectedCount;
 	bool			m_levelProgress;

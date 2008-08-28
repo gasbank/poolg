@@ -204,3 +204,17 @@ void CreditState::setupLight()
 	pd3dDevice->LightEnable( 0, TRUE );
 
 }
+
+HRESULT CreditState::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext )
+{
+	return S_OK;
+}
+
+void CreditState::onLostDevice()
+{
+}
+
+HRESULT CreditState::onCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext )
+{
+	return S_OK;
+}

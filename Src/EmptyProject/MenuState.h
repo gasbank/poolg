@@ -21,6 +21,11 @@ public:
 	virtual HRESULT enter();
 	virtual HRESULT leave();
 
+	virtual HRESULT onCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
+		void* pUserContext );
+	virtual HRESULT onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
+		void* pUserContext );
+	virtual void onLostDevice();
 	
 private:
 	Sprite*			m_sprite;

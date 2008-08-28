@@ -3,6 +3,10 @@
 #include "ScriptManager.h"
 #include "Utility.h"
 
+extern LPD3DXFONT						g_dlgNameFont;
+extern LPD3DXFONT						g_dlgContentFont;
+
+
 Dialog::Dialog(void)
 {
 	ctorDialogPane();
@@ -20,12 +24,13 @@ Dialog::Dialog( Speak* speakArray, UINT speakCount, const TileRegion* region, bo
 }
 void Dialog::ctorDialogPane()
 {
-	m_contentPic.init(L"Images/dae-sa.png", GetG().m_dev);
+	// TODO Dialog pane images
+	/*m_contentPic.init(L"Images/dae-sa.png", GetG().m_dev);
 	m_contentPic.setPos (-(GetG().m_scrWidth / 2.0f), -(GetG().m_scrHeight / 2.0f), 2.8f);
 	m_contentPic.setSize(200, 200);
 	m_namePic.init(L"Images/name_window.png", GetG().m_dev);
 	m_namePic.setPos (-(GetG().m_scrWidth / 2.0f), -(GetG().m_scrHeight / 2.0f) + 200, 2.8f);
-	m_namePic.setSize(150, 60);
+	m_namePic.setSize(150, 60);*/
 
 	m_speakArray	= 0;
 	m_speakCount	= 0;
@@ -67,8 +72,6 @@ HRESULT Dialog::init()
 	
 	m_bTalking = false;
 
-	V( D3DXCreateFont( GetG().m_dev, 12, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Gulim"), &m_contentFont) );
-	V( D3DXCreateFont( GetG().m_dev, 12, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("msgothic"), &m_nameFont) );
 
 	m_bInit = true;
 	return hr;
@@ -79,8 +82,6 @@ HRESULT Dialog::release()
 	m_contentPic.release();
 	m_namePic.release();
 
-	SAFE_RELEASE( m_nameFont );
-	SAFE_RELEASE( m_contentFont );
 	SAFE_DELETE_ARRAY( m_speakArray );
 
 	m_bInit = false;
@@ -157,12 +158,12 @@ HRESULT Dialog::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 
 void Dialog::printDialog()
 {
-	m_nameFont->DrawTextA(0, m_speakArray[m_curSpeakIdx].content, -1, &m_contentRect, DT_NOCLIP | DT_WORDBREAK, D3DXCOLOR( 0.0f, 1.0f, 1.0f, 1.0f ) );
+	g_dlgNameFont->DrawTextA(0, m_speakArray[m_curSpeakIdx].content, -1, &m_contentRect, DT_NOCLIP | DT_WORDBREAK, D3DXCOLOR( 0.0f, 1.0f, 1.0f, 1.0f ) );
 }
 
 void Dialog::printName()
 {
-	m_contentFont->DrawTextA(0, m_speakArray[m_curSpeakIdx].name, -1, &m_nameRect, DT_NOCLIP | DT_WORDBREAK, D3DXCOLOR( 1.0f, 1.0f, 0.0f, 1.0f ) );
+	g_dlgContentFont->DrawTextA(0, m_speakArray[m_curSpeakIdx].name, -1, &m_nameRect, DT_NOCLIP | DT_WORDBREAK, D3DXCOLOR( 1.0f, 1.0f, 0.0f, 1.0f ) );
 }
 
 bool Dialog::nextDialog()

@@ -56,3 +56,18 @@ HRESULT FieldState::release()
 {
 	return S_OK;
 }
+
+HRESULT FieldState::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext )
+{
+	return S_OK;
+}
+
+void FieldState::onLostDevice()
+{
+
+}
+
+HRESULT FieldState::onCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext )
+{
+	return S_OK;
+}

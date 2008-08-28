@@ -16,3 +16,4 @@ double State::getStateTime(double fTime)
 		m_startTime = fTime;
 	return fTime - m_startTime;
 }
+

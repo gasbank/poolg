@@ -50,7 +50,7 @@ BombShader*						g_bombShader			= 0;
 SpriteManager*					g_spriteManager			= 0;
 EpLight*						g_epLight				= 0;
 
-LPD3DXFONT						g_pFont					= 0;
+
 LPD3DXEFFECT		            g_pEffect				= 0;
 D3DXHANDLE						g_tech					= 0;
 LPDIRECT3DVERTEXBUFFER9			g_lineElement			= 0;
@@ -60,6 +60,11 @@ HANDLE							g_consoleReleasedEvent = 0;		// Signal object to resolve multi-thre
 LPD3DXMESH						g_testTeapot			= 0;
 
 D3DCOLOR						g_fillColor;
+
+LPD3DXFONT						g_pFont					= 0;		// ... Some globally used font?
+LPD3DXFONT						g_unitNameFont			= 0;
+LPD3DXFONT						g_dlgNameFont			= 0;
+LPD3DXFONT						g_dlgContentFont		= 0;
 
 LOGMANAGER logMan;
 
@@ -155,43 +160,9 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 	GetG().m_dev = pd3dDevice;
 	VideoMan::getSingleton().SetDev( pd3dDevice );
 
-	// (2) Read all world script files
-	// TODO: IS THIS NEEDED ON EVERY OnCreateDevice()?
-	assert( GetWorldManager().getWorldCount() == 0 );
-	ConstCharList worldList;
-	GetScriptManager().readCharPtrList( "EpWorldList", worldList );
-	char scriptCommand[512];
-	ConstCharList::iterator it = worldList.begin();
-	for ( ; it != worldList.end(); ++it )
-	{
-		const char* worldName = *it;
 
-		StringCchPrintfA( scriptCommand, 512, "Script/%s.tcl", worldName );
-		GetScriptManager().executeFile( scriptCommand );
-		StringCchPrintfA( scriptCommand, 512, "%s::modelFilePath", worldName );
-		const char* modelFilePath = GetScriptManager().readString( scriptCommand );
-		WCHAR mfp[128];
-		size_t numOfConvert;
-		mbstowcs_s( &numOfConvert, mfp, 128, modelFilePath, 512 );
-		World* world = World::createWorld( worldName, mfp, false );
-		GetWorldManager().addWorld( world );
-	}
-
-	// (3) Sprite manager
-	assert( g_spriteManager == 0 );
-	g_spriteManager = new SpriteManager( pd3dDevice );
-
-	// (4) Top State Manager (tsm)
-	// TODO: State preservation is needed!!! NO CREATION ON EVERY OnCreateDevice()!
-	assert( g_tsm == 0 );
-	g_tsm = new TopStateManager();
-	g_tsm->init();
-	
-	// (5) World State Manager (wsm)
-	// TODO: State preservation is needed!!! NO CREATION ON EVERY OnCreateDevice()!
-	assert( g_wsm == 0 );
-	g_wsm = new WorldStateManager();
-	g_wsm->init();
+	GetTopStateManager().onCreateDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
+	GetWorldStateManager().onCreateDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
 
 	// (6) Set the first world
 	// TODO: This is 'DO ONCE THROUGH THE WHOLE LIFETIME job.. not on every OnCreateDevice()!
@@ -230,10 +201,13 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 	GetG().m_screenFlash.setup();
 	GetEpLight().setupLight();
 
+	// Font Creation
+	V( D3DXCreateFont( pd3dDevice, 26, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T( "Arial Black"), &g_unitNameFont ) );
+	V( D3DXCreateFont( pd3dDevice, 12, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Gulim"), &g_dlgContentFont) );
+	V( D3DXCreateFont( pd3dDevice, 12, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("msgothic"), &g_dlgNameFont) );
 
 	// (11) Script side callback invocation (Do at the end of this function.)
 	GetScriptManager().execute( "EpOnCreateDevice" );
-
 	return S_OK;
 }
 
@@ -272,9 +246,12 @@ HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFA
 		g_postRadialBlurShader->onResetDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
 	//g_alphaShader->onResetDevice();
 
-	GetG().m_screenFlash.reset( pd3dDevice, pBackBufferSurfaceDesc, pUserContext);
+	GetG().m_screenFlash.reset( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
 
-
+	GetWorldManager().onResetDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
+	GetTopStateManager().onResetDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
+	GetWorldStateManager().onResetDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
+	GetSpriteManager().onResetDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
 
 	D3DFORMAT d3dFormat = D3DFMT_A8R8G8B8;
 
@@ -303,6 +280,12 @@ HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFA
 
 	if ( g_pFont )
 		g_pFont->OnResetDevice();
+	if ( g_unitNameFont )
+		g_unitNameFont->OnResetDevice();
+	if ( g_dlgNameFont )
+		g_dlgNameFont->OnResetDevice();
+	if ( g_dlgContentFont )
+		g_dlgContentFont->OnResetDevice();
 
 	return hr;
 }
@@ -703,6 +686,15 @@ void CALLBACK OnD3D9LostDevice( void* pUserContext )
 		g_bombShader->onLostDevice();
 	if ( g_pFont )
 		g_pFont->OnLostDevice();
+	if ( g_unitNameFont )
+		g_unitNameFont->OnLostDevice();
+	if ( g_dlgNameFont )
+		g_dlgNameFont->OnLostDevice();
+	if ( g_dlgContentFont )
+		g_dlgContentFont->OnLostDevice();
+
+	if ( WorldManager::getSingletonPtr() )
+		GetWorldManager().onLostDevice();
 }
 
 
@@ -714,6 +706,10 @@ void CALLBACK OnD3D9DestroyDevice( void* pUserContext )
 	OutputDebugString( _T( " - INFO: OnDestroyDevice() called.\n" ) );
 
 	SAFE_RELEASE( g_pFont );
+	SAFE_RELEASE( g_unitNameFont );
+	SAFE_RELEASE( g_dlgNameFont );
+	SAFE_RELEASE( g_dlgContentFont );
+
 	SAFE_RELEASE( g_testTeapot );
 
 	EP_SAFE_RELEASE( g_tsm );
@@ -722,9 +718,6 @@ void CALLBACK OnD3D9DestroyDevice( void* pUserContext )
 
 	SAFE_RELEASE( g_lineElement );
 
-
-	EP_SAFE_RELEASE( g_wm );
-	delete g_epLight;
 
 	SAFE_DELETE( g_spriteManager );
 
@@ -895,6 +888,82 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 #if defined(DEBUG) | defined(_DEBUG)
 	_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 #endif
+
+	// TODO: Perform any application-level initialization here
+	// All 'D3D device independent' objects shall be allocated here.
+	g_debugBuffer.resize( 2048 );
+	
+	SetCurrentWorkingDirectory();
+
+	// (1) Script Manager Initialization
+	CreateScriptManagerIfNotExist();
+	GetScriptManager().executeFile( "Script/EpInitScript.tcl" );
+	GetScriptManager().executeFile( "Script/EpDialog1.tcl" );
+	GetScriptManager().executeFile( "Script/EpSkill.tcl" );
+	GetScriptManager().execute( "EpInitApp" );
+
+	// (2) Camera Setup
+	GetG().m_camera.SetAttachCameraToModel( true );
+	GetG().m_camera.SetEnablePositionMovement( true );
+
+	// (3) World Manager
+	assert( g_wm == 0 );
+	g_wm = new WorldManager();
+
+	// (4) EpLight
+	assert( g_epLight == 0 );
+	g_epLight = new EpLight();
+
+	// (5) Ep Console Thread
+	uintptr_t t = _beginthread( EpConsoleThreadMain, 0, 0 );
+	WaitForSingleObject( g_scriptBindingFinishedEvent, INFINITE );
+
+	const char* windowMode = GetScriptManager().readString( "EpWindowMode" );
+	bool bWindowMode = (*windowMode)=='1'?true:false;
+
+
+	// (2) Read all world script files
+	// TODO: IS THIS NEEDED ON EVERY OnCreateDevice()?
+	assert( GetWorldManager().getWorldCount() == 0 );
+	ConstCharList worldList;
+	GetScriptManager().readCharPtrList( "EpWorldList", worldList );
+	char scriptCommand[512];
+	ConstCharList::iterator it = worldList.begin();
+	for ( ; it != worldList.end(); ++it )
+	{
+		const char* worldName = *it;
+
+		StringCchPrintfA( scriptCommand, 512, "Script/%s.tcl", worldName );
+		GetScriptManager().executeFile( scriptCommand );
+		StringCchPrintfA( scriptCommand, 512, "%s::modelFilePath", worldName );
+		const char* modelFilePath = GetScriptManager().readString( scriptCommand );
+		WCHAR mfp[128];
+		size_t numOfConvert;
+		mbstowcs_s( &numOfConvert, mfp, 128, modelFilePath, 512 );
+		World* world = World::createWorld( worldName, mfp, false );
+		GetWorldManager().addWorld( world );
+	}
+
+
+
+	// (3) Sprite manager
+	assert( g_spriteManager == 0 );
+	g_spriteManager = new SpriteManager();
+
+
+	// (4) Top State Manager (tsm)
+	// TODO: State preservation is needed!!! NO CREATION ON EVERY OnCreateDevice()!
+	assert( g_tsm == 0 );
+	g_tsm = new TopStateManager();
+	g_tsm->init();
+
+	// (5) World State Manager (wsm)
+	// TODO: State preservation is needed!!! NO CREATION ON EVERY OnCreateDevice()!
+	assert( g_wsm == 0 );
+	g_wsm = new WorldStateManager();
+	g_wsm->init();
+
+
 	// Set the callback functions
 	DXUTSetCallbackD3D9DeviceAcceptable( IsD3D9DeviceAcceptable );
 	DXUTSetCallbackD3D9DeviceCreated( OnD3D9CreateDevice );
@@ -907,32 +976,6 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 	DXUTSetCallbackFrameMove( OnFrameMove );
 	DXUTSetCallbackKeyboard( KeyboardProc );
 
-	g_debugBuffer.resize( 2048 );
-
-	// TODO: Perform any application-level initialization here
-	SetCurrentWorkingDirectory();
-
-	// Script Manager Initialization
-	CreateScriptManagerIfNotExist();
-	GetScriptManager().executeFile( "Script/EpInitScript.tcl" );
-	GetScriptManager().executeFile( "Script/EpDialog1.tcl" );
-	GetScriptManager().executeFile( "Script/EpSkill.tcl" );
-	GetScriptManager().execute( "EpInitApp" );
-
-	GetG().m_camera.SetAttachCameraToModel( true );
-	GetG().m_camera.SetEnablePositionMovement( true );
-
-	g_wm = new WorldManager();
-	g_epLight = new EpLight();
-
-	uintptr_t t = _beginthread( EpConsoleThreadMain, 0, 0 );
-
-	g_scriptBindingFinishedEvent = CreateEvent( NULL , TRUE , FALSE , NULL );  
-	ResetEvent( g_scriptBindingFinishedEvent ); 
-	WaitForSingleObject( g_scriptBindingFinishedEvent, INFINITE );
-
-	const char* windowMode = GetScriptManager().readString( "EpWindowMode" );
-	bool bWindowMode = (*windowMode)=='1'?true:false;
 
 	// Initialize DXUT and create the desired Win32 window and Direct3D device for the application
 	DXUTInit( true, true ); // Parse the command line and show msgboxes
@@ -961,7 +1004,10 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 	WaitForSingleObject( g_consoleReleasedEvent, INFINITE );
 #endif
 
+	EP_SAFE_RELEASE( g_wm );
 	EP_SAFE_RELEASE( g_scriptManager );
+	SAFE_DELETE( g_epLight );
+
 	Tcl_Finalize();
 
 	return DXUTGetExitCode();

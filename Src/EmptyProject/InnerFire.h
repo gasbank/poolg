@@ -1,3 +1,4 @@
+#pragma once
 #include "Picture.h"
 #include "Unit.h"
 

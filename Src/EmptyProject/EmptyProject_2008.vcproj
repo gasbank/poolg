@@ -810,35 +810,11 @@
 			Name="UI"
 			>
 			<File
-				RelativePath=".\ProgressBar.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\ProgressBar.h"
-				>
-			</File>
-			<File
 				RelativePath=".\ProgressUi.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\ProgressUi.h"
-				>
-			</File>
-			<File
-				RelativePath=".\SkillDescBox.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\SkillDescBox.h"
-				>
-			</File>
-			<File
-				RelativePath=".\StatusBar.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\StatusBar.h"
 				>
 			</File>
 			<File

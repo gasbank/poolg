@@ -1,11 +1,7 @@
 #pragma once
 
-#include "StatusBar.h"
-#include "ProgressBar.h"
-#include "StatusBar.h"
 #include "State.h"
 #include "InnerFire.h"
-#include "SkillDescBox.h"
 
 class SkillSet;
 class World;

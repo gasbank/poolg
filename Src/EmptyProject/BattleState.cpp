@@ -864,11 +864,11 @@ void BattleState::renderFixedText(int scrWidth, int scrHeight)
 		break;
 	}
 
-	//if (m_SkillContentBox.isOn())
+	if (m_skillContentBoxMover->isOn() && !m_skillContentBoxMover->isMoving())
 		m_lblSkillDescription->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 0.8f, 0.8f, 1.0f, 1.0f ) );
 
 
-	//if ( m_StatSelectBox.isOn() )
+	if ( m_statSelectBoxMover->isOn() && !m_statSelectBoxMover->isMoving())
 	{
 		int statSelectX = scrWidth/2 + 10;
 		int statSelectY = scrHeight/2 - 150;

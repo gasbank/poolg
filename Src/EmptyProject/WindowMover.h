@@ -7,6 +7,7 @@ public:
 	void onBox();
 	void offBox();
 	bool isOn() {return m_isOn;}
+	bool isMoving () {return (m_movingDirect^m_isOn);}
 
 	void setOff ();
 

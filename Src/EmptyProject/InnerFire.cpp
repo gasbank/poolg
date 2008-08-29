@@ -4,10 +4,13 @@
 InnerFire::InnerFire(void)
 : Unit( UT_INNERFIRE )
 {
-	m_bInit = false;
-	m_angle = 0;
-	m_angleVelocity = 0;
-	m_angleAccelRate = 0.1f;
+	m_d3dxMesh			= 0;
+	m_d3dTex			= 0;
+
+	m_bInit				= false;
+	m_angle				= 0;
+	m_angleVelocity		= 0;
+	m_angleAccelRate	= 0.1f;
 }
 
 
@@ -32,8 +35,7 @@ void InnerFire::init(const TCHAR* imgFileName, float radius, float height, int a
 
 void InnerFire::release()
 {
-	SAFE_RELEASE(m_d3dxMesh);
-	SAFE_RELEASE(m_d3dTex);
+	
 }
 
 HRESULT InnerFire::draw(bool textured)
@@ -156,5 +158,7 @@ HRESULT InnerFire::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE
 
 void InnerFire::onLostDevice()
 {
+	SAFE_RELEASE(m_d3dxMesh);
+	SAFE_RELEASE(m_d3dTex);
 
 }

@@ -36,7 +36,7 @@ HRESULT SkillObject::frameRender ( double dTime, float fElapsedTime )
 	for( iPass = 0; iPass < cPasses; iPass++ )
 	{
 		V( g_bombShader->beginPass( iPass ) );
-		f = this->m_effectObject->getMesh()->DrawSubset( 0 );
+		//f = this->m_effectObject->getMesh()->DrawSubset( 0 );
 		V( g_bombShader->endPass() );
 	}
 	V( g_bombShader->end() );

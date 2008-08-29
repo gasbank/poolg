@@ -83,7 +83,7 @@ void Character::heal (int point)
 Unit* Character::createCharacter( LPD3DXMESH mesh, int tileX, int tileY, float posZ )
 {
 	Character* u = new Character( UT_CHARACTER );
-	u->init( GetG().m_dev, mesh );
+	u->init();
 	u->setTilePos( tileX, tileY );
 	u->setTileBufferPos( tileX, tileY );
 	return u;

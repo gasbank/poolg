@@ -19,6 +19,13 @@
 #include "InnerFire.h"
 
 extern PostSepiaShader*				g_postSepiaShader;
+extern LPD3DXFONT					m_lblHYnamL;
+extern LPD3DXFONT					m_lblREB;
+extern LPD3DXFONT					m_lblSkill;
+extern LPD3DXFONT					m_lblSkillDescription;
+extern LPD3DXFONT					m_lblStatSelect;
+
+
 
 BattleState::BattleState()
 {
@@ -177,6 +184,7 @@ BattleState::BattleState()
 	m_expIllusionPlayerProg = new ProgressUi( PM_ILLUSION );
 	m_hpIllusionEnemyProg = new ProgressUi( PM_ILLUSION );
 	m_csIllusionEnemyProg = new ProgressUi( PM_ILLUSION );
+
 }
 
 BattleState::~BattleState()
@@ -217,10 +225,12 @@ HRESULT BattleState::enter()
 
 
 	// TODO Anim test
-	ArnNode* guardBallNode = getHero()->getArnMesh()->getNodeByName("GuardBall");
-	((ArnMesh*)guardBallNode)->setDoAnim( true );
-	((ArnMesh*)guardBallNode)->setVisible( true );
-
+	if ( getHero()->getArnMesh() )
+	{
+		ArnNode* guardBallNode = getHero()->getArnMesh()->getNodeByName("GuardBall");
+		((ArnMesh*)guardBallNode)->setDoAnim( true );
+		((ArnMesh*)guardBallNode)->setVisible( true );
+	}
 	m_desaturation = 0;
 
 	return S_OK;
@@ -388,13 +398,17 @@ HRESULT BattleState::frameMove(double fTime, float fElapsedTime)
 
 	// TODO Anim test
 
-	ArnNode* guardBallNode = getHero()->getArnMesh()->getNodeByName("GuardBall");
-	guardBallNode->update( fTime, fElapsedTime );
-	if ( ((ArnXformable*)guardBallNode)->isAnimSeqEnded() )
+	if ( getHero()->getArnMesh() )
 	{
-		((ArnXformable*)guardBallNode)->resetAnimSeqTime();
-		((ArnXformable*)guardBallNode)->setDoAnim( true );
+		ArnNode* guardBallNode = getHero()->getArnMesh()->getNodeByName("GuardBall");
+		guardBallNode->update( fTime, fElapsedTime );
+		if ( ((ArnXformable*)guardBallNode)->isAnimSeqEnded() )
+		{
+			((ArnXformable*)guardBallNode)->resetAnimSeqTime();
+			((ArnXformable*)guardBallNode)->setDoAnim( true );
+		}
 	}
+	
 	
 	//// WorldState에 접근하기 위한 코드.
 	//TopStateManager& tsm = TopStateManager::getSingleton();
@@ -702,17 +716,11 @@ HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 
 HRESULT BattleState::release ()
 {
-	m_sprite->release();
+	//m_sprite->release();
 
 
 	EP_SAFE_RELEASE( m_innerFire );
 	
-	SAFE_RELEASE( m_lblHYnamL );
-	SAFE_RELEASE( m_lblREB );
-	SAFE_RELEASE( m_lblSkill );
-	SAFE_RELEASE( m_lblSkillDescription );
-	SAFE_RELEASE( m_lblStatSelect );
-
 	SAFE_DELETE( m_hpBarPlayerProg );
 	SAFE_DELETE( m_csBarPlayerProg );
 	SAFE_DELETE( m_expBarPlayerProg );
@@ -1136,12 +1144,7 @@ void BattleState::updateBarRate()
 HRESULT BattleState::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext )
 {
 
-	D3DXCreateFont( pd3dDevice, 17, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblHYnamL );
-	D3DXCreateFont( pd3dDevice, 18, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Rockwell Extra Bold"), &m_lblREB );
-	D3DXCreateFont( pd3dDevice, 20, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblSkill );
-	D3DXCreateFont( pd3dDevice, 15, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblSkillDescription );
-	D3DXCreateFont( pd3dDevice, 17, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblStatSelect );
-
+	
 	m_innerFire->onResetDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
 
 	return S_OK;
@@ -1149,11 +1152,13 @@ HRESULT BattleState::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFA
 
 void BattleState::onLostDevice()
 {
-
+	m_innerFire->onLostDevice();
 }
 
 HRESULT BattleState::onCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext )
 {
 	m_pDev = pd3dDevice;
+
+	
 	return S_OK;
 }

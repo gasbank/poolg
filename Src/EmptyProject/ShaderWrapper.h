@@ -12,30 +12,36 @@ public:
 	Shader(void);
 	virtual ~Shader(void);
 
-	virtual HRESULT					initEffect( LPDIRECT3DDEVICE9 pd3dDevice, const WCHAR* shaderFileName, DWORD dwShaderFlags = gs_shaderFlags );
-	virtual HRESULT					initShader( LPDIRECT3DDEVICE9 pd3dDevice, const WCHAR* shaderFileName );
 	HRESULT							compileShader( const char* functionName, const char* profile, DWORD dwShaderFlags = gs_shaderFlags );
 	LPDIRECT3DVERTEXDECLARATION9	getVertexDeclaration() const { return m_pVertexDeclaration; }
 	LPD3DXCONSTANTTABLE				getConstantTable() const { return m_pConstantTable; }
 	LPDIRECT3DVERTEXSHADER9			getVertexShader() const { return m_pVertexShader; }
 	virtual void					release();
 	virtual void					update( float fTime, float fElapsedTime );
-	virtual HRESULT CALLBACK		onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext );
 
-	D3DVERTEXELEMENT9* getDecl() const { return m_decl; }
+	virtual HRESULT CALLBACK		onCreateDevice( LPDIRECT3DDEVICE9 pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc ) = 0;
+	virtual HRESULT CALLBACK		onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc );
+	virtual void CALLBACK			onLostDevice();
+	virtual void CALLBACK			onDestroyDevice();
+	
+
+	D3DVERTEXELEMENT9*				getDecl() const { return m_decl; }
 
 protected:
-	LPD3DXEFFECT					m_effect;
+	virtual HRESULT					initEffect( LPDIRECT3DDEVICE9 pd3dDevice, const WCHAR* shaderFileName, DWORD dwShaderFlags = gs_shaderFlags );
+	virtual HRESULT					initShader( LPDIRECT3DDEVICE9 pd3dDevice, const WCHAR* shaderFileName );
+
 	LPDIRECT3DDEVICE9				m_dev;
+
+	LPD3DXEFFECT					m_effect;
+
+	
 	LPDIRECT3DVERTEXSHADER9         m_pVertexShader;
-	
 	LPD3DXCONSTANTTABLE             m_pConstantTable;
-	
 	LPDIRECT3DVERTEXDECLARATION9    m_pVertexDeclaration;
 	D3DVERTEXELEMENT9*				m_decl;
 	
-	WCHAR m_shaderFileName[512];
-	
+	WCHAR							m_shaderFileName[128];
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -45,7 +51,9 @@ class BombShader : public Shader
 public:
 	BombShader();
 	~BombShader();
-	virtual HRESULT CALLBACK		onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext );
+	virtual HRESULT CALLBACK		onCreateDevice( LPDIRECT3DDEVICE9 pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc );
+	virtual HRESULT CALLBACK		onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc );
+	virtual void CALLBACK			onLostDevice();
 
 	void							initMainTechnique() { m_hDefaultTech = m_effect->GetTechniqueByName( "Main" ); }
 	HRESULT							setMainTechnique() { return m_effect->SetTechnique( m_hDefaultTech ); }
@@ -53,7 +61,6 @@ public:
 	HRESULT							beginPass( UINT pass ) { return m_effect->BeginPass( pass ); }
 	HRESULT							endPass() { return m_effect->EndPass(); }
 	HRESULT							end() { return m_effect->End(); }
-	void							onLostDevice() { m_effect->OnLostDevice(); }
 	HRESULT							setWorldViewProj( double fTime, float fElapsedTime, const D3DXMATRIX* mWorld, const D3DXMATRIX* mView, const D3DXMATRIX* mProj );
 private:
 	D3DXHANDLE						m_hDefaultTech;
@@ -67,7 +74,7 @@ class PostSepiaShader : public Shader
 public:
 	PostSepiaShader();
 	~PostSepiaShader();
-	virtual HRESULT CALLBACK		onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext );
+	virtual HRESULT CALLBACK		onCreateDevice( LPDIRECT3DDEVICE9 pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc );
 
 	void							initMainTechnique();
 	HRESULT							setMainTechnique() { return m_effect->SetTechnique( m_hDefaultTech ); }
@@ -75,12 +82,10 @@ public:
 	HRESULT							beginPass( UINT pass ) { return m_effect->BeginPass( pass ); }
 	HRESULT							endPass() { return m_effect->EndPass(); }
 	HRESULT							end() { return m_effect->End(); }
-	void							onLostDevice() { m_effect->OnLostDevice(); }
 	HRESULT							setFullscreenTexture( LPDIRECT3DTEXTURE9 tex );
 	void							setDesaturation( float desat );
 private:
 	D3DXHANDLE						m_hDefaultTech;
-	LPDIRECT3DTEXTURE9				m_tex;
 };
 //////////////////////////////////////////////////////////////////////////
 
@@ -89,7 +94,7 @@ class PostRadialBlurShader : public Shader
 public:
 	PostRadialBlurShader() {}
 	~PostRadialBlurShader() {}
-	virtual HRESULT CALLBACK		onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext );
+	virtual HRESULT CALLBACK		onCreateDevice( LPDIRECT3DDEVICE9 pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc );
 
 	void							initMainTechnique();
 	HRESULT							setMainTechnique() { return m_effect->SetTechnique( m_hDefaultTech ); }
@@ -97,12 +102,10 @@ public:
 	HRESULT							beginPass( UINT pass ) { return m_effect->BeginPass( pass ); }
 	HRESULT							endPass() { return m_effect->EndPass(); }
 	HRESULT							end() { return m_effect->End(); }
-	void							onLostDevice() { m_effect->OnLostDevice(); }
 	HRESULT							setFullscreenTexture( LPDIRECT3DTEXTURE9 tex );
 	void							setBlurWidth( float blurWidth );
 private:
 	D3DXHANDLE						m_hDefaultTech;
-	LPDIRECT3DTEXTURE9				m_tex;
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -113,9 +116,8 @@ public:
 	AlphaShader() {}
 	~AlphaShader() {}
 
-	virtual HRESULT					initShader( LPDIRECT3DDEVICE9 pd3dDevice, const WCHAR* shaderFileName );
 	virtual HRESULT CALLBACK		onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext );
-
+	virtual HRESULT CALLBACK		onCreateDevice( LPDIRECT3DDEVICE9 pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc );
 };
 
 
@@ -135,13 +137,12 @@ class MotionBlurShader : public Shader
 public:
 	MotionBlurShader() {}
 	~MotionBlurShader() {}
+	
+	virtual HRESULT CALLBACK		onCreateDevice( LPDIRECT3DDEVICE9 pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc );
+	virtual HRESULT CALLBACK		onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc );
+	virtual void CALLBACK			onLostDevice();
+	virtual void CALLBACK			onDestroyDevice();
 
-	virtual HRESULT					initShader( LPDIRECT3DDEVICE9 pd3dDevice, const WCHAR* shaderFileName );
-	virtual HRESULT CALLBACK		onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext );
-
-	void							onCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext );
-	void							onLostDevice();
-	void							onDestroyDevice();
 	void							onFrameMove( double dTime, float fElapsedTime );
 	void							onFrameRender( IDirect3DDevice9* pd3dDevice, double dTime, float fElapsedTime );
 private:

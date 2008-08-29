@@ -43,11 +43,12 @@ World::~World(void)
 
 HRESULT World::init()
 {
-	assert( GetG().m_dev );
+	//assert( GetG().m_dev );
 
 	HRESULT hr = S_OK;
 
-	loadWorldModel();
+	if ( GetG().m_videoMan.GetDev() )
+		loadWorldModel();
 
 	char command[128];
 	StringCchPrintfA( command, 128, "%s::init 0x%p", m_worldName.c_str(), this );
@@ -64,7 +65,6 @@ HRESULT World::init()
 		throw std::runtime_error( "Sound should not be init twice or more" );
 
 	
-	setupLight();
 
 	// 'enter' function implemented in the script file defines which characters are exist in this world
 	char scriptCommand[128];
@@ -352,7 +352,7 @@ void World::setupLight()
 	LPDIRECT3DDEVICE9& pd3dDevice = GetG().m_dev;
 
 	ZeroMemory(&light, sizeof(D3DLIGHT9));
-	D3DCOLORVALUE cv = { 0.0f, 0.0f, 0.0f, 1.0f };
+	D3DCOLORVALUE cv = { 0.5f, 0.5f, 0.5f, 1.0f };
 	light.Ambient = cv;
 	light.Diffuse = cv;
 	light.Specular = cv;
@@ -368,9 +368,9 @@ void World::setupLight()
 	light.Type = D3DLIGHT_DIRECTIONAL;
 	light.Range = 1000.0f;
 
-	pd3dDevice->SetLight(0, &light);
-	pd3dDevice->LightEnable(0, TRUE);
-	pd3dDevice->SetRenderState( D3DRS_LIGHTING, TRUE );
+	//pd3dDevice->SetLight(0, &light);
+	//pd3dDevice->LightEnable(0, TRUE);
+	//pd3dDevice->SetRenderState( D3DRS_LIGHTING, TRUE );
 }
 
 UINT World::addUnit( Unit* u )
@@ -798,6 +798,14 @@ HRESULT World::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DES
 {
 	OutputDebugString( _T( " - INFO: World::onResetDevice called.\n" ) );
 	loadWorldModel();
+
+	D3DLIGHT9& light = GetG().m_light;
+
+	setupLight();
+	pd3dDevice->SetLight(0, &light);
+	pd3dDevice->LightEnable(0, TRUE);
+	pd3dDevice->SetRenderState( D3DRS_LIGHTING, FALSE );
+
 	return S_OK;
 }
 
@@ -810,6 +818,7 @@ void World::onLostDevice()
 HRESULT World::onCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext )
 {
 	OutputDebugString( _T( " - INFO: World::onCreateDevice called.\n" ) );
+
 
 	return S_OK;
 }

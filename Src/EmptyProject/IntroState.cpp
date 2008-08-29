@@ -151,14 +151,14 @@ HRESULT IntroState::release()
 {	
 	m_pBlack.release();
 
-	if ( m_pGalaxy )
+	/*if ( m_pGalaxy )
 		m_pGalaxy->release();
 	if ( m_pLogo ) 
 		m_pLogo->release();
 	if ( m_pLogoDrawRequest )
 		m_pLogoDrawRequest->release();
 	if ( m_pGalaxyDrawRequest )
-		m_pGalaxyDrawRequest->release();
+		m_pGalaxyDrawRequest->release();*/
 
 	return S_OK;
 }

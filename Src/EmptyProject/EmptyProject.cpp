@@ -46,7 +46,7 @@ WorldManager*					g_wm					= 0;
 TopStateManager*				g_tsm					= 0;
 WorldStateManager*				g_wsm					= 0;
 ScriptManager*					g_scriptManager			= 0;		// Set to zero is 'CRUCIAL!'
-BombShader*						g_bombShader			= 0;
+
 SpriteManager*					g_spriteManager			= 0;
 EpLight*						g_epLight				= 0;
 
@@ -65,6 +65,16 @@ LPD3DXFONT						g_pFont					= 0;		// ... Some globally used font?
 LPD3DXFONT						g_unitNameFont			= 0;
 LPD3DXFONT						g_dlgNameFont			= 0;
 LPD3DXFONT						g_dlgContentFont		= 0;
+// CreditState
+LPD3DXFONT						g_d3dxFont				= 0;
+LPD3DXFONT						g_d3dxFontBig			= 0;
+// Battle State
+LPD3DXFONT						m_lblHYnamL				= 0;
+LPD3DXFONT						m_lblREB				= 0;
+LPD3DXFONT						m_lblSkill				= 0;
+LPD3DXFONT						m_lblSkillDescription	= 0;
+LPD3DXFONT						m_lblStatSelect			= 0;
+
 
 LOGMANAGER logMan;
 
@@ -75,7 +85,6 @@ bool							g_bTileGrid				= false;
 
 
 
-MotionBlurShader*				g_motionBlurShader		= 0;
 
 
 LPDIRECT3DTEXTURE9				g_pFullScreenRenderTarget		= 0;
@@ -90,13 +99,17 @@ LPDIRECT3DSURFACE9				g_radialBlurRenderTargetSurf	= 0;
 PostSepiaShader*				g_postSepiaShader				= 0;
 PostRadialBlurShader*			g_postRadialBlurShader			= 0;
 
+//MotionBlurShader*				g_motionBlurShader		= 0;
+BombShader*						g_bombShader			= 0;
+
+
 int								g_nActiveSystem = 0;
 CParticleSystem					*g_pParticleSystems[6];
 bool							g_bParticleVisible = false;
 
 //////////////////////////////////////////////////////////////////////////
 
-void ConfigureShaders( LPDIRECT3DDEVICE9 pd3dDevice );
+void ConfigureShaders( LPDIRECT3DDEVICE9 pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc );
 void ConfigureParticleSystem( LPDIRECT3DDEVICE9 pd3dDevice );
 void ConfigureTileGridGeometry( LPDIRECT3DDEVICE9 pd3dDevice );
 void ConfigureTestGeometry( LPDIRECT3DDEVICE9 pd3dDevice );			// TODO Not necessary on release build
@@ -126,12 +139,7 @@ bool CALLBACK IsD3D9DeviceAcceptable( D3DCAPS9* pCaps, D3DFORMAT AdapterFormat, 
 //--------------------------------------------------------------------------------------
 bool CALLBACK ModifyDeviceSettings( DXUTDeviceSettings* pDeviceSettings, void* pUserContext )
 {
-
-
-	//pDeviceSettings->d3d9.pp.EnableAutoDepthStencil= TRUE;
-	//pDeviceSettings->d3d9.pp.AutoDepthStencilFormat = D3DFMT_D16;
-
-	pDeviceSettings->d3d9.BehaviorFlags |= D3DCREATE_MULTITHREADED; // For multi-threaded console
+	//pDeviceSettings->d3d9.BehaviorFlags |= D3DCREATE_MULTITHREADED; // For multi-threaded console
 
 	return true;
 }
@@ -139,75 +147,72 @@ bool CALLBACK ModifyDeviceSettings( DXUTDeviceSettings* pDeviceSettings, void* p
 //--------------------------------------------------------------------------------------
 // Create any D3D9 resources that will live through a device reset (D3DPOOL_MANAGED)
 // and aren't tied to the back buffer size
-//
-//	PREREQUISITIES
-//
-//		- VideoMan			class instance
-//		- G					struct instance
-//		- WorldManager		class instance
-//		- ScriptManager		class instance
 //--------------------------------------------------------------------------------------
 HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
 									void* pUserContext )
 {
 	OutputDebugString( _T( " - INFO: OnCreateDevice called.\n" ) );
 
-	HRESULT hr;
+	HRESULT hr = S_OK;
+
+	UNREFERENCED_PARAMETER( hr );
 
 	// (1) Set D3D device global variable which is shared through the whole application lifetime.
+	//     GetG() related init
 	assert( GetG().m_dev == 0 );
 	assert( VideoMan::getSingleton().GetDev() == 0 );
 	GetG().m_dev = pd3dDevice;
 	VideoMan::getSingleton().SetDev( pd3dDevice );
-
-
-	GetTopStateManager().onCreateDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
-	GetWorldStateManager().onCreateDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
-
-	// (6) Set the first world
-	// TODO: This is 'DO ONCE THROUGH THE WHOLE LIFETIME job.. not on every OnCreateDevice()!
-	const char* startWorldName = GetScriptManager().readString( "EpStartWorldName" );
-	GetWorldManager().setNextWorld( startWorldName );
-
-	// (7) Configure shaders and particle system
-	ConfigureShaders( pd3dDevice );
-	ConfigureParticleSystem( pd3dDevice );
-	
-	// (8) Configure geometries (Vertex and index buffer manipulation)
-	ConfigureTileGridGeometry( pd3dDevice );
-	ConfigureTestGeometry( pd3dDevice );
-
-	// (9) Debugging information rendering font
-	V( D3DXCreateFont( pd3dDevice, 12, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Gulimche"), &g_pFont) );
-
-	// (10) Camera and Light configuration
-
-	//화면의 크기를 변환할 때마다 화면의 크기를 나타내는 전역변수 갱신.
 	GetG().m_scrWidth = pBackBufferSurfaceDesc->Width;
 	GetG().m_scrHeight = pBackBufferSurfaceDesc->Height;
-
-	TCHAR scrSizeString[64];
-	StringCchPrintf( scrSizeString, 64, _T( "- INFO: Window width: %d / height: %d\n" ), GetG().m_scrWidth, GetG().m_scrHeight );
-	OutputDebugString( scrSizeString );
-
+	
 	// Orthogonal and fixed view xforms for GUI or fixed element rendering
 	D3DXVECTOR3 eye(0, 0, -50.0f), at(0, 0, 0), up(0, 1.0f, 0);
 	D3DXMatrixOrthoLH(&GetG().g_orthoProjMat, (FLOAT)pBackBufferSurfaceDesc->Width, (FLOAT)pBackBufferSurfaceDesc->Height, 0.1f, 100.0f);
 	D3DXMatrixLookAtLH(&GetG().g_fixedViewMat,	&eye, &at, &up);
 
+	TCHAR scrSizeString[64];
+	StringCchPrintf( scrSizeString, 64, _T( "- INFO: Window width: %d / height: %d\n" ), GetG().m_scrWidth, GetG().m_scrHeight );
+	OutputDebugString( scrSizeString );
+
 	float fAspectRatio = pBackBufferSurfaceDesc->Width / ( FLOAT )pBackBufferSurfaceDesc->Height;
 	GetG().m_camera.SetProjParams( D3DX_PI / 4, fAspectRatio, 1.0f, 1000.0f );
+	
+	// (x) Screen Flash (Alpha shader) init
+	GetG().m_screenFlash.onCreateDevice( pd3dDevice, pBackBufferSurfaceDesc );
 
-	GetG().m_screenFlash.setup();
+
+	// (2) Configure shaders and particle system
+	ConfigureShaders( pd3dDevice, pBackBufferSurfaceDesc );
+	//ConfigureParticleSystem( pd3dDevice );
+	
+	// (3) Configure geometries (Vertex and index buffer manipulation)
+	ConfigureTileGridGeometry( pd3dDevice );
+	ConfigureTestGeometry( pd3dDevice );
+	
+	// (4) Light setup
 	GetEpLight().setupLight();
 
-	// Font Creation
-	V( D3DXCreateFont( pd3dDevice, 26, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T( "Arial Black"), &g_unitNameFont ) );
-	V( D3DXCreateFont( pd3dDevice, 12, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Gulim"), &g_dlgContentFont) );
-	V( D3DXCreateFont( pd3dDevice, 12, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("msgothic"), &g_dlgNameFont) );
+	// (5) Globally used fonts
+	
+	V_RETURN( D3DXCreateFont( pd3dDevice, 12, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Gulimche"), &g_pFont) );
+	V_RETURN( D3DXCreateFont( pd3dDevice, 26, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T( "Arial Black"), &g_unitNameFont ) );
+	V_RETURN( D3DXCreateFont( pd3dDevice, 12, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Gulim"), &g_dlgContentFont) );
+	V_RETURN( D3DXCreateFont( pd3dDevice, 12, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("msgothic"), &g_dlgNameFont) );
+	V_RETURN( D3DXCreateFont( pd3dDevice, 26, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T( "Palatino Linotype"), &g_d3dxFont ) );
+	V_RETURN( D3DXCreateFont( pd3dDevice, 32, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T( "Palatino Linotype"), &g_d3dxFontBig ) );
+	V_RETURN( D3DXCreateFont( pd3dDevice, 17, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblHYnamL ) );
+	V_RETURN( D3DXCreateFont( pd3dDevice, 18, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Rockwell Extra Bold"), &m_lblREB ) );
+	V_RETURN( D3DXCreateFont( pd3dDevice, 20, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblSkill ) );
+	V_RETURN( D3DXCreateFont( pd3dDevice, 15, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblSkillDescription ) );
+	V_RETURN( D3DXCreateFont( pd3dDevice, 17, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblStatSelect ) );
 
-	// (11) Script side callback invocation (Do at the end of this function.)
-	GetScriptManager().execute( "EpOnCreateDevice" );
+
+	// (6) OnCreateDevice propagation
+	GetTopStateManager().onCreateDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
+	GetWorldStateManager().onCreateDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
+	GetSpriteManager().onCreateDevice( pd3dDevice );
+	GetWorldManager().onCreateDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
 	return S_OK;
 }
 
@@ -220,17 +225,17 @@ HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFA
 {
 	OutputDebugString( _T(" - INFO: OnResetDevice() called.\n") );
 
+	GetG().m_dev = pd3dDevice;
+	VideoMan::getSingleton().SetDev( pd3dDevice );
+	GetG().m_scrWidth = pBackBufferSurfaceDesc->Width;
+	GetG().m_scrHeight = pBackBufferSurfaceDesc->Height;
+
 	HRESULT hr = S_OK;
 
 	pd3dDevice->SetRenderState( D3DRS_DITHERENABLE, TRUE );
 	pd3dDevice->SetRenderState( D3DRS_SPECULARENABLE, TRUE );
-
 	pd3dDevice->SetRenderState(D3DRS_LIGHTING, TRUE);
 	pd3dDevice->SetRenderState(D3DRS_ZENABLE, TRUE);
-
-	// MacBook Air has problem with this render state... strange
-	//pd3dDevice->SetRenderState(D3DRS_SHADEMODE, D3DSHADE_PHONG);
-
 	pd3dDevice->SetSamplerState( 0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR );
 	pd3dDevice->SetSamplerState( 0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR );
 	pd3dDevice->SetSamplerState( 0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR );
@@ -238,20 +243,12 @@ HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFA
 	//g_fillColor = D3DCOLOR_ARGB( 0, 45, 50, 170 );
 	g_fillColor = D3DCOLOR_ARGB( 0, 0, 0, 0 );
 
-	if ( g_bombShader )
-		g_bombShader->onResetDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
-	if ( g_postSepiaShader )
-		g_postSepiaShader->onResetDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
-	if ( g_postRadialBlurShader )
-		g_postRadialBlurShader->onResetDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
-	//g_alphaShader->onResetDevice();
+	GetG().m_screenFlash.onResetDevice( pd3dDevice, pBackBufferSurfaceDesc );
 
-	GetG().m_screenFlash.reset( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
-
+	GetSpriteManager().onResetDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
 	GetWorldManager().onResetDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
 	GetTopStateManager().onResetDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
 	GetWorldStateManager().onResetDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
-	GetSpriteManager().onResetDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
 
 	D3DFORMAT d3dFormat = D3DFMT_A8R8G8B8;
 
@@ -278,14 +275,23 @@ HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFA
 
 	SetupFullscreenQuad( pBackBufferSurfaceDesc );
 
-	if ( g_pFont )
-		g_pFont->OnResetDevice();
-	if ( g_unitNameFont )
-		g_unitNameFont->OnResetDevice();
-	if ( g_dlgNameFont )
-		g_dlgNameFont->OnResetDevice();
-	if ( g_dlgContentFont )
-		g_dlgContentFont->OnResetDevice();
+	
+	g_pFont->OnResetDevice();
+	g_unitNameFont->OnResetDevice();
+	g_dlgNameFont->OnResetDevice();
+	g_dlgContentFont->OnResetDevice();
+
+	m_lblHYnamL->OnResetDevice();
+	m_lblREB->OnResetDevice();
+	m_lblSkill->OnResetDevice();
+	m_lblSkillDescription->OnResetDevice();
+	m_lblStatSelect->OnResetDevice();
+
+
+	g_postRadialBlurShader->onResetDevice( pd3dDevice, pBackBufferSurfaceDesc );
+	g_postSepiaShader->onResetDevice( pd3dDevice, pBackBufferSurfaceDesc );
+	//g_motionBlurShader->onResetDevice( pd3dDevice, pBackBufferSurfaceDesc );
+	g_bombShader->onResetDevice( pd3dDevice, pBackBufferSurfaceDesc );
 
 	return hr;
 }
@@ -296,6 +302,7 @@ HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFA
 //--------------------------------------------------------------------------------------
 void CALLBACK OnFrameMove( double fTime, float fElapsedTime, void* pUserContext )
 {
+
 	HRESULT hr;
 
 	UNREFERENCED_PARAMETER( hr );
@@ -330,21 +337,6 @@ void CALLBACK OnFrameMove( double fTime, float fElapsedTime, void* pUserContext 
 	GetG().m_screenFlash.frameMove( fTime, fElapsedTime );
 }
 
-
-
-HRESULT drawAlphaAnimatedPlane( double fTime, float fElapsedTime )
-{
-	HRESULT hr = S_OK;
-	//GetG().m_dev->SetRenderState( D3DRS_LIGHTING, FALSE );
-	//GetG().m_dev->SetRenderState( D3DRS_CULLMODE, D3DCULL_NONE );
-	//GetG().m_dev->SetTexture( 0, 0 );
-	////V_RETURN( GetG().m_dev->SetVertexShader( g_alphaShader->getVertexShader() ) );
-	//D3DPERF_BeginEvent( 0, L"Draw Alpha Animated" );
-	//V_RETURN( g_testPolygonCloned->DrawSubset( 0 ) );
-	//D3DPERF_EndEvent();
-	//V_RETURN( GetG().m_dev->SetVertexShader( 0 ) );
-	return hr;
-}
 
 HRESULT drawBurningTeapot( double fTime, float fElapsedTime )
 {
@@ -384,8 +376,6 @@ void renderDebugText()
 
 	D3DXCOLOR textColor = D3DXCOLOR( 1.0f, 0.0f, 0.0f, 1.0f );
 	g_pFont->DrawTextW( 0, g_debugBuffer.c_str(), -1, &rc, DT_NOCLIP | DT_RIGHT, textColor );
-
-	
 }
 
 void renderFixedElements( double fTime, float fElapsedTime )
@@ -483,6 +473,7 @@ void SetupFullscreenQuad( const D3DSURFACE_DESC* pBackBufferSurfaceDesc )
 //--------------------------------------------------------------------------------------
 void CALLBACK OnD3D9FrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float fElapsedTime, void* pUserContext )
 {
+
 	HRESULT hr;
 
 	LPDIRECT3DSURFACE9 originalRT = 0;
@@ -693,8 +684,35 @@ void CALLBACK OnD3D9LostDevice( void* pUserContext )
 	if ( g_dlgContentFont )
 		g_dlgContentFont->OnLostDevice();
 
+	if ( SpriteManager::getSingletonPtr() )
+		GetSpriteManager().onLostDevice();
+
 	if ( WorldManager::getSingletonPtr() )
 		GetWorldManager().onLostDevice();
+
+	if ( TopStateManager::getSingletonPtr() )
+		GetTopStateManager().onLostDevice();
+
+	if ( WorldStateManager::getSingletonPtr() )
+		GetWorldStateManager().onLostDevice();
+
+	SAFE_RELEASE( g_pFullScreenRenderTarget );
+	SAFE_RELEASE( g_pFullScreenRenderTargetSurf );
+	SAFE_RELEASE( g_sepiaRenderTarget );
+	SAFE_RELEASE( g_sepiaRenderTargetSurf );
+	SAFE_RELEASE( g_radialBlurRenderTarget );
+	SAFE_RELEASE( g_radialBlurRenderTargetSurf );
+
+	g_postRadialBlurShader->onLostDevice();
+	g_postSepiaShader->onLostDevice();
+	//g_motionBlurShader->onLostDevice();
+	g_bombShader->onLostDevice();
+
+	GetG().m_screenFlash.onLostDevice();
+
+	// GetG() related
+	GetG().m_dev = 0;
+	GetG().m_videoMan.SetDev(0);
 }
 
 
@@ -705,36 +723,32 @@ void CALLBACK OnD3D9DestroyDevice( void* pUserContext )
 {
 	OutputDebugString( _T( " - INFO: OnDestroyDevice() called.\n" ) );
 
+	// Globally used fonts
 	SAFE_RELEASE( g_pFont );
 	SAFE_RELEASE( g_unitNameFont );
 	SAFE_RELEASE( g_dlgNameFont );
 	SAFE_RELEASE( g_dlgContentFont );
+	SAFE_RELEASE( g_d3dxFont );
+	SAFE_RELEASE( g_d3dxFontBig );
 
+	// Test geometries
 	SAFE_RELEASE( g_testTeapot );
 
-	EP_SAFE_RELEASE( g_tsm );
-	EP_SAFE_RELEASE( g_wsm );
-	EP_SAFE_RELEASE( g_bombShader );
-
+	// Tile grid geometry
 	SAFE_RELEASE( g_lineElement );
 
-
-	SAFE_DELETE( g_spriteManager );
-
-	EP_SAFE_RELEASE( g_motionBlurShader );
-
+	// Shaders
+	EP_SAFE_RELEASE( g_bombShader );
+	//EP_SAFE_RELEASE( g_motionBlurShader );
 	EP_SAFE_RELEASE( g_postSepiaShader );
 	EP_SAFE_RELEASE( g_postRadialBlurShader );
 
-	GetG().m_videoMan.SetDev(0);
-	GetG().m_screenFlash.release();
 
-	SAFE_RELEASE( g_pFullScreenRenderTarget );
-	SAFE_RELEASE( g_pFullScreenRenderTargetSurf );
-	SAFE_RELEASE( g_sepiaRenderTarget );
-	SAFE_RELEASE( g_sepiaRenderTargetSurf );
-	SAFE_RELEASE( g_radialBlurRenderTarget );
-	SAFE_RELEASE( g_radialBlurRenderTargetSurf );
+	// GetG() related
+	GetG().m_dev = 0;
+	GetG().m_videoMan.SetDev(0);
+	GetG().m_screenFlash.onDestroyDevice();
+
 
 	for( int i = 0; i < 6; ++i )
 	{
@@ -744,6 +758,18 @@ void CALLBACK OnD3D9DestroyDevice( void* pUserContext )
 			g_pParticleSystems[i] = NULL;
 		}
 	}
+
+
+	SAFE_RELEASE( m_lblHYnamL );
+	SAFE_RELEASE( m_lblREB );
+	SAFE_RELEASE( m_lblSkill );
+	SAFE_RELEASE( m_lblSkillDescription );
+	SAFE_RELEASE( m_lblStatSelect );
+
+
+	GetSpriteManager().onDestroyDevice();
+
+	GetG().m_screenFlash.onDestroyDevice();
 }
 
 
@@ -819,7 +845,7 @@ int EpOutputDebugString( const char* msg )
 
 
 
-#define EP_CONSOLE
+//#define EP_CONSOLE
 
 static int g_closeConsole = 2008;
 
@@ -889,12 +915,12 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 	_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 #endif
 
+
 	// TODO: Perform any application-level initialization here
-	// All 'D3D device independent' objects shall be allocated here.
+	// There is no dependency on D3D device in application-level init step.(and should be)
+	SetCurrentWorkingDirectory();
 	g_debugBuffer.resize( 2048 );
 	
-	SetCurrentWorkingDirectory();
-
 	// (1) Script Manager Initialization
 	CreateScriptManagerIfNotExist();
 	GetScriptManager().executeFile( "Script/EpInitScript.tcl" );
@@ -902,30 +928,28 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 	GetScriptManager().executeFile( "Script/EpSkill.tcl" );
 	GetScriptManager().execute( "EpInitApp" );
 
-	// (2) Camera Setup
-	GetG().m_camera.SetAttachCameraToModel( true );
-	GetG().m_camera.SetEnablePositionMovement( true );
 
-	// (3) World Manager
+	// (9) Sprite manager
+	assert( g_spriteManager == 0 );
+	g_spriteManager = new SpriteManager();
+
+	// (2) Top State Manager (tsm)
+	// TODO: State preservation is needed!!! NO CREATION ON EVERY OnCreateDevice()!
+	assert( g_tsm == 0 );
+	g_tsm = new TopStateManager();
+	g_tsm->init();
+
+	// (3) World State Manager (wsm)
+	// TODO: State preservation is needed!!! NO CREATION ON EVERY OnCreateDevice()!
+	assert( g_wsm == 0 );
+	g_wsm = new WorldStateManager();
+	g_wsm->init();
+	
+	// (4) World Manager
 	assert( g_wm == 0 );
 	g_wm = new WorldManager();
 
-	// (4) EpLight
-	assert( g_epLight == 0 );
-	g_epLight = new EpLight();
-
-	// (5) Ep Console Thread
-	uintptr_t t = _beginthread( EpConsoleThreadMain, 0, 0 );
-	g_scriptBindingFinishedEvent = CreateEvent( NULL, TRUE, FALSE, NULL );
-	ResetEvent( g_scriptBindingFinishedEvent );
-	WaitForSingleObject( g_scriptBindingFinishedEvent, INFINITE );
-
-	const char* windowMode = GetScriptManager().readString( "EpWindowMode" );
-	bool bWindowMode = (*windowMode)=='1'?true:false;
-
-
-	// (2) Read all world script files
-	// TODO: IS THIS NEEDED ON EVERY OnCreateDevice()?
+	// (5) Read all world script files
 	assert( GetWorldManager().getWorldCount() == 0 );
 	ConstCharList worldList;
 	GetScriptManager().readCharPtrList( "EpWorldList", worldList );
@@ -946,27 +970,39 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 		GetWorldManager().addWorld( world );
 	}
 
+	// (6) Camera Setup
+	GetG().m_camera.SetAttachCameraToModel( true );
+	GetG().m_camera.SetEnablePositionMovement( true );
+
+	// (7) EpLight
+	assert( g_epLight == 0 );
+	g_epLight = new EpLight();
+
+	// (8) Ep Console Thread
+	g_scriptBindingFinishedEvent = CreateEvent( NULL, TRUE, FALSE, NULL );
+	ResetEvent( g_scriptBindingFinishedEvent );
+	uintptr_t t = _beginthread( EpConsoleThreadMain, 0, 0 );
+	WaitForSingleObject( g_scriptBindingFinishedEvent, INFINITE );
 
 
-	// (3) Sprite manager
-	assert( g_spriteManager == 0 );
-	g_spriteManager = new SpriteManager();
+
+	// (10) Script side callback invocation (Do at the end of this function.)
+	GetScriptManager().execute( "EpOnCreateDevice" );
+
+	// (11) Set the first world
+	// TODO: This is 'DO ONCE THROUGH THE WHOLE LIFETIME job.. not on every OnCreateDevice()!
+	const char* startWorldName = GetScriptManager().readString( "EpStartWorldName" );
+	GetWorldManager().setNextWorld( startWorldName );
+	GetWorldManager().changeToNextWorldIfExist();
+
+	// (12) Determine Windowed or full screen mode
+	const char* windowMode = GetScriptManager().readString( "EpWindowMode" );
+	bool bWindowMode = (*windowMode)=='1'?true:false;
 
 
-	// (4) Top State Manager (tsm)
-	// TODO: State preservation is needed!!! NO CREATION ON EVERY OnCreateDevice()!
-	assert( g_tsm == 0 );
-	g_tsm = new TopStateManager();
-	g_tsm->init();
+	//////////////////////////////////////////////////////////////////////////
 
-	// (5) World State Manager (wsm)
-	// TODO: State preservation is needed!!! NO CREATION ON EVERY OnCreateDevice()!
-	assert( g_wsm == 0 );
-	g_wsm = new WorldStateManager();
-	g_wsm->init();
-
-
-	// Set the callback functions
+	// Set the DXUT callback functions
 	DXUTSetCallbackD3D9DeviceAcceptable( IsD3D9DeviceAcceptable );
 	DXUTSetCallbackD3D9DeviceCreated( OnD3D9CreateDevice );
 	DXUTSetCallbackD3D9DeviceReset( OnD3D9ResetDevice );
@@ -977,7 +1013,6 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 	DXUTSetCallbackMsgProc( MsgProc );
 	DXUTSetCallbackFrameMove( OnFrameMove );
 	DXUTSetCallbackKeyboard( KeyboardProc );
-
 
 	// Initialize DXUT and create the desired Win32 window and Direct3D device for the application
 	DXUTInit( true, true ); // Parse the command line and show msgboxes
@@ -997,20 +1032,38 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 
 	DXUTMainLoop();
 
-	// TODO: Perform any application-level cleanup here
-	g_closeConsole = 1;
+	DXUTShutdown();
 
+	//////////////////////////////////////////////////////////////////////////
+
+	// TODO: Perform any application-level cleanup here
+	
 #if defined(DEBUG) && defined(EP_CONSOLE)
 	g_consoleReleasedEvent = CreateEvent( NULL , TRUE , FALSE , NULL );  
 	ResetEvent( g_consoleReleasedEvent ); 
+	g_closeConsole = 1;
 	WaitForSingleObject( g_consoleReleasedEvent, INFINITE );
+	
 #endif
 
-	EP_SAFE_RELEASE( g_wm );
-	EP_SAFE_RELEASE( g_scriptManager );
-	SAFE_DELETE( g_epLight );
+	// DO NOT USE EP_SAFE_RELEASE or SAFE_DELETE on these objects.
+	// It should be allocated once time through the application lifetime,
+	// and therefore should be deallocated only once.
 
-	//Tcl_Finalize();
+	g_wm->release();
+	g_scriptManager->release(); 
+	g_tsm->release();
+	g_wsm->release();
+
+	delete g_wm;
+	delete g_scriptManager;
+	delete g_tsm;
+	delete g_wsm;
+	delete g_spriteManager;
+
+	delete g_epLight;
+	
+	Tcl_Finalize();
 
 	return DXUTGetExitCode();
 }
@@ -1184,32 +1237,27 @@ void ConfigureParticleSystem( LPDIRECT3DDEVICE9 pd3dDevice )
 
 }
 
-void ConfigureShaders( LPDIRECT3DDEVICE9 pd3dDevice )
+void ConfigureShaders( LPDIRECT3DDEVICE9 pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc )
 {
 	// Shader
 	assert( g_bombShader == 0 );
 	g_bombShader = new BombShader();
-	g_bombShader->initEffect( pd3dDevice, L"Shaders/HLSL/vbomb.fx" );
+	g_bombShader->onCreateDevice( pd3dDevice, pBackBufferSurfaceDesc );
 	g_bombShader->initMainTechnique();
 
-	assert( g_motionBlurShader == 0 );
+	/*assert( g_motionBlurShader == 0 );
 	g_motionBlurShader = new MotionBlurShader();
-	g_motionBlurShader->initShader( pd3dDevice, L"" );
+	g_motionBlurShader->initShader( pd3dDevice, L"" );*/
 
 	assert( g_postSepiaShader == 0 );
 	g_postSepiaShader = new PostSepiaShader();
-	g_postSepiaShader->initEffect( pd3dDevice, L"Shaders/HLSL/post_sepia.fx" );
+	g_postSepiaShader->onCreateDevice( pd3dDevice, pBackBufferSurfaceDesc );
 	g_postSepiaShader->initMainTechnique();
 
 	assert( g_postRadialBlurShader == 0 );
 	g_postRadialBlurShader = new PostRadialBlurShader();
-	g_postRadialBlurShader->initEffect( pd3dDevice, L"Shaders/HLSL/post_radialBlur.fx" );
+	g_postRadialBlurShader->onCreateDevice( pd3dDevice, pBackBufferSurfaceDesc );
 	g_postRadialBlurShader->initMainTechnique();
-
-	//assert( g_alphaShader == 0 );
-	//g_alphaShader = new AlphaShader();
-	//g_alphaShader->initShader( pd3dDevice, L"Shaders/Alpha.vsh" );
-	//g_alphaShader->compileShader( "Alpha", "vs_2_0" );
 
 }
 

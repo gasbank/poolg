@@ -18,7 +18,7 @@ StructureObject::~StructureObject(void)
 Unit* StructureObject::createStructureObject( LPD3DXMESH mesh, int tileX, int tileY, float posZ, bool pushable )
 {
 	StructureObject* u = new StructureObject();
-	u->init( GetG().m_dev, mesh );
+	u->init();
 	u->setTilePos( tileX, tileY );
 	u->setTileBufferPos( tileX, tileY );
 	u->setPushable( pushable );

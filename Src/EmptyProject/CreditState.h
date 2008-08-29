@@ -27,8 +27,6 @@ public:
 private:
 	void setupLight();
 
-	LPD3DXFONT						m_d3dxFont;
-	LPD3DXFONT						m_d3dxFontBig;
 
 	D3DMATERIAL9					m_textMat;
 	float							m_textMatAlpha;

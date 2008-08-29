@@ -66,10 +66,7 @@ void Shader::update( float fTime, float fElapsedTime )
 
 void Shader::release()
 {
-	SAFE_RELEASE( m_pVertexShader );
-	SAFE_RELEASE( m_pConstantTable );
-	SAFE_RELEASE( m_pVertexDeclaration );
-	SAFE_RELEASE( m_effect );
+	onDestroyDevice();
 }
 
 HRESULT Shader::initEffect( LPDIRECT3DDEVICE9 pd3dDevice, const WCHAR* shaderFileName, DWORD dwShaderFlags )
@@ -83,7 +80,7 @@ HRESULT Shader::initEffect( LPDIRECT3DDEVICE9 pd3dDevice, const WCHAR* shaderFil
 	return hr;
 }
 
-HRESULT Shader::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext )
+HRESULT Shader::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc )
 {
 	HRESULT hr = S_OK;
 	if( m_effect )
@@ -93,7 +90,24 @@ HRESULT Shader::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DE
 	return hr;
 }
 
+void CALLBACK Shader::onDestroyDevice()
+{
+	SAFE_RELEASE( m_pVertexShader );
+	SAFE_RELEASE( m_pConstantTable );
+	SAFE_RELEASE( m_pVertexDeclaration );
+	SAFE_RELEASE( m_effect );
+}
 
+void CALLBACK Shader::onLostDevice()
+{
+	if ( m_effect )
+		m_effect->OnLostDevice();
+}
+
+HRESULT CALLBACK Shader::onCreateDevice( LPDIRECT3DDEVICE9 pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc )
+{
+	return S_OK;
+}
 //////////////////////////////////////////////////////////////////////////
 
 
@@ -107,26 +121,14 @@ BombShader::~BombShader()
 }
 
 
-HRESULT CALLBACK BombShader::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext )
+HRESULT CALLBACK BombShader::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc )
 {
 	HRESULT hr = S_OK;
 
-	/*
-	D3DXCOLOR colorWhite( 1.0f, 1.0f, 1.0f, 1.0f );
-	D3DXCOLOR colorBlack( 0.0f, 0.0f, 0.0f, 1.0f );
-	D3DXCOLOR colorAmbient( 0.35f, 0.35f, 0.35f, 0 );
-	D3DXCOLOR colorSpecular( 0.5f, 0.5f, 0.5f, 1.0f );
-	LPDIRECT3DTEXTURE9 texture = 0;
-	V_RETURN( m_effect->SetVector( "MaterialAmbientColor", ( D3DXVECTOR4* )&colorAmbient ) );
-	V_RETURN( m_effect->SetVector( "MaterialDiffuseColor", ( D3DXVECTOR4* )&colorWhite ) );
-	V_RETURN( m_effect->SetTexture( "RenderTargetTexture", texture ) );
-
-	V_RETURN( m_effect->SetFloat( "VelocityCapSq", 1.0f ) );
-	V_RETURN( m_effect->SetFloat( "ConvertToNonHomogeneous", 0.1f ) );
-	*/
-
 	V_RETURN( D3DXCreateTextureFromFile( m_dev, L"Shaders/Textures/FireGrade.bmp", &m_fireTexture ) );
 	V_RETURN( m_effect->SetTexture( "gGradeTex", m_fireTexture) );
+
+	Shader::onResetDevice( pd3dDevice, pBackBufferSurfaceDesc );
 	return hr;
 }
 
@@ -142,9 +144,28 @@ HRESULT BombShader::setWorldViewProj( double fTime, float fElapsedTime, const D3
 	return hr;
 }
 
+HRESULT CALLBACK BombShader::onCreateDevice( LPDIRECT3DDEVICE9 pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc )
+{
+	initEffect( pd3dDevice, L"Shaders/HLSL/vbomb.fx" );
+	return S_OK;
+}
+
+void CALLBACK BombShader::onLostDevice()
+{
+	SAFE_RELEASE( m_fireTexture );
+
+	Shader::onLostDevice();
+}
 //////////////////////////////////////////////////////////////////////////()
 
-HRESULT AlphaShader::initShader( LPDIRECT3DDEVICE9 pd3dDevice, const WCHAR* shaderFileName )
+HRESULT CALLBACK AlphaShader::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext )
+{
+	HRESULT hr = S_OK;
+
+	return hr;
+}
+
+HRESULT CALLBACK AlphaShader::onCreateDevice( LPDIRECT3DDEVICE9 pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc )
 {
 	HRESULT hr = S_OK;
 
@@ -161,31 +182,20 @@ HRESULT AlphaShader::initShader( LPDIRECT3DDEVICE9 pd3dDevice, const WCHAR* shad
 
 	m_dev = pd3dDevice;
 	V_RETURN( m_dev->CreateVertexDeclaration( decl, &m_pVertexDeclaration ) );
-	V_RETURN( StringCchCopy( m_shaderFileName, sizeof(m_shaderFileName)/sizeof(TCHAR), shaderFileName ) );
-	return hr;
-}
+	V_RETURN( StringCchCopy( m_shaderFileName, sizeof(m_shaderFileName)/sizeof(TCHAR), L"Shaders/Alpha.vsh" ) );
 
-HRESULT CALLBACK AlphaShader::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext )
-{
-	HRESULT hr = S_OK;
 
 	return hr;
-}
 
+
+}
 //////////////////////////////////////////////////////////////////////////
 
 const DWORD                 SCREEN_VERTEX::FVF = D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEX1;
 
-HRESULT MotionBlurShader::initShader( LPDIRECT3DDEVICE9 pd3dDevice, const WCHAR* shaderFileName )
-{
-	g_nPasses = 0;
-	g_nRtUsed = 0;
-	return S_OK;
-}
 
 
-
-HRESULT CALLBACK MotionBlurShader::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext )
+HRESULT CALLBACK MotionBlurShader::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc )
 {
 	HRESULT hr;
 
@@ -319,8 +329,7 @@ HRESULT CALLBACK MotionBlurShader::onResetDevice( IDirect3DDevice9* pd3dDevice, 
 	return S_OK;
 }
 
-void MotionBlurShader::onCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
-									  void* pUserContext )
+HRESULT MotionBlurShader::onCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc )
 {
 
 	// Query multiple RT setting and set the num of passes required
@@ -348,12 +357,12 @@ void MotionBlurShader::onCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSU
 	else
 		g_VelocityTexFormat = D3DFMT_G16R16F;
 
+	return Shader::onCreateDevice( pd3dDevice, pBackBufferSurfaceDesc );
+
 }
 
 void MotionBlurShader::onLostDevice()
 {
-	if( m_effect )
-		m_effect->OnLostDevice();
 	SAFE_RELEASE( m_textSprite );
 	SAFE_RELEASE( g_pFullScreenRenderTargetSurf );
 	SAFE_RELEASE( g_pFullScreenRenderTarget );
@@ -361,13 +370,16 @@ void MotionBlurShader::onLostDevice()
 	SAFE_RELEASE( g_pPixelVelocityTexture1 );
 	SAFE_RELEASE( g_pPixelVelocitySurf2 );
 	SAFE_RELEASE( g_pPixelVelocityTexture2 );
+
+	Shader::onLostDevice();
 }
 
 void MotionBlurShader::onDestroyDevice()
 {
-	SAFE_RELEASE( m_effect );
 	SAFE_RELEASE( g_pFullScreenRenderTargetSurf );
 	SAFE_RELEASE( g_pFullScreenRenderTarget );
+
+	Shader::onDestroyDevice();
 }
 
 void MotionBlurShader::onFrameMove( double dTime, float fElapsedTime )
@@ -525,11 +537,6 @@ PostSepiaShader::~PostSepiaShader()
 
 }
 
-HRESULT CALLBACK PostSepiaShader::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext )
-{
-	return S_OK;
-}
-
 HRESULT PostSepiaShader::setFullscreenTexture( LPDIRECT3DTEXTURE9 tex )
 {
 	HRESULT hr = S_OK;
@@ -547,13 +554,14 @@ void PostSepiaShader::setDesaturation( float desat )
 	m_effect->SetFloat( "gDesat", desat );
 }
 
+HRESULT CALLBACK PostSepiaShader::onCreateDevice( LPDIRECT3DDEVICE9 pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc )
+{
+	initEffect( pd3dDevice, L"Shaders/HLSL/post_sepia.fx" );
+	return S_OK;
+}
 //////////////////////////////////////////////////////////////////////////
 
 
-HRESULT CALLBACK PostRadialBlurShader::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext )
-{
-	return S_OK;
-}
 
 void PostRadialBlurShader::initMainTechnique()
 {
@@ -570,4 +578,10 @@ HRESULT PostRadialBlurShader::setFullscreenTexture( LPDIRECT3DTEXTURE9 tex )
 void PostRadialBlurShader::setBlurWidth( float blurWidth )
 {
 	m_effect->SetFloat( "gBlurWidth", blurWidth );
+}
+
+HRESULT CALLBACK PostRadialBlurShader::onCreateDevice( LPDIRECT3DDEVICE9 pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc )
+{
+	initEffect( pd3dDevice, L"Shaders/HLSL/post_radialBlur.fx" );
+	return S_OK;
 }

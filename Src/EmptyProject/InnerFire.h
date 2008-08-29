@@ -37,6 +37,8 @@ protected:
 	bool m_bInit;
 
 private:
+	LPD3DXMESH m_d3dxMesh;
+	LPDIRECT3DTEXTURE9 m_d3dTex;
 	
 	std::tstring m_imgFileName;
 };

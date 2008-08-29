@@ -38,16 +38,13 @@ public:
 	virtual HRESULT					frameRender( double dTime, float fElapsedTime );
 	virtual LRESULT					handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 	virtual bool					frameMove( float fElapsedTime );
-	virtual HRESULT onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
-									void* pUserContext );
-	virtual void onLostDevice();
+	virtual HRESULT					onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
+													void* pUserContext );
+	virtual void					onLostDevice();
 	virtual const D3DXVECTOR3&		getPos() const { return m_vPos; }
 
 
-	HRESULT							init( LPDIRECT3DDEVICE9 pd3dDevice, LPD3DXMESH mesh );
-	const D3DXVECTOR3&				getLowerLeft() const	{ return m_lowerLeft; }
-	const D3DXVECTOR3&				getUpperRight() const	{ return m_upperRight; }
-	LPD3DXMESH						getMesh() const			{ return m_d3dxMesh; }
+	HRESULT							init();
 	
 	void							release();
 	void							clearKey();
@@ -95,7 +92,8 @@ public:
 	void							setDynamicMotion( DynamicMotion* dm );
 	void							setForcedMove( int i );
 	void							forcedMoveTest();
-	void							setArnMesh( ArnMesh* arnMesh )			{ assert( arnMesh ); m_arnMesh = arnMesh; }
+	
+	void							setArnMeshName( const char* arnMeshName ) { m_arnMeshName = arnMeshName; }
 	ArnMesh*						getArnMesh() const						{ return m_arnMesh; }
 
 	void							setColor( int r, int g, int b );
@@ -108,7 +106,7 @@ public:
 	static Unit*					createUnit( LPD3DXMESH mesh, int tileX = 0, int tileY = 0, float posZ = 0 );
 
 
-	bool getSoulAnimation() { return m_bSoulAnimation; }
+	bool							getSoulAnimation() { return m_bSoulAnimation; }
 	void							setNameVisible( bool b ) { m_bNameVisible = b; }
 	void							setName( std::string str ) { m_name = str; }
 
@@ -120,19 +118,18 @@ protected:
 	void							setLocalXformDirty()					{ m_bLocalXformDirty = true; }
 	HRESULT							rayTesting( UnitInput ui );
 
+	void							updateArnMesh();
+
 	BYTE							m_aKeys[UNIT_MAX_KEYS];
 	UINT							m_cKeysDown;            // Number of camera keys that are down.
 	D3DXVECTOR3						m_vKeyboardDirection;
 	D3DXVECTOR3						m_vVelocity;
-	LPD3DXMESH						m_d3dxMesh;
-	LPDIRECT3DTEXTURE9				m_d3dTex;
 
 	DynamicMotion*					m_dm;
 
-
+	
 private:
-
-	World*							getWorldState() const;
+	
 	void							drawSoul();
 	void							updateSoulAnimation( float fElapsedTime );
 	void							drawName();
@@ -144,11 +141,9 @@ private:
 	};
 	void							updateLocalXform();
 	
-	D3DXVECTOR3						m_lowerLeft, m_upperRight; // bounding box params
 	D3DXVECTOR3						m_vRot, m_vPos, m_vScale;
 	bool							m_bLocalXformDirty;
 	D3DXMATRIX						m_localXform;
-	LPDIRECT3DDEVICE9				m_pd3dDevice;
 	D3DMATERIAL9					m_material;
 	
 	bool							m_removeFlag;
@@ -178,6 +173,8 @@ private:
 	// For name drawing
 	std::string						m_name;
 	bool							m_bNameVisible;
+
+	std::string						m_arnMeshName;
 };
 
 SCRIPT_FACTORY( Unit )

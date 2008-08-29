@@ -35,6 +35,9 @@ HRESULT TopStateManager::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DS
 
 void TopStateManager::onLostDevice()
 {
+	m_states[GAME_TOP_STATE_INTRO]->onLostDevice();
+	m_states[GAME_TOP_STATE_PLAY]->onLostDevice();
+	m_states[GAME_TOP_STATE_CREDIT]->onLostDevice();
 }
 
 HRESULT TopStateManager::onCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext )

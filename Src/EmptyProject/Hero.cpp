@@ -26,15 +26,15 @@ Hero::~Hero(void)
 Unit* Hero::createHero( LPD3DXMESH mesh, int tileX, int tileY, float posZ )
 {
 	Hero* u = new Hero();
-	u->init( GetG().m_dev, mesh );
+	u->init();
 	u->setTilePos( tileX, tileY );
 	u->setTileBufferPos( tileX, tileY );
 
 	// As default, hero's model is PoolG
 	PlayState* ps = static_cast<PlayState*>(GetTopStateManager().getState( GAME_TOP_STATE_PLAY ));
 	ArnSceneGraph* charSceneGraph = ps->getCharacterSceneGraph();
-	ArnMesh* arnMesh = static_cast<ArnMesh*>(charSceneGraph->getSceneRoot()->getNodeByName( "PoolGModel" ));
-	u->setArnMesh( arnMesh );
+	//ArnMesh* arnMesh = static_cast<ArnMesh*>(charSceneGraph->getSceneRoot()->getNodeByName( "PoolGModel" ));
+	u->setArnMeshName( "PoolGModel" );
 	
 	u->addToSkillSet( SL_FIRST );
 
@@ -122,11 +122,9 @@ LRESULT Hero::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 
 Unit* EpCreateHero( Tcl_Obj* tilePos )
 {
-	LPD3DXMESH d3dxMesh;
-	D3DXCreateTeapot( GetG().m_dev, &d3dxMesh, 0 );
 	int tileX = 0, tileY = 0;
 	GetScriptManager().readTwoIntObj( tilePos, tileX, tileY );
-	return Hero::createHero( d3dxMesh, tileX, tileY, 0 );
+	return Hero::createHero( 0, tileX, tileY, 0 );
 
 } SCRIPT_CALLABLE_PV_OBJ( EpCreateHero )
 

@@ -51,7 +51,6 @@ proc getHero { tilePos } {
 		EpCharacterSetCurCs			$pHeroUnit -1
 		EpCharacterSetMoveDuration	$pHeroUnit [expr 0.2]
 		EpUnitSetColor				$pHeroUnit 255 0 255
-		EpUnitSetPosZ				$pHeroUnit -[EpUnitGetUpperRightZ $pHeroUnit]
 		EpUnitSetArnMesh			$pHeroUnit "PoolGModel"
 		EpRegisterToWorld			$curWorld $pHeroUnit
 	}

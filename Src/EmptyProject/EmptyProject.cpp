@@ -819,7 +819,7 @@ int EpOutputDebugString( const char* msg )
 
 
 
-#define EP_CONSOLE
+//#define EP_CONSOLE
 
 static int g_closeConsole = 2008;
 
@@ -915,9 +915,11 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 	g_epLight = new EpLight();
 
 	// (5) Ep Console Thread
-	uintptr_t t = _beginthread( EpConsoleThreadMain, 0, 0 );
 	g_scriptBindingFinishedEvent = CreateEvent( NULL, TRUE, FALSE, NULL );
 	ResetEvent( g_scriptBindingFinishedEvent );
+
+	uintptr_t t = _beginthread( EpConsoleThreadMain, 0, 0 );
+	
 	WaitForSingleObject( g_scriptBindingFinishedEvent, INFINITE );
 
 	const char* windowMode = GetScriptManager().readString( "EpWindowMode" );
@@ -998,19 +1000,21 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 	DXUTMainLoop();
 
 	// TODO: Perform any application-level cleanup here
-	g_closeConsole = 1;
+	
 
 #if defined(DEBUG) && defined(EP_CONSOLE)
 	g_consoleReleasedEvent = CreateEvent( NULL , TRUE , FALSE , NULL );  
 	ResetEvent( g_consoleReleasedEvent ); 
+	g_closeConsole = 1;
 	WaitForSingleObject( g_consoleReleasedEvent, INFINITE );
+	
 #endif
 
 	EP_SAFE_RELEASE( g_wm );
 	EP_SAFE_RELEASE( g_scriptManager );
 	SAFE_DELETE( g_epLight );
 
-	//Tcl_Finalize();
+	Tcl_Finalize();
 
 	return DXUTGetExitCode();
 }

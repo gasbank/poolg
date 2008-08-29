@@ -916,6 +916,8 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 
 	// (5) Ep Console Thread
 	uintptr_t t = _beginthread( EpConsoleThreadMain, 0, 0 );
+	g_scriptBindingFinishedEvent = CreateEvent( NULL, TRUE, FALSE, NULL );
+	ResetEvent( g_scriptBindingFinishedEvent );
 	WaitForSingleObject( g_scriptBindingFinishedEvent, INFINITE );
 
 	const char* windowMode = GetScriptManager().readString( "EpWindowMode" );
@@ -1008,7 +1010,7 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 	EP_SAFE_RELEASE( g_scriptManager );
 	SAFE_DELETE( g_epLight );
 
-	Tcl_Finalize();
+	//Tcl_Finalize();
 
 	return DXUTGetExitCode();
 }

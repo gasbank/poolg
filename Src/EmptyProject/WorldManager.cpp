@@ -94,6 +94,8 @@ void WorldManager::detachAllWorlds()
 void WorldManager::release()
 {
 	detachAllWorlds();
+
+	EpSafeReleaseAll( m_globalDialogs );
 }
 
 HRESULT WorldManager::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,

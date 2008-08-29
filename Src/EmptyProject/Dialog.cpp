@@ -126,8 +126,8 @@ HRESULT Dialog::frameRender(IDirect3DDevice9* pd3dDevice,  double fTime, float f
 		if( m_bTalking )
 		{
 			D3DPERF_BeginEvent(0x12345678, L"Draw Dialog Pane");
-			m_contentPic.draw();
-			m_namePic.draw();
+			//m_contentPic.draw();
+			//m_namePic.draw();
 			D3DPERF_EndEvent();
 
 			printDialog();

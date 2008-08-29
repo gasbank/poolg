@@ -117,15 +117,17 @@ namespace eval EpThreadTest {
 	# assign our event handler for stdin
 	fileevent stdin readable EpThreadTest::localHandler
 	# send a startup message and initial prompt
-	puts -nonewline stdout "Startup...\nEp> "
-	flush stdout
-	
 	# enter the tcl event loop
 	puts "Engine global variable g_closeConsole is $closeConsole"
+	puts -nonewline stdout "Startup...\nEp> "
+	flush stdout
 	
 	while { $closeConsole eq 2008 } {
 		set x 0
 		after 500 {set x 1}
 		vwait x
 	}
+	puts "Ep Console thread has been terminated."
+	flush stdout
+	
 }

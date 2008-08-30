@@ -181,6 +181,12 @@ void IntroState::setupCamera()
 
 HRESULT IntroState::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext )
 {
+	if ( m_pLogoDrawRequest )
+	{
+		D3DXVECTOR3 logoPos( GetG().m_scrWidth / 2.0f - 124.0f, GetG().m_scrHeight / 2.0f - 64.5f, 0.0f );
+		m_pLogoDrawRequest->position = logoPos;
+	}
+	
 	return S_OK;
 }
 

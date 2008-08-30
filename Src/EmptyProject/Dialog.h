@@ -35,6 +35,8 @@ public:
 	bool getRemoveFlag() const { return m_bRemoveFlag; }
 	void setRemoveFlag(bool val) { m_bRemoveFlag = val; }
 
+	void updateDialogPosition();
+
 	void printDebugInfo() const;
 private:
 	Dialog(void);

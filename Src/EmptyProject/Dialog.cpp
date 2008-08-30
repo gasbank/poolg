@@ -53,21 +53,8 @@ HRESULT Dialog::init()
 		throw std::runtime_error( "Double init error" );
 	HRESULT hr = S_OK;
 
-	const UINT dialogPaneM_H = 200;
-	const UINT dialogPaneM_W = 200;
-	const UINT dialogPaneN_H = 60;
-	const UINT dialogPaneN_W = 150;
-	const UINT dialogPaneM_S = 20;
-	const UINT dialogPaneN_S = 16;
+	updateDialogPosition();
 
-	m_contentRect.top = GetG().m_scrHeight - dialogPaneM_H + dialogPaneM_S;
-	m_contentRect.left = dialogPaneM_S;
-	m_contentRect.right = dialogPaneM_W - dialogPaneM_S;
-	m_contentRect.bottom = GetG().m_scrHeight - dialogPaneM_S;
-	m_nameRect.top = (GetG().m_scrHeight - dialogPaneM_H) - dialogPaneN_H + dialogPaneN_S;
-	m_nameRect.left = dialogPaneN_S;
-	m_nameRect.right = dialogPaneN_W - dialogPaneN_S;
-	m_nameRect.bottom = (GetG().m_scrHeight - dialogPaneM_H) - dialogPaneN_S;
 
 	
 	m_bTalking = false;
@@ -227,4 +214,23 @@ void Dialog::printDebugInfo() const
 	printf( " region=" ); Utility::printValue( m_region );
 	printf( " onetime=%d talking=%d", m_bOneTime, m_bTalking );
 	printf( " init=%d remove=%d\n", m_bInit, m_bRemoveFlag );
+}
+
+void Dialog::updateDialogPosition()
+{
+	const UINT dialogPaneM_H = 200;
+	const UINT dialogPaneM_W = 200;
+	const UINT dialogPaneN_H = 60;
+	const UINT dialogPaneN_W = 150;
+	const UINT dialogPaneM_S = 20;
+	const UINT dialogPaneN_S = 16;
+
+	m_contentRect.top = GetG().m_scrHeight - dialogPaneM_H + dialogPaneM_S;
+	m_contentRect.left = dialogPaneM_S;
+	m_contentRect.right = dialogPaneM_W - dialogPaneM_S;
+	m_contentRect.bottom = GetG().m_scrHeight - dialogPaneM_S;
+	m_nameRect.top = (GetG().m_scrHeight - dialogPaneM_H) - dialogPaneN_H + dialogPaneN_S;
+	m_nameRect.left = dialogPaneN_S;
+	m_nameRect.right = dialogPaneN_W - dialogPaneN_S;
+	m_nameRect.bottom = (GetG().m_scrHeight - dialogPaneM_H) - dialogPaneN_S;
 }

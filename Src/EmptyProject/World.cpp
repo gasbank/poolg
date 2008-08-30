@@ -811,6 +811,9 @@ HRESULT World::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DES
 	{
 		(*it)->onResetDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
 	}
+
+	if ( m_curDialog )
+		m_curDialog->updateDialogPosition();
 	return S_OK;
 }
 

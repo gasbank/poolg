@@ -24,7 +24,7 @@ public:
 	virtual HRESULT release() = 0;
 
 	double getStateTime(double fTime);
-	World* getCurWorld() { return GetWorldManager().getCurWorld(); }
+	World* getCurWorld() const { return GetWorldManager().getCurWorld(); }
 
 	
 protected:

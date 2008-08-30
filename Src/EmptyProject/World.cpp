@@ -806,6 +806,11 @@ HRESULT World::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DES
 	pd3dDevice->LightEnable(0, TRUE);
 	pd3dDevice->SetRenderState( D3DRS_LIGHTING, FALSE );
 
+	UnitSet::iterator it = m_unitSet.begin();
+	for ( ; it != m_unitSet.end(); ++it )
+	{
+		(*it)->onResetDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
+	}
 	return S_OK;
 }
 

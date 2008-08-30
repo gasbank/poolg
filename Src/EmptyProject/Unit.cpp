@@ -449,10 +449,9 @@ void Unit::onLostDevice()
 
 void Unit::updateArnMesh()
 {
-	ArnMesh* arnMesh = 
-		static_cast<ArnMesh*>(
-		static_cast<PlayState*>(
-		GetTopStateManager().getState( GAME_TOP_STATE_PLAY ))->getCharacterSceneGraph()->getSceneRoot()->getNodeByName( m_arnMeshName.c_str() ));
+	PlayState* ps = static_cast<PlayState*>( GetTopStateManager().getState( GAME_TOP_STATE_PLAY ) );
+	ArnNode* charSceneRoot = ps->getCharacterSceneGraph()->getSceneRoot();
+	ArnMesh* arnMesh = static_cast<ArnMesh*>( charSceneRoot->getNodeByName( m_arnMeshName.c_str() ));
 	if ( !arnMesh )
 	{
 		throw std::runtime_error( "Specified ArnMesh not found on Character model file." );

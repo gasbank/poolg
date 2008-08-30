@@ -67,7 +67,7 @@ ArnSceneGraph* PlayState::getCharacterSceneGraph()
 
 void PlayState::loadArnModels()
 {
-	// Hero model
+	// Character models are stored in 'Characters.arn' file
 	assert( m_CharactersArnFile == 0 && m_CharactersSg == 0 );
 	m_CharactersArnFile = new ArnFileData;
 	load_arnfile( _T("Characters.arn"), *m_CharactersArnFile );

@@ -24,8 +24,8 @@ SingleIncident::~SingleIncident(void)
 
 bool SingleIncident::update( double dTime, float fElapsedTime )
 {
-	assert( m_trigger.size() );
-	assert( m_action.size() );
+	assert( !m_trigger.empty() );
+	assert( !m_action.empty() );
 
 	if ( !checkTrigCountRemained() )
 		return false;

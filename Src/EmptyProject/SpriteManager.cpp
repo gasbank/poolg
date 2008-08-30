@@ -43,7 +43,7 @@ void SpriteManager::frameRender()
 				continue;
 
 			const Sprite::DrawRequestList& dr = it->second->getDrawRequestList();
-			if ( dr.size() )
+			if ( !dr.empty() )
 			{
 				Sprite::DrawRequestList::const_iterator itDr = dr.begin();
 				for ( ; itDr != dr.end(); ++itDr )
@@ -70,7 +70,7 @@ void SpriteManager::frameRender()
 				continue;
 
 			const Sprite::DrawRequestList& dr = it->second->getDrawReqXformableList();
-			if ( dr.size() )
+			if ( !dr.empty() )
 			{
 				Sprite::DrawRequestList::const_iterator itDr = dr.begin();
 				
@@ -123,7 +123,7 @@ void SpriteManager::frameRenderSpecificSprite( const char* spriteName )
 	assert( sprite->isCustomRendered() );
 	const Sprite::DrawRequestList& dr = sprite->getDrawRequestList();
 	
-	if ( dr.size() )
+	if ( !dr.empty() )
 	{
 		Sprite::DrawRequestList::const_iterator itDr = dr.begin();
 		for ( ; itDr != dr.end(); ++itDr )

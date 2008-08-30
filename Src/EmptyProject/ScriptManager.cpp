@@ -131,7 +131,7 @@ bool ScriptManager::readCharPtrList( const char* variableName, ConstCharList& st
 	{
 		throw std::runtime_error( "Requested string list not found on script file" );
 	}
-	assert( strList.size() == 0 );
+	assert( strList.empty() );
 	UINT i;
 	for ( i = 0; i < (UINT)retObjLength; ++i )
 	{

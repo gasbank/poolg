@@ -14,38 +14,39 @@
 #include "SkillObject.h"
 #include "DynamicMotion.h"
 #include "Skill.h"
+#include "SkillSet.h"
 #include "Utility.h"
 #include "Sound.h"
 
 extern TileManager tileManager;
 
-
-void Character::doNormalAttack( int type, Character* enemy )
-{
-	D3DXVECTOR3 fireDir = enemy->getPos() - getPos();
-	float dist = D3DXVec3Length( &fireDir );
-
-	D3DXVec3Normalize( &fireDir, &fireDir );
-
-
-
-	LPD3DXMESH mesh;
-	D3DXCreateSphere( GetG().m_dev, 0.3f, 16, 16, &mesh, 0 );
-	Unit* missile = Unit::createUnit(mesh, 0, 0, 0);
-
-	missile->setDynamicMotion(DynamicMotion::createDMfireUniformly
-		(missile, this->getPos(), fireDir, dist, 10.0f ));
-
-	SkillObject* so = SkillObject::createSOnormalAttack(this, enemy, missile);
-	m_skillObjectList.push_back(so);
-
-}
+//
+//void Character::doNormalAttack( int type, Character* enemy )
+//{
+//	D3DXVECTOR3 fireDir = enemy->getPos() - getPos();
+//	float dist = D3DXVec3Length( &fireDir );
+//
+//	D3DXVec3Normalize( &fireDir, &fireDir );
+//
+//
+//
+//	LPD3DXMESH mesh;
+//	D3DXCreateSphere( GetG().m_dev, 0.3f, 16, 16, &mesh, 0 );
+//	Unit* missile = Unit::createUnit(mesh, 0, 0, 0);
+//
+//	missile->setDynamicMotion(DynamicMotion::createDMfireUniformly
+//		(missile, this->getPos(), fireDir, dist, 10.0f ));
+//
+//	SkillObject* so = SkillObject::createSOnormalAttack(this, enemy, missile);
+//	m_skillObjectList.push_back(so);
+//
+//}
 
 
 
 void Character::doCsBurn ()
 {
-	LPD3DXMESH mesh;
+	/*LPD3DXMESH mesh;
 	D3DXCreateBox(GetG().m_dev, 5, 5, 0.5f, &mesh, 0);
 	Unit* effectObj = Unit::createUnit(mesh, 0, 0, 0);
 
@@ -53,7 +54,7 @@ void Character::doCsBurn ()
 		(effectObj, this->getPos(), 5, 0.03f, 50));
 
 	SkillObject* so = SkillObject::createSOcsBurn(this, effectObj);
-	m_skillObjectList.push_back(so);
+	m_skillObjectList.push_back(so);*/
 }
 
 

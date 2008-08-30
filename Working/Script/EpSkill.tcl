@@ -1,4 +1,10 @@
-set skillName [ list NormalAttackSkill HealSkill MultiThreadSkill MeditationSkill CsBurnSkill ]
+set skillName [ list \
+	NormalAttackSkill\
+	HealSkill\
+	MultiThreadSkill\
+	MeditationSkill\
+	CsBurnSkill\
+	]
 
 
 namespace eval NormalAttackSkill {

@@ -6,6 +6,7 @@
 #include "DynamicMotion.h"
 #include "Sound.h"
 #include "ShaderWrapper.h"
+#include "Unit.h"
 
 extern BombShader*						g_bombShader;
 

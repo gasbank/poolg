@@ -1,21 +1,24 @@
 #pragma once
-#include "BattleState.h"
-#include "Character.h"
 
-#include <string>
-
-enum SkillLocation { SL_FIRST, SL_SECOND, SL_THIRD, SL_FOURTH, SL_FIFTH };
+class BattleState;
+class Character;
+class SkillObject;
+class Unit;
+class DynamicMotion;
 
 class Skill
 {
 public:
-//	Skill ( std::wstring skillName, std::wstring description, int csEssentials,  );
+	Skill() {}
+	virtual ~Skill() {}
 
-	virtual void useSkill( BattleState* battleState );
-	std::wstring getDescription() { return m_description; }
-	void setUser(Character* hero, Character* enemy) { m_hero = hero; m_enemy = enemy; }
-	std::wstring getSkillName() { return m_skillName; }
+	virtual void				useSkill( BattleState* battleState );
 
+	const std::wstring&			getDescription() const { return m_description; }
+	void						setUser(Character* hero, Character* enemy) { m_hero = hero; m_enemy = enemy; }
+	const std::wstring&			getSkillName() const { return m_skillName; }
+
+protected:
 	std::wstring		m_skillName;
 	std::wstring		m_description;
 	int					m_csEssentials;
@@ -32,31 +35,6 @@ public:
 	
 };
 
-
-class SkillSet
-{
-public:
-	SkillSet();
-	~SkillSet();
-	void setSkill( SkillLocation skillLocation, Skill* skill );
-	void deleteSkill( SkillLocation skillLocation );
-	bool useSkill();
-	std::wstring getSkillName( SkillLocation skillLocation );
-	SkillLocation getSkillLocation() { return m_skillLocation; }
-	void moveSkillLocation(char mode);
-	void setCharacter (Character* hero, Character* enemy);
-
-	std::wstring getDescription (SkillLocation skillLocation);
-
-	/*사용 전엔 반드시 battleState를 설정해 주어야 한다.*/
-	void setBattleState( BattleState* battleState ) { m_battleState = battleState; }
-
-private:
-	Skill*				m_skillSet[5];
-	SkillLocation		m_skillLocation;
-	BattleState*		m_battleState;
-
-};
 
 class NormalAttack : public Skill
 {

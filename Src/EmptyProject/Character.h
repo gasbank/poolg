@@ -28,7 +28,7 @@ public:
 	virtual void						pushUnitInFront( UnitInput dir );
 
 	/*스킬 함수*/
-	void doNormalAttack(int type, Character* enemy);
+	//void doNormalAttack(int type, Character* enemy);
 
 	void doCsBurn();
 	void recoverCs ();

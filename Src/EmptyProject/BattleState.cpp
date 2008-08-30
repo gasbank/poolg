@@ -17,6 +17,7 @@
 #include "ProgressUi.h"
 #include "WindowMover.h"
 #include "InnerFire.h"
+#include "SkillSet.h"
 
 extern PostSepiaShader*				g_postSepiaShader;
 extern LPD3DXFONT					m_lblHYnamL;
@@ -998,7 +999,7 @@ void BattleState::passTurn()
 
 void BattleState::doComputerAction()
 {
-	getFirstEnemy()->doNormalAttack(0, getHero());
+	//getFirstEnemy()->doNormalAttack(0, getHero());
 }
 
 Character* BattleState::getHero()

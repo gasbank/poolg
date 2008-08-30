@@ -987,6 +987,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\SkillSet.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\SkillSet.h"
+			>
+		</File>
+		<File
 			RelativePath=".\Sound.cpp"
 			>
 		</File>

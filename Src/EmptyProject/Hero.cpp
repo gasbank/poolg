@@ -7,6 +7,7 @@
 #include "PlayState.h"
 #include "ArnMesh.h"
 #include "Skill.h"
+#include "SkillSet.h"
 #include "Sound.h"
 
 Hero::Hero(void)

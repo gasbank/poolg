@@ -1,7 +1,8 @@
 #pragma once
-#include "Unit.h"
+
 
 class BattleState;
+class Unit;
 
 class SkillObject
 {

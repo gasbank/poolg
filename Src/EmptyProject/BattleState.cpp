@@ -265,6 +265,7 @@ HRESULT BattleState::leave()
 
 HRESULT BattleState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, float fElapsedTime)
 {
+
 	pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 	pd3dDevice->SetTransform(D3DTS_VIEW, &GetG().g_fixedViewMat);
 	pd3dDevice->SetTransform(D3DTS_PROJECTION, &GetG().g_orthoProjMat);
@@ -292,8 +293,8 @@ HRESULT BattleState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, flo
 	pd3dDevice->SetTransform(D3DTS_VIEW, GetG().m_camera.GetViewMatrix());
 	pd3dDevice->SetTransform(D3DTS_PROJECTION, GetG().m_camera.GetProjMatrix());
 
-	if (this->m_curTurnType == TT_PLAYER)
-		m_innerFire->draw();
+	/*if (this->m_curTurnType == TT_PLAYER)
+		m_innerFire->draw();*/
 
 	renderFixedText(GetG().m_scrWidth, GetG().m_scrHeight);
 
@@ -302,6 +303,7 @@ HRESULT BattleState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, flo
 
 HRESULT BattleState::frameMove(double fTime, float fElapsedTime)
 {
+
 	double fStateTime = getStateTime(fTime);
 
 	//박스 위치 갱신
@@ -619,7 +621,7 @@ HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 		{
 			m_skillContentBoxMover->offBox();
 		}
-		if (wParam == VK_RETURN)
+		if (wParam == VK_NUMPAD5)
 		{
 			m_curTurnType = TT_NATURAL;
 

@@ -675,16 +675,17 @@ void CALLBACK OnD3D9LostDevice( void* pUserContext )
 {
 	OutputDebugString( _T( " - INFO: OnLostDevice() called.\n" ) );
 
-	if ( g_bombShader )
-		g_bombShader->onLostDevice();
-	if ( g_pFont )
-		g_pFont->OnLostDevice();
-	if ( g_unitNameFont )
-		g_unitNameFont->OnLostDevice();
-	if ( g_dlgNameFont )
-		g_dlgNameFont->OnLostDevice();
-	if ( g_dlgContentFont )
-		g_dlgContentFont->OnLostDevice();
+	g_pFont->OnLostDevice();
+	g_unitNameFont->OnLostDevice();
+	g_dlgNameFont->OnLostDevice();
+	g_dlgContentFont->OnLostDevice();
+
+	m_lblHYnamL->OnLostDevice();
+	m_lblREB->OnLostDevice();
+	m_lblSkill->OnLostDevice();
+	m_lblSkillDescription->OnLostDevice();
+	m_lblStatSelect->OnLostDevice();
+
 
 	if ( SpriteManager::getSingletonPtr() )
 		GetSpriteManager().onLostDevice();

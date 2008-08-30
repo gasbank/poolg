@@ -28,11 +28,6 @@ Unit* Enemy::createEnemy( LPD3DXMESH mesh, int tileX, int tileY, float posZ )
 	u->init();
 	u->setTilePos( tileX, tileY );
 	u->setTileBufferPos( tileX, tileY );
-		
-	// As default, enemy's model is GwengYi
-	PlayState* ps = static_cast<PlayState*>(GetTopStateManager().getState( GAME_TOP_STATE_PLAY ));
-	ArnSceneGraph* charSceneGraph = ps->getCharacterSceneGraph();
-	//ArnMesh* arnMesh = static_cast<ArnMesh*>(charSceneGraph->getSceneRoot()->getNodeByName( "GwengYiModel" ));
 	u->setArnMeshName( "GwengYiModel" );
 
 	return u;

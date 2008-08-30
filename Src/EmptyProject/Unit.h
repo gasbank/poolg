@@ -111,6 +111,7 @@ public:
 	void							setName( std::string str ) { m_name = str; }
 
 	void							printDebugInfo() const;
+	void							updateArnMesh();
 protected:
 									Unit( UnitType type );
 	virtual UnitInput				mapKey( UINT nKey ) const;
@@ -118,7 +119,7 @@ protected:
 	void							setLocalXformDirty()					{ m_bLocalXformDirty = true; }
 	HRESULT							rayTesting( UnitInput ui );
 
-	void							updateArnMesh();
+	
 
 	BYTE							m_aKeys[UNIT_MAX_KEYS];
 	UINT							m_cKeysDown;            // Number of camera keys that are down.

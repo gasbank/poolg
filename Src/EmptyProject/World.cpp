@@ -772,6 +772,12 @@ VOID World::enter()
 	//GetEpLight().setFadeDuration( 1.0f );
 	GetEpLight().setBrightness( 0.0f );
 	//GetEpLight().fadeInLightForcedDelayed( 2.0f );
+
+	UnitSet::iterator it = m_unitSet.begin();
+	for ( ; it != m_unitSet.end(); ++it )
+	{
+		(*it)->updateArnMesh();
+	}
 }
 
 UINT World::preloadDialogs()

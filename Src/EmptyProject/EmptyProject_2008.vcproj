@@ -590,6 +590,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\MainState.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\MainState.h"
+				>
+			</File>
+			<File
 				RelativePath=".\PlayState.cpp"
 				>
 			</File>

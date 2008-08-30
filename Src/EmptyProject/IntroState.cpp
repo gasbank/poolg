@@ -12,6 +12,7 @@ IntroState::IntroState(void)
 	m_pLogoDrawRequest = 0;
 	m_pGalaxy = 0;
 	m_pGalaxyDrawRequest = 0;
+	m_nextState = GAME_TOP_STATE_MAIN;
 
 
 
@@ -62,8 +63,6 @@ HRESULT IntroState::enter()
 
 	//pd3dDevice->SetTransform( D3DTS_WORLD, &DX_CONSTS::D3DXMAT_IDENTITY );
 
-
-
 	return S_OK;
 }
 
@@ -107,7 +106,7 @@ HRESULT IntroState::frameMove( double fTime, float fElapsedTime )
 		if ( m_pPrologueDrawRequest != 0 )
 			m_pPrologue->removeDrawRequest( m_pPrologueDrawRequest );
 
-		TopStateManager::getSingleton().setNextState( GAME_TOP_STATE_PLAY );
+		TopStateManager::getSingleton().setNextState( m_nextState );
 	}
 
 	if ( 6.0f <= m_fFadeTimer && m_fFadeTimer < 46.0f )
@@ -140,7 +139,7 @@ HRESULT IntroState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 				m_pLogo->removeDrawRequest( m_pLogoDrawRequest );
 			if ( m_pPrologueDrawRequest != 0 )
 				m_pPrologue->removeDrawRequest( m_pPrologueDrawRequest );
-			TopStateManager::getSingleton().setNextState( GAME_TOP_STATE_PLAY );
+			TopStateManager::getSingleton().setNextState( m_nextState );
 		}
 	}
 

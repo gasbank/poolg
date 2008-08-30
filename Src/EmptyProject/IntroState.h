@@ -4,6 +4,7 @@
 #include "Picture.h"
 #include "Sound.h" // 사운드 헤더파일
 #include "Sprite.h"
+#include "StateManager.h"
 
 #define NUM_OF_LINES 20
 
@@ -54,6 +55,8 @@ private:
 
 	float m_fFadeTimer;
 	float m_fTextAlpha;
+
+	GameState m_nextState;
 };
 
 /* SDKmisc.h

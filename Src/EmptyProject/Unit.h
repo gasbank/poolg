@@ -25,7 +25,7 @@ static const POINT g_moveAmount[4] = {
 class World;
 class ArnMesh;
 
-enum UnitType { UT_UNIT, UT_CHARACTER, UT_HERO, UT_ENEMY, UT_ATTACKOBJECT, UT_INNERFIRE, UT_STRUCTREOBJECT };
+enum UnitType { UT_UNIT, UT_CHARACTER, UT_HERO, UT_ENEMY, UT_ATTACKOBJECT, UT_INNERFIRE, UT_STRUCTREOBJECT, UT_SKILLOBJECT };
 
 class Unit
 {
@@ -112,6 +112,7 @@ public:
 
 	void							printDebugInfo() const;
 	void							updateArnMesh();
+
 protected:
 									Unit( UnitType type );
 	virtual UnitInput				mapKey( UINT nKey ) const;
@@ -125,33 +126,23 @@ protected:
 	UINT							m_cKeysDown;            // Number of camera keys that are down.
 	D3DXVECTOR3						m_vKeyboardDirection;
 	D3DXVECTOR3						m_vVelocity;
-
-	DynamicMotion*					m_dm;
-
 	
 private:
-	
 	void							drawSoul();
 	void							updateSoulAnimation( float fElapsedTime );
 	void							drawName();
-
-	struct TeapotVertex
-	{
-		float x, y, z;
-		float nx, ny, nz;
-	};
 	void							updateLocalXform();
 	
-	D3DXVECTOR3						m_vRot, m_vPos, m_vScale;
+	D3DXVECTOR3						m_vRot;
+	D3DXVECTOR3						m_vPos;
+	D3DXVECTOR3						m_vScale;
+
 	bool							m_bLocalXformDirty;
 	D3DXMATRIX						m_localXform;
 	D3DMATERIAL9					m_material;
 	
 	bool							m_removeFlag;
 	bool							m_bForcedMove;
-	
-	
-	
 
 	Point2Uint						m_tilePos;
 	Point2Uint						m_tileBufferPos;

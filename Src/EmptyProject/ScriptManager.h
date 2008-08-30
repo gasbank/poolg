@@ -14,7 +14,7 @@ public:
 	HRESULT init();
 	HRESULT release();
 
-	void execute(const char* command);					// Execute script command
+	Tcl_Obj* execute(const char* command);					// Execute script command
 	void executeFile(const char* fileName);				// Execute script file with ownership (could not modify script file during runtime)
 	
 	Tcl_Interp* getInterp() { assert(m_interp); return m_interp; }

@@ -14,23 +14,72 @@ AttackObject기반으로 인한 수치변경 or 자기자신 효과(buff). (공격 or 자가)
 공격일 경우 공격 object가 대사출력, 자가일 경우 
 */
 
+//
+//void Skill::useSkill (BattleState *bs)
+//{
+//	int curCs = m_hero->getCurCs();
+//
+//	if (curCs < m_csEssentials)
+//	{
+//		bs->pushBattleLog("스피릿이 부족합니다.");
+//		bs->pushBattleLog("기술은 취소되며 코딩스피릿 번이 일어납니다.");
+//		m_hero->doCsBurn();
+//		return;
+//	}
+//
+//	m_hero->setCurCs (curCs - m_csEssentials);
+//
+//}
 
-void Skill::useSkill (BattleState *bs)
+Skill* Skill::createSkillByScript( const char* skillName )
 {
-	int curCs = m_hero->getCurCs();
+	char tempBuf[256];
+	StringCchPrintfA( tempBuf, 256, "%s::name", skillName );
+	const char* skillName = GetScriptManager().readString( tempBuf );
+	StringCchPrintfA( tempBuf, 256, "%s::description", skillName );
+	const char* skillDescription = GetScriptManager().readString( tempBuf );
+	StringCchPrintfA( tempBuf, 256, "%s::csEssentials", skillName );
+	int csEssentials = GetScriptManager().readInt( tempBuf );
 
-	if (curCs < m_csEssentials)
+	Skill* ret = new Skill( skillName, skillDescription, csEssentials );
+
+	StringCchPrintfA( tempBuf, 256, "%s::registerSkillObjects", skillName );
+	Tcl_Obj* skillObjects = GetScriptManager().execute( tempBuf );
+
+	int skillObjectsCount = 0;
+	Tcl_Interp* interp = GetScriptManager().getInterp();
+	Tcl_ListObjLength( interp, skillObjects, &skillObjectsCount );
+	
+	int i;
+	for ( i = 0; i < skillObjectsCount; ++i )
 	{
-		bs->pushBattleLog("스피릿이 부족합니다.");
-		bs->pushBattleLog("기술은 취소되며 코딩스피릿 번이 일어납니다.");
-		m_hero->doCsBurn();
-		return;
+		Tcl_Obj* elem;
+		int length;
+		long soPtrVal = 0;
+		SkillObject* so = 0;
+		Tcl_ListObjIndex( interp, skillObjects, i, &elem );
+		Tcl_GetLongFromObj( interp, elem, &soPtrVal );
+		so = reinterpret_cast<SkillObject*>( soPtrVal );
+		if ( so->getType() == UT_SKILLOBJECT )
+			ret->addSkillObject( so );
+		else
+			throw std::runtime_error( "Serious error on script file." );
 	}
 
-	m_hero->setCurCs (curCs - m_csEssentials);
-
+	return ret;
 }
 
+Skill::Skill( const char* name, const char* desc, int csEssentials )
+{
+	m_skillName			= name;
+	m_skillDescription	= desc;
+	m_csEssentials		= csEssentials;
+}
+
+void Skill::addSkillObject( SkillObject* so )
+{
+	m_skillObjects.push_back( so );
+}
 //////////////////////////////////////////////////////////////////////////
 
 

@@ -87,6 +87,32 @@ SkillObject* SkillObject::createSOgoto (Character* user, Character* target, Unit
 	return so;
 }
 
+void SkillObject::onHit()
+{
+
+}
+
+SkillObject* SkillObject::createSkillObject( const char* bst, UINT size, D3DCOLOR color, const char* dmt )
+{
+	BasicShapeType bstEnum;
+	if ( strcmp( bst, "SPHERE" ) == 0 ) bstEnum = BST_SPHERE;
+	else if ( strcmp( bst, "CUBE" ) == 0 ) bstEnum = BST_CUBE;
+	else if ( strcmp( bst, "PLANE" ) == 0 ) bstEnum = BST_PLANE;
+	else bstEnum = BST_UNKNOWN;
+
+	DynamicMotionType dmtEnum;
+	if ( strcmp( bst, "FIRE_UNIFORMLY" ) == 0 ) dmtEnum = DMT_FIRE_UNIFORMLY;
+	else if ( strcmp( bst, "RANDOM_CURVE" ) == 0 ) dmtEnum = DMT_RANDOM_CURVE;
+	else dmtEnum = DMT_UNKNOWN;
+
+	SkillObject* so = new SkillObject( bstEnum, size, color, dmtEnum );
+	return so;
+}
+
+SkillObject::SkillObject( BasicShapeType bst, UINT size, D3DCOLOR color, DynamicMotionType dmt )
+{
+
+}
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 SOnormalAttack::~SOnormalAttack(void)

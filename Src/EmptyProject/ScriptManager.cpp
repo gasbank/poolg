@@ -45,10 +45,11 @@ HRESULT ScriptManager::release()
 	return S_OK;
 }
 
-void ScriptManager::execute( const char* command )
+Tcl_Obj* ScriptManager::execute( const char* command )
 {
 	if ( Tcl_Eval( m_interp, command ) != TCL_OK )
 		throwScriptErrorWithMessage( m_interp );
+	return Tcl_GetObjResult( m_interp );
 }
 
 void ScriptManager::executeFile( const char* fileName )

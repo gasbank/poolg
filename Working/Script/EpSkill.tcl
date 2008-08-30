@@ -1,9 +1,7 @@
 set skillName [ list \
 	NormalAttackSkill\
-	HealSkill\
-	MultiThreadSkill\
-	MeditationSkill\
-	CsBurnSkill\
+	
+	
 	]
 
 
@@ -11,10 +9,21 @@ namespace eval NormalAttackSkill {
 	set name					"NormalAttack"
 	set description				"NormalAttack을 상대방에게 날립니다."
 	set csEssentials			2
-	set skillObjectCount		1
-	set dynamicmotion			DMfireUniformly				;#모션에 대한 정의
 	
-	
+	proc registerSkillObjects {} {
+		set soList						[ list ]
+		set healPerObject				-5
+		
+		set so							[ EpCreateSkillObject SPHERE 2 RED DM_RANDOM_CURVE ]
+		EpSkillObjectSetOnHitAction		$so		[ EpCreateHealAction 0 $healPerObject ]
+		lappend							$soList $so
+		
+		set so							[ EpCreateSkillObject CUBE 2 BLUE DM_RANDOM_CURVE ]
+		EpSkillObjectSetOnHitAction		$so		[ EpCreateHealAction 0 $healPerObject ]
+		lappend							$soList $so
+		
+		return							$soList
+	}
 	
 	proc onObjectHitTarget  { attackCount, user, target } {
 		set userCoding  	[ EpCharacterGetCoding $user ]
@@ -24,7 +33,16 @@ namespace eval NormalAttackSkill {
 	}
 }
 
-namespace eval HealSkill {
+if 0 {
+	
+	
+	HealSkill\
+	MultiThreadSkill\
+	MeditationSkill\
+	CsBurnSkill\
+	
+	
+	namespace eval HealSkill {
 	set name					"Heal"
 	set description				"치유함."
 	set csEssentials			7
@@ -86,4 +104,7 @@ namespace eval CsBurnSkill {
 		EpCharacterSetCurCs $target 0
 		EpCharacterSetCurHp $target [ expr $targetCurHp/2 ]
 	}
+}
+
+	
 }

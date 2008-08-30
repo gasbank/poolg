@@ -7,6 +7,8 @@ class SkillSet;
 class SkillObject;
 class Trigger;
 
+typedef std::list<SkillObject*> SkillObjectList;
+
 //고정적 스탯. 레벨 업 시만 오르는.(simon ornen)
 struct Stat
 {
@@ -30,9 +32,9 @@ public:
 	/*스킬 함수*/
 	//void doNormalAttack(int type, Character* enemy);
 
-	void doCsBurn();
-	void recoverCs ();
-	void heal (int point);
+	void								doCsBurn();
+	void								recoverCs ();
+	void								heal (int point);
 
 	
 
@@ -69,23 +71,16 @@ protected:
 private:
 	void								boundaryTesting( UnitInput );
 
-	typedef std::list<SkillObject*> SkillObjectList;
-	SkillObjectList m_skillObjectList;
-
-	bool					m_bMoving;
-	float					m_fMovingTime;
+	bool								m_bMoving;
+	float								m_fMovingTime;
 
 	//유동적 스탯.
-	int						m_maxHp;
-	int						m_curHp;
-	int						m_maxCs;
-	int						m_curCs;
+	int									m_maxHp;
+	int									m_curHp;
+	int									m_maxCs;
+	int									m_curCs;
 
-
-
-
-	float					m_moveDuration; // A time needed to move one time(tile) in seconds
-	
+	float								m_moveDuration; // A time needed to move one time(tile) in seconds
 	
 	TileRegion							m_boundaryTileRect;
 
@@ -98,7 +93,8 @@ private:
 	bool								m_bControllable;
 
 	SkillSet*							m_skillSet;	
-	
+	SkillObjectList						m_skillObjectList;
+
 };
 
 

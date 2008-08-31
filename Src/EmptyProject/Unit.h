@@ -89,7 +89,6 @@ public:
 	UnitType						getType() const							{ return m_type; }
 	const char*						getTypeString() const;
 	World*							getCurWorld() const						{ return GetWorldManager().getCurWorld(); }
-	void							setDynamicMotion( DynamicMotion* dm );
 	void							setForcedMove( int i );
 	void							forcedMoveTest();
 	

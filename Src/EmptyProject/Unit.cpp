@@ -38,7 +38,6 @@ Unit::Unit( UnitType type )
 	m_bLocalXformDirty			= true;
 	m_removeFlag				= false;
 	m_bForcedMove				= false;
-	m_dm						= NULL;
 
 	D3DXMatrixIdentity(&m_localXform);
 
@@ -104,8 +103,6 @@ LRESULT Unit::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 bool Unit::frameMove( float fElapsedTime )
 {	
 	bool flag = true;
-	if ( m_dm != NULL )
-		flag = m_dm->frameMove( fElapsedTime );
 
 	updateLocalXform();
 	if ( m_bForcedMove )
@@ -371,13 +368,6 @@ const char* Unit::getTypeString() const
 	return 0;
 }
 
-void Unit::setDynamicMotion( DynamicMotion* dm )
-{
-	if (m_dm != NULL)
-		delete m_dm;
-	m_dm = dm;
-}
-
 void Unit::printDebugInfo() const
 {
 	printf( "Unit: Type - %s ", getTypeString() );
@@ -433,7 +423,6 @@ void Unit::drawName()
 
 void Unit::release()
 {
-	SAFE_DELETE( m_dm );
 }
 
 HRESULT Unit::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext )

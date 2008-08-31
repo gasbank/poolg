@@ -803,43 +803,44 @@ void BattleState::renderFixedText(int scrWidth, int scrHeight)
 
 	SkillSet* skillSet = getHero()->getSkillSet();
 
-	StringCchPrintf(textBuffer, 512, skillSet->getSkillName(SL_FIRST).c_str());
-	m_lblSkill->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+	char textBufferA[512];
+	StringCchPrintfA(textBufferA, 512, skillSet->getSkillName(SL_FIRST).c_str());
+	m_lblSkill->DrawTextA(0, textBufferA, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 	rc.top += skillLineInterval;
-	StringCchPrintf(textBuffer, 512, skillSet->getSkillName(SL_SECOND).c_str());
-	m_lblSkill->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+	StringCchPrintfA(textBufferA, 512, skillSet->getSkillName(SL_SECOND).c_str());
+	m_lblSkill->DrawTextA(0, textBufferA, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 	rc.top += skillLineInterval;
-	StringCchPrintf(textBuffer, 512, skillSet->getSkillName(SL_THIRD).c_str());
-	m_lblSkill->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+	StringCchPrintfA(textBufferA, 512, skillSet->getSkillName(SL_THIRD).c_str());
+	m_lblSkill->DrawTextA(0, textBufferA, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 	rc.top += skillLineInterval;
-	StringCchPrintf(textBuffer, 512, skillSet->getSkillName(SL_FOURTH).c_str());
-	m_lblSkill->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+	StringCchPrintfA(textBufferA, 512, skillSet->getSkillName(SL_FOURTH).c_str());
+	m_lblSkill->DrawTextA(0, textBufferA, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 	rc.top += skillLineInterval;
-	StringCchPrintf(textBuffer, 512, skillSet->getSkillName(SL_FIFTH).c_str());
-	m_lblSkill->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+	StringCchPrintfA(textBufferA, 512, skillSet->getSkillName(SL_FIFTH).c_str());
+	m_lblSkill->DrawTextA(0, textBufferA, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 
 	/*스킬 라벨 그리기*/
 	switch (skillSet->getSkillLocation())
 	{
 	case SL_FIRST:
 		rc.top = scrHeight - 190;
-		StringCchPrintf(textBuffer, 512, skillSet->getSkillName(SL_FIRST).c_str());
+		StringCchPrintfA(textBufferA, 512, skillSet->getSkillName(SL_FIRST).c_str());
 		break;
 	case SL_SECOND:
 		rc.top = scrHeight - 190 + skillLineInterval;
-		StringCchPrintf(textBuffer, 512, skillSet->getSkillName(SL_SECOND).c_str());
+		StringCchPrintfA(textBufferA, 512, skillSet->getSkillName(SL_SECOND).c_str());
 		break;
 	case SL_THIRD:
 		rc.top = scrHeight - 190 + skillLineInterval*2;
-		StringCchPrintf(textBuffer, 512, skillSet->getSkillName(SL_THIRD).c_str());
+		StringCchPrintfA(textBufferA, 512, skillSet->getSkillName(SL_THIRD).c_str());
 		break;
 	case SL_FOURTH:
 		rc.top = scrHeight - 190 + skillLineInterval*3;
-		StringCchPrintf(textBuffer, 512, skillSet->getSkillName(SL_FOURTH).c_str());
+		StringCchPrintfA(textBufferA, 512, skillSet->getSkillName(SL_FOURTH).c_str());
 		break;
 	case SL_FIFTH:
 		rc.top = scrHeight - 190 + skillLineInterval*4;
-		StringCchPrintf(textBuffer, 512, skillSet->getSkillName(SL_FIFTH).c_str());
+		StringCchPrintfA(textBufferA, 512, skillSet->getSkillName(SL_FIFTH).c_str());
 		break;
 	}
 	m_lblSkill->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 0.0f, 1.0f, 1.0f ) );
@@ -851,19 +852,19 @@ void BattleState::renderFixedText(int scrWidth, int scrHeight)
 	switch (skillSet->getSkillLocation())
 	{
 	case SL_FIRST:
-		StringCchPrintf(textBuffer, 512, skillSet->getDescription(SL_FIRST).c_str());
+		StringCchPrintfA(textBufferA, 512, skillSet->getDescription(SL_FIRST).c_str());
 		break;
 	case SL_SECOND:
-		StringCchPrintf(textBuffer, 512, skillSet->getDescription(SL_SECOND).c_str());
+		StringCchPrintfA(textBufferA, 512, skillSet->getDescription(SL_SECOND).c_str());
 		break;
 	case SL_THIRD:
-		StringCchPrintf(textBuffer, 512, skillSet->getDescription(SL_THIRD).c_str());
+		StringCchPrintfA(textBufferA, 512, skillSet->getDescription(SL_THIRD).c_str());
 		break;
 	case SL_FOURTH:
-		StringCchPrintf(textBuffer, 512, skillSet->getDescription(SL_FOURTH).c_str());
+		StringCchPrintfA(textBufferA, 512, skillSet->getDescription(SL_FOURTH).c_str());
 		break;
 	case SL_FIFTH:
-		StringCchPrintf(textBuffer, 512, skillSet->getDescription(SL_FIFTH).c_str());
+		StringCchPrintfA(textBufferA, 512, skillSet->getDescription(SL_FIFTH).c_str());
 		break;
 	}
 

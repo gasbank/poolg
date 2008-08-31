@@ -3,8 +3,8 @@
 #include "Skill.h"
 #include "BattleState.h"
 
-const std::wstring		SkillSet::ms_emptySlotSkillName = L"-";
-const std::wstring		SkillSet::ms_emptySlotSkillDescription = L"스킬이 없습니다.";
+const std::string		SkillSet::ms_emptySlotSkillName("-");
+const std::string		SkillSet::ms_emptySlotSkillDescription("스킬이 없습니다.");
 
 SkillSet::SkillSet()
 {
@@ -39,7 +39,7 @@ void SkillSet::deleteSkill (SkillLocation skillLocation)
 	m_skillSet[(int)skillLocation] = NULL;
 }
 
-const std::wstring& SkillSet::getSkillName (SkillLocation skillLocation) const
+const std::string& SkillSet::getSkillName (SkillLocation skillLocation) const
 {
 	/*비었을 경우 NULL 반환*/
 	if (m_skillSet[(int)skillLocation] == NULL)
@@ -52,7 +52,7 @@ bool SkillSet::useSkill ()
 	if (m_skillSet[(int)this->m_skillLocation] == NULL)
 		return false;
 
-	m_skillSet[(int)this->m_skillLocation]->useSkill( m_battleState );
+	//m_skillSet[(int)this->m_skillLocation]->useSkill( m_battleState );
 
 	return true;
 }
@@ -114,13 +114,13 @@ void SkillSet::setCharacter (Character* hero, Character* enemy)
 {
 	for (int i = 0; i < 5; i++)
 	{
-		if (m_skillSet[i] != NULL)
-			m_skillSet[i]->setUser (hero, enemy);
+		/*if (m_skillSet[i] != NULL)
+			m_skillSet[i]->setUser (hero, enemy);*/
 	}
 }
 
 
-const std::wstring& SkillSet::getDescription (SkillLocation skillLocation) const
+const std::string& SkillSet::getDescription (SkillLocation skillLocation) const
 {
 	if (m_skillSet[(int)skillLocation] == NULL)
 		return ms_emptySlotSkillDescription;

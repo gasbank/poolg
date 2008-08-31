@@ -38,7 +38,7 @@ Unit* Hero::createHero( LPD3DXMESH mesh, int tileX, int tileY, float posZ )
 
 void Hero::addToSkillSet( SkillLocation sl )
 {
-	SkillSet* skillSet = getSkillSet();
+	/*SkillSet* skillSet = getSkillSet();
 
 	switch ( sl )
 	{
@@ -47,7 +47,7 @@ void Hero::addToSkillSet( SkillLocation sl )
 	case SL_THIRD: skillSet->setSkill (SL_THIRD, (Skill*) new Goto()); break;
 	case SL_FOURTH: skillSet->setSkill (SL_FOURTH, (Skill*) new MultiThread());; break;
 	case SL_FIFTH: skillSet->setSkill (SL_FIFTH, (Skill*) new Meditation()); break;
-	}
+	}*/
 }
 
 void Hero::levelUp()

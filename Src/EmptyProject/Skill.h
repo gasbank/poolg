@@ -11,11 +11,11 @@ typedef std::list<SkillObject*> SkillObjectList;
 class Skill
 {
 public:
-	static Skill*				createSkillByScript( const char* skillName );
+	static Skill*				createSkillByScript( const char* skillNsName );
 								~Skill() {}
 
-	const std::wstring&			getDescription() const { return m_skillDescription; }
-	const std::wstring&			getSkillName() const { return m_skillName; }
+	const std::string&			getDescription() const { return m_skillDescription; }
+	const std::string&			getSkillName() const { return m_skillName; }
 
 	void						doSkill();
 

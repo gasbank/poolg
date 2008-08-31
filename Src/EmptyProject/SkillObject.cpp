@@ -7,8 +7,21 @@
 #include "Sound.h"
 #include "ShaderWrapper.h"
 #include "Unit.h"
+#include "ScriptManager.h"
 
 extern BombShader*						g_bombShader;
+
+
+SkillObject::SkillObject( BasicShapeType bst, float size, D3DCOLOR color, DynamicMotionType dmt )
+: Unit( UT_SKILLOBJECT )
+, m_target( 0 )
+, m_velocity( 0 )
+, m_onHitHpDamage( 0 )
+, m_dm( 0 )
+, m_size( size )
+, m_color( color )
+{
+}
 
 SkillObject::~SkillObject(void)
 {
@@ -53,6 +66,40 @@ BattleState* SkillObject::getBattleState()
 	return reinterpret_cast<BattleState*>( GetWorldStateManager().getCurState() );
 }
 
+SkillObject* SkillObject::createSkillObject( const char* bst, float size, D3DCOLOR color, const char* dmt )
+{
+	BasicShapeType bstEnum;
+	if ( strcmp( bst, "SPHERE" ) == 0 ) bstEnum = BST_SPHERE;
+	else if ( strcmp( bst, "CUBE" ) == 0 ) bstEnum = BST_CUBE;
+	else if ( strcmp( bst, "PLANE" ) == 0 ) bstEnum = BST_PLANE;
+	else bstEnum = BST_UNKNOWN;
+
+	DynamicMotionType dmtEnum;
+	if ( strcmp( bst, "FIRE_UNIFORMLY" ) == 0 ) dmtEnum = DMT_FIRE_UNIFORMLY;
+	else if ( strcmp( bst, "RANDOM_CURVE" ) == 0 ) dmtEnum = DMT_RANDOM_CURVE;
+	else dmtEnum = DMT_UNKNOWN;
+
+	SkillObject* so = new SkillObject( bstEnum, size, color, dmtEnum );
+	return so;
+}
+
+
+//////////////////////////////////////////////////////////////////////////
+
+SkillObject* EpCreateSkillObject( const char* bst, double size, int color /* ARGB */, const char* dmt )
+{
+	return SkillObject::createSkillObject( bst, (float)size, (D3DCOLOR)color, dmt );
+} SCRIPT_CALLABLE_PV_PC_D_I_PC( EpCreateSkillObject )
+
+START_SCRIPT_FACTORY( SkillObject )
+	CREATE_OBJ_COMMAND( EpCreateSkillObject )
+END_SCRIPT_FACTORY( SkillObject )
+
+
+
+//////////////////////////////////////////////////////////////////////////
+
+
 //SkillObject* SkillObject::createSOnormalAttack(Character* user, Character* target, Unit* effectObject)
 //{
 //	SOnormalAttack* so = new SOnormalAttack (user, target, effectObject);
@@ -90,28 +137,6 @@ BattleState* SkillObject::getBattleState()
 //}
 
 
-SkillObject* SkillObject::createSkillObject( const char* bst, UINT size, D3DCOLOR color, const char* dmt )
-{
-	BasicShapeType bstEnum;
-	if ( strcmp( bst, "SPHERE" ) == 0 ) bstEnum = BST_SPHERE;
-	else if ( strcmp( bst, "CUBE" ) == 0 ) bstEnum = BST_CUBE;
-	else if ( strcmp( bst, "PLANE" ) == 0 ) bstEnum = BST_PLANE;
-	else bstEnum = BST_UNKNOWN;
-
-	DynamicMotionType dmtEnum;
-	if ( strcmp( bst, "FIRE_UNIFORMLY" ) == 0 ) dmtEnum = DMT_FIRE_UNIFORMLY;
-	else if ( strcmp( bst, "RANDOM_CURVE" ) == 0 ) dmtEnum = DMT_RANDOM_CURVE;
-	else dmtEnum = DMT_UNKNOWN;
-
-	SkillObject* so = new SkillObject( bstEnum, size, color, dmtEnum );
-	return so;
-}
-
-SkillObject::SkillObject( BasicShapeType bst, UINT size, D3DCOLOR color, DynamicMotionType dmt )
-: Unit( UT_SKILLOBJECT )
-{
-
-}
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //SOnormalAttack::~SOnormalAttack(void)

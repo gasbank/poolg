@@ -426,15 +426,15 @@ void Character::addMoveImpulse( const D3DXVECTOR3& impulse )
 	//printf( "Now impulse is " ); Utility::printValue( m_moveImpulse ); printf( "\n" );
 }
 //////////////////////////////////////////////////////////////////////////
-
-
-Unit* EpCreateCharacter( int tileX, int tileY )
-{
-	LPD3DXMESH d3dxMesh;
-	D3DXCreateTeapot( GetG().m_dev, &d3dxMesh, 0 );
-	return Character::createCharacter( d3dxMesh, tileX, tileY, 0 );
-
-} SCRIPT_CALLABLE_PV_I_I( EpCreateCharacter )
+//
+//
+//Unit* EpCreateCharacter( int tileX, int tileY )
+//{
+//	LPD3DXMESH d3dxMesh;
+//	D3DXCreateTeapot( GetG().m_dev, &d3dxMesh, 0 );
+//	return Character::createCharacter( d3dxMesh, tileX, tileY, 0 );
+//
+//} SCRIPT_CALLABLE_PV_I_I( EpCreateCharacter )
 
 int EpCharacterSetCurHp( void* ptr, int curHp )
 {
@@ -499,7 +499,7 @@ int EpCharacterSetTilePos( void* ptr, Tcl_Obj* tilePos )
 } SCRIPT_CALLABLE_I_PV_OBJ( EpCharacterSetTilePos )
 
 START_SCRIPT_FACTORY(Character)
-	CREATE_OBJ_COMMAND( EpCreateCharacter )
+	//CREATE_OBJ_COMMAND( EpCreateCharacter )
 	CREATE_OBJ_COMMAND( EpCharacterSetCurHp )
 	CREATE_OBJ_COMMAND( EpCharacterSetCurCs )
 	CREATE_OBJ_COMMAND( EpCharacterSetMoveDuration )

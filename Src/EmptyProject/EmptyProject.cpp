@@ -57,7 +57,8 @@ LPDIRECT3DVERTEXBUFFER9			g_lineElement			= 0;
 HANDLE							g_scriptBindingFinishedEvent				= 0;		// Signal object to resolve multi-threaded problems on console thread and main app thread
 HANDLE							g_consoleReleasedEvent = 0;		// Signal object to resolve multi-threaded problems on console thread and main app thread
 
-LPD3DXMESH						g_testTeapot			= 0;
+
+LPD3DXMESH						g_bst[BST_COUNT];
 
 D3DCOLOR						g_fillColor;
 
@@ -356,7 +357,7 @@ HRESULT drawBurningTeapot( double fTime, float fElapsedTime )
 		// Draw mesh here...
 
 		//D3DPERF_BeginEvent( 0, L"Shader applied teapot" );
-		g_testTeapot->DrawSubset( 0 );
+		g_bst[BST_TEAPOT]->DrawSubset( 0 );
 		//D3DPERF_EndEvent();
 
 		V( g_bombShader->endPass() );
@@ -735,7 +736,10 @@ void CALLBACK OnD3D9DestroyDevice( void* pUserContext )
 	SAFE_RELEASE( g_d3dxFontBig );
 
 	// Test geometries
-	SAFE_RELEASE( g_testTeapot );
+	SAFE_RELEASE( g_bst[BST_TEAPOT] );
+	SAFE_RELEASE( g_bst[BST_CUBE] );
+	SAFE_RELEASE( g_bst[BST_PLANE] );
+	SAFE_RELEASE( g_bst[BST_SPHERE] );
 
 	// Tile grid geometry
 	SAFE_RELEASE( g_lineElement );
@@ -918,6 +922,7 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 	_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 #endif
 
+	ZeroMemory( g_bst, sizeof(LPD3DXMESH) * 4 );
 
 	// TODO: Perform any application-level initialization here
 	// There is no dependency on D3D device in application-level init step.(and should be)
@@ -1286,6 +1291,14 @@ void ConfigureTileGridGeometry( LPDIRECT3DDEVICE9 pd3dDevice )
 
 void ConfigureTestGeometry( LPDIRECT3DDEVICE9 pd3dDevice )
 {
-	assert( g_testTeapot == 0 );
-	D3DXCreateTeapot( pd3dDevice, &g_testTeapot, 0 );
+	UINT i;
+	for ( i = 0; i < BST_COUNT; ++i )
+	{
+		assert( g_bst[i] == 0 );
+	}
+	//enum BasicShapeType { BST_UNKNOWN, BST_TEAPOT, BST_SPHERE, BST_CUBE, BST_PLANE, BST_COUNT };
+	D3DXCreateTeapot( pd3dDevice, &g_bst[BST_TEAPOT], 0 );
+	D3DXCreateSphere( pd3dDevice, 1.0f, 8, 8, &g_bst[BST_SPHERE], 0 );
+	D3DXCreateBox( pd3dDevice, 1.0f, 1.0f, 1.0f, &g_bst[BST_CUBE], 0 );
+	D3DXCreatePolygon( pd3dDevice, 1.0f, 4, &g_bst[BST_PLANE], 0 );
 }

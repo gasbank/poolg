@@ -5,13 +5,12 @@ class BattleState;
 class DynamicMotion;
 class Action;
 
-enum BasicShapeType { BST_UNKNOWN, BST_SPHERE, BST_CUBE, BST_PLANE };
 enum DynamicMotionType { DMT_UNKNOWN, DMT_FIRE_UNIFORMLY, DMT_RANDOM_CURVE };
 
 class SkillObject : public Unit
 {
 public:
-	static SkillObject*				createSkillObject( const char* bst, UINT size, D3DCOLOR color, const char* dmt );
+	static SkillObject*				createSkillObject( const char* bst, float size, D3DCOLOR color, const char* dmt );
 	virtual							~SkillObject();
 
 	// Virtual Methods
@@ -30,12 +29,16 @@ protected:
 	BattleState*					getBattleState();
 
 private:
-									SkillObject( BasicShapeType bst, UINT size, D3DCOLOR color, DynamicMotionType dmt );
+									SkillObject( BasicShapeType bst, float size, D3DCOLOR color, DynamicMotionType dmt );
 	Unit*							m_target;
 	float							m_velocity;
-	int								m_onHitHpDamage;
+	float							m_size;
+	D3DCOLOR						m_color;
 	DynamicMotion*					m_dm;
+	int								m_onHitHpDamage;
 };
+
+SCRIPT_FACTORY( SkillObject )
 
 
 //class SOnormalAttack : public SkillObject

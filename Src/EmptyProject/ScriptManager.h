@@ -117,6 +117,7 @@ static const DWORD _trait_PV_PV			= AT_PV | (AT_PV << 4);
 static const DWORD _trait_PV_PC			= AT_PV | (AT_PC << 4);
 static const DWORD _trait_PV_PC_I		= AT_PV | (AT_PC << 4) | (AT_I << 8);
 static const DWORD _trait_PV_PC_PC_I	= AT_PV | (AT_PC << 4) | (AT_PC << 8) | (AT_I << 12);
+static const DWORD _trait_PV_PC_D_I_PC	= AT_PV | (AT_PC << 4) | (AT_D << 8) | (AT_I << 12) | ( AT_PC << 16 );
 static const DWORD _trait_PV_I			= AT_PV | (AT_I << 4);
 static const DWORD _trait_PV_I_I		= AT_PV | (AT_I << 4) | (AT_I << 8);
 static const DWORD _trait_PV_PV_I		= AT_PV | (AT_PV << 4) | (AT_I << 8);
@@ -316,6 +317,15 @@ static const DWORD _trait_OBJ_PV		= AT_OBJ | (AT_PV << 4);
 		args[0].pv = funcName(args[1].pc, args[2].pc, args[3].i);				\
 	}																			\
 	SCRIPT_CALLABLE_END(funcName, PV_PC_PC_I)
+
+
+#define SCRIPT_CALLABLE_PV_PC_D_I_PC(funcName)									\
+	void _wrap_##funcName(ScriptArgumentList& args)								\
+	{																			\
+		args[0].pv = funcName(args[1].pc, args[2].d, args[3].i, args[4].pc);	\
+	}																			\
+	SCRIPT_CALLABLE_END(funcName, PV_PC_D_I_PC)
+
 
 #define SCRIPT_CALLABLE_PV_PV_PV(funcName)										\
 	void _wrap_##funcName(ScriptArgumentList& args)								\

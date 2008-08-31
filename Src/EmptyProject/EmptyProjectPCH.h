@@ -73,3 +73,5 @@ template<typename T> void EpSafeReleaseAll( T& obj ) {
 };
 
 #define FLOAT_POS_INF		(0x7f800000)
+
+enum BasicShapeType { BST_UNKNOWN, BST_TEAPOT, BST_SPHERE, BST_CUBE, BST_PLANE, BST_COUNT };

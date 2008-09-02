@@ -103,6 +103,8 @@ bool SOnormalAttack::frameMove (float fElapsedTime)
 
 		// Hit to the target!
 		int damage = m_user->getStat().coding- m_target->getStat().def + 5;
+		if (damage < 0)
+			damage = 1;
 
 		m_target->damage(damage);
 
@@ -323,6 +325,9 @@ bool SOmtBullet::frameMove (float fElapsedTime)
 			//방어 무시
 			damage = m_user->getStat().coding / 2;
 
+		if ( damage < 0 )
+			damage = 1;
+
 		m_target->damage(damage);
 
 		D3DXVECTOR3 posDiff = m_target->getPos() - m_user->getPos();
@@ -343,11 +348,14 @@ bool SOmtBullet::frameMove (float fElapsedTime)
 			getBattleState()->pushBattleLog(resultLog.c_str());
 			if (m_target->isDead())
 			{
+				//죽게 만들지 않는다.
+				m_target->setCurHp( 1 );
+/*
 				getBattleState()->pushBattleLog("HP가 모두 소진되었습니다. 게임 오버입니다.");
 				getBattleState()->pushBattleLog("순순히 F5키를 누르고 종료하시죠.");
 				m_target->setDead();
-
-				getBattleState()->setNextTurnType(TT_NATURAL);
+*/
+				getBattleState()->setNextTurnType(TT_PLAYER);
 				getBattleState()->passTurn();
 
 			}
@@ -366,9 +374,13 @@ bool SOmtBullet::frameMove (float fElapsedTime)
 			getBattleState()->pushBattleLog(resultLog.c_str());
 			if (m_target->isDead())
 			{
+				//죽게 만들지 않는다.
+				m_target->setCurHp( 1 );
+				/*
 				getBattleState()->pushBattleLog("대상을 섬멸하였습니다! (Enter key로 월드로 복귀)");
 				m_target->setDead();
-				getBattleState()->setNextTurnType(TT_NATURAL);
+				*/
+				getBattleState()->setNextTurnType( TT_COMPUTER );
 				GetAudioState().pSoundBank->Play( GetAudioState().iAttack, 0, 0, NULL );
 			}
 			else
@@ -426,6 +438,9 @@ bool SOgoto::frameMove (float fElapsedTime)
 		// Hit to the target!
 		// 자신의 공격력 + 자신의 방어력 - 상대방 공격력
 		int damage = m_user->getStat().coding + m_user->getStat().def - m_target->getStat().def;
+
+		if ( damage < 0 )
+			damage = 1;
 
 		m_target->damage(damage);
 

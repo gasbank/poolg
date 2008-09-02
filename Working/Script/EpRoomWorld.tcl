@@ -14,6 +14,8 @@ namespace eval EpRoomWorld {
 		variable world
 		
 		EpOutputDebugString " - [info level 0] called / curWorld: $curWorld\n"
+
+		EpAddSkillToHero 1
 		
 		set world				$curWorld;
 	}

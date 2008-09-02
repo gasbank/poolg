@@ -60,6 +60,9 @@ namespace eval EpA213World::LegendOfDinosaurQuest {
 		set triggerD0		[ EpCreateUnitPositionWithTraceTrigger $EpA213World::pHeroUnit $pGoodDinosaur 0x001 ]
 		set actionD0		[ EpCreateDialogAction "EpA213World::LegendOfDinosaurQuest::goodDinosaurDialog1" ]
 		set actionD1		[ EpCreateScriptAction "EpUnitSetArnMesh $pGoodDinosaur \"PoolGModel\"" ]
+		set actionD2		[ EpCreateScriptAction "EpAddSkillToHero 4" ]
+		set actionD3		[ EpCreateScriptAction "EpAddSkillToHero 3" ]
+
 
 		EpAddTriggerToSequence	$seqIncident $triggerA0
 		EpAddActionToSequence	$seqIncident $actionA0
@@ -76,6 +79,8 @@ namespace eval EpA213World::LegendOfDinosaurQuest {
 		EpAddTriggerToSequence	$seqIncident $triggerD0
 		EpAddActionToSequence	$seqIncident $actionD0
 		EpAddActionToSequence	$seqIncident $actionD1
+		EpAddActionToSequence	$seqIncident $actionD2
+		EpAddActionToSequence	$seqIncident $actionD3
 
 		EpIncidentSetName	$seqIncident "LegendOfDinsaur sequential incident"
 
@@ -150,7 +155,7 @@ namespace eval EpA213World::LegendOfDinosaurQuest {
 		set player "PoolG"
 		set npc "Gentle Dinosaur"
 		set system "System"
-
+	
 		set dialog [ list\
 			$npc		"가져오셨군요!"\
 			$npc		"정말 고마워요. 저는 이제 다시 쥐로 돌아갈 수 있게 되었어요."\

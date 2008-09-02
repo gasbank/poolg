@@ -254,7 +254,7 @@ void MultiThread::useSkill(BattleState *bs)
 
 	D3DXVec3Normalize( &fireDir, &fireDir );
 
-	int frequency = m_hero->getStat().sense / 5;
+	int frequency = m_hero->getStat().sense / 4;
 
 	for (int i=frequency-1; i >= 0; i--)
 	{

@@ -113,6 +113,7 @@ namespace eval EpA213World::OldRatandGatekeeperQuest {
 		set action0		[ EpCreateScriptAction "#" ]
 		set action1		[ EpCreateDialogAction "EpA213World::OldRatandGatekeeperQuest::oldCat1Dialog" ]
 		set action2		[ EpCreateScriptAction "EpEnemySetTalkable $pOldCat1 0" ]
+		set action3		[ EpCreateScriptAction "EpAddSkillToHero 4" ]
 				
 		set seqIncident	[ EpCreateSequentialIncident 1 ]
 		EpAddTriggerToSequence $seqIncident $trigger0
@@ -120,6 +121,7 @@ namespace eval EpA213World::OldRatandGatekeeperQuest {
 		EpAddTriggerToSequence $seqIncident $trigger1
 		EpAddActionToSequence $seqIncident $action1
 		EpAddActionToSequence $seqIncident $action2
+		EpAddActionToSequence $seqIncident $action3
 
 		set action					[ EpCreateScriptAction	"EpEnemySetTalkable $pOldCat11 0" ]
 		EpAddActionToSequence		$seqIncident	$action
@@ -180,6 +182,8 @@ namespace eval EpA213World::OldRatandGatekeeperQuest {
 		set player "PoolG"
 		set npc "Old Cat(Gatekeeper)"
 		set	system "System"
+
+		
 	
 		set dialog [ list\
 			$npc		"두부 냄새가 나는군."\

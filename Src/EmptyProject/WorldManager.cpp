@@ -18,17 +18,6 @@ WorldManager::WorldManager(void)
 	m_curWorld = 0;
 	m_nextWorld = 0;
 
-
-	// Load dialogs from script
-	ConstCharList dialogList;
-	GetScriptManager().readCharPtrList( "EpDialogList", dialogList );
-	ConstCharList::iterator itDialogList = dialogList.begin();
-	for ( ; itDialogList != dialogList.end(); ++itDialogList )
-	{
-		Dialog* newDlg = Dialog::createDialogByScript( *itDialogList );
-		newDlg->init();
-		m_globalDialogs.push_back( newDlg );
-	}
 }
 
 WorldManager::~WorldManager(void)
@@ -115,6 +104,17 @@ void WorldManager::onLostDevice()
 
 HRESULT WorldManager::onCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext )
 {
+	// Load dialogs from script
+	ConstCharList dialogList;
+	GetScriptManager().readCharPtrList( "EpDialogList", dialogList );
+	ConstCharList::iterator itDialogList = dialogList.begin();
+	for ( ; itDialogList != dialogList.end(); ++itDialogList )
+	{
+		Dialog* newDlg = Dialog::createDialogByScript( *itDialogList );
+		newDlg->init();
+		m_globalDialogs.push_back( newDlg );
+	}
+
 	if ( m_curWorld )
 		m_curWorld->onCreateDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
 

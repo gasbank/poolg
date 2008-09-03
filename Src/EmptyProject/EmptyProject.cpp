@@ -163,6 +163,9 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 
 	GetTopStateManager().onCreateDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
 	GetWorldStateManager().onCreateDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
+	
+	// I'm not sure that this is right place for this code.
+	g_wm->onCreateDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
 
 	// (6) Set the first world
 	// TODO: This is 'DO ONCE THROUGH THE WHOLE LIFETIME job.. not on every OnCreateDevice()!

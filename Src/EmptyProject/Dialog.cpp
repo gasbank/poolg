@@ -2,6 +2,8 @@
 #include "Dialog.h"
 #include "ScriptManager.h"
 #include "Utility.h"
+#include "Sprite.h"
+#include "SpriteManager.h"
 
 extern LPD3DXFONT						g_dlgNameFont;
 extern LPD3DXFONT						g_dlgContentFont;
@@ -25,12 +27,12 @@ Dialog::Dialog( Speak* speakArray, UINT speakCount, const TileRegion* region, bo
 void Dialog::ctorDialogPane()
 {
 	// TODO Dialog pane images
-	/*m_contentPic.init(L"Images/dae-sa.png", GetG().m_dev);
+	m_contentPic.init(L"Images/dae-sa.png", GetG().m_dev);
 	m_contentPic.setPos (-(GetG().m_scrWidth / 2.0f), -(GetG().m_scrHeight / 2.0f), 2.8f);
 	m_contentPic.setSize(200, 200);
 	m_namePic.init(L"Images/name_window.png", GetG().m_dev);
 	m_namePic.setPos (-(GetG().m_scrWidth / 2.0f), -(GetG().m_scrHeight / 2.0f) + 200, 2.8f);
-	m_namePic.setSize(150, 60);*/
+	m_namePic.setSize(150, 60);
 
 	m_speakArray	= 0;
 	m_speakCount	= 0;
@@ -40,12 +42,11 @@ void Dialog::ctorDialogPane()
 	m_bInit			= false;
 	m_bRemoveFlag	= false;
 }
+
 Dialog::~Dialog(void)
 {
 	
 }
-
-
 
 HRESULT Dialog::init()
 {
@@ -126,8 +127,8 @@ HRESULT Dialog::frameRender(IDirect3DDevice9* pd3dDevice,  double fTime, float f
 		if( m_bTalking )
 		{
 			D3DPERF_BeginEvent(0x12345678, L"Draw Dialog Pane");
-			//m_contentPic.draw();
-			//m_namePic.draw();
+			m_contentPic.draw();
+			m_namePic.draw();
 			D3DPERF_EndEvent();
 
 			printDialog();

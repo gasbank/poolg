@@ -447,6 +447,11 @@ void Unit::updateArnMesh()
 	}
 	m_arnMesh = arnMesh;
 }
+
+void Unit::setMesh( LPD3DXMESH d3dxMesh )
+{
+	
+}
 //////////////////////////////////////////////////////////////////////////
 //
 //Unit* EpCreateUnit( int tileX, int tileY )

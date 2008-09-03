@@ -95,6 +95,8 @@ public:
 	void							setArnMeshName( const char* arnMeshName ) { m_arnMeshName = arnMeshName; }
 	ArnMesh*						getArnMesh() const						{ return m_arnMesh; }
 
+	void							setMesh( LPD3DXMESH d3dxMesh );
+
 	void							setColor( int r, int g, int b );
 	
 	bool							isForcedMove() const					{ return m_bForcedMove; }
@@ -148,7 +150,12 @@ private:
 
 	UnitType						m_type;
 
+	// Pointer to mesh object. If ArnMesh is set for this Unit instance,
+	// you should set m_d3dxMesh to NULL. If ArnMesh is not set, you should
+	// assign non-NULL value to m_d3dxMesh. In short, you must set only one of those pointer.
 	ArnMesh*						m_arnMesh;
+	LPD3DXMESH						m_d3dxMesh;
+
 	bool							m_bMovable;
 
 	// For soul animation

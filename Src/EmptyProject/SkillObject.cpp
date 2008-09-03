@@ -10,7 +10,7 @@
 #include "ScriptManager.h"
 
 extern BombShader*						g_bombShader;
-
+extern LPD3DXMESH						g_bst[BST_COUNT];
 
 SkillObject::SkillObject( BasicShapeType bst, float size, D3DCOLOR color, DynamicMotionType dmt )
 : Unit( UT_SKILLOBJECT )

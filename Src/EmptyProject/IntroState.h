@@ -42,6 +42,8 @@ private:
 	Sprite* m_pPrologue;
 	DrawRequest* m_pPrologueDrawRequest;
 
+	float m_prologueInitZPos;
+
 	bool m_logoVisible;
 	float m_logoFading;
 

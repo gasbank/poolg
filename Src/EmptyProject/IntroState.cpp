@@ -13,6 +13,7 @@ IntroState::IntroState(void)
 	m_pGalaxy = 0;
 	m_pGalaxyDrawRequest = 0;
 	m_nextState = GAME_TOP_STATE_MAIN;
+	m_prologueInitZPos =  -34.0f;
 
 
 
@@ -89,14 +90,27 @@ HRESULT IntroState::frameMove( double fTime, float fElapsedTime )
 			m_pLogo->removeDrawRequest( m_pLogoDrawRequest );
 	}
 
-	if ( 0.0f <= m_fFadeTimer && m_fFadeTimer < 46.0f )
+	if ( 6.0f >= m_fFadeTimer )
+	{
+		D3DXMATRIX prologueTrans;
+		D3DXMATRIX prologueScale;
+		D3DXMatrixScaling( &prologueScale, 0.03f, -0.03f, 0.03f );
+		D3DXMatrixTranslation( 
+			&prologueTrans, 
+			0.0f, 
+			m_prologueInitZPos,
+			0.0f );
+		m_pPrologueDrawRequest->xform = prologueScale * prologueTrans;
+	}	
+	if ( 6.0f <= m_fFadeTimer && m_fFadeTimer < 46.0f )
 	{	
 		D3DXMATRIX prologueTrans;
 		D3DXMATRIX prologueScale;
 		D3DXMatrixScaling( &prologueScale, 0.03f, -0.03f, 0.03f );
 		D3DXMatrixTranslation( 
-			&prologueTrans, 0.0f, 
-			-35.0f + ( float ) (m_fFadeTimer - 6.0f) * m_velocity,
+			&prologueTrans, 
+			0.0f, 
+			m_prologueInitZPos + (float)m_fFadeTimer * m_velocity,
 			0.0f );
 		m_pPrologueDrawRequest->xform = prologueScale * prologueTrans;
 
@@ -117,14 +131,16 @@ HRESULT IntroState::frameMove( double fTime, float fElapsedTime )
 
 HRESULT IntroState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, float fElapsedTime)
 {
-	pd3dDevice->SetRenderState( D3DRS_LIGHTING, TRUE );
+	/*pd3dDevice->SetRenderState( D3DRS_LIGHTING, TRUE );*/
 	
-	// Setup view and projection xforms - ?
-	pd3dDevice->SetTexture(0, 0);
+	//// Setup view and projection xforms - ?
+	//pd3dDevice->SetTexture(0, 0);
 
-	// Apply non-fixed camera
-	pd3dDevice->SetTransform(D3DTS_VIEW, GetG().m_camera.GetViewMatrix());
-	pd3dDevice->SetTransform(D3DTS_PROJECTION, GetG().m_camera.GetProjMatrix());
+	//// Apply non-fixed camera
+	//pd3dDevice->SetTransform(D3DTS_VIEW, GetG().m_camera.GetViewMatrix());
+	//pd3dDevice->SetTransform(D3DTS_PROJECTION, GetG().m_camera.GetProjMatrix());
+
+	//printf("CamAt %f %f %f\n", GetG().m_camera.GetLookAtPt()->x, GetG().m_camera.GetLookAtPt()->y, GetG().m_camera.GetLookAtPt()->z );
 
 	return S_OK;
 }
@@ -135,11 +151,16 @@ HRESULT IntroState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 	{
 		if ( wParam == VK_ESCAPE )
 		{
-			if ( m_pLogoDrawRequest != 0 )
-				m_pLogo->removeDrawRequest( m_pLogoDrawRequest );
-			if ( m_pPrologueDrawRequest != 0 )
-				m_pPrologue->removeDrawRequest( m_pPrologueDrawRequest );
-			TopStateManager::getSingleton().setNextState( m_nextState );
+			if ( m_fFadeTimer < 6.0f )
+				m_fFadeTimer = 6.0f;
+			else
+			{
+				if ( m_pLogoDrawRequest != 0 )
+					m_pLogo->removeDrawRequest( m_pLogoDrawRequest );
+				if ( m_pPrologueDrawRequest != 0 )
+					m_pPrologue->removeDrawRequest( m_pPrologueDrawRequest );
+				TopStateManager::getSingleton().setNextState( m_nextState );
+			}
 		}
 	}
 
@@ -172,7 +193,7 @@ void IntroState::setupLight()
 
 void IntroState::setupCamera()
 {
-	D3DXVECTOR3 vecEye( 0.0f, -30.0f, -20.0f );
+	D3DXVECTOR3 vecEye( 0.0f, -10.0f, -25.0f );
 	D3DXVECTOR3 vecAt( 0.0f, 0.0f, 0.0f );
 	D3DXVECTOR3 vecUp( 0.0f, 1.0f, 0.0f );
 	GetG().m_camera.setViewParamsWithUp( &vecEye, &vecAt, &vecUp );

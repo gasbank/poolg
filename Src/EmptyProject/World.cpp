@@ -72,13 +72,8 @@ HRESULT World::init()
 	GetScriptManager().execute( scriptCommand );
 	
 	// Hero and enemies are defined afterwards
-	
-	
 
 	assert( m_heroUnit );
-
-	GetG().m_camera.setAttachPos( &getHeroPos() );
-	GetG().m_camera.begin( CAMERA_ATTACH );
 
 	m_curDialog = 0;
 	return hr;
@@ -145,7 +140,7 @@ HRESULT World::frameMove( double dTime, float fElapsedTime )
 
 	UNREFERENCED_PARAMETER( hr );
 
-	if ( GetTopStateManager().curStateEnum() == GAME_TOP_STATE_PLAY && m_bNotEntered )
+	if ( m_bNotEntered )
 	{
 		enter();
 		m_bNotEntered = false;
@@ -764,10 +759,13 @@ Hero* World::pullOutHero()
 
 VOID World::enter()
 {
-	D3DXVECTOR3 eye( getHero()->getPos().x, getHero()->getPos().y, getHero()->getPos().z - 30.0f );
+	GetG().m_camera.setAttachPos( &getHeroPos() );
+	GetG().m_camera.begin( CAMERA_ATTACH );
+
+	/*D3DXVECTOR3 eye( getHero()->getPos().x, getHero()->getPos().y, getHero()->getPos().z - 30.0f );
 	D3DXVECTOR3 at( getHero()->getPos().x, getHero()->getPos().y, getHero()->getPos().z - 1.0f );
 	D3DXVECTOR3 up( 0.0f, 1.0f, 0.0f );
-	GetG().m_camera.setViewParamsWithUp( &eye, &at, &up );
+	GetG().m_camera.setViewParamsWithUp( &eye, &at, &up );*/
 
 	//GetEpLight().setFadeDuration( 1.0f );
 	GetEpLight().setBrightness( 0.0f );

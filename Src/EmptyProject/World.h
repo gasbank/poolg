@@ -38,7 +38,7 @@ public:
 	HRESULT							onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
 													void* pUserContext );
 	void							onLostDevice();
-	VOID							enter();
+	void							enter();
 
 	const std::string&				getWorldName() { return m_worldName; }
 	UINT							addUnit( Unit* u );

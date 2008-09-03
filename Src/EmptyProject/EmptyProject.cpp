@@ -654,7 +654,9 @@ LRESULT CALLBACK MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
 {
 	EpCamera& g_camera = GetG().m_camera;
 
+#ifdef DEBUG
 	g_camera.handleMessages(hWnd, uMsg, wParam, lParam);
+#endif
 	GetEpLight().handleMessages(hWnd, uMsg, wParam, lParam);
 	GetG().m_screenFlash.handleMessage( hWnd, uMsg, wParam, lParam );
 

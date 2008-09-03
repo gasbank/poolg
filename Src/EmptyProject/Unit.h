@@ -95,7 +95,7 @@ public:
 	void							setDynamicMotion( DynamicMotion* dm );
 	void							setForcedMove( int i );
 	void							forcedMoveTest();
-	void							setArnMesh( ArnMesh* arnMesh )			{ assert( arnMesh ); m_arnMesh = arnMesh; }
+	void							setArnMesh( ArnMesh* arnMesh );
 	ArnMesh*						getArnMesh() const						{ return m_arnMesh; }
 
 	void							setColor( int r, int g, int b );

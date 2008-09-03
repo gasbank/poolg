@@ -464,6 +464,23 @@ HRESULT Unit::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC
 void Unit::onLostDevice()
 {
 }
+
+void Unit::setArnMesh( ArnMesh* arnMesh )
+{
+	assert( arnMesh ); 
+	m_arnMesh = arnMesh;
+
+	if ( m_arnMesh )
+	{
+		ArnNode* guardBallNode = getArnMesh()->getNodeByName("GuardBall");
+
+		if ( guardBallNode )
+		{
+			((ArnMesh*)guardBallNode)->setDoAnim( false );
+			((ArnMesh*)guardBallNode)->setVisible( false );
+		}
+	}
+}
 //////////////////////////////////////////////////////////////////////////
 //
 //Unit* EpCreateUnit( int tileX, int tileY )

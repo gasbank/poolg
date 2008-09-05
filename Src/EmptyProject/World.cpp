@@ -168,7 +168,7 @@ HRESULT World::frameMove( double dTime, float fElapsedTime )
 	
 	m_sampleTeapotMeshRot += fElapsedTime * D3DXToRadian(35); // 35 degrees per second
 
-	GetWorldStateManager().transit();
+	GetWorldStateManager().transit( dTime );
 	GetWorldStateManager().getCurState()->frameMove(dTime, fElapsedTime);
 
 	m_modelSg->getSceneRoot()->update(dTime, fElapsedTime);

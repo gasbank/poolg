@@ -4,8 +4,6 @@
 #include "TileManager.h"
 
 
-typedef std::vector<std::string> StringVector;
-
 class Dialog
 {
 public:

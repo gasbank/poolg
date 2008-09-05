@@ -13,6 +13,7 @@ public:
 	void registerSkill( Skill* skill );
 
 	void unregisterAllSkills();
+
 private:
 	SkillMap m_skillMap;
 };

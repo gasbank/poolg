@@ -60,8 +60,6 @@ inline bool WasKeyDown( BYTE key ) { return( (key & KEY_WAS_DOWN_MASK) == KEY_WA
 
 #define SCRIPT_FACTORY(className) class _script_factory_##className { public: static void init(); };
 
-typedef std::list<const char*> ConstCharList;
-
 
 template<typename T> void EpSafeReleaseAll( T& obj ) {
 	T::iterator it = obj.begin();

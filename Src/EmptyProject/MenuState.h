@@ -18,7 +18,7 @@ public:
 	void select(int move);
 	void saveloadselect(int select);
 
-	virtual HRESULT enter();
+	virtual HRESULT enter( double dStartTime );
 	virtual HRESULT leave();
 
 	virtual HRESULT onCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,

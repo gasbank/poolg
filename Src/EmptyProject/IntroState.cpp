@@ -45,7 +45,7 @@ IntroState::~IntroState(void)
 {
 }
 
-HRESULT IntroState::enter()
+HRESULT IntroState::enter( double dStartTime )
 {
 	LPDIRECT3DDEVICE9 pd3dDevice = GetG().m_dev;
 
@@ -64,14 +64,12 @@ HRESULT IntroState::enter()
 
 
 
-	return S_OK;
+	return State::enter( dStartTime );
 }
 
 HRESULT IntroState::leave()
 {
-	m_startTime = -1.0f;
-
-	return S_OK;
+	return State::leave();
 }
 
 HRESULT IntroState::frameMove( double fTime, float fElapsedTime )

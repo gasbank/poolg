@@ -15,12 +15,12 @@ PlayState::~PlayState(void)
 {
 }
 
-HRESULT PlayState::enter()
+HRESULT PlayState::enter( double dStartTime )
 {
 	if ( !getCurWorld() )
 		throw std::runtime_error( "m_nextWorld should be set before calling enter() method" );
 
-	return S_OK;
+	return State::enter( dStartTime );
 
 }
 

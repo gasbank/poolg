@@ -56,7 +56,7 @@ CreditState::~CreditState( void )
 	release();
 }
 
-HRESULT CreditState::enter()
+HRESULT CreditState::enter( double dStartTime )
 {
 	LPDIRECT3DDEVICE9& pd3dDevice = GetG().m_dev;
 	
@@ -75,7 +75,7 @@ HRESULT CreditState::enter()
 	m_textMat.Ambient.a = m_textMat.Specular.a = m_textMat.Diffuse.a = 0.0f;
 	m_textMat.Power = 1.0f;
 
-	return S_OK;
+	return State::enter( dStartTime );
 }
 
 HRESULT CreditState::leave()

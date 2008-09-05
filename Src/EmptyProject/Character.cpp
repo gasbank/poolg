@@ -425,6 +425,16 @@ void Character::addMoveImpulse( const D3DXVECTOR3& impulse )
 	m_moveImpulse += impulse;
 	//printf( "Now impulse is " ); Utility::printValue( m_moveImpulse ); printf( "\n" );
 }
+
+bool Character::deleteSkill( SkillLocation skillLoc )
+{
+	if ( m_skillSet->getSkill( skillLoc ) )
+	{
+		m_skillSet->deleteSkill( skillLoc );
+		return true;
+	}
+	return false;
+}
 //////////////////////////////////////////////////////////////////////////
 //
 //

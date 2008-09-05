@@ -9,6 +9,8 @@ class Trigger;
 
 typedef std::list<SkillObject*> SkillObjectList;
 
+enum SkillLocation;
+
 //고정적 스탯. 레벨 업 시만 오르는.(simon ornen)
 struct Stat
 {
@@ -62,8 +64,8 @@ public:
 	void								setControllable(bool bCtrl)		{ m_bControllable = bCtrl; }
 
 	void								pushSkillObject (SkillObject* skillObj);
-
-	SkillSet*							getSkillSet() const { return m_skillSet; }
+	const SkillSet*						getSkillSet() const { return m_skillSet; }
+	bool								deleteSkill( SkillLocation skillLoc );
 	
 protected:
 										Character( UnitType type );
@@ -92,7 +94,7 @@ private:
 
 	bool								m_bControllable;
 
-	SkillSet*							m_skillSet;	
+	SkillSet*							m_skillSet;
 	SkillObjectList						m_skillObjectList;
 
 };

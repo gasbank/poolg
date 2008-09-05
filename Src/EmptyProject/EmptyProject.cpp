@@ -315,7 +315,7 @@ void CALLBACK OnFrameMove( double fTime, float fElapsedTime, void* pUserContext 
 
 	//////////////////////////////////////////////////////////////////////////
 
-	TopStateManager::getSingleton().transit();
+	TopStateManager::getSingleton().transit( fTime );
 
 	if (GetTopStateManager().getCurState())
 		GetTopStateManager().getCurState()->frameMove(fTime, fElapsedTime);

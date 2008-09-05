@@ -4,7 +4,7 @@ class Skill;
 class BattleState;
 
 
-enum SkillLocation { SL_FIRST, SL_SECOND, SL_THIRD, SL_FOURTH, SL_FIFTH };
+enum SkillLocation { SL_FIRST = 0, SL_SECOND, SL_THIRD, SL_FOURTH, SL_FIFTH };
 
 
 class SkillSet
@@ -14,21 +14,26 @@ public:
 									~SkillSet();
 
 	void							setSkill( SkillLocation skillLocation, Skill* skill );
+	const Skill*					getSkill( SkillLocation skillLoc ) const { return m_skillSet[(int)skillLoc]; }
 	void							deleteSkill( SkillLocation skillLocation );
-	bool							useSkill();
+	void							deleteAllSkills();
+	//bool							useSkill();
 	const std::string&				getSkillName( SkillLocation skillLocation ) const;
 	const std::string&				getDescription( SkillLocation skillLocation ) const;
-	SkillLocation					getSkillLocation() const { return m_skillLocation; }
-	void							moveSkillLocation( char mode );
-	void							setCharacter( Character* hero, Character* enemy );
 
-	/*사용 전엔 반드시 battleState를 설정해 주어야 한다.*/
-	void							setBattleState( BattleState* battleState ) { m_battleState = battleState; }
+	/*SkillLocation					getSkillLocation() const { return m_skillLocation; }*/
+	/*void							moveSkillLocation( char mode );
+	void							setCharacter( Character* hero, Character* enemy );*/
+
+	///*사용 전엔 반드시 battleState를 설정해 주어야 한다.*/
+	//void							setBattleState( BattleState* battleState ) { m_battleState = battleState; }
 
 private:
-	Skill*							m_skillSet[5];
-	SkillLocation					m_skillLocation;
-	BattleState*					m_battleState;
+	static const UINT				ms_skillCount = 5;
+	const Skill*					m_skillSet[ms_skillCount];
+
+	/*SkillLocation					m_skillLocation;*/
+	/*BattleState*					m_battleState;*/
 
 	static const std::string		ms_emptySlotSkillName;
 	static const std::string		ms_emptySlotSkillDescription;

@@ -123,19 +123,19 @@ Unit* EpCreateHero( Tcl_Obj* tilePos )
 
 } SCRIPT_CALLABLE_PV_OBJ( EpCreateHero )
 
-int EpAddSkillToHero( int skillNo )
-{
-	Hero* hero = (Hero*)GetWorldManager().getCurWorld()->getHeroUnit();
-	hero->addToSkillSet( (SkillLocation)skillNo );
-	return 0;
-} SCRIPT_CALLABLE_I_I( EpAddSkillToHero )
-
-int EpDeleteSkillFromHero( int skillNo )
-{
-	Hero* hero = (Hero*)GetWorldManager().getCurWorld()->getHeroUnit();
-	hero->getSkillSet()->deleteSkill(  ( SkillLocation )skillNo );
-	return 0;
-} SCRIPT_CALLABLE_I_I( EpDeleteSkillFromHero )
+//int EpAddSkillToHero( int skillNo )
+//{
+//	Hero* hero = (Hero*)GetWorldManager().getCurWorld()->getHeroUnit();
+//	hero->addToSkillSet( (SkillLocation)skillNo );
+//	return 0;
+//} SCRIPT_CALLABLE_I_I( EpAddSkillToHero )
+//
+//int EpDeleteSkillFromHero( int skillNo )
+//{
+//	Hero* hero = (Hero*)GetWorldManager().getCurWorld()->getHeroUnit();
+//	hero->deleteSkill(  ( SkillLocation )skillNo );
+//	return 0;
+//} SCRIPT_CALLABLE_I_I( EpDeleteSkillFromHero )
 
 int EpHeroSetEncounterEnemy( int b )
 {
@@ -147,7 +147,7 @@ int EpHeroSetEncounterEnemy( int b )
 
 START_SCRIPT_FACTORY(Hero)
 	CREATE_OBJ_COMMAND( EpCreateHero )
-	CREATE_OBJ_COMMAND( EpAddSkillToHero )
-	CREATE_OBJ_COMMAND( EpDeleteSkillFromHero )
+	/*CREATE_OBJ_COMMAND( EpAddSkillToHero )
+	CREATE_OBJ_COMMAND( EpDeleteSkillFromHero )*/
 	CREATE_OBJ_COMMAND( EpHeroSetEncounterEnemy )
 END_SCRIPT_FACTORY(Hero)

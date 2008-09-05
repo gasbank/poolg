@@ -571,62 +571,6 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="Top States"
-			>
-			<File
-				RelativePath=".\CreditState.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\CreditState.h"
-				>
-			</File>
-			<File
-				RelativePath=".\IntroState.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\IntroState.h"
-				>
-			</File>
-			<File
-				RelativePath=".\PlayState.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\PlayState.h"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="World States"
-			>
-			<File
-				RelativePath=".\BattleState.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\BattleState.h"
-				>
-			</File>
-			<File
-				RelativePath=".\FieldState.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\FieldState.h"
-				>
-			</File>
-			<File
-				RelativePath=".\MenuState.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\MenuState.h"
-				>
-			</File>
-		</Filter>
-		<Filter
 			Name="Shaders"
 			>
 			<File
@@ -805,6 +749,62 @@
 				RelativePath=".\WorldStateManager.h"
 				>
 			</File>
+			<Filter
+				Name="Top States"
+				>
+				<File
+					RelativePath=".\CreditState.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\CreditState.h"
+					>
+				</File>
+				<File
+					RelativePath=".\IntroState.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\IntroState.h"
+					>
+				</File>
+				<File
+					RelativePath=".\PlayState.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\PlayState.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="PlayState&apos;s Substates (World States)"
+				>
+				<File
+					RelativePath=".\BattleState.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\BattleState.h"
+					>
+				</File>
+				<File
+					RelativePath=".\FieldState.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\FieldState.h"
+					>
+				</File>
+				<File
+					RelativePath=".\MenuState.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\MenuState.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="UI"
@@ -866,10 +866,6 @@
 				>
 			</File>
 		</Filter>
-		<File
-			RelativePath=".\ClassDiagram1.cd"
-			>
-		</File>
 		<File
 			RelativePath=".\Dialog.cpp"
 			>

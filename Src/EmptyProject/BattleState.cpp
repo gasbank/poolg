@@ -194,7 +194,7 @@ BattleState::~BattleState()
 }
 
 /* 전투 시작 시 다음 함수가 호출됨*/
-HRESULT BattleState::enter()
+HRESULT BattleState::enter( double dStartTime )
 {
 	getHero()->clearKey();
 
@@ -205,9 +205,10 @@ HRESULT BattleState::enter()
 	updateBarRate();
 
 	/*스킬 대상 설정*/
-	SkillSet* skillSet = getHero()->getSkillSet();
+	/*SkillSet* skillSet = getHero()->getSkillSet();
 	skillSet->setCharacter (getHero(), getFirstEnemy());
-	skillSet->setBattleState(this);
+	skillSet->setBattleState(this);*/
+
 	m_noneSkillSelectedCount = 0;
 	m_levelProgress = false;
 	m_levelUpFlag = false;
@@ -234,12 +235,11 @@ HRESULT BattleState::enter()
 	}
 	m_desaturation = 0;
 
-	return S_OK;
+	return State::enter( dStartTime );
 }
 
 HRESULT BattleState::leave()
 {
-	m_startTime = -1.0f;
 	m_battleLog.clear();
 
 	GetAudioState().leaveBattle();
@@ -261,7 +261,7 @@ HRESULT BattleState::leave()
 	camera.setSmoothCameraDuration( 1.0f );
 	camera.begin( CAMERA_SMOOTH_ATTACH );
 
-	return S_OK;
+	return State::leave();
 }
 
 HRESULT BattleState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, float fElapsedTime)
@@ -602,114 +602,114 @@ HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 			return S_OK;
 		}
 
-		SkillSet* skillSet = this->getHero()->getSkillSet();
-		skillSet->setCharacter( getHero(), getFirstEnemy() );
+		//const SkillSet* skillSet = this->getHero()->getSkillSet();
+		//skillSet->setCharacter( getHero(), getFirstEnemy() );
 
 		/*화살표에 따라 기술 분기*/
-		if (wParam == VK_UP)
-		{
-			skillSet->moveSkillLocation('u');
-		}
-		if (wParam == VK_DOWN)
-		{
-			skillSet->moveSkillLocation('d');
-		}
-		if (wParam == VK_LEFT)
-		{
-			m_skillContentBoxMover->onBox();
-		}
-		if (wParam == VK_RIGHT)
-		{
-			m_skillContentBoxMover->offBox();
-		}
-		if (wParam == VK_NUMPAD5)
-		{
-			m_curTurnType = TT_NATURAL;
+		//if (wParam == VK_UP)
+		//{
+		//	skillSet->moveSkillLocation('u');
+		//}
+		//if (wParam == VK_DOWN)
+		//{
+		//	skillSet->moveSkillLocation('d');
+		//}
+		//if (wParam == VK_LEFT)
+		//{
+		//	m_skillContentBoxMover->onBox();
+		//}
+		//if (wParam == VK_RIGHT)
+		//{
+		//	m_skillContentBoxMover->offBox();
+		//}
+		//if (wParam == VK_NUMPAD5)
+		//{
+		//	m_curTurnType = TT_NATURAL;
 
 
-			if (!(skillSet->useSkill()))
-			{
-				//이부분에 스킬이 없습니다 라는 다이얼로그를 추가할수도.
-				//이스터 에그입니다. 마음껏 추가하시죠.
-				switch (m_noneSkillSelectedCount)
-				{
-				case 0:
-					m_battleLog.push_back(std::string("스킬이 없습니다."));
-					break;
-				case 1:
-					m_battleLog.push_back(std::string("스킬이 없는데요?"));
-					break;
-				case 2:
-					m_battleLog.push_back(std::string("스킬이 없다니까요!!?"));
-					break;
-				case 3:
-					m_battleLog.push_back(std::string("없는 스킬 자꾸 누르는 저의가 무엇이냐!"));
-					break;
-				case 4:
-					m_battleLog.push_back(std::string("뭥미???"));
-					break;
-				case 5:
-					m_battleLog.push_back(std::string("..."));
-					break;
-				case 6:
-					m_battleLog.push_back(std::string("..."));
-					break;
-				case 7:
-					m_battleLog.push_back(std::string("어쩔 수 없군. 몇 가지 팁을 제공하죠."));
-					break;
-				case 8:
-					m_battleLog.push_back(std::string("맵의 곳곳에 숨겨진 박카스가 존재하는 듯 하다."));
-					break;
-				case 9:
-					m_battleLog.push_back(std::string("박카스를 쟁취하려면 맵에 존재하는 갖가지 퍼즐을 풀어야 한다."));
-					break;
-				case 10:
-					m_battleLog.push_back(std::string("최종 보스와의 대전을 위해 물약을 최대한 많이 쟁겨놓으십시오."));
-					break;
-				case 11:
-					m_battleLog.push_back(std::string("신도 세미나실은 신성합니다. 존중해주시죠."));
-					break;
-				case 12:
-					m_battleLog.push_back(std::string("제육덮밥"));
-					break;
-				case 13:
-					m_battleLog.push_back(std::string("보스는 사실 거미를 무서워하는 듯 하다."));
-					break;
-				case 14:
-					m_battleLog.push_back(std::string("흐흥, 딱히 스크립트를 모르기 땜시 이런 switch문 노가다를 한건 아니야!"));
-					break;
-				case 15:
-					m_battleLog.push_back(std::string("goto문은 지양합시다."));
-					break;
-				case 16:
-					m_battleLog.push_back(std::string("1일 1코딩."));
-					break;
-				case 17:
-					m_battleLog.push_back(std::string("게임은 조금만 합시다."));
-					break;
-				case 18:
-					m_battleLog.push_back(std::string("코드에 주석은 필수."));
-					break;
-				case 19:
-					m_battleLog.push_back(std::string("제작 동안 OOO군의 프로젝트 말살 음모가 있었습니다."));
-					break;
-				case 20:
-					m_battleLog.push_back(std::string("맛의진미"));
-					break;
-				case 21:
-					m_battleLog.push_back(std::string("일부 스킬들은 연속기로 쓸 수 있습니다."));
-					break;
-				case 22:
-					m_battleLog.push_back( std::string( "OOO군은 무려 EP를 지우고, DXUT에 오타를 가하는 등의 음해를 가했습니다." ));
-					break;
-				default:
-					m_battleLog.push_back(std::string("훗, 더 이상의 자세한 팁은 생략한다."));;
-					break;
-				}
-				m_noneSkillSelectedCount++;
-				m_curTurnType = TT_PLAYER;
-			}
-		}
+		//	if (!(skillSet->useSkill()))
+		//	{
+		//		//이부분에 스킬이 없습니다 라는 다이얼로그를 추가할수도.
+		//		//이스터 에그입니다. 마음껏 추가하시죠.
+		//		switch (m_noneSkillSelectedCount)
+		//		{
+		//		case 0:
+		//			m_battleLog.push_back(std::string("스킬이 없습니다."));
+		//			break;
+		//		case 1:
+		//			m_battleLog.push_back(std::string("스킬이 없는데요?"));
+		//			break;
+		//		case 2:
+		//			m_battleLog.push_back(std::string("스킬이 없다니까요!!?"));
+		//			break;
+		//		case 3:
+		//			m_battleLog.push_back(std::string("없는 스킬 자꾸 누르는 저의가 무엇이냐!"));
+		//			break;
+		//		case 4:
+		//			m_battleLog.push_back(std::string("뭥미???"));
+		//			break;
+		//		case 5:
+		//			m_battleLog.push_back(std::string("..."));
+		//			break;
+		//		case 6:
+		//			m_battleLog.push_back(std::string("..."));
+		//			break;
+		//		case 7:
+		//			m_battleLog.push_back(std::string("어쩔 수 없군. 몇 가지 팁을 제공하죠."));
+		//			break;
+		//		case 8:
+		//			m_battleLog.push_back(std::string("맵의 곳곳에 숨겨진 박카스가 존재하는 듯 하다."));
+		//			break;
+		//		case 9:
+		//			m_battleLog.push_back(std::string("박카스를 쟁취하려면 맵에 존재하는 갖가지 퍼즐을 풀어야 한다."));
+		//			break;
+		//		case 10:
+		//			m_battleLog.push_back(std::string("최종 보스와의 대전을 위해 물약을 최대한 많이 쟁겨놓으십시오."));
+		//			break;
+		//		case 11:
+		//			m_battleLog.push_back(std::string("신도 세미나실은 신성합니다. 존중해주시죠."));
+		//			break;
+		//		case 12:
+		//			m_battleLog.push_back(std::string("제육덮밥"));
+		//			break;
+		//		case 13:
+		//			m_battleLog.push_back(std::string("보스는 사실 거미를 무서워하는 듯 하다."));
+		//			break;
+		//		case 14:
+		//			m_battleLog.push_back(std::string("흐흥, 딱히 스크립트를 모르기 땜시 이런 switch문 노가다를 한건 아니야!"));
+		//			break;
+		//		case 15:
+		//			m_battleLog.push_back(std::string("goto문은 지양합시다."));
+		//			break;
+		//		case 16:
+		//			m_battleLog.push_back(std::string("1일 1코딩."));
+		//			break;
+		//		case 17:
+		//			m_battleLog.push_back(std::string("게임은 조금만 합시다."));
+		//			break;
+		//		case 18:
+		//			m_battleLog.push_back(std::string("코드에 주석은 필수."));
+		//			break;
+		//		case 19:
+		//			m_battleLog.push_back(std::string("제작 동안 OOO군의 프로젝트 말살 음모가 있었습니다."));
+		//			break;
+		//		case 20:
+		//			m_battleLog.push_back(std::string("맛의진미"));
+		//			break;
+		//		case 21:
+		//			m_battleLog.push_back(std::string("일부 스킬들은 연속기로 쓸 수 있습니다."));
+		//			break;
+		//		case 22:
+		//			m_battleLog.push_back( std::string( "OOO군은 무려 EP를 지우고, DXUT에 오타를 가하는 등의 음해를 가했습니다." ));
+		//			break;
+		//		default:
+		//			m_battleLog.push_back(std::string("훗, 더 이상의 자세한 팁은 생략한다."));;
+		//			break;
+		//		}
+		//		m_noneSkillSelectedCount++;
+		//		m_curTurnType = TT_PLAYER;
+		//	}
+		//}
 
 			
 	}
@@ -801,7 +801,7 @@ void BattleState::renderFixedText(int scrWidth, int scrHeight)
 	rc.top = scrHeight - 190;
 	rc.left = scrWidth - 110;
 
-	SkillSet* skillSet = getHero()->getSkillSet();
+	const SkillSet* skillSet = getHero()->getSkillSet();
 
 	char textBufferA[512];
 	StringCchPrintfA(textBufferA, 512, skillSet->getSkillName(SL_FIRST).c_str());
@@ -819,54 +819,54 @@ void BattleState::renderFixedText(int scrWidth, int scrHeight)
 	StringCchPrintfA(textBufferA, 512, skillSet->getSkillName(SL_FIFTH).c_str());
 	m_lblSkill->DrawTextA(0, textBufferA, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 
-	/*스킬 라벨 그리기*/
-	switch (skillSet->getSkillLocation())
-	{
-	case SL_FIRST:
-		rc.top = scrHeight - 190;
-		StringCchPrintfA(textBufferA, 512, skillSet->getSkillName(SL_FIRST).c_str());
-		break;
-	case SL_SECOND:
-		rc.top = scrHeight - 190 + skillLineInterval;
-		StringCchPrintfA(textBufferA, 512, skillSet->getSkillName(SL_SECOND).c_str());
-		break;
-	case SL_THIRD:
-		rc.top = scrHeight - 190 + skillLineInterval*2;
-		StringCchPrintfA(textBufferA, 512, skillSet->getSkillName(SL_THIRD).c_str());
-		break;
-	case SL_FOURTH:
-		rc.top = scrHeight - 190 + skillLineInterval*3;
-		StringCchPrintfA(textBufferA, 512, skillSet->getSkillName(SL_FOURTH).c_str());
-		break;
-	case SL_FIFTH:
-		rc.top = scrHeight - 190 + skillLineInterval*4;
-		StringCchPrintfA(textBufferA, 512, skillSet->getSkillName(SL_FIFTH).c_str());
-		break;
-	}
-	m_lblSkill->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 0.0f, 1.0f, 1.0f ) );
+	///*스킬 라벨 그리기*/
+	//switch (skillSet->getSkillLocation())
+	//{
+	//case SL_FIRST:
+	//	rc.top = scrHeight - 190;
+	//	StringCchPrintfA(textBufferA, 512, skillSet->getSkillName(SL_FIRST).c_str());
+	//	break;
+	//case SL_SECOND:
+	//	rc.top = scrHeight - 190 + skillLineInterval;
+	//	StringCchPrintfA(textBufferA, 512, skillSet->getSkillName(SL_SECOND).c_str());
+	//	break;
+	//case SL_THIRD:
+	//	rc.top = scrHeight - 190 + skillLineInterval*2;
+	//	StringCchPrintfA(textBufferA, 512, skillSet->getSkillName(SL_THIRD).c_str());
+	//	break;
+	//case SL_FOURTH:
+	//	rc.top = scrHeight - 190 + skillLineInterval*3;
+	//	StringCchPrintfA(textBufferA, 512, skillSet->getSkillName(SL_FOURTH).c_str());
+	//	break;
+	//case SL_FIFTH:
+	//	rc.top = scrHeight - 190 + skillLineInterval*4;
+	//	StringCchPrintfA(textBufferA, 512, skillSet->getSkillName(SL_FIFTH).c_str());
+	//	break;
+	//}
+	//m_lblSkill->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 0.0f, 1.0f, 1.0f ) );
 
 
-	rc.top = scrHeight - 190;
-	rc.left = scrWidth - 410;
+	//rc.top = scrHeight - 190;
+	//rc.left = scrWidth - 410;
 
-	switch (skillSet->getSkillLocation())
-	{
-	case SL_FIRST:
-		StringCchPrintfA(textBufferA, 512, skillSet->getDescription(SL_FIRST).c_str());
-		break;
-	case SL_SECOND:
-		StringCchPrintfA(textBufferA, 512, skillSet->getDescription(SL_SECOND).c_str());
-		break;
-	case SL_THIRD:
-		StringCchPrintfA(textBufferA, 512, skillSet->getDescription(SL_THIRD).c_str());
-		break;
-	case SL_FOURTH:
-		StringCchPrintfA(textBufferA, 512, skillSet->getDescription(SL_FOURTH).c_str());
-		break;
-	case SL_FIFTH:
-		StringCchPrintfA(textBufferA, 512, skillSet->getDescription(SL_FIFTH).c_str());
-		break;
-	}
+	//switch (skillSet->getSkillLocation())
+	//{
+	//case SL_FIRST:
+	//	StringCchPrintfA(textBufferA, 512, skillSet->getDescription(SL_FIRST).c_str());
+	//	break;
+	//case SL_SECOND:
+	//	StringCchPrintfA(textBufferA, 512, skillSet->getDescription(SL_SECOND).c_str());
+	//	break;
+	//case SL_THIRD:
+	//	StringCchPrintfA(textBufferA, 512, skillSet->getDescription(SL_THIRD).c_str());
+	//	break;
+	//case SL_FOURTH:
+	//	StringCchPrintfA(textBufferA, 512, skillSet->getDescription(SL_FOURTH).c_str());
+	//	break;
+	//case SL_FIFTH:
+	//	StringCchPrintfA(textBufferA, 512, skillSet->getDescription(SL_FIFTH).c_str());
+	//	break;
+	//}
 
 	if (m_skillContentBoxMover->isOn() && !m_skillContentBoxMover->isMoving())
 		m_lblSkillDescription->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 0.8f, 0.8f, 1.0f, 1.0f ) );
@@ -1161,8 +1161,6 @@ void BattleState::onLostDevice()
 
 HRESULT BattleState::onCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext )
 {
-	m_pDev = pd3dDevice;
 
-	
 	return S_OK;
 }

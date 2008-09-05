@@ -19,7 +19,7 @@ State* StateManager::getCurState() const
 	return m_curStates;
 }
 
-void StateManager::transit()
+void StateManager::transit( double dCurrentTime )
 {
 	if (m_nextState != 0)
 	{
@@ -29,13 +29,14 @@ void StateManager::transit()
 		m_prevStates = m_curStates;
 		m_curStates = m_nextState;
 		m_nextState = 0;
-		m_curStates->enter();
+		m_curStates->enter( dCurrentTime );
 	}
 }
 
-State* StateManager::getState( GameState gs )
+State* StateManager::getState( GameState gs ) const
 {
-	return m_states[gs];
+	StateMap::const_iterator cit = m_states.find( gs );
+	return cit->second;
 }
 
 void StateManager::release()

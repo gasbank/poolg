@@ -11,7 +11,7 @@ class SkillObject : public Unit
 {
 public:
 	static SkillObject*				createSkillObject( const char* bst, float size, D3DCOLOR color, const char* dmt );
-	virtual							~SkillObject();
+									~SkillObject();
 
 	// Virtual Methods
 	virtual HRESULT					frameRender( double dTime, float fElapsedTime );

@@ -12,6 +12,7 @@ public:
 	static DynamicMotion* createDMpuff			( Unit* target, const D3DXVECTOR3& initPos, float puffRate, float puffSpeed );
 	static DynamicMotion* createRandomCurve		() { return 0; }
 
+	virtual void release() {}
 protected:
 	Unit* m_target;
 };

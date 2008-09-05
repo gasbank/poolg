@@ -8,6 +8,7 @@
 #include "ShaderWrapper.h"
 #include "Unit.h"
 #include "ScriptManager.h"
+#include "Action.h"
 
 extern BombShader*						g_bombShader;
 extern LPD3DXMESH						g_bst[BST_COUNT];
@@ -20,6 +21,7 @@ SkillObject::SkillObject( BasicShapeType bst, float size, D3DCOLOR color, Dynami
 , m_dm( 0 )
 , m_size( size )
 , m_color( color )
+, m_onHitAction( 0 )
 {
 	setMesh( g_bst[bst] );
 }
@@ -28,6 +30,10 @@ SkillObject::~SkillObject(void)
 {
 	//m_effectObject->release();
 	//delete m_effectObject;
+
+	EP_SAFE_RELEASE( m_dm );
+	EP_SAFE_RELEASE( m_onHitAction );
+
 }
 
 bool SkillObject::frameMove ( float fElapsedTime )

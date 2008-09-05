@@ -1011,6 +1011,7 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 
 	Skill* skill = Skill::createSkillByScript( "NormalAttackSkill" );
 
+	delete skill;
 
 	//////////////////////////////////////////////////////////////////////////
 

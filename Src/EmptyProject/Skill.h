@@ -12,7 +12,7 @@ class Skill
 {
 public:
 	static Skill*				createSkillByScript( const char* skillNsName );
-								~Skill() {}
+								~Skill();
 
 	const std::string&			getDescription() const { return m_skillDescription; }
 	const std::string&			getSkillName() const { return m_skillName; }

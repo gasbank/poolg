@@ -2,10 +2,10 @@
 #include "Unit.h"
 #include "TileManager.h"
 
-
 class SkillSet;
 class SkillObject;
 class Trigger;
+class Skill;
 
 typedef std::list<SkillObject*> SkillObjectList;
 
@@ -31,8 +31,12 @@ public:
 	virtual const D3DXVECTOR3&			getPos() const { if ( m_moveImpulse != DX_CONSTS::D3DXVEC3_ZERO ) return m_curPos; else return Unit::getPos(); }
 	virtual void						pushUnitInFront( UnitInput dir );
 
-	/*스킬 함수*/
+	/* 스킬 관련 함수 */
 	//void doNormalAttack(int type, Character* enemy);
+	void								pushSkillObject (SkillObject* skillObj);
+	const SkillSet*						getSkillSet() const { return m_skillSet; }
+	bool								deleteSkill( SkillLocation skillLoc );
+	bool								acquireSkill( const Skill* skill );
 
 	void								doCsBurn();
 	void								recoverCs ();
@@ -63,9 +67,6 @@ public:
 
 	void								setControllable(bool bCtrl)		{ m_bControllable = bCtrl; }
 
-	void								pushSkillObject (SkillObject* skillObj);
-	const SkillSet*						getSkillSet() const { return m_skillSet; }
-	bool								deleteSkill( SkillLocation skillLoc );
 	
 protected:
 										Character( UnitType type );

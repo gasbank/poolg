@@ -132,3 +132,15 @@ void SkillSet::deleteAllSkills()
 	m_skillSet[3] = 0;
 	m_skillSet[4] = 0;
 }
+
+bool SkillSet::acquireSkill( const Skill* skill )
+{
+	ConstSkillList::const_iterator cit = std::find( m_memorizedSkills.begin(), m_memorizedSkills.end(), skill );
+	if ( skill && ( cit == m_memorizedSkills.end() ) )
+	{
+		m_memorizedSkills.push_back( skill );
+		return true;
+	}
+	// Has skill already or skill param is null.
+	return false;
+}

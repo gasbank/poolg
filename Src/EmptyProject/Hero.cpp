@@ -9,6 +9,7 @@
 #include "Skill.h"
 #include "SkillSet.h"
 #include "Sound.h"
+#include "SkillManager.h"
 
 Hero::Hero(void)
 : Character( UT_HERO )
@@ -32,23 +33,12 @@ Unit* Hero::createHero( LPD3DXMESH mesh, int tileX, int tileY, float posZ )
 	u->setTileBufferPos( tileX, tileY );
 	u->setArnMeshName( "PoolGModel" );
 
-	u->addToSkillSet( SL_FIRST );
+	// Acquire the most basic skill to our hero!
+	//u->addToSkillSet( SL_FIRST );
+	u->acquireSkill( GetSKillManager().getSkill( "NormalAttack" ) );
 	return u;
 }
 
-void Hero::addToSkillSet( SkillLocation sl )
-{
-	/*SkillSet* skillSet = getSkillSet();
-
-	switch ( sl )
-	{
-	case SL_FIRST: skillSet->setSkill (SL_FIRST, (Skill*) new NormalAttack()); break;
-	case SL_SECOND: skillSet->setSkill (SL_SECOND, (Skill*) new Heal()); break;
-	case SL_THIRD: skillSet->setSkill (SL_THIRD, (Skill*) new Goto()); break;
-	case SL_FOURTH: skillSet->setSkill (SL_FOURTH, (Skill*) new MultiThread());; break;
-	case SL_FIFTH: skillSet->setSkill (SL_FIFTH, (Skill*) new Meditation()); break;
-	}*/
-}
 
 void Hero::levelUp()
 {

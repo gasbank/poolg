@@ -998,21 +998,22 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 	// (10) Script side callback invocation (Do at the end of this function.)
 	GetScriptManager().execute( "EpOnCreateDevice" );
 
-	// (11) Set the first world
+	// (11) Setup SkillManager
+	SkillManager* g_skillManager = new SkillManager();
+	GetSKillManager().registerSkill( Skill::createSkillByScript( "NormalAttackSkill" ) );
+
+	// (12) Set the first world
 	// TODO: This is 'DO ONCE THROUGH THE WHOLE LIFETIME job.. not on every OnCreateDevice()!
 	const char* startWorldName = GetScriptManager().readString( "EpStartWorldName" );
 	GetWorldManager().setNextWorld( startWorldName );
 	GetWorldManager().changeToNextWorldIfExist();
 
-	// (12) Determine Windowed or full screen mode
+	// (13) Determine Windowed or full screen mode
 	const char* windowMode = GetScriptManager().readString( "EpWindowMode" );
 	bool bWindowMode = (*windowMode)=='1'?true:false;
 
 
 
-	SkillManager* g_skillManager = new SkillManager();
-
-	GetSKillManager().registerSkill( Skill::createSkillByScript( "NormalAttackSkill" ) );
 
 	//////////////////////////////////////////////////////////////////////////
 

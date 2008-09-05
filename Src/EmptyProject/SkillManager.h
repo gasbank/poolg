@@ -14,6 +14,7 @@ public:
 
 	void unregisterAllSkills();
 
+	const Skill* getSkill( const char* skillName ) const;
 private:
 	SkillMap m_skillMap;
 };

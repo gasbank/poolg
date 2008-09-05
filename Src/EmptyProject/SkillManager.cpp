@@ -29,3 +29,12 @@ void SkillManager::unregisterAllSkills()
 {
 	EpSafeReleaseAllMap( m_skillMap );
 }
+
+const Skill* SkillManager::getSkill( const char* skillName ) const
+{
+	SkillMap::const_iterator cit = m_skillMap.find( skillName );
+	if ( cit != m_skillMap.end() )
+		return cit->second;
+	else
+		return 0;
+}

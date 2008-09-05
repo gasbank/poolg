@@ -435,6 +435,11 @@ bool Character::deleteSkill( SkillLocation skillLoc )
 	}
 	return false;
 }
+
+bool Character::acquireSkill( const Skill* skill )
+{
+	return m_skillSet->acquireSkill( skill );
+}
 //////////////////////////////////////////////////////////////////////////
 //
 //

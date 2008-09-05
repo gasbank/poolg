@@ -3,6 +3,7 @@
 class Skill;
 class BattleState;
 
+typedef std::list<const Skill*> ConstSkillList;
 
 enum SkillLocation { SL_FIRST = 0, SL_SECOND, SL_THIRD, SL_FOURTH, SL_FIFTH };
 
@@ -12,6 +13,8 @@ class SkillSet
 public:
 									SkillSet();
 									~SkillSet();
+
+	bool							acquireSkill( const Skill* skill );
 
 	void							setSkill( SkillLocation skillLocation, Skill* skill );
 	const Skill*					getSkill( SkillLocation skillLoc ) const { return m_skillSet[(int)skillLoc]; }
@@ -30,10 +33,8 @@ public:
 
 private:
 	static const UINT				ms_skillCount = 5;
-	const Skill*					m_skillSet[ms_skillCount];
-
-	/*SkillLocation					m_skillLocation;*/
-	/*BattleState*					m_battleState;*/
+	const Skill*					m_skillSet[ms_skillCount];	// Equipped Skills: Five active skills drawn from memorized skills.
+	ConstSkillList					m_memorizedSkills;			// Memorized Skills: Skills which an owner of this SkillSet is capable of using.
 
 	static const std::string		ms_emptySlotSkillName;
 	static const std::string		ms_emptySlotSkillDescription;

@@ -450,7 +450,7 @@ void Unit::updateArnMesh()
 
 void Unit::setMesh( LPD3DXMESH d3dxMesh )
 {
-	
+	m_d3dxMesh = d3dxMesh;
 }
 //////////////////////////////////////////////////////////////////////////
 //

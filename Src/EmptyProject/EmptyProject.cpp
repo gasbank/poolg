@@ -37,7 +37,7 @@
 #include "Sprite.h"
 #include "EpLight.h"
 #include "particlesystem.h"
-
+#include "Skill.h"
 
 SCREEN_VERTEX g_Vertex[4];
 
@@ -1006,6 +1006,10 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 	// (12) Determine Windowed or full screen mode
 	const char* windowMode = GetScriptManager().readString( "EpWindowMode" );
 	bool bWindowMode = (*windowMode)=='1'?true:false;
+
+
+
+	Skill* skill = Skill::createSkillByScript( "NormalAttackSkill" );
 
 
 	//////////////////////////////////////////////////////////////////////////

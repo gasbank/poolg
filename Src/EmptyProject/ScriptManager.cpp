@@ -14,6 +14,7 @@
 #include "StructureObject.h"
 #include "TileManager.h"
 #include "SequentialIncident.h"
+#include "SkillObject.h"
 
 int Tcl_AppInit(Tcl_Interp *interp);
 
@@ -174,6 +175,7 @@ void ScriptManager::initScriptBindings()
 	INIT_BINDING( Trigger );
 	INIT_BINDING( StructureObject );
 	INIT_BINDING( SequentialIncident );
+	INIT_BINDING( SkillObject );
 }
 #undef INIT_BINDING
 

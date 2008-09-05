@@ -44,7 +44,7 @@ Skill* Skill::createSkillByScript( const char* skillNsName )
 
 	Skill* ret = new Skill( skillName, skillDescription, csEssentials );
 
-	StringCchPrintfA( tempBuf, 256, "%s::registerSkillObjects", skillName );
+	StringCchPrintfA( tempBuf, 256, "%s::registerSkillObjects", skillNsName );
 	Tcl_Obj* skillObjects = GetScriptManager().execute( tempBuf );
 
 	int skillObjectsCount = 0;

@@ -21,6 +21,7 @@ SkillObject::SkillObject( BasicShapeType bst, float size, D3DCOLOR color, Dynami
 , m_size( size )
 , m_color( color )
 {
+	setMesh( g_bst[bst] );
 }
 
 SkillObject::~SkillObject(void)
@@ -91,8 +92,19 @@ SkillObject* EpCreateSkillObject( const char* bst, double size, int color /* ARG
 	return SkillObject::createSkillObject( bst, (float)size, (D3DCOLOR)color, dmt );
 } SCRIPT_CALLABLE_PV_PC_D_I_PC( EpCreateSkillObject )
 
+int EpSkillObjectSetOnHitAction( void* soPtr, void* actPtr )
+{
+	SkillObject* so = reinterpret_cast<SkillObject*>( soPtr );
+	Action* act = reinterpret_cast<Action*>( actPtr );
+	so->setOnHitAction( act );
+	return 0;
+} SCRIPT_CALLABLE_I_PV_PV( EpSkillObjectSetOnHitAction )
+
+
+
 START_SCRIPT_FACTORY( SkillObject )
 	CREATE_OBJ_COMMAND( EpCreateSkillObject )
+	CREATE_OBJ_COMMAND( EpSkillObjectSetOnHitAction )
 END_SCRIPT_FACTORY( SkillObject )
 
 

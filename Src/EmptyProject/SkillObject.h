@@ -24,7 +24,7 @@ public:
 	static SkillObject*				createSOmtBullet		(Character* user, Character* target, Unit* effectObject, int leftNumber, int maxNumber);
 	static SkillObject*				createSOgoto			(Character* user, Character* target, Unit* effectObject);*/
 
-	void							setOnHitAction( Action* act );
+	void							setOnHitAction( Action* act ) { m_onHitAction = act; }
 protected:
 	BattleState*					getBattleState();
 
@@ -36,6 +36,7 @@ private:
 	D3DCOLOR						m_color;
 	DynamicMotion*					m_dm;
 	int								m_onHitHpDamage;
+	Action*							m_onHitAction;
 };
 
 SCRIPT_FACTORY( SkillObject )

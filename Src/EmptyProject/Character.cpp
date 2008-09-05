@@ -438,7 +438,12 @@ bool Character::deleteSkill( SkillLocation skillLoc )
 
 bool Character::memorizeSkill( const Skill* skill )
 {
-	return m_skillSet->acquireSkill( skill );
+	return m_skillSet->memorizeSkill( skill );
+}
+
+bool Character::equipSkill( UINT slot, const Skill* skill )
+{
+	return m_skillSet->equipSkill( slot, skill );
 }
 //////////////////////////////////////////////////////////////////////////
 //

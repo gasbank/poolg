@@ -36,6 +36,7 @@ Unit* Hero::createHero( LPD3DXMESH mesh, int tileX, int tileY, float posZ )
 	// Acquire the most basic skill to our hero!
 	//u->addToSkillSet( SL_FIRST );
 	u->memorizeSkill( GetSKillManager().getSkill( "NormalAttack" ) );
+	u->equipSkill( 0, GetSKillManager().getSkill( "NormalAttack" ) );
 	return u;
 }
 

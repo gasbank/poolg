@@ -37,6 +37,7 @@ public:
 	const SkillSet*						getSkillSet() const { return m_skillSet; }
 	bool								deleteSkill( SkillLocation skillLoc );
 	bool								memorizeSkill( const Skill* skill );
+	bool								equipSkill( UINT slot, const Skill* skill );
 
 	void								doCsBurn();
 	void								recoverCs ();

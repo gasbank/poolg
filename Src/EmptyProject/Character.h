@@ -36,7 +36,7 @@ public:
 	void								pushSkillObject (SkillObject* skillObj);
 	const SkillSet*						getSkillSet() const { return m_skillSet; }
 	bool								deleteSkill( SkillLocation skillLoc );
-	bool								acquireSkill( const Skill* skill );
+	bool								memorizeSkill( const Skill* skill );
 
 	void								doCsBurn();
 	void								recoverCs ();

@@ -38,6 +38,7 @@
 #include "EpLight.h"
 #include "particlesystem.h"
 #include "Skill.h"
+#include "SkillManager.h"
 
 SCREEN_VERTEX g_Vertex[4];
 
@@ -46,7 +47,7 @@ WorldManager*					g_wm					= 0;
 TopStateManager*				g_tsm					= 0;
 WorldStateManager*				g_wsm					= 0;
 ScriptManager*					g_scriptManager			= 0;		// Set to zero is 'CRUCIAL!'
-
+SkillManager*					g_skillManager			= 0;
 SpriteManager*					g_spriteManager			= 0;
 EpLight*						g_epLight				= 0;
 
@@ -1009,9 +1010,9 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 
 
 
-	Skill* skill = Skill::createSkillByScript( "NormalAttackSkill" );
+	SkillManager* g_skillManager = new SkillManager();
 
-	delete skill;
+	GetSKillManager().registerSkill( Skill::createSkillByScript( "NormalAttackSkill" ) );
 
 	//////////////////////////////////////////////////////////////////////////
 
@@ -1073,7 +1074,7 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 	delete g_tsm;
 	delete g_wsm;
 	delete g_spriteManager;
-
+	delete g_skillManager;
 	delete g_epLight;
 	
 	Tcl_Finalize();

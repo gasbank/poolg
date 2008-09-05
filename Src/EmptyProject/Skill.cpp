@@ -83,6 +83,11 @@ void Skill::addSkillObject( SkillObject* so )
 
 Skill::~Skill()
 {
+	release();
+}
+
+void Skill::release()
+{
 	EpSafeReleaseAll( m_skillObjects );
 }
 //////////////////////////////////////////////////////////////////////////

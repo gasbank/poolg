@@ -19,7 +19,7 @@ public:
 
 	void						doSkill();
 
-
+	void						release();
 private:
 								Skill( const char* name, const char* desc, int csEssentials );
 	void						addSkillObject( SkillObject* so );

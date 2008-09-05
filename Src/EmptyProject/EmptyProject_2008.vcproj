@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="Windows-1252"?>
+<?xml version="1.0" encoding="ks_c_5601-1987"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
@@ -979,6 +979,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\SkillManager.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\SkillManager.h"
+			>
+		</File>
+		<File
 			RelativePath=".\SkillObject.cpp"
 			>
 		</File>
@@ -1016,6 +1024,10 @@
 		</File>
 		<File
 			RelativePath=".\SpriteManager.h"
+			>
+		</File>
+		<File
+			RelativePath=".\Typedefs.h"
 			>
 		</File>
 		<File

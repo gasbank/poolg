@@ -72,6 +72,20 @@ template<typename T> void EpSafeReleaseAll( T& obj ) {
 	obj.clear();	
 };
 
+template<typename T> void EpSafeReleaseAllMap( T& obj ) {
+	T::iterator it = obj.begin();
+	for ( ; it != obj.end(); ++it )
+	{
+		EP_SAFE_RELEASE( it->second );
+	}
+	obj.clear();	
+};
+
+
+
 #define FLOAT_POS_INF		(0x7f800000)
 
 enum BasicShapeType { BST_UNKNOWN, BST_TEAPOT, BST_SPHERE, BST_CUBE, BST_PLANE, BST_COUNT };
+
+
+#include "Typedefs.h"

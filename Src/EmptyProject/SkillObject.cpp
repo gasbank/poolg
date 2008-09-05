@@ -9,21 +9,20 @@
 #include "Unit.h"
 #include "ScriptManager.h"
 #include "Action.h"
+#include "DynamicMotion.h"
 
 extern BombShader*						g_bombShader;
 extern LPD3DXMESH						g_bst[BST_COUNT];
 
 SkillObject::SkillObject( BasicShapeType bst, float size, D3DCOLOR color, DynamicMotionType dmt )
 : Unit( UT_SKILLOBJECT )
+, m_bst( bst )
 , m_target( 0 )
 , m_velocity( 0 )
-, m_onHitHpDamage( 0 )
-, m_dm( 0 )
+, m_dm( DynamicMotion::createDynamicMotion( dmt ) )
 , m_size( size )
 , m_color( color )
-, m_onHitAction( 0 )
 {
-	setMesh( g_bst[bst] );
 }
 
 SkillObject::~SkillObject(void)
@@ -32,7 +31,7 @@ SkillObject::~SkillObject(void)
 	//delete m_effectObject;
 
 	EP_SAFE_RELEASE( m_dm );
-	EP_SAFE_RELEASE( m_onHitAction );
+	EpSafeReleaseAll( m_onHitActionList );
 
 }
 
@@ -98,19 +97,19 @@ SkillObject* EpCreateSkillObject( const char* bst, double size, int color /* ARG
 	return SkillObject::createSkillObject( bst, (float)size, (D3DCOLOR)color, dmt );
 } SCRIPT_CALLABLE_PV_PC_D_I_PC( EpCreateSkillObject )
 
-int EpSkillObjectSetOnHitAction( void* soPtr, void* actPtr )
+int EpSkillObjectAddOnHitAction( void* soPtr, void* actPtr )
 {
 	SkillObject* so = reinterpret_cast<SkillObject*>( soPtr );
 	Action* act = reinterpret_cast<Action*>( actPtr );
-	so->setOnHitAction( act );
+	so->addOnHitAction( act );
 	return 0;
-} SCRIPT_CALLABLE_I_PV_PV( EpSkillObjectSetOnHitAction )
+} SCRIPT_CALLABLE_I_PV_PV( EpSkillObjectAddOnHitAction )
 
 
 
 START_SCRIPT_FACTORY( SkillObject )
 	CREATE_OBJ_COMMAND( EpCreateSkillObject )
-	CREATE_OBJ_COMMAND( EpSkillObjectSetOnHitAction )
+	CREATE_OBJ_COMMAND( EpSkillObjectAddOnHitAction )
 END_SCRIPT_FACTORY( SkillObject )
 
 

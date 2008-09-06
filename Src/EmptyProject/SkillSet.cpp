@@ -2,12 +2,15 @@
 #include "SkillSet.h"
 #include "Skill.h"
 #include "BattleState.h"
+#include "Character.h"
 
-const std::string		SkillSet::ms_emptySlotSkillName("-");
-const std::string		SkillSet::ms_emptySlotSkillDescription("스킬이 없습니다.");
+const std::string SkillSet::ms_emptySlotSkillName("-");
+const std::string SkillSet::ms_emptySlotSkillDescription("스킬이 없습니다.");
 
-SkillSet::SkillSet()
+SkillSet::SkillSet( Character* owner )
+: m_owner( owner )
 {
+	assert( m_owner );
 	m_equippedSkills.resize( 5 );
 }
 
@@ -29,91 +32,18 @@ void SkillSet::deleteSkill (SkillLocation skillLocation)
 	m_equippedSkills[(int)skillLocation] = NULL;
 }
 
-const std::string& SkillSet::getSkillName( SkillLocation skillLocation ) const
+const std::string& SkillSet::getSkillName( UINT slot ) const
 {
-	if (m_equippedSkills[(int)skillLocation] == NULL)
+	if (m_equippedSkills.size() <= slot || m_equippedSkills[slot] == NULL)
 		return ms_emptySlotSkillName;
-	return m_equippedSkills[(int)skillLocation]->getSkillName();
+	return m_equippedSkills[slot]->getSkillName();
 }
-//
-//bool SkillSet::useSkill()
-//{
-//	if (m_equippedSkills[(int)this->m_skillLocation] == NULL)
-//		return false;
-//
-//	//m_equippedSkills[(int)this->m_skillLocation]->useSkill( m_battleState );
-//
-//	return true;
-//}
 
-//void SkillSet::moveSkillLocation( char mode )
-//{
-//	switch (mode)
-//	{
-//		/*initialize*/
-//	case 'i':
-//		m_skillLocation = SL_FIRST;
-//		break;
-//		/*up*/
-//	case 'u':
-//		switch (m_skillLocation)
-//		{
-//		case SL_FIRST:
-//			m_skillLocation = SL_FIFTH;
-//			break;
-//		case SL_SECOND:
-//			m_skillLocation = SL_FIRST;
-//			break;
-//		case SL_THIRD:
-//			m_skillLocation = SL_SECOND;
-//			break;
-//		case SL_FOURTH:
-//			m_skillLocation = SL_THIRD;
-//			break;
-//		case SL_FIFTH:
-//			m_skillLocation = SL_FOURTH;
-//			break;
-//		}
-//		break;
-//		/*down*/
-//	case 'd':
-//		switch (m_skillLocation)
-//		{
-//		case SL_FIRST:
-//			m_skillLocation = SL_SECOND;
-//			break;
-//		case SL_SECOND:
-//			m_skillLocation = SL_THIRD;
-//			break;
-//		case SL_THIRD:
-//			m_skillLocation = SL_FOURTH;
-//			break;
-//		case SL_FOURTH:
-//			m_skillLocation = SL_FIFTH;
-//			break;
-//		case SL_FIFTH:
-//			m_skillLocation = SL_FIRST;
-//			break;
-//		}
-//		break;
-//	}
-//}
-//
-//void SkillSet::setCharacter (Character* hero, Character* enemy)
-//{
-//	for (int i = 0; i < 5; i++)
-//	{
-//		/*if (m_equippedSkills[i] != NULL)
-//			m_equippedSkills[i]->setUser (hero, enemy);*/
-//	}
-//}
-
-
-const std::string& SkillSet::getDescription (SkillLocation skillLocation) const
+const std::string& SkillSet::getDescription( UINT slot ) const
 {
-	if (m_equippedSkills[(int)skillLocation] == NULL)
+	if (m_equippedSkills.size() <= slot || m_equippedSkills[slot] == NULL)
 		return ms_emptySlotSkillDescription;
-	return m_equippedSkills[(int)skillLocation]->getDescription();
+	return m_equippedSkills[slot]->getDescription();
 }
 
 void SkillSet::deleteAllSkills()
@@ -150,5 +80,28 @@ bool SkillSet::equipSkill( UINT slot, const Skill* skill )
 		return true;
 	}
 	// Not memorized or already equipped skill.
+	return false;
+}
+
+bool SkillSet::useSkill( UINT slot, Character* target ) const
+{
+	if ( slot >= m_equippedSkills.size() )
+		throw std::runtime_error( "Slot index is larger than a number of skill slots." );
+
+	const Skill* skill = m_equippedSkills[slot];
+	if ( skill )
+	{
+		// TODO: Clone the skill's skill objects and register to owner(type of Character)'s m_skillObjects.
+		SkillObjectList soList;
+		if ( skill->getClonedSkillObjects( soList, target ) )
+		{
+			assert( !soList.empty() );
+			m_owner->pushSkillObjectList( soList );
+			return true;
+		}
+		else
+			return false;
+	}
+	// Selected skill slot is empty.
 	return false;
 }

@@ -33,7 +33,8 @@ public:
 
 	/* 스킬 관련 함수 */
 	//void doNormalAttack(int type, Character* enemy);
-	void								pushSkillObject (SkillObject* skillObj);
+	void								pushSkillObject( SkillObject* skillObj ) { m_skillObjects.push_back( skillObj ); }
+	void								pushSkillObjectList( const SkillObjectList soList );
 	const SkillSet*						getSkillSet() const { return m_skillSet; }
 	bool								deleteSkill( SkillLocation skillLoc );
 	bool								memorizeSkill( const Skill* skill );
@@ -97,7 +98,7 @@ private:
 	bool								m_bControllable;
 
 	SkillSet*							m_skillSet;
-	SkillObjectList						m_skillObjectList;
+	SkillObjectList						m_skillObjects;
 
 };
 

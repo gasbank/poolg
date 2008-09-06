@@ -208,6 +208,8 @@ HRESULT BattleState::enter( double dStartTime )
 	/*SkillSet* skillSet = getHero()->getSkillSet();
 	skillSet->setCharacter (getHero(), getFirstEnemy());
 	skillSet->setBattleState(this);*/
+	m_heroSkillSet = getHero()->getSkillSet();
+	m_curSelSkill = 0;
 
 	m_noneSkillSelectedCount = 0;
 	m_levelProgress = false;
@@ -442,9 +444,6 @@ HRESULT BattleState::frameMove(double fTime, float fElapsedTime)
 
 HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-
-
-
 	if (uMsg == WM_KEYUP)
 	{
 		if ( m_statSelectBoxMover->isOn() )
@@ -606,110 +605,112 @@ HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 		//skillSet->setCharacter( getHero(), getFirstEnemy() );
 
 		/*화살표에 따라 기술 분기*/
-		//if (wParam == VK_UP)
-		//{
-		//	skillSet->moveSkillLocation('u');
-		//}
-		//if (wParam == VK_DOWN)
-		//{
-		//	skillSet->moveSkillLocation('d');
-		//}
-		//if (wParam == VK_LEFT)
-		//{
-		//	m_skillContentBoxMover->onBox();
-		//}
-		//if (wParam == VK_RIGHT)
-		//{
-		//	m_skillContentBoxMover->offBox();
-		//}
-		//if (wParam == VK_NUMPAD5)
-		//{
-		//	m_curTurnType = TT_NATURAL;
+		if (wParam == VK_UP)
+		{
+			if ( m_curSelSkill > 0 )
+				--m_curSelSkill;
+		}
+		if (wParam == VK_DOWN)
+		{
+			if ( m_curSelSkill < 4 )
+				++m_curSelSkill;
+		}
+		if (wParam == VK_LEFT)
+		{
+			m_skillContentBoxMover->onBox();
+		}
+		if (wParam == VK_RIGHT)
+		{
+			m_skillContentBoxMover->offBox();
+		}
+		if (wParam == 'Z')
+		{
+			m_curTurnType = TT_NATURAL;
 
-
-		//	if (!(skillSet->useSkill()))
-		//	{
-		//		//이부분에 스킬이 없습니다 라는 다이얼로그를 추가할수도.
-		//		//이스터 에그입니다. 마음껏 추가하시죠.
-		//		switch (m_noneSkillSelectedCount)
-		//		{
-		//		case 0:
-		//			m_battleLog.push_back(std::string("스킬이 없습니다."));
-		//			break;
-		//		case 1:
-		//			m_battleLog.push_back(std::string("스킬이 없는데요?"));
-		//			break;
-		//		case 2:
-		//			m_battleLog.push_back(std::string("스킬이 없다니까요!!?"));
-		//			break;
-		//		case 3:
-		//			m_battleLog.push_back(std::string("없는 스킬 자꾸 누르는 저의가 무엇이냐!"));
-		//			break;
-		//		case 4:
-		//			m_battleLog.push_back(std::string("뭥미???"));
-		//			break;
-		//		case 5:
-		//			m_battleLog.push_back(std::string("..."));
-		//			break;
-		//		case 6:
-		//			m_battleLog.push_back(std::string("..."));
-		//			break;
-		//		case 7:
-		//			m_battleLog.push_back(std::string("어쩔 수 없군. 몇 가지 팁을 제공하죠."));
-		//			break;
-		//		case 8:
-		//			m_battleLog.push_back(std::string("맵의 곳곳에 숨겨진 박카스가 존재하는 듯 하다."));
-		//			break;
-		//		case 9:
-		//			m_battleLog.push_back(std::string("박카스를 쟁취하려면 맵에 존재하는 갖가지 퍼즐을 풀어야 한다."));
-		//			break;
-		//		case 10:
-		//			m_battleLog.push_back(std::string("최종 보스와의 대전을 위해 물약을 최대한 많이 쟁겨놓으십시오."));
-		//			break;
-		//		case 11:
-		//			m_battleLog.push_back(std::string("신도 세미나실은 신성합니다. 존중해주시죠."));
-		//			break;
-		//		case 12:
-		//			m_battleLog.push_back(std::string("제육덮밥"));
-		//			break;
-		//		case 13:
-		//			m_battleLog.push_back(std::string("보스는 사실 거미를 무서워하는 듯 하다."));
-		//			break;
-		//		case 14:
-		//			m_battleLog.push_back(std::string("흐흥, 딱히 스크립트를 모르기 땜시 이런 switch문 노가다를 한건 아니야!"));
-		//			break;
-		//		case 15:
-		//			m_battleLog.push_back(std::string("goto문은 지양합시다."));
-		//			break;
-		//		case 16:
-		//			m_battleLog.push_back(std::string("1일 1코딩."));
-		//			break;
-		//		case 17:
-		//			m_battleLog.push_back(std::string("게임은 조금만 합시다."));
-		//			break;
-		//		case 18:
-		//			m_battleLog.push_back(std::string("코드에 주석은 필수."));
-		//			break;
-		//		case 19:
-		//			m_battleLog.push_back(std::string("제작 동안 OOO군의 프로젝트 말살 음모가 있었습니다."));
-		//			break;
-		//		case 20:
-		//			m_battleLog.push_back(std::string("맛의진미"));
-		//			break;
-		//		case 21:
-		//			m_battleLog.push_back(std::string("일부 스킬들은 연속기로 쓸 수 있습니다."));
-		//			break;
-		//		case 22:
-		//			m_battleLog.push_back( std::string( "OOO군은 무려 EP를 지우고, DXUT에 오타를 가하는 등의 음해를 가했습니다." ));
-		//			break;
-		//		default:
-		//			m_battleLog.push_back(std::string("훗, 더 이상의 자세한 팁은 생략한다."));;
-		//			break;
-		//		}
-		//		m_noneSkillSelectedCount++;
-		//		m_curTurnType = TT_PLAYER;
-		//	}
-		//}
+			bool skillStarted = m_heroSkillSet->useSkill( m_curSelSkill, getFirstEnemy() );
+			if ( !skillStarted )
+			{
+				//이부분에 스킬이 없습니다 라는 다이얼로그를 추가할수도.
+				//이스터 에그입니다. 마음껏 추가하시죠.
+				switch (m_noneSkillSelectedCount)
+				{
+				case 0:
+					m_battleLog.push_back(std::string("스킬이 없습니다."));
+					break;
+				case 1:
+					m_battleLog.push_back(std::string("스킬이 없는데요?"));
+					break;
+				case 2:
+					m_battleLog.push_back(std::string("스킬이 없다니까요!!?"));
+					break;
+				case 3:
+					m_battleLog.push_back(std::string("없는 스킬 자꾸 누르는 저의가 무엇이냐!"));
+					break;
+				case 4:
+					m_battleLog.push_back(std::string("뭥미???"));
+					break;
+				case 5:
+					m_battleLog.push_back(std::string("..."));
+					break;
+				case 6:
+					m_battleLog.push_back(std::string("..."));
+					break;
+				case 7:
+					m_battleLog.push_back(std::string("어쩔 수 없군. 몇 가지 팁을 제공하죠."));
+					break;
+				case 8:
+					m_battleLog.push_back(std::string("맵의 곳곳에 숨겨진 박카스가 존재하는 듯 하다."));
+					break;
+				case 9:
+					m_battleLog.push_back(std::string("박카스를 쟁취하려면 맵에 존재하는 갖가지 퍼즐을 풀어야 한다."));
+					break;
+				case 10:
+					m_battleLog.push_back(std::string("최종 보스와의 대전을 위해 물약을 최대한 많이 쟁겨놓으십시오."));
+					break;
+				case 11:
+					m_battleLog.push_back(std::string("신도 세미나실은 신성합니다. 존중해주시죠."));
+					break;
+				case 12:
+					m_battleLog.push_back(std::string("제육덮밥"));
+					break;
+				case 13:
+					m_battleLog.push_back(std::string("보스는 사실 거미를 무서워하는 듯 하다."));
+					break;
+				case 14:
+					m_battleLog.push_back(std::string("흐흥, 딱히 스크립트를 모르기 땜시 이런 switch문 노가다를 한건 아니야!"));
+					break;
+				case 15:
+					m_battleLog.push_back(std::string("goto문은 지양합시다."));
+					break;
+				case 16:
+					m_battleLog.push_back(std::string("1일 1코딩."));
+					break;
+				case 17:
+					m_battleLog.push_back(std::string("게임은 조금만 합시다."));
+					break;
+				case 18:
+					m_battleLog.push_back(std::string("코드에 주석은 필수."));
+					break;
+				case 19:
+					m_battleLog.push_back(std::string("제작 동안 OOO군의 프로젝트 말살 음모가 있었습니다."));
+					break;
+				case 20:
+					m_battleLog.push_back(std::string("맛의진미"));
+					break;
+				case 21:
+					m_battleLog.push_back(std::string("일부 스킬들은 연속기로 쓸 수 있습니다."));
+					break;
+				case 22:
+					m_battleLog.push_back( std::string( "OOO군은 무려 EP를 지우고, DXUT에 오타를 가하는 등의 음해를 가했습니다." ));
+					break;
+				default:
+					m_battleLog.push_back(std::string("훗, 더 이상의 자세한 팁은 생략한다."));;
+					break;
+				}
+				m_noneSkillSelectedCount++;
+				m_curTurnType = TT_PLAYER;
+			}
+		}
 
 			
 	}
@@ -745,6 +746,7 @@ void BattleState::renderFixedText(int scrWidth, int scrHeight)
 	// Print battle log
 	const UINT maxDrawLogCount = 4;	// This is the number of lines of the battle log.
 	const UINT lineHeight = 15;
+	const DWORD drawTextFormat = DT_NOCLIP | DT_LEFT;
 	RECT rc;
 	rc.top		= 55;	// This is the height of the bottom line of the battle log.
 	rc.left		= 25;
@@ -760,7 +762,7 @@ void BattleState::renderFixedText(int scrWidth, int scrHeight)
 	UINT drawLogCount = 0;
 	for ( ; it != m_battleLog.rend(); ++it )
 	{
-		m_lblHYnamL->DrawTextA(0, (*it).c_str(), -1, &rc, DT_NOCLIP, D3DXCOLOR( 0.9f, 0.9f, 0.9f, 1.0f ) );
+		m_lblHYnamL->DrawTextA(0, (*it).c_str(), -1, &rc, drawTextFormat, D3DXCOLOR( 0.9f, 0.9f, 0.9f, 1.0f ) );
 		rc.top -= lineHeight;
 		drawLogCount++;
 		if ( drawLogCount >= maxDrawLogCount )
@@ -774,26 +776,26 @@ void BattleState::renderFixedText(int scrWidth, int scrHeight)
 	rc.top = (LONG)(statusBoxPlayersPositionY - 115);
 	rc.left = (LONG)(statusBoxPlayersPositionX + 5);
 	StringCchPrintf(textBuffer, 512, L"HP");
-	m_lblREB->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+	m_lblREB->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 	rc.top += (LONG)21.08;
 	StringCchPrintf(textBuffer, 512, L"CS");
-	m_lblREB->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+	m_lblREB->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 	rc.top += (LONG)21.08;
 	StringCchPrintf(textBuffer, 512, L"EX");
-	m_lblREB->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+	m_lblREB->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 	rc.top += (LONG)21.08;
 	StringCchPrintf(textBuffer, 512, L"Level : %d", ( ( Hero* )getHero() )->getLevel() );
-	m_lblREB->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+	m_lblREB->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 
 
 	/*적 status 라벨 그리기*/
 	rc.top = (LONG)18;
 	rc.left = (LONG)(scrWidth - 167);
 	StringCchPrintf(textBuffer, 512, L"HP");
-	m_lblREB->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+	m_lblREB->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 	rc.top += (LONG)21.08;
 	StringCchPrintf(textBuffer, 512, L"CS");
-	m_lblREB->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+	m_lblREB->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 
 
 	int skillLineInterval = 39;
@@ -801,50 +803,29 @@ void BattleState::renderFixedText(int scrWidth, int scrHeight)
 	rc.top = scrHeight - 190;
 	rc.left = scrWidth - 110;
 
-	const SkillSet* skillSet = getHero()->getSkillSet();
 
+	// Draw all equipped skill names of hero.
 	char textBufferA[512];
-	StringCchPrintfA(textBufferA, 512, skillSet->getSkillName(SL_FIRST).c_str());
-	m_lblSkill->DrawTextA(0, textBufferA, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+	StringCchPrintfA(textBufferA, 512, m_heroSkillSet->getSkillName(SL_FIRST).c_str());
+	m_lblSkill->DrawTextA(0, textBufferA, -1, &rc, drawTextFormat, DX_CONSTS::D3DXCOLOR_WHITE );
 	rc.top += skillLineInterval;
-	StringCchPrintfA(textBufferA, 512, skillSet->getSkillName(SL_SECOND).c_str());
-	m_lblSkill->DrawTextA(0, textBufferA, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+	StringCchPrintfA(textBufferA, 512, m_heroSkillSet->getSkillName(SL_SECOND).c_str());
+	m_lblSkill->DrawTextA(0, textBufferA, -1, &rc, drawTextFormat, DX_CONSTS::D3DXCOLOR_WHITE );
 	rc.top += skillLineInterval;
-	StringCchPrintfA(textBufferA, 512, skillSet->getSkillName(SL_THIRD).c_str());
-	m_lblSkill->DrawTextA(0, textBufferA, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+	StringCchPrintfA(textBufferA, 512, m_heroSkillSet->getSkillName(SL_THIRD).c_str());
+	m_lblSkill->DrawTextA(0, textBufferA, -1, &rc, drawTextFormat, DX_CONSTS::D3DXCOLOR_WHITE );
 	rc.top += skillLineInterval;
-	StringCchPrintfA(textBufferA, 512, skillSet->getSkillName(SL_FOURTH).c_str());
-	m_lblSkill->DrawTextA(0, textBufferA, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+	StringCchPrintfA(textBufferA, 512, m_heroSkillSet->getSkillName(SL_FOURTH).c_str());
+	m_lblSkill->DrawTextA(0, textBufferA, -1, &rc, drawTextFormat, DX_CONSTS::D3DXCOLOR_WHITE );
 	rc.top += skillLineInterval;
-	StringCchPrintfA(textBufferA, 512, skillSet->getSkillName(SL_FIFTH).c_str());
-	m_lblSkill->DrawTextA(0, textBufferA, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+	StringCchPrintfA(textBufferA, 512, m_heroSkillSet->getSkillName(SL_FIFTH).c_str());
+	m_lblSkill->DrawTextA(0, textBufferA, -1, &rc, drawTextFormat, DX_CONSTS::D3DXCOLOR_WHITE );
 
-	///*스킬 라벨 그리기*/
-	//switch (skillSet->getSkillLocation())
-	//{
-	//case SL_FIRST:
-	//	rc.top = scrHeight - 190;
-	//	StringCchPrintfA(textBufferA, 512, skillSet->getSkillName(SL_FIRST).c_str());
-	//	break;
-	//case SL_SECOND:
-	//	rc.top = scrHeight - 190 + skillLineInterval;
-	//	StringCchPrintfA(textBufferA, 512, skillSet->getSkillName(SL_SECOND).c_str());
-	//	break;
-	//case SL_THIRD:
-	//	rc.top = scrHeight - 190 + skillLineInterval*2;
-	//	StringCchPrintfA(textBufferA, 512, skillSet->getSkillName(SL_THIRD).c_str());
-	//	break;
-	//case SL_FOURTH:
-	//	rc.top = scrHeight - 190 + skillLineInterval*3;
-	//	StringCchPrintfA(textBufferA, 512, skillSet->getSkillName(SL_FOURTH).c_str());
-	//	break;
-	//case SL_FIFTH:
-	//	rc.top = scrHeight - 190 + skillLineInterval*4;
-	//	StringCchPrintfA(textBufferA, 512, skillSet->getSkillName(SL_FIFTH).c_str());
-	//	break;
-	//}
-	//m_lblSkill->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 0.0f, 1.0f, 1.0f ) );
-
+	/* Draw currently selected skill of hero. */
+	rc.top = scrHeight - 190 + skillLineInterval * m_curSelSkill;
+	StringCchPrintfA(textBufferA, 512, m_heroSkillSet->getSkillName( m_curSelSkill ).c_str());
+	m_lblSkill->DrawTextA(0, textBufferA, -1, &rc, drawTextFormat, DX_CONSTS::D3DXCOLOR_RED );
+	
 
 	//rc.top = scrHeight - 190;
 	//rc.left = scrWidth - 410;
@@ -869,7 +850,7 @@ void BattleState::renderFixedText(int scrWidth, int scrHeight)
 	//}
 
 	if (m_skillContentBoxMover->isOn() && !m_skillContentBoxMover->isMoving())
-		m_lblSkillDescription->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 0.8f, 0.8f, 1.0f, 1.0f ) );
+		m_lblSkillDescription->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 0.8f, 0.8f, 1.0f, 1.0f ) );
 
 
 	if ( m_statSelectBoxMover->isOn() && !m_statSelectBoxMover->isMoving())
@@ -882,25 +863,25 @@ void BattleState::renderFixedText(int scrWidth, int scrHeight)
 
 
 		StringCchPrintf(textBuffer, 512, L"HEALTH");
-		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 		rc.top += statSelectInterval;
 		StringCchPrintf(textBuffer, 512, L"WILL");
-		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 		rc.top += statSelectInterval;
 		StringCchPrintf(textBuffer, 512, L"CODING");
-		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 		rc.top += statSelectInterval;
 		StringCchPrintf(textBuffer, 512, L"DEFENSE");
-		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 		rc.top += statSelectInterval;
 		StringCchPrintf(textBuffer, 512, L"SENSE");
-		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 		rc.top += statSelectInterval;
 		StringCchPrintf(textBuffer, 512, L"IMMUNITY");
-		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 		rc.top += statSelectInterval;
 		StringCchPrintf(textBuffer, 512, L"exit");
-		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 		rc.top += statSelectInterval;
 
 
@@ -938,7 +919,7 @@ void BattleState::renderFixedText(int scrWidth, int scrHeight)
 			break;
 		}
 
-		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 0.0f, 1.0f, 0.0f, 1.0f ) );
+		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 0.0f, 1.0f, 0.0f, 1.0f ) );
 
 
 
@@ -946,32 +927,32 @@ void BattleState::renderFixedText(int scrWidth, int scrHeight)
 		rc.left = statSelectX + 100;
 
 		StringCchPrintf(textBuffer, 512, L"%d", getHero()->getStat().health);
-		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 		rc.top += statSelectInterval;
 		StringCchPrintf(textBuffer, 512, L"%d", getHero()->getStat().will);
-		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 		rc.top += statSelectInterval;
 		StringCchPrintf(textBuffer, 512, L"%d", getHero()->getStat().coding);
-		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 		rc.top += statSelectInterval;
 		StringCchPrintf(textBuffer, 512, L"%d", getHero()->getStat().def);
-		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 		rc.top += statSelectInterval;
 		StringCchPrintf(textBuffer, 512, L"%d", getHero()->getStat().sense);
-		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 		rc.top += statSelectInterval;
 		StringCchPrintf(textBuffer, 512, L"%d", getHero()->getStat().immunity);
-		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 		rc.top += statSelectInterval * 2;
 
 		StringCchPrintf( textBuffer, 512, L"%d", m_statCount );
 		if (m_statCount != 0)
 		{
-			m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+			m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 		}
 		else
 		{
-			m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 0.0f, 0.0f, 1.0f ) );
+			m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 0.0f, 0.0f, 1.0f ) );
 		}
 
 

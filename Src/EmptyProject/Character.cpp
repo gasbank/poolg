@@ -94,13 +94,13 @@ Character::~Character()
 {
 
 	
-	SkillObjectList::iterator it = m_skillObjectList.begin();
-	for ( ; it != m_skillObjectList.end(); ++it)
+	SkillObjectList::iterator it = m_skillObjects.begin();
+	for ( ; it != m_skillObjects.end(); ++it)
 	{
 		SAFE_DELETE(*it);
 	}
 
-	m_skillObjectList.clear();
+	m_skillObjects.clear();
 	delete m_skillSet;
 }
 
@@ -176,14 +176,14 @@ bool Character::frameMove( float fElapsedTime )
 		}
 	}
 
-	SkillObjectList::iterator it = m_skillObjectList.begin();
-	for ( ; it != m_skillObjectList.end() ; )
+	SkillObjectList::iterator it = m_skillObjects.begin();
+	for ( ; it != m_skillObjects.end() ; )
 	{
 		bool ret = (*it)->frameMove( fElapsedTime );
 		if (!ret)
 		{
 			SAFE_DELETE(*it);
-			it = m_skillObjectList.erase( it );
+			it = m_skillObjects.erase( it );
 		}
 		else
 			++it;
@@ -213,8 +213,8 @@ bool Character::frameMove( float fElapsedTime )
 
 HRESULT Character::frameRender( double dTime, float fElapsedTime )
 {
-	SkillObjectList::iterator it = m_skillObjectList.begin();
-	for ( ; it != m_skillObjectList.end(); ++it )
+	SkillObjectList::iterator it = m_skillObjects.begin();
+	for ( ; it != m_skillObjects.end(); ++it )
 	{
 		(*it)->frameRender( dTime, fElapsedTime );
 	}
@@ -278,7 +278,7 @@ Character::Character( UnitType type )
 	
 	// Initialize random number
 	srand ( (unsigned)time(NULL) );
-	m_skillSet = new SkillSet();
+	m_skillSet = new SkillSet( this );
 }
 
 void Character::setCurHp( int curHp )
@@ -343,11 +343,6 @@ void Character::boundaryTesting( UnitInput mappedKey )
 void Character::setBoundaryRect( LONG x0, LONG y0, LONG x1, LONG y1 )
 {
 	m_boundaryTileRect = TileRegion( x0, y0, x1, y1 );
-}
-
-void Character::pushSkillObject (SkillObject* skillObj)
-{
-	m_skillObjectList.push_back( skillObj );
 }
 
 void Character::damage( int point )
@@ -444,6 +439,15 @@ bool Character::memorizeSkill( const Skill* skill )
 bool Character::equipSkill( UINT slot, const Skill* skill )
 {
 	return m_skillSet->equipSkill( slot, skill );
+}
+
+void Character::pushSkillObjectList( const SkillObjectList soList )
+{
+	SkillObjectList::const_iterator cit = soList.begin();
+	for ( ; cit != soList.end(); ++cit )
+	{
+		pushSkillObject( *cit );
+	}
 }
 //////////////////////////////////////////////////////////////////////////
 //

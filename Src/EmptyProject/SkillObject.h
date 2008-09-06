@@ -11,6 +11,7 @@ class SkillObject : public Unit
 {
 public:
 	static SkillObject*				createSkillObject( const char* bst, float size, D3DCOLOR color, const char* dmt );
+	static SkillObject*				clone( const SkillObject& so );
 									~SkillObject();
 
 	// Virtual Methods
@@ -25,14 +26,14 @@ public:
 	static SkillObject*				createSOgoto			(Character* user, Character* target, Unit* effectObject);*/
 
 	void							addOnHitAction( Action* act ) { m_onHitActionList.push_back( act ); }
-protected:
-	BattleState*					getBattleState();
-
+	void							setTarget( Character* target ) { m_target = target; }
 private:
 									SkillObject( BasicShapeType bst, float size, D3DCOLOR color, DynamicMotionType dmt );
+									SkillObject( BasicShapeType bst, float size, D3DCOLOR color, DynamicMotion* dm );
+	BattleState*					getBattleState() const;
 
 	BasicShapeType					m_bst;
-	Unit*							m_target;
+	Character*						m_target;
 	float							m_velocity;
 	float							m_size;
 	D3DCOLOR						m_color;

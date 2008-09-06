@@ -6,7 +6,7 @@ class SkillObject;
 class Unit;
 class DynamicMotion;
 
-typedef std::list<SkillObject*> SkillObjectList;
+
 
 class Skill
 {
@@ -17,7 +17,7 @@ public:
 	const std::string&			getDescription() const { return m_skillDescription; }
 	const std::string&			getSkillName() const { return m_skillName; }
 
-	void						doSkill();
+	bool						getClonedSkillObjects( SkillObjectList& soList, Character* target ) const;
 
 	void						release();
 private:

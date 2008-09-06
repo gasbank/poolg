@@ -11,6 +11,7 @@ class DrawRequest;
 class ProgressUi;
 class WindowMover;
 class InnerFire;
+class SkillSet;
 
 enum TurnType { TT_NATURAL, TT_COMPUTER, TT_PLAYER };
 enum PlayerSide { PS_NOTSET, PS_COMPUTER, PS_PLAYER };
@@ -21,7 +22,6 @@ typedef std::set<Enemy*> EnemyList;
 class BattleState : public State
 {
 public:
-
 							BattleState();
 							~BattleState();
 
@@ -52,12 +52,13 @@ public:
 	Enemy*					getFirstEnemy() { assert( m_enemies.size() ); return *m_enemies.begin(); }
 
 private:
-
 	void					doComputerAction();
 	Character*				getHero();
 	void					setupCamera();
 	void					updateBarRate();
 
+	const SkillSet*			m_heroSkillSet;
+	UINT					m_curSelSkill;		// Currently selected skill slot index
 	EnemyList				m_enemies;			// Enemy pool of this battle session. Should be cleared at BattleState::leave
 
 	/*이곳부터가 컴포넌트*/

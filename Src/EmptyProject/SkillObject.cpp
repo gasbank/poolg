@@ -25,6 +25,17 @@ SkillObject::SkillObject( BasicShapeType bst, float size, D3DCOLOR color, Dynami
 {
 }
 
+SkillObject::SkillObject( BasicShapeType bst, float size, D3DCOLOR color, DynamicMotion* dm )
+: Unit( UT_SKILLOBJECT )
+, m_bst( bst )
+, m_target( 0 )
+, m_velocity( 0 )
+, m_dm( dm )
+, m_size( size )
+, m_color( color )
+{
+}
+
 SkillObject::~SkillObject(void)
 {
 	//m_effectObject->release();
@@ -67,7 +78,7 @@ HRESULT SkillObject::frameRender ( double dTime, float fElapsedTime )
 	return f;
 }
 
-BattleState* SkillObject::getBattleState()
+BattleState* SkillObject::getBattleState() const
 {
 	return reinterpret_cast<BattleState*>( GetWorldStateManager().getCurState() );
 }
@@ -89,6 +100,12 @@ SkillObject* SkillObject::createSkillObject( const char* bst, float size, D3DCOL
 	return so;
 }
 
+SkillObject* SkillObject::clone( const SkillObject& so )
+{
+	DynamicMotion* dmCloned = so.m_dm->clone();
+	SkillObject* cloned = new SkillObject( so.m_bst, so.m_size, so.m_color, dmCloned );
+	return cloned;
+}
 
 //////////////////////////////////////////////////////////////////////////
 

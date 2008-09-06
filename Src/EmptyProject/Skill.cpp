@@ -96,7 +96,7 @@ bool Skill::getClonedSkillObjects( SkillObjectList& soList, Character* target ) 
 	SkillObjectList::const_iterator cit = m_skillObjects.begin();
 	for ( ; cit != m_skillObjects.end(); ++cit )
 	{
-		SkillObject* so = SkillObject::clone( **cit );
+		SkillObject* so = (*cit)->clone();
 		so->setTarget( target );
 		soList.push_back( so );
 	}

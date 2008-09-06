@@ -36,6 +36,22 @@ SkillObject::SkillObject( BasicShapeType bst, float size, D3DCOLOR color, Dynami
 {
 }
 
+SkillObject::SkillObject( const SkillObject& so )
+: Unit( UT_SKILLOBJECT )
+, m_bst( so.m_bst )
+, m_target( so.m_target )
+, m_velocity( so.m_velocity )
+, m_dm( so.m_dm->clone() )
+, m_size( so.m_size )
+, m_color( so.m_color )
+{
+	ActionList::const_iterator cit = so.m_onHitActionList.begin();
+	for ( ; cit != so.m_onHitActionList.end(); ++cit )
+	{
+		addOnHitAction( (*cit)->clone() );
+	}
+}
+
 SkillObject::~SkillObject(void)
 {
 	//m_effectObject->release();
@@ -100,11 +116,9 @@ SkillObject* SkillObject::createSkillObject( const char* bst, float size, D3DCOL
 	return so;
 }
 
-SkillObject* SkillObject::clone( const SkillObject& so )
+SkillObject* SkillObject::clone() const
 {
-	DynamicMotion* dmCloned = so.m_dm->clone();
-	SkillObject* cloned = new SkillObject( so.m_bst, so.m_size, so.m_color, dmCloned );
-	return cloned;
+	return new SkillObject( *this );
 }
 
 //////////////////////////////////////////////////////////////////////////

@@ -61,7 +61,11 @@ CharacterAction::CharacterAction( Character* character )
 
 Character* CharacterAction::getCharacter() const
 {
-	return dynamic_cast<Character*>( getUnit() );
+	Character* ret = dynamic_cast<Character*>( getUnit() );
+	if ( !ret )
+		throw std::runtime_error( "CharacterAction::m_unit pointer corrupted." );
+
+	return ret;
 }
 
 void CharacterAction::setCharacter( Character* val )

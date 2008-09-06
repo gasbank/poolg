@@ -91,13 +91,13 @@ void Skill::release()
 	EpSafeReleaseAll( m_skillObjects );
 }
 
-bool Skill::getClonedSkillObjects( SkillObjectList& soList, Character* target ) const
+bool Skill::getClonedSkillObjects( SkillObjectList& soList, Character* user, Character* target ) const
 {
 	SkillObjectList::const_iterator cit = m_skillObjects.begin();
 	for ( ; cit != m_skillObjects.end(); ++cit )
 	{
 		SkillObject* so = (*cit)->clone();
-		so->setTarget( target );
+		so->setUserAndTarget( user, target );
 		soList.push_back( so );
 	}
 	return true;

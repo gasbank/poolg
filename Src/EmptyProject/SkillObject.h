@@ -26,7 +26,7 @@ public:
 
 	SkillObject*					clone() const;
 	void							addOnHitAction( Action* act ) { m_onHitActionList.push_back( act ); }
-	void							setTarget( Character* target ) { m_target = target; }
+	void							setUserAndTarget( Character* user, Character* target );
 
 private:
 									SkillObject( const SkillObject& so );
@@ -35,6 +35,7 @@ private:
 	BattleState*					getBattleState() const;
 
 	BasicShapeType					m_bst;
+	Character*						m_user;
 	Character*						m_target;
 	float							m_velocity;
 	float							m_size;

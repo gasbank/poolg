@@ -17,17 +17,20 @@ extern LPD3DXMESH						g_bst[BST_COUNT];
 SkillObject::SkillObject( BasicShapeType bst, float size, D3DCOLOR color, DynamicMotionType dmt )
 : Unit( UT_SKILLOBJECT )
 , m_bst( bst )
+, m_user( 0 )
 , m_target( 0 )
 , m_velocity( 0 )
-, m_dm( DynamicMotion::createDynamicMotion( dmt ) )
+, m_dm( 0 )
 , m_size( size )
 , m_color( color )
 {
+	m_dm = DynamicMotion::createDynamicMotion( dmt, this );
 }
 
 SkillObject::SkillObject( BasicShapeType bst, float size, D3DCOLOR color, DynamicMotion* dm )
 : Unit( UT_SKILLOBJECT )
 , m_bst( bst )
+, m_user( 0 )
 , m_target( 0 )
 , m_velocity( 0 )
 , m_dm( dm )
@@ -39,6 +42,7 @@ SkillObject::SkillObject( BasicShapeType bst, float size, D3DCOLOR color, Dynami
 SkillObject::SkillObject( const SkillObject& so )
 : Unit( UT_SKILLOBJECT )
 , m_bst( so.m_bst )
+, m_user( so.m_user )
 , m_target( so.m_target )
 , m_velocity( so.m_velocity )
 , m_dm( so.m_dm->clone() )
@@ -50,6 +54,7 @@ SkillObject::SkillObject( const SkillObject& so )
 	{
 		addOnHitAction( (*cit)->clone() );
 	}
+	m_dm->setMotionTarget( this );
 }
 
 SkillObject::~SkillObject(void)
@@ -64,27 +69,35 @@ SkillObject::~SkillObject(void)
 
 bool SkillObject::frameMove( double dTime, float fElapsedTime )
 {
-	// 'm_dm' governs the movement of this Unit-derived object.
+	// 'm_dm' governs the movement of this SkillObject.
+	bool frameMoveInProgress = true;
+
 	m_dm->frameMove( fElapsedTime );
 
 	D3DXVECTOR3 objToTarget = getPos() - m_target->getPos();
 	float dist = D3DXVec3Length( &objToTarget );
 	if ( dist < 0.1f )
 	{
-		ActionList::iterator it = m_onHitActionList.begin();
-		UINT updateInProgressCount = 0;
-		for ( ; it != m_onHitActionList.end(); ++it )
-		{
-			bool updateInProgress = (*it)->update( dTime, fElapsedTime );
-			if ( updateInProgress )
-				++updateInProgress;
-		}
-		if ( updateInProgressCount > 0 )
-			return true; // SkillObject is collided with target unit, however hit actions are not completed yet.
-		else
-			return false; // No more frameMove() is needed.
+		
+		m_target->damage( 10 );
+		frameMoveInProgress = false;
+		
+		//ActionList::iterator it = m_onHitActionList.begin();
+		//UINT updateInProgressCount = 0;
+		//for ( ; it != m_onHitActionList.end(); ++it )
+		//{
+		//	bool updateInProgress = (*it)->update( dTime, fElapsedTime );
+		//	if ( updateInProgress )
+		//		++updateInProgress;
+		//}
+		//if ( updateInProgressCount > 0 )
+		//	return true; // SkillObject is collided with target unit, however hit actions are not completed yet.
+		//else
+		//	return false; // No more frameMove() is needed.
 	}
-	return true;
+
+	Unit::frameMove( dTime, fElapsedTime );
+	return frameMoveInProgress;
 }
 
 HRESULT SkillObject::frameRender ( double dTime, float fElapsedTime )
@@ -98,7 +111,7 @@ HRESULT SkillObject::frameRender ( double dTime, float fElapsedTime )
 	UINT iPass, cPasses;
 	V( g_bombShader->setMainTechnique() );
 	
-	//V( g_bombShader->setWorldViewProj( dTime, fElapsedTime, &this->m_effectObject->getLocalXform(), GetG().m_camera.GetViewMatrix(), GetG().m_camera.GetProjMatrix() ) );
+	V( g_bombShader->setWorldViewProj( dTime, fElapsedTime, &getLocalXform(), GetG().m_camera.GetViewMatrix(), GetG().m_camera.GetProjMatrix() ) );
 
 	V( g_bombShader->begin( &cPasses, 0 ) );
 	for( iPass = 0; iPass < cPasses; iPass++ )
@@ -146,6 +159,12 @@ SkillObject* SkillObject::clone() const
 	return new SkillObject( *this );
 }
 
+void SkillObject::setUserAndTarget( Character* user, Character* target )
+{
+	m_user = user;
+	m_target = target;
+	m_dm->setFireAndTargetUnit( user, target );
+}
 //////////////////////////////////////////////////////////////////////////
 
 SkillObject* EpCreateSkillObject( const char* bst, double size, int color /* ARGB */, const char* dmt )

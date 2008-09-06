@@ -83,7 +83,7 @@ bool SkillSet::equipSkill( UINT slot, const Skill* skill )
 	return false;
 }
 
-bool SkillSet::useSkill( UINT slot, Character* target ) const
+bool SkillSet::useSkill( UINT slot, Character* user, Character* target ) const
 {
 	if ( slot >= m_equippedSkills.size() )
 		throw std::runtime_error( "Slot index is larger than a number of skill slots." );
@@ -93,7 +93,7 @@ bool SkillSet::useSkill( UINT slot, Character* target ) const
 	{
 		// TODO: Clone the skill's skill objects and register to owner(type of Character)'s m_skillObjects.
 		SkillObjectList soList;
-		if ( skill->getClonedSkillObjects( soList, target ) )
+		if ( skill->getClonedSkillObjects( soList, user, target ) )
 		{
 			assert( !soList.empty() );
 			m_owner->pushSkillObjectList( soList );

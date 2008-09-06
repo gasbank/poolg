@@ -22,10 +22,10 @@ bool DynamicMotion::frameMove(float fElapsedTime)
 	return true;
 }
 
-DynamicMotion* DynamicMotion::createDynamicMotion( DynamicMotionType dmt )
+DynamicMotion* DynamicMotion::createDynamicMotion( DynamicMotionType dmt, Unit* motionTarget )
 {
 	// TODO DynamicMotion factory method
-	return new RandomCurveDynamicMotion( ( Unit* )0 );
+	return new RandomCurveDynamicMotion( motionTarget );
 }
 
 
@@ -179,18 +179,35 @@ DynamicMotion* PuffDynamicMotion::clone() const
 
 RandomCurveDynamicMotion::RandomCurveDynamicMotion( Unit* motionTarget )
 : DynamicMotion( motionTarget )
-, m_dummy( 1985.56f )
+, m_totalElapsedTime( 0 )
+, m_duration( 3.0f )
 {
 }
 
 RandomCurveDynamicMotion::RandomCurveDynamicMotion( const RandomCurveDynamicMotion& dm )
 : DynamicMotion( dm )
-, m_dummy( dm.m_dummy )
+, m_totalElapsedTime( dm.m_totalElapsedTime )
+, m_duration( dm.m_duration )
 {
 }
 
 bool RandomCurveDynamicMotion::frameMove( float fElapsedTime )
 {
+	assert( getMotionTarget() );
+	assert( getMotionTarget()->getType() == UT_SKILLOBJECT );
+
+	m_totalElapsedTime += fElapsedTime;
+	D3DXVECTOR3 targetPos = DX_CONSTS::D3DXVEC3_ZERO;
+	if ( m_totalElapsedTime < m_duration )
+	{
+		D3DXVec3Lerp( &targetPos, &getFireUnit()->getPos(), &getTargetUnit()->getPos(), m_totalElapsedTime / m_duration );
+	}
+	else
+	{
+		targetPos = getTargetUnit()->getPos();
+	}
+
+	getMotionTarget()->setPos( targetPos );
 	return true;
 }
 

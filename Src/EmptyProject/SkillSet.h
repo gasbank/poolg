@@ -23,7 +23,7 @@ public:
 	const Skill*					getSkill( SkillLocation skillLoc ) const { return m_equippedSkills[(int)skillLoc]; }
 	void							deleteSkill( SkillLocation skillLocation );
 	void							deleteAllSkills();
-	bool							useSkill( UINT slot, Character* target ) const;
+	bool							useSkill( UINT slot, Character* user, Character* target ) const;
 	const std::string&				getSkillName( UINT slot ) const;
 	const std::string&				getDescription( UINT slot ) const;
 

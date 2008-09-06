@@ -6,8 +6,7 @@ enum DynamicMotionType { DMT_UNKNOWN, DMT_FIRE_UNIFORMLY, DMT_RANDOM_CURVE };
 class DynamicMotion
 {
 public:	
-	static DynamicMotion*		createDynamicMotion		( DynamicMotionType dmt );
-	static DynamicMotion*		createRandomCurve		() { return 0; }
+	static DynamicMotion*		createDynamicMotion( DynamicMotionType dmt, Unit* motionTarget );
 	virtual						~DynamicMotion() {}
 
 	virtual DynamicMotion*		clone() const = 0;
@@ -16,12 +15,15 @@ public:
 	
 	void						setFireAndTargetUnit( const Unit* fireUnit, const Unit* targetUnit ) { m_fireUnit = fireUnit; m_targetUnit = targetUnit; }
 	void						setConstantVelocity( float constVelocity ) { m_constVelocity = constVelocity; }
-	
+	void						setMotionTarget(Unit* val) { m_motionTarget = val; }
+
 protected:
 								DynamicMotion( Unit* motionTarget );
 								DynamicMotion( const DynamicMotion& dm );
 	Unit*						getMotionTarget() const { return m_motionTarget; }
-	void						setMotionTarget(Unit* val) { m_motionTarget = val; }
+	
+	const Unit*					getFireUnit() const { return m_fireUnit; }
+	const Unit*					getTargetUnit() const { return m_targetUnit; }
 
 private:
 	Unit*						m_motionTarget;			// This unit's animation(motion) is governed by this DynamicMotion object.
@@ -92,5 +94,6 @@ protected:
 								RandomCurveDynamicMotion( const RandomCurveDynamicMotion& dm );
 
 private:
-	float						m_dummy;
+	float						m_totalElapsedTime;
+	float						m_duration;
 };

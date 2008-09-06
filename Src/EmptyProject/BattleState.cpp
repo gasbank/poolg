@@ -428,6 +428,7 @@ HRESULT BattleState::frameMove(double fTime, float fElapsedTime)
 	if ( m_battleWinner != PS_NOTSET )
 		GetWorldStateManager().setNextState(GAME_WORLD_STATE_FIELD);
 
+	// If player is dead, make entire screen to gray scale.
 	if ( getHero()->getCurHp() <= 0 )
 	{
 		g_postSepiaShader->setDesaturation( m_desaturation );
@@ -627,7 +628,7 @@ HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 		{
 			m_curTurnType = TT_NATURAL;
 
-			bool skillStarted = m_heroSkillSet->useSkill( m_curSelSkill, getFirstEnemy() );
+			bool skillStarted = m_heroSkillSet->useSkill( m_curSelSkill, getHero(), getFirstEnemy() );
 			if ( !skillStarted )
 			{
 				//이부분에 스킬이 없습니다 라는 다이얼로그를 추가할수도.

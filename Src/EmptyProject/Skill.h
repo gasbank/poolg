@@ -17,7 +17,7 @@ public:
 	const std::string&			getDescription() const { return m_skillDescription; }
 	const std::string&			getSkillName() const { return m_skillName; }
 
-	bool						getClonedSkillObjects( SkillObjectList& soList, Character* target ) const;
+	bool						getClonedSkillObjects( SkillObjectList& soList, Character* user, Character* target ) const;
 
 	void						release();
 private:

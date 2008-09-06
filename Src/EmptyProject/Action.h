@@ -44,22 +44,42 @@ SCRIPT_FACTORY( Action )
 
 //////////////////////////////////////////////////////////////////////////
 
-class BattleAction : public Action
+class UnitAction : public Action
 {
 public:
-							BattleAction( const Unit* targetUnit, float dist );
-	virtual					~BattleAction(void);
+	virtual					~UnitAction();
 
+	Unit*					getUnit() const { return m_unit; }
+	void					setUnit( Unit* val ) { m_unit = val; }
+
+protected:
+							UnitAction( Unit* unit ) : m_unit( unit ) {}
 
 private:
-	const Unit*				m_targetUnit;
-	float					m_dist;
+	Unit*					m_unit;
 };
+
+//////////////////////////////////////////////////////////////////////////
+
+// If there is an action which affects one character in the world,
+// you can create a class based on this CharacterAction class.
+// CharacterAction derived class can be used at Skill's onHitAction.
+class CharacterAction : public UnitAction
+{
+public:
+	Character*				getCharacter() const;
+	void					setCharacter( Character* val );
+
+protected:
+							CharacterAction( Character* character );
+};
+
 
 //////////////////////////////////////////////////////////////////////////
 
 class Dialog;
 
+// Dialog window will be shown. Player cannot abort dialog in middle.
 class DialogAction : public Action
 {
 public:
@@ -92,7 +112,7 @@ private:
 
 //////////////////////////////////////////////////////////////////////////
 
-class HealAction : public Action
+class HealAction : public CharacterAction
 {
 public:
 							HealAction( Character* targetChar, int healAmount );
@@ -102,22 +122,19 @@ public:
 	virtual void			activate();
 
 private:
-	Character*				m_targetChar;
 	int						m_healAmount;
 };
 
 //////////////////////////////////////////////////////////////////////////
 
-class UnitSpawnAction : public Action
+class UnitSpawnAction : public UnitAction
 {
 public:
-							UnitSpawnAction( Unit* createUnit );
+							UnitSpawnAction( Unit* unit );
 	virtual					~UnitSpawnAction();
 
 	virtual void			activate();
 
-private:
-	Unit*					m_createUnit;
 };
 
 
@@ -140,17 +157,16 @@ private:
 
 //////////////////////////////////////////////////////////////////////////
 
-class UnitMoveAction : public Action
+class UnitMoveAction : public UnitAction
 {
 public:
-							UnitMoveAction( Unit* targetUnit, std::string input );
+							UnitMoveAction( Unit* unit, std::string input );
 	virtual					~UnitMoveAction();
 
 	virtual void			activate();
 	virtual bool			update( double dTime, float fElapsedTime );
 
 private:
-	Unit*					m_targetUnit;
 	float					m_activateElapsedTime;
 	std::string				m_input;
 };
@@ -188,16 +204,15 @@ private:
 
 //////////////////////////////////////////////////////////////////////////
 
-class TeleportAction : public Action
+class TeleportAction : public UnitAction
 {
 public:
-							TeleportAction( Unit* targetUnit, int x, int y );
+							TeleportAction( Unit* unit, int x, int y );
 	virtual					~TeleportAction();
 
 	virtual void			activate();
 
 private:
-	Unit*					m_targetUnit;
 	int						m_tileX;
 	int						m_tileY;
 };
@@ -225,14 +240,14 @@ private:
 
 //////////////////////////////////////////////////////////////////////////
 
-class ControllableAction : public Action
+class ControllableAction : public CharacterAction
 {
 public:
-							ControllableAction( Character* c, bool controllable );
+							ControllableAction( Character* character, bool controllable );
 
 	virtual void			activate();
+
 private:
-	Character*				m_c;
 	bool					m_bControllable;
 };
 

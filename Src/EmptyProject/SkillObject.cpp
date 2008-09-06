@@ -52,7 +52,8 @@ SkillObject::SkillObject( const SkillObject& so )
 	ActionList::const_iterator cit = so.m_onHitActionList.begin();
 	for ( ; cit != so.m_onHitActionList.end(); ++cit )
 	{
-		addOnHitAction( (*cit)->clone() );
+		Action* act = (*cit)->clone();
+		addOnHitAction( act );
 	}
 	m_dm->setMotionTarget( this );
 }
@@ -78,22 +79,21 @@ bool SkillObject::frameMove( double dTime, float fElapsedTime )
 	float dist = D3DXVec3Length( &objToTarget );
 	if ( dist < 0.1f )
 	{
+		/*m_target->damage( 10 );
+		frameMoveInProgress = false;*/
 		
-		m_target->damage( 10 );
-		frameMoveInProgress = false;
-		
-		//ActionList::iterator it = m_onHitActionList.begin();
-		//UINT updateInProgressCount = 0;
-		//for ( ; it != m_onHitActionList.end(); ++it )
-		//{
-		//	bool updateInProgress = (*it)->update( dTime, fElapsedTime );
-		//	if ( updateInProgress )
-		//		++updateInProgress;
-		//}
-		//if ( updateInProgressCount > 0 )
-		//	return true; // SkillObject is collided with target unit, however hit actions are not completed yet.
-		//else
-		//	return false; // No more frameMove() is needed.
+		ActionList::iterator it = m_onHitActionList.begin();
+		UINT updateInProgressCount = 0;
+		for ( ; it != m_onHitActionList.end(); ++it )
+		{
+			bool updateInProgress = (*it)->update( dTime, fElapsedTime );
+			if ( updateInProgress )
+				++updateInProgress;
+		}
+		if ( updateInProgressCount > 0 )
+			frameMoveInProgress = true; // SkillObject is collided with target unit, however hit actions are not completed yet.
+		else
+			frameMoveInProgress = false; // No more frameMove() is needed.
 	}
 
 	Unit::frameMove( dTime, fElapsedTime );
@@ -164,6 +164,16 @@ void SkillObject::setUserAndTarget( Character* user, Character* target )
 	m_user = user;
 	m_target = target;
 	m_dm->setFireAndTargetUnit( user, target );
+
+	ActionList::iterator it = m_onHitActionList.begin();
+	for ( ; it != m_onHitActionList.end(); ++it )
+	{
+		CharacterAction* ca = dynamic_cast<CharacterAction*>( *it );
+		if ( ca )
+		{
+			ca->setCharacter( m_target );
+		}	
+	}
 }
 //////////////////////////////////////////////////////////////////////////
 

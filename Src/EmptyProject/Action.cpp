@@ -51,18 +51,25 @@ bool Action::update( double dTime, float fElapsedTime )
 		activate();
 	return false;
 }
-
 //////////////////////////////////////////////////////////////////////////
 
-BattleAction::BattleAction( const Unit* targetUnit, float dist )
-: m_targetUnit( targetUnit ), m_dist( dist )
-{
 
-}
-BattleAction::~BattleAction( void )
+CharacterAction::CharacterAction( Character* character )
+: UnitAction( dynamic_cast<Character*>( character ) )
 {
-
 }
+
+Character* CharacterAction::getCharacter() const
+{
+	return dynamic_cast<Character*>( getUnit() );
+}
+
+void CharacterAction::setCharacter( Character* val )
+{
+	setUnit( val );
+}
+
+
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -147,8 +154,8 @@ Action* EpCreateSoundAction( const char* soundName )
 
 //////////////////////////////////////////////////////////////////////////
 
-HealAction::HealAction( Character* targetChar, int healAmount )
-: m_targetChar ( targetChar ), m_healAmount( healAmount )
+HealAction::HealAction( Character* character, int healAmount )
+: CharacterAction( character ), m_healAmount( healAmount )
 {
 }
 
@@ -160,7 +167,8 @@ void HealAction::activate()
 {
 	Action::activate();
 
-	m_targetChar->heal( m_healAmount );
+	getCharacter()->heal( m_healAmount );
+	setCharacter( 0 );
 
 	// HealAction is 'very' instantaneous, so deactivate() is called
 	// immediately after activate().
@@ -175,27 +183,25 @@ Action* EpCreateHealAction( void* targetChar, int healAmount )
 
 //////////////////////////////////////////////////////////////////////////
 
-UnitSpawnAction::UnitSpawnAction( Unit* createUnit )
-: m_createUnit ( createUnit )
+UnitSpawnAction::UnitSpawnAction( Unit* unit )
+: UnitAction( unit )
 {
 }
 
 UnitSpawnAction::~UnitSpawnAction()
 {
-	EP_SAFE_RELEASE( m_createUnit );
 }
 
 void UnitSpawnAction::activate()
 {
 	Action::activate();
 
-	getCurWorld()->addUnit( m_createUnit );
-	m_createUnit = 0; // Unit instance ownership moved to the world!
+	getCurWorld()->addUnit( getUnit() );
+	setUnit( 0 ); // Unit instance ownership moved to the world!
 
 	// UnitSpawnAction is 'very' instantaneous, so deactivate() is called
 	// immediately after activate().
 	deactivate();
-
 }
 
 Action* EpCreateUnitSpawnAction( void* createUnit )
@@ -205,27 +211,6 @@ Action* EpCreateUnitSpawnAction( void* createUnit )
 }  SCRIPT_CALLABLE_PV_PV( EpCreateUnitSpawnAction )
 
 //////////////////////////////////////////////////////////////////////////
-
-
-
-Action* EpCreateAction( ActionType at, ... )
-{
-	Action* ret = 0;
-	va_list params;
-	int count = 0;
-	
-	switch (at)
-	{
-	case AT_BATTLE:
-		count = 2;
-		va_start( params, count );
-		ret = new BattleAction(
-			va_arg( params, Unit*),
-			va_arg( params, float) );
-		break;
-	}
-	return ret;
-}
 
 
 void ScriptAction::activate()
@@ -248,8 +233,8 @@ Action* EpCreateScriptAction( const char* scriptCommand )
 
 //////////////////////////////////////////////////////////////////////////
 
-UnitMoveAction::UnitMoveAction( Unit* targetUnit, std::string input )
-: m_targetUnit ( targetUnit ), m_input ( input ), m_activateElapsedTime( 0 )
+UnitMoveAction::UnitMoveAction( Unit* unit, std::string input )
+: UnitAction( unit ), m_input ( input ), m_activateElapsedTime( 0 )
 {
 }
 
@@ -272,7 +257,7 @@ void UnitMoveAction::activate()
 	else if ( m_input == "DOWN" )
 		i = 1;
 
-	m_targetUnit->setForcedMove( i );
+	getUnit()->setForcedMove( i );
 	m_activateElapsedTime = 0;
 }
 
@@ -283,6 +268,7 @@ bool UnitMoveAction::update( double dTime, float fElapsedTime )
 	m_activateElapsedTime += fElapsedTime;
 	if ( m_activateElapsedTime > 2.0f )
 	{
+		setUnit( 0 );
 		deactivate();
 		return false;
 	}
@@ -336,8 +322,8 @@ Action* EpCreateFadeAction( const char* type, int durationMs )
 
 //////////////////////////////////////////////////////////////////////////
 
-TeleportAction::TeleportAction( Unit* targetUnit, int x, int y )
-: m_targetUnit ( targetUnit ), m_tileX ( x ) , m_tileY ( y )
+TeleportAction::TeleportAction( Unit* unit, int x, int y )
+: UnitAction( unit ), m_tileX( x ) , m_tileY( y )
 {
 }
 
@@ -349,8 +335,9 @@ void TeleportAction::activate()
 {
 	Action::activate();
 
-	m_targetUnit->setTileBufferPos( m_tileX, m_tileY );
-	m_targetUnit->setTilePos( m_tileX, m_tileY );
+	getUnit()->setTileBufferPos( m_tileX, m_tileY );
+	getUnit()->setTilePos( m_tileX, m_tileY );
+	setUnit( 0 );
 
 	// TeleportAction is 'very' instantaneous, so deactivate() is called
 	// immediately after activate().
@@ -419,9 +406,9 @@ Action* EpCreateCameraAction( const char* type, const char* extCamName, int dura
 
 //////////////////////////////////////////////////////////////////////////
 
-ControllableAction::ControllableAction( Character* c, bool controllable )
+ControllableAction::ControllableAction( Character* character, bool controllable )
+: CharacterAction( character )
 {
-	m_c = c; 
 	m_bControllable = controllable;
 }
 
@@ -429,8 +416,9 @@ void ControllableAction::activate()
 {
 	Action::activate();
 
-	m_c->clearKey();
-	m_c->setControllable( m_bControllable );
+	getCharacter()->clearKey();
+	getCharacter()->setControllable( m_bControllable );
+	setCharacter( 0 );
 	
 	// ControllableAction is 'very' instantaneous, so deactivate() is called
 	// immediately after activate().
@@ -593,3 +581,9 @@ START_SCRIPT_FACTORY( Action )
 END_SCRIPT_FACTORY( Action )
 
 
+
+
+UnitAction::~UnitAction()
+{
+	EP_SAFE_RELEASE( m_unit );
+}

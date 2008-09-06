@@ -19,9 +19,10 @@ namespace eval NormalAttackSkill {
 		EpSkillObjectAddOnHitAction		$so		[ EpCreateHealAction 0 $healPerObject ]
 		lappend							soList $so
 		
-		#set so							[ EpCreateSkillObject CUBE 1.5 0xff0000ff DM_RANDOM_CURVE ]
-		#EpSkillObjectAddOnHitAction		$so		[ EpCreateHealAction 0 $healPerObject ]
-		#lappend							soList $so
+		set dm							[ EpCreateRandomCurveDynamicMotion 0.4 ]
+		set so							[ EpCreateSkillObject CUBE 1.5 0xff0000ff $dm ]
+		EpSkillObjectAddOnHitAction		$so		[ EpCreateHealAction 0 $healPerObject ]
+		lappend							soList $so
 		
 		return							$soList
 	}

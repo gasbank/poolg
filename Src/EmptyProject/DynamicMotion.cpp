@@ -199,6 +199,7 @@ RandomCurveDynamicMotion::RandomCurveDynamicMotion( const RandomCurveDynamicMoti
 , m_totalElapsedTime( dm.m_totalElapsedTime )
 , m_duration( dm.m_duration )
 {
+	assert( m_duration > 0 );
 }
 
 bool RandomCurveDynamicMotion::frameMove( float fElapsedTime )
@@ -210,7 +211,18 @@ bool RandomCurveDynamicMotion::frameMove( float fElapsedTime )
 	D3DXVECTOR3 targetPos = DX_CONSTS::D3DXVEC3_ZERO;
 	if ( m_totalElapsedTime < m_duration )
 	{
-		D3DXVec3Lerp( &targetPos, &getFireUnit()->getPos(), &getTargetUnit()->getPos(), m_totalElapsedTime / m_duration );
+		float zeroToOne = m_totalElapsedTime / m_duration;
+		D3DXVec3Lerp( &targetPos, &getFireUnit()->getPos(), &getTargetUnit()->getPos(), zeroToOne );
+		
+		D3DXVECTOR3 zDelta( 0, 0, 3.0f * zeroToOne * (zeroToOne - 1 ) );
+		
+
+		D3DXVECTOR3 fireDir = getTargetUnit()->getPos() - getFireUnit()->getPos();
+		D3DXMATRIX mat;
+		D3DXMatrixRotationAxis( &mat, &fireDir, D3DXToRadian( (zeroToOne * 360 - 180) * 2 ) );
+		D3DXVec3TransformCoord( &zDelta, &zDelta, &mat );
+
+		targetPos += zDelta;
 	}
 	else
 	{

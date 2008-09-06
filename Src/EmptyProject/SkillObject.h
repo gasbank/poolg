@@ -5,12 +5,11 @@ class BattleState;
 class DynamicMotion;
 class Action;
 
-enum DynamicMotionType;
 
 class SkillObject : public Unit
 {
 public:
-	static SkillObject*				createSkillObject( const char* bst, float size, D3DCOLOR color, const char* dmt );
+	static SkillObject*				createSkillObject( const char* bst, float size, D3DCOLOR color, DynamicMotion* dmt );
 									~SkillObject();
 
 	// Virtual Methods
@@ -30,7 +29,6 @@ public:
 
 private:
 									SkillObject( const SkillObject& so );
-									SkillObject( BasicShapeType bst, float size, D3DCOLOR color, DynamicMotionType dmt );
 									SkillObject( BasicShapeType bst, float size, D3DCOLOR color, DynamicMotion* dm );
 	BattleState*					getBattleState() const;
 

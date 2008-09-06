@@ -14,19 +14,6 @@
 extern BombShader*						g_bombShader;
 extern LPD3DXMESH						g_bst[BST_COUNT];
 
-SkillObject::SkillObject( BasicShapeType bst, float size, D3DCOLOR color, DynamicMotionType dmt )
-: Unit( UT_SKILLOBJECT )
-, m_bst( bst )
-, m_user( 0 )
-, m_target( 0 )
-, m_velocity( 0 )
-, m_dm( 0 )
-, m_size( size )
-, m_color( color )
-{
-	m_dm = DynamicMotion::createDynamicMotion( dmt, this );
-}
-
 SkillObject::SkillObject( BasicShapeType bst, float size, D3DCOLOR color, DynamicMotion* dm )
 : Unit( UT_SKILLOBJECT )
 , m_bst( bst )
@@ -137,7 +124,7 @@ BattleState* SkillObject::getBattleState() const
 	return reinterpret_cast<BattleState*>( GetWorldStateManager().getCurState() );
 }
 
-SkillObject* SkillObject::createSkillObject( const char* bst, float size, D3DCOLOR color, const char* dmt )
+SkillObject* SkillObject::createSkillObject( const char* bst, float size, D3DCOLOR color, DynamicMotion* dm )
 {
 	BasicShapeType bstEnum;
 	if ( strcmp( bst, "SPHERE" ) == 0 ) bstEnum = BST_SPHERE;
@@ -145,12 +132,7 @@ SkillObject* SkillObject::createSkillObject( const char* bst, float size, D3DCOL
 	else if ( strcmp( bst, "PLANE" ) == 0 ) bstEnum = BST_PLANE;
 	else bstEnum = BST_UNKNOWN;
 
-	DynamicMotionType dmtEnum;
-	if ( strcmp( bst, "FIRE_UNIFORMLY" ) == 0 ) dmtEnum = DMT_FIRE_UNIFORMLY;
-	else if ( strcmp( bst, "RANDOM_CURVE" ) == 0 ) dmtEnum = DMT_RANDOM_CURVE;
-	else dmtEnum = DMT_UNKNOWN;
-
-	SkillObject* so = new SkillObject( bstEnum, size, color, dmtEnum );
+	SkillObject* so = new SkillObject( bstEnum, size, color, dm );
 	return so;
 }
 
@@ -177,10 +159,11 @@ void SkillObject::setUserAndTarget( Character* user, Character* target )
 }
 //////////////////////////////////////////////////////////////////////////
 
-SkillObject* EpCreateSkillObject( const char* bst, double size, int color /* ARGB */, const char* dmt )
+SkillObject* EpCreateSkillObject( const char* bst, double size, int color /* ARGB */, void* dmPtr )
 {
-	return SkillObject::createSkillObject( bst, (float)size, (D3DCOLOR)color, dmt );
-} SCRIPT_CALLABLE_PV_PC_D_I_PC( EpCreateSkillObject )
+	DynamicMotion* dm = reinterpret_cast<DynamicMotion*>( dmPtr );
+	return SkillObject::createSkillObject( bst, (float)size, (D3DCOLOR)color, dm );
+} SCRIPT_CALLABLE_PV_PC_D_I_PV( EpCreateSkillObject )
 
 int EpSkillObjectAddOnHitAction( void* soPtr, void* actPtr )
 {

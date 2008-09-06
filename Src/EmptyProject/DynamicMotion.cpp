@@ -1,11 +1,11 @@
 #include "EmptyProjectPCH.h"
 #include "DynamicMotion.h"
+#include "ScriptManager.h"
 
 DynamicMotion::DynamicMotion( Unit* motionTarget )
 : m_motionTarget( motionTarget )
 , m_fireUnit( 0 )
 , m_targetUnit( 0 )
-, m_constVelocity( 0 )
 {
 }
 
@@ -13,21 +13,30 @@ DynamicMotion::DynamicMotion( const DynamicMotion& dm )
 : m_motionTarget( dm.m_motionTarget )
 , m_fireUnit( dm.m_fireUnit )
 , m_targetUnit( dm.m_targetUnit )
-, m_constVelocity( dm.m_constVelocity )
 {
 }
 
-bool DynamicMotion::frameMove(float fElapsedTime)
-{
-	return true;
-}
-
-DynamicMotion* DynamicMotion::createDynamicMotion( DynamicMotionType dmt, Unit* motionTarget )
+DynamicMotion* DynamicMotion::createDynamicMotion( DynamicMotionType dmt )
 {
 	// TODO DynamicMotion factory method
-	return new RandomCurveDynamicMotion( motionTarget );
+	return new RandomCurveDynamicMotion( ( Unit* )0, 1.0f );
 }
 
+DynamicMotion* DynamicMotion::createRandomCurveDynamicMotion( float duration )
+{
+	return new RandomCurveDynamicMotion( ( Unit* )0, duration );
+}
+
+//////////////////////////////////////////////////////////////////////////
+
+DynamicMotion* EpCreateRandomCurveDynamicMotion( double duration )
+{
+	return DynamicMotion::createRandomCurveDynamicMotion( (float)duration );
+} SCRIPT_CALLABLE_PV_D( EpCreateRandomCurveDynamicMotion )
+
+START_SCRIPT_FACTORY( DynamicMotion )
+	CREATE_OBJ_COMMAND( EpCreateRandomCurveDynamicMotion )
+END_SCRIPT_FACTORY( DynamicMotion )
 
 
 
@@ -69,6 +78,7 @@ DynamicMotion* FireUniformlyDynamicMotion::clone() const
 {
 	return new FireUniformlyDynamicMotion( *this );
 }
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 bool SpinAroundDynamicMotion::frameMove(float fElapsedTime)
@@ -174,13 +184,13 @@ DynamicMotion* PuffDynamicMotion::clone() const
 {
 	return new PuffDynamicMotion( *this );
 }
+
 //////////////////////////////////////////////////////////////////////////
 
-
-RandomCurveDynamicMotion::RandomCurveDynamicMotion( Unit* motionTarget )
+RandomCurveDynamicMotion::RandomCurveDynamicMotion( Unit* motionTarget, float duration )
 : DynamicMotion( motionTarget )
 , m_totalElapsedTime( 0 )
-, m_duration( 3.0f )
+, m_duration( duration )
 {
 }
 
@@ -215,3 +225,5 @@ DynamicMotion* RandomCurveDynamicMotion::clone() const
 {
 	return new RandomCurveDynamicMotion( *this );
 }
+
+//////////////////////////////////////////////////////////////////////////

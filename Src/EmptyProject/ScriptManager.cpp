@@ -15,6 +15,7 @@
 #include "TileManager.h"
 #include "SequentialIncident.h"
 #include "SkillObject.h"
+#include "DynamicMotion.h"
 
 int Tcl_AppInit(Tcl_Interp *interp);
 
@@ -176,6 +177,7 @@ void ScriptManager::initScriptBindings()
 	INIT_BINDING( StructureObject );
 	INIT_BINDING( SequentialIncident );
 	INIT_BINDING( SkillObject );
+	INIT_BINDING( DynamicMotion );
 }
 #undef INIT_BINDING
 

@@ -15,7 +15,7 @@ public:
 
 	// Virtual Methods
 	virtual HRESULT					frameRender( double dTime, float fElapsedTime );
-	virtual bool					frameMove( float fElapsedTime );
+	virtual bool					frameMove( double dTime, float fElapsedTime );
 
 	/*static SkillObject*				createSOnormalAttack	(Character* user, Character* target, Unit* effectObject);
 	static SkillObject*				createSOheal			(Character* user, Unit* effectObject);

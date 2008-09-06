@@ -38,14 +38,14 @@ HRESULT Enemy::frameRender( double dTime, float fElapsedTime )
 	return Character::frameRender( dTime, fElapsedTime );
 }
 
-bool Enemy::frameMove( float fElapsedTime )
+bool Enemy::frameMove( double dTime, float fElapsedTime )
 {
 	WorldStateManager& rWsm = GetWorldStateManager();
 
 	if ( m_bRandomWalkable && rWsm.curStateEnum() == GAME_WORLD_STATE_FIELD )
 		walkRandomly();
 
-	return Character::frameMove( fElapsedTime );
+	return Character::frameMove( dTime, fElapsedTime );
 }
 
 LRESULT Enemy::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )

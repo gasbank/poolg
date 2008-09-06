@@ -73,10 +73,10 @@ int Hero::gainExp( int expPoint )
 }
 
 
-bool Hero::frameMove( float fElapsedTime )
+bool Hero::frameMove( double dTime, float fElapsedTime )
 {
 	//printf( "Tile X, Y : %d, %d \n", getTilePosX(), getTilePosY() );
-	return Character::frameMove( fElapsedTime );
+	return Character::frameMove( dTime, fElapsedTime );
 }
 
 LRESULT Hero::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )

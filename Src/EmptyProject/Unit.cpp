@@ -19,6 +19,7 @@ extern LPD3DXFONT		g_unitNameFont;
 Unit::Unit( UnitType type )
 : m_type( type )
 {
+	m_d3dxMesh					= 0;
 	m_arnMesh					= 0;
 
 	m_fSoulAnimationDuration	= 1.0f;
@@ -100,7 +101,7 @@ LRESULT Unit::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 	return FALSE;
 }
 
-bool Unit::frameMove( float fElapsedTime )
+bool Unit::frameMove( double dTime, float fElapsedTime )
 {	
 	bool flag = true;
 
@@ -433,7 +434,7 @@ HRESULT Unit::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC
 
 void Unit::onLostDevice()
 {
-
+	SAFE_RELEASE( m_d3dxMesh );
 }
 
 void Unit::updateArnMesh()

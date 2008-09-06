@@ -212,15 +212,13 @@ HRESULT World::frameMove( double dTime, float fElapsedTime )
 	}
 
 	UnitSet::iterator it2 = m_unitSet.begin();
-	for ( ; it2 != m_unitSet.end(); )
+	for ( ; it2 != m_unitSet.end(); ++it2 )
 	{
-		(*it2)->frameMove(fElapsedTime);
-		/*if ( (*it2)->getRemoveFlag() )
-		{
-			it2 = removeUnit( *it2 );
-		}
-		else*/
-			++it2;
+		(*it2)->frameMove( dTime, fElapsedTime );
+
+		// TODO:
+		// Any registered units will not be deallocated automatically
+		// until the world destructed.
 	}
 
 

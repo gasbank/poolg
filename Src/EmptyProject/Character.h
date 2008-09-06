@@ -26,7 +26,7 @@ public:
 
 	// Virtual Methods
 	virtual HRESULT						frameRender( double dTime, float fElapsedTime );
-	virtual bool						frameMove( float fElapsedTime );
+	virtual bool						frameMove( double dTime, float fElapsedTime );
 	virtual LRESULT						handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 	virtual const D3DXVECTOR3&			getPos() const { if ( m_moveImpulse != DX_CONSTS::D3DXVEC3_ZERO ) return m_curPos; else return Unit::getPos(); }
 	virtual void						pushUnitInFront( UnitInput dir );

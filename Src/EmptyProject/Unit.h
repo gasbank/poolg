@@ -37,7 +37,7 @@ public:
 	// Virtual Methods
 	virtual HRESULT					frameRender( double dTime, float fElapsedTime );
 	virtual LRESULT					handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
-	virtual bool					frameMove( float fElapsedTime );
+	virtual bool					frameMove( double dTime, float fElapsedTime );
 	virtual HRESULT					onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
 													void* pUserContext );
 	virtual void					onLostDevice();
@@ -96,6 +96,7 @@ public:
 	ArnMesh*						getArnMesh() const						{ return m_arnMesh; }
 
 	void							setMesh( LPD3DXMESH d3dxMesh );
+	LPD3DXMESH						getMesh() const { return m_d3dxMesh; }
 
 	void							setColor( int r, int g, int b );
 	

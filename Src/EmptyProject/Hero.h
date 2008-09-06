@@ -11,7 +11,7 @@ public:
 	virtual						~Hero( void );
 
 	// Virtual Methods
-	virtual bool				frameMove( float fElapsedTime );
+	virtual bool				frameMove( double dTime, float fElapsedTime );
 	virtual LRESULT				handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 
 	int							gainExp (int expPoint);

@@ -11,7 +11,7 @@ public:
 
 	// VIrtual Methods
 	virtual HRESULT				frameRender( double dTime, float fElapsedTime );
-	virtual bool				frameMove( float fElapsedTime );
+	virtual bool				frameMove( double dTime, float fElapsedTime );
 	virtual LRESULT				handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 
 	void						setRandomWalkable( bool randomWalkable )	{ m_bRandomWalkable = randomWalkable; }

@@ -10,7 +10,7 @@ public:
 	void init (const TCHAR* imgFileName, float radius, float height, int angleNumber);
 	void release ();
 	HRESULT draw (bool textured = true);
-	virtual bool frameMove (float fElapsedTime);
+	virtual bool frameMove ( double dTime, float fElapsedTime);
 	virtual HRESULT onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
 		void* pUserContext );
 	virtual void onLostDevice();
@@ -37,7 +37,6 @@ protected:
 	bool m_bInit;
 
 private:
-	LPD3DXMESH m_d3dxMesh;
 	LPDIRECT3DTEXTURE9 m_d3dTex;
 	
 	std::tstring m_imgFileName;

@@ -666,14 +666,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\DynamicMotion.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\DynamicMotion.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Enemy.cpp"
 				>
 			</File>
@@ -690,11 +682,27 @@
 				>
 			</File>
 			<File
+				RelativePath=".\InnerFire.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\InnerFire.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Npc.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\Npc.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SkillObject.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SkillObject.h"
 				>
 			</File>
 			<File
@@ -875,6 +883,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\DynamicMotion.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\DynamicMotion.h"
+			>
+		</File>
+		<File
 			RelativePath="EmptyProject.cpp"
 			>
 		</File>
@@ -931,14 +947,6 @@
 			>
 		</File>
 		<File
-			RelativePath=".\InnerFire.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\InnerFire.h"
-			>
-		</File>
-		<File
 			RelativePath=".\particlesystem.cpp"
 			>
 		</File>
@@ -980,14 +988,6 @@
 		</File>
 		<File
 			RelativePath=".\SkillManager.h"
-			>
-		</File>
-		<File
-			RelativePath=".\SkillObject.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\SkillObject.h"
 			>
 		</File>
 		<File

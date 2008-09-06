@@ -62,16 +62,35 @@ SkillObject::~SkillObject(void)
 
 }
 
-bool SkillObject::frameMove ( float fElapsedTime )
+bool SkillObject::frameMove( double dTime, float fElapsedTime )
 {
-	//return this->m_effectObject->frameMove(fElapsedTime);
+	// 'm_dm' governs the movement of this Unit-derived object.
+	m_dm->frameMove( fElapsedTime );
+
+	D3DXVECTOR3 objToTarget = getPos() - m_target->getPos();
+	float dist = D3DXVec3Length( &objToTarget );
+	if ( dist < 0.1f )
+	{
+		ActionList::iterator it = m_onHitActionList.begin();
+		UINT updateInProgressCount = 0;
+		for ( ; it != m_onHitActionList.end(); ++it )
+		{
+			bool updateInProgress = (*it)->update( dTime, fElapsedTime );
+			if ( updateInProgress )
+				++updateInProgress;
+		}
+		if ( updateInProgressCount > 0 )
+			return true; // SkillObject is collided with target unit, however hit actions are not completed yet.
+		else
+			return false; // No more frameMove() is needed.
+	}
 	return true;
 }
 
 HRESULT SkillObject::frameRender ( double dTime, float fElapsedTime )
 {
 	HRESULT f = 0;
-	D3DPERF_BeginEvent(0, L"SkillObjRender");
+	D3DPERF_BeginEvent( 0, L"SkillObject Render" );
 
 	HRESULT hr = S_OK;
 	D3DXMATRIX mWorld;
@@ -85,12 +104,18 @@ HRESULT SkillObject::frameRender ( double dTime, float fElapsedTime )
 	for( iPass = 0; iPass < cPasses; iPass++ )
 	{
 		V( g_bombShader->beginPass( iPass ) );
-		//f = this->m_effectObject->getMesh()->DrawSubset( 0 );
+
+		if ( getMesh() == 0 )
+		{
+			setMesh( g_bst[ m_bst ] );
+		}
+		f = getMesh()->DrawSubset( 0 );
+		
 		V( g_bombShader->endPass() );
 	}
 	V( g_bombShader->end() );
 	
-	D3DPERF_EndEvent ();
+	D3DPERF_EndEvent();
 	return f;
 }
 

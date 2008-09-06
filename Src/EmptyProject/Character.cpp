@@ -104,7 +104,7 @@ Character::~Character()
 	delete m_skillSet;
 }
 
-bool Character::frameMove( float fElapsedTime )
+bool Character::frameMove( double dTime, float fElapsedTime )
 {
 
 	if (m_bMoving == false)
@@ -179,7 +179,7 @@ bool Character::frameMove( float fElapsedTime )
 	SkillObjectList::iterator it = m_skillObjects.begin();
 	for ( ; it != m_skillObjects.end() ; )
 	{
-		bool ret = (*it)->frameMove( fElapsedTime );
+		bool ret = (*it)->frameMove( dTime, fElapsedTime );
 		if (!ret)
 		{
 			SAFE_DELETE(*it);
@@ -208,7 +208,7 @@ bool Character::frameMove( float fElapsedTime )
 		setLocalXformDirty();
 	}
 
-	return Unit::frameMove( fElapsedTime );
+	return Unit::frameMove( dTime, fElapsedTime );
 }
 
 HRESULT Character::frameRender( double dTime, float fElapsedTime )

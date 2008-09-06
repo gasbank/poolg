@@ -26,7 +26,7 @@ Unit* StructureObject::createStructureObject( LPD3DXMESH mesh, int tileX, int ti
 	return u;
 }
 
-bool StructureObject::frameMove( float fElapsedTime )
+bool StructureObject::frameMove( double dTime, float fElapsedTime )
 {
 	if (m_bMoving == false)
 	{
@@ -91,7 +91,7 @@ bool StructureObject::frameMove( float fElapsedTime )
 		}
 	}
 
-	return Unit::frameMove( fElapsedTime );
+	return Unit::frameMove( dTime, fElapsedTime );
 }
 
 Unit* EpCreateStructureObject( int tileX, int tileY, int p )

@@ -1,9 +1,4 @@
-set skillName [ list \
-	NormalAttackSkill\
-	
-	
-	]
-
+set EpSkillList [ list NormalAttackSkill TestSkill ]
 
 namespace eval NormalAttackSkill {
 	set name					"NormalAttack"
@@ -34,6 +29,33 @@ namespace eval NormalAttackSkill {
 		EpCharacterDamage 	$target $damage
 	}
 }
+
+
+namespace eval TestSkill {
+	set name					"TestSkill"
+	set description				"여러가지 실험을 위한 스킬이다."
+	set csEssentials			1
+	
+	proc registerSkillObjects {} {
+		set soList						[ list ]
+		set healPerObject				-10
+		
+		set dm							[ EpCreateRandomCurveDynamicMotion 0.3 ]
+		set so							[ EpCreateSkillObject SPHERE 2.0 0xffff0000 $dm ]
+		EpSkillObjectAddOnHitAction		$so		[ EpCreateHealAction 0 $healPerObject ]
+		lappend							soList $so
+		
+		set dm							[ EpCreateRandomCurveDynamicMotion 0.6 ]
+		set so							[ EpCreateSkillObject CUBE 1.5 0xff0000ff $dm ]
+		EpSkillObjectAddOnHitAction		$so		[ EpCreateHealAction 0 $healPerObject ]
+		EpSkillObjectAddOnHitAction		$so		[ EpCreateFlickerAction 250 50 255 255 255 ]
+		lappend							soList $so
+		
+		return							$soList
+	}
+}
+
+
 
 if 0 {
 	

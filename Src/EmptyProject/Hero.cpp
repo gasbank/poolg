@@ -37,6 +37,9 @@ Unit* Hero::createHero( LPD3DXMESH mesh, int tileX, int tileY, float posZ )
 	//u->addToSkillSet( SL_FIRST );
 	u->memorizeSkill( GetSKillManager().getSkill( "NormalAttack" ) );
 	u->equipSkill( 0, GetSKillManager().getSkill( "NormalAttack" ) );
+
+	u->memorizeSkill( GetSKillManager().getSkill( "TestSkill" ) );
+	u->equipSkill( 1, GetSKillManager().getSkill( "TestSkill" ) );
 	return u;
 }
 

@@ -1000,7 +1000,14 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 
 	// (11) Setup SkillManager
 	SkillManager* g_skillManager = new SkillManager();
-	GetSKillManager().registerSkill( Skill::createSkillByScript( "NormalAttackSkill" ) );
+	ConstCharList skillList;
+	GetScriptManager().readCharPtrList( "EpSkillList", skillList );
+	it = skillList.begin();
+	for ( ; it != skillList.end(); ++it )
+	{
+		const char* skillName = *it;
+		GetSKillManager().registerSkill( Skill::createSkillByScript( skillName ) );
+	}
 
 	// (12) Set the first world
 	// TODO: This is 'DO ONCE THROUGH THE WHOLE LIFETIME job.. not on every OnCreateDevice()!

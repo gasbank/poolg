@@ -272,6 +272,7 @@ public:
 							FlickerAction( float durationms, float fadeDuration, D3DXCOLOR& color );
 
 	virtual bool			update( double dTime, float fElapsedTime );
+	virtual Action*			clone() const { return new FlickerAction( *this ); }
 
 protected:
 	virtual	void			activate();

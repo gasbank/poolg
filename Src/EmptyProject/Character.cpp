@@ -179,8 +179,8 @@ bool Character::frameMove( double dTime, float fElapsedTime )
 	SkillObjectList::iterator it = m_skillObjects.begin();
 	for ( ; it != m_skillObjects.end() ; )
 	{
-		bool ret = (*it)->frameMove( dTime, fElapsedTime );
-		if (!ret)
+		bool frameMoveInProgress = (*it)->frameMove( dTime, fElapsedTime );
+		if ( !frameMoveInProgress )
 		{
 			SAFE_DELETE(*it);
 			it = m_skillObjects.erase( it );

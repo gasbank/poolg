@@ -14,7 +14,6 @@ class InnerFire;
 class SkillSet;
 
 enum TurnType { TT_NATURAL, TT_COMPUTER, TT_PLAYER };
-enum PlayerSide { PS_NOTSET, PS_COMPUTER, PS_PLAYER };
 enum StatSelect { SS_HEALTH, SS_WILL, SS_CODING, SS_DEF, SS_SENSE, SS_IMMUNITY, SS_EXIT };
 
 typedef std::set<Enemy*> EnemyList;
@@ -56,6 +55,7 @@ private:
 	Character*				getHero();
 	void					setupCamera();
 	void					updateBarRate();
+	void					printEasterEggMessage();
 
 	const SkillSet*			m_heroSkillSet;
 	UINT					m_curSelSkill;		// Currently selected skill slot index
@@ -103,8 +103,6 @@ private:
 	
 	TurnType				m_curTurnType;
 	TurnType				m_nextTurnType;
-	PlayerSide				m_battleWinner;
-
 
 	InnerFire*				m_innerFire;
 

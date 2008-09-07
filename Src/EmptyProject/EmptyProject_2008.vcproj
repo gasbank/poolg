@@ -999,11 +999,11 @@
 			>
 		</File>
 		<File
-			RelativePath=".\particlesystem.cpp"
+			RelativePath=".\ParticleSystem.cpp"
 			>
 		</File>
 		<File
-			RelativePath=".\particlesystem.h"
+			RelativePath=".\ParticleSystem.h"
 			>
 		</File>
 		<File

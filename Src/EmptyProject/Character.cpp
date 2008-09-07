@@ -410,8 +410,9 @@ void Character::pushUnitInFront( UnitInput dir )
 
 void Character::setDead()
 {
-	m_curHp = -1;
-	startSoulAnimation( 1.0f, 10.0f );
+	throw std::runtime_error( "Do not call this method." );
+	/*m_curHp = -1;
+	startSoulAnimation( 1.0f, 10.0f );*/
 }
 
 void Character::addMoveImpulse( const D3DXVECTOR3& impulse )

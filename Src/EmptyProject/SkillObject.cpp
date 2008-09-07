@@ -66,8 +66,30 @@ bool SkillObject::frameMove( double dTime, float fElapsedTime )
 	float dist = D3DXVec3Length( &objToTarget );
 	if ( dist < 0.1f )
 	{
-		/*m_target->damage( 10 );
-		frameMoveInProgress = false;*/
+		assert( m_target );
+		
+		m_target->addMoveImpulse( DX_CONSTS::D3DXVEC3_Z / 2.5f ); // Attacked unit shows startled shake
+
+		/*if ( m_target->getType() == UT_HERO )
+		{ 
+			if ( m_target->isDead() )
+			{
+				getBattleState()->pushBattleLog( "HP가 모두 소진되었습니다. 게임 오버입니다." );
+				getBattleState()->pushBattleLog( "순순히 F5키를 누르고 종료하시죠." );
+				m_target->setDead();
+				getBattleState()->setNextTurnType( TT_NATURAL );
+				getBattleState()->passTurn();
+			}
+			else
+			{
+				getBattleState()->setNextTurnType( TT_PLAYER );
+				getBattleState()->passTurn();
+			}
+		}
+		else
+		{
+			
+		}*/
 		
 		ActionList::iterator it = m_onHitActionList.begin();
 		UINT updateInProgressCount = 0;

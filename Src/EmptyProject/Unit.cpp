@@ -308,7 +308,10 @@ void Unit::updateSoulAnimation( float fElapsedTime )
 		if ( m_fSoulAnimationTimer < m_fSoulAnimationDuration )
 			m_fSoulAnimationTimer += fElapsedTime;
 		else
+		{
 			m_bSoulAnimation = false;
+			setRemoveFlag( true ); // Since soul animation is finished, we should set remove flag to true.
+		}
 
 		float ratio = sin( D3DXToRadian( m_fSoulAnimationTimer / m_fSoulAnimationDuration * 90.0f ) );
 		float height = ratio * m_fSoulAnimationHeight;

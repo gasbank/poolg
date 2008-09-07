@@ -27,10 +27,10 @@ public:
 	virtual HRESULT			enter( double dStartTime );
 	virtual HRESULT			leave();
 
-	virtual HRESULT			frameRender (IDirect3DDevice9* pd3dDevice, double fTime, float fElapsedTime);
-	virtual HRESULT			frameMove (double fTime, float fElapsedTime);
+	virtual HRESULT			frameRender( IDirect3DDevice9* pd3dDevice, double fTime, float fElapsedTime );
+	virtual HRESULT			frameMove( double dTime, float fElapsedTime );
 
-	virtual HRESULT			handleMessages (HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	virtual HRESULT			handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 	
 	virtual HRESULT			onCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext );
 	virtual HRESULT			onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext );
@@ -38,12 +38,12 @@ public:
 
 	virtual HRESULT			release ();
 
-	void					renderFixedText (int scrWidth, int scrHeight);
+	void					renderFixedText( int scrWidth, int scrHeight );
 
 	void					setNextTurnType( TurnType tt ) { m_nextTurnType = tt; }
 	void					passTurn();
 	void					pushBattleLog( const char* log ) { m_battleLog.push_back( log ); }	
-	void					statSelectMove (char choice);
+	void					statSelectMove( char choice );
 	
 	void					insertEnemy( Enemy* enemy ) { m_enemies.insert( enemy ); }
 
@@ -51,6 +51,7 @@ public:
 	Enemy*					getFirstEnemy() { assert( m_enemies.size() ); return *m_enemies.begin(); }
 
 private:
+	void					frameMoveUserInterfaces( double dTime, float fElapsedTime );
 	void					doComputerAction();
 	Character*				getHero();
 	void					setupCamera();

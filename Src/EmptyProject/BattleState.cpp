@@ -265,7 +265,7 @@ HRESULT BattleState::leave()
 	return State::leave();
 }
 
-HRESULT BattleState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, float fElapsedTime)
+HRESULT BattleState::frameRender( IDirect3DDevice9* pd3dDevice, double fTime, float fElapsedTime )
 {
 
 	pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
@@ -303,109 +303,15 @@ HRESULT BattleState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, flo
 	return S_OK;
 }
 
-HRESULT BattleState::frameMove(double fTime, float fElapsedTime)
+HRESULT BattleState::frameMove( double dTime, float fElapsedTime )
 {
-
-	double fStateTime = getStateTime(fTime);
-
-	//박스 위치 갱신
-	m_skillContentBoxMover->frameMove( fElapsedTime );
-	m_statSelectBoxMover->frameMove( fElapsedTime );
-
-	m_skillContentBox->position = m_skillContentBoxMover->getPos();
-	m_statSelectBox->position = m_statSelectBoxMover->getPos();
-
-
-
-	//현재 수치 적용
-	m_hpBarPlayerProg->setCurVal( getHero()->getCurHp() );
-	m_csBarPlayerProg->setCurVal( getHero()->getCurCs() );
-	m_expBarPlayerProg->setCurVal( ((Hero*)getHero() )->getCurExp() );
-	m_hpBarEnemyProg->setCurVal( getFirstEnemy()->getCurHp() );
-	m_csBarEnemyProg->setCurVal( getFirstEnemy()->getCurCs() );
-
-	m_hpIllusionPlayerProg->setCurVal( getHero()->getCurHp() );
-	m_csIllusionPlayerProg->setCurVal( getHero()->getCurCs() );
-	m_expIllusionPlayerProg->setCurVal( ((Hero*)getHero() )->getCurExp() );
-	m_hpIllusionEnemyProg->setCurVal( getFirstEnemy()->getCurHp() );
-	m_csIllusionEnemyProg->setCurVal( getFirstEnemy()->getCurCs() );
-
-	//수치 이동
-	m_hpBarPlayerProg->setRate( fElapsedTime );
-	m_csBarPlayerProg->setRate( fElapsedTime );
-	m_expBarPlayerProg->setRate( fElapsedTime );
-	m_hpBarEnemyProg->setRate( fElapsedTime );
-	m_csBarEnemyProg->setRate( fElapsedTime );
-
-	m_hpIllusionPlayerProg->setRate( fElapsedTime );
-	m_csIllusionPlayerProg->setRate( fElapsedTime );
-	m_expIllusionPlayerProg->setRate( fElapsedTime );
-	m_hpIllusionEnemyProg->setRate( fElapsedTime );
-	m_csIllusionEnemyProg->setRate( fElapsedTime );
-
-
-
-	//수치를 그림에 적용
-	//원 크기는 333에서 443까지.
-	//따라서 right = 333 + 110 * rate;
-	int barLeftBound = 333;
-	int	barLength = 110;
-
-	m_hpBarPlayer->srcRect.right = barLeftBound + (int)( barLength*( m_hpBarPlayerProg->getRate() ) );
-	m_csBarPlayer->srcRect.right = barLeftBound + (int)( barLength*( m_csBarPlayerProg->getRate() ) );
-	m_expBarPlayer->srcRect.right = barLeftBound + (int)( barLength*( m_expBarPlayerProg->getRate() ) );
-
-	m_hpBarEnemy->srcRect.right = barLeftBound + (int)( barLength*( m_hpBarEnemyProg->getRate() ) );
-	m_csBarEnemy->srcRect.right = barLeftBound + (int)( barLength*( m_hpBarEnemyProg->getRate() ) );
-
-
-	m_hpIllusionPlayer->srcRect.right = barLeftBound + (int)( barLength*( m_hpIllusionPlayerProg->getRate() ) );
-	m_csIllusionPlayer->srcRect.right = barLeftBound + (int)( barLength*( m_csIllusionPlayerProg->getRate() ) );
-	m_expIllusionPlayer->srcRect.right = barLeftBound + (int)( barLength*( m_expIllusionPlayerProg->getRate() ) );
-
-	m_hpIllusionEnemy->srcRect.right = barLeftBound + (int)( barLength*( m_hpIllusionEnemyProg->getRate() ) );
-	m_csIllusionEnemy->srcRect.right = barLeftBound + (int)( barLength*( m_csIllusionEnemyProg->getRate() ) );
-
-/*
-	m_SkillContentBox.frameMove(fElapsedTime);
-	m_StatSelectBox.frameMove( fElapsedTime );
-	m_hpBgPlayer.frameMove(fElapsedTime);
-	m_mpBgPlayer.frameMove(fElapsedTime);
-	m_expBgPlayer.frameMove(fElapsedTime);
-	m_hpBgEnemy.frameMove(fElapsedTime);
-	m_mpBgEnemy.frameMove(fElapsedTime);
-
-	m_hpIllusionPlayer.frameMove(fElapsedTime);
-	m_hpIllusionEnemy.frameMove(fElapsedTime);
-	m_mpIllusionPlayer.frameMove(fElapsedTime);
-	m_expIllusionPlayer.frameMove( fElapsedTime );
-
-	m_hpBarPlayer.frameMove(fElapsedTime);
-	m_mpBarPlayer.frameMove(fElapsedTime);
-	m_expBarPlayer.frameMove(fElapsedTime);
-
-	m_innerFire.frameMove(fElapsedTime);
-	m_innerFire.setPos( getHero()->getPos().x, getHero()->getPos().y, -3);
-
-	m_hpBarEnemy.frameMove(fElapsedTime);
-	m_mpBarEnemy.frameMove(fElapsedTime);
-
-	m_hpBarPlayer.changeRate((float)getHero()->getCurHp());
-	m_hpBarEnemy.changeRate((float)getFirstEnemy()->getCurHp());
-	m_hpIllusionPlayer.changeRate((float)getHero()->getCurHp());
-	m_hpIllusionEnemy.changeRate((float)getFirstEnemy()->getCurHp());
-	m_mpBarPlayer.changeRate((float)getHero()->getCurCs());
-	m_mpIllusionPlayer.changeRate((float)getHero()->getCurCs());
-	m_expBarPlayer.changeRate( (float) ( (Hero*)getHero() )->getCurExp() );
-	m_expIllusionPlayer.changeRate( (float) ( (Hero*)getHero() )->getCurExp() );
-*/
+	frameMoveUserInterfaces( dTime, fElapsedTime );
 
 	// TODO Anim test
-
 	if ( getHero()->getArnMesh() )
 	{
 		ArnNode* guardBallNode = getHero()->getArnMesh()->getNodeByName("GuardBall");
-		guardBallNode->update( fTime, fElapsedTime );
+		guardBallNode->update( dTime, fElapsedTime );
 		if ( ((ArnXformable*)guardBallNode)->isAnimSeqEnded() )
 		{
 			((ArnXformable*)guardBallNode)->resetAnimSeqTime();
@@ -413,21 +319,23 @@ HRESULT BattleState::frameMove(double fTime, float fElapsedTime)
 		}
 	}
 	
-	
-	//// WorldState에 접근하기 위한 코드.
-	//TopStateManager& tsm = TopStateManager::getSingleton();
-	//WorldState* ws = static_cast<WorldState*>( tsm.getCurState() );
-	//const D3DXVECTOR3& vEnemyPos = ws->getEnemyPos();
-	//const D3DXVECTOR3& vHeroPos = ws->getHeroPos();
-
-	// 주인공이 적과 멀어지거나(충돌 상태가 아니거나), 승자가 결정되면 FieldState로 돌아간다.
-	//if ( ws->isCollide( &vEnemyPos, &vHeroPos ) == false || m_battleWinner != PS_NOTSET )
-
 	// TODO 승자가 결정되면 FieldState로 돌아간다.
-	if ( getFirstEnemy()->getCurHp() <= 0 )
+	if ( getFirstEnemy()->isDead() && !getFirstEnemy()->getSoulAnimation() )
 	{
-		getFirstEnemy()->setRemoveFlag( true );
-		GetWorldStateManager().setNextState(GAME_WORLD_STATE_FIELD);
+		getFirstEnemy()->startSoulAnimation( 1.0f, 10.0f );
+	}
+
+	EnemyList::iterator it = m_enemies.begin();
+	bool allEnemiesRemoved = true;
+	for ( ; it != m_enemies.end(); ++it )
+	{
+		allEnemiesRemoved = allEnemiesRemoved && (*it)->getRemoveFlag();
+		if ( !allEnemiesRemoved )
+			break;
+	}
+	if ( allEnemiesRemoved )
+	{
+		GetWorldStateManager().setNextState( GAME_WORLD_STATE_FIELD );
 	}
 
 	// If player is dead, make entire screen to gray scale.
@@ -1155,4 +1063,99 @@ void BattleState::printEasterEggMessage()
 		break;
 	}
 	m_noneSkillSelectedCount++;
+}
+
+void BattleState::frameMoveUserInterfaces( double dTime, float fElapsedTime )
+{
+	//박스 위치 갱신
+	m_skillContentBoxMover->frameMove( fElapsedTime );
+	m_statSelectBoxMover->frameMove( fElapsedTime );
+
+	m_skillContentBox->position = m_skillContentBoxMover->getPos();
+	m_statSelectBox->position = m_statSelectBoxMover->getPos();
+
+
+
+	//현재 수치 적용
+	m_hpBarPlayerProg->setCurVal( getHero()->getCurHp() );
+	m_csBarPlayerProg->setCurVal( getHero()->getCurCs() );
+	m_expBarPlayerProg->setCurVal( ((Hero*)getHero() )->getCurExp() );
+	m_hpBarEnemyProg->setCurVal( getFirstEnemy()->getCurHp() );
+	m_csBarEnemyProg->setCurVal( getFirstEnemy()->getCurCs() );
+
+	m_hpIllusionPlayerProg->setCurVal( getHero()->getCurHp() );
+	m_csIllusionPlayerProg->setCurVal( getHero()->getCurCs() );
+	m_expIllusionPlayerProg->setCurVal( ((Hero*)getHero() )->getCurExp() );
+	m_hpIllusionEnemyProg->setCurVal( getFirstEnemy()->getCurHp() );
+	m_csIllusionEnemyProg->setCurVal( getFirstEnemy()->getCurCs() );
+
+	//수치 이동
+	m_hpBarPlayerProg->setRate( fElapsedTime );
+	m_csBarPlayerProg->setRate( fElapsedTime );
+	m_expBarPlayerProg->setRate( fElapsedTime );
+	m_hpBarEnemyProg->setRate( fElapsedTime );
+	m_csBarEnemyProg->setRate( fElapsedTime );
+
+	m_hpIllusionPlayerProg->setRate( fElapsedTime );
+	m_csIllusionPlayerProg->setRate( fElapsedTime );
+	m_expIllusionPlayerProg->setRate( fElapsedTime );
+	m_hpIllusionEnemyProg->setRate( fElapsedTime );
+	m_csIllusionEnemyProg->setRate( fElapsedTime );
+
+
+
+	//수치를 그림에 적용
+	//원 크기는 333에서 443까지.
+	//따라서 right = 333 + 110 * rate;
+	int barLeftBound = 333;
+	int	barLength = 110;
+
+	m_hpBarPlayer->srcRect.right = barLeftBound + (int)( barLength*( m_hpBarPlayerProg->getRate() ) );
+	m_csBarPlayer->srcRect.right = barLeftBound + (int)( barLength*( m_csBarPlayerProg->getRate() ) );
+	m_expBarPlayer->srcRect.right = barLeftBound + (int)( barLength*( m_expBarPlayerProg->getRate() ) );
+
+	m_hpBarEnemy->srcRect.right = barLeftBound + (int)( barLength*( m_hpBarEnemyProg->getRate() ) );
+	m_csBarEnemy->srcRect.right = barLeftBound + (int)( barLength*( m_hpBarEnemyProg->getRate() ) );
+
+
+	m_hpIllusionPlayer->srcRect.right = barLeftBound + (int)( barLength*( m_hpIllusionPlayerProg->getRate() ) );
+	m_csIllusionPlayer->srcRect.right = barLeftBound + (int)( barLength*( m_csIllusionPlayerProg->getRate() ) );
+	m_expIllusionPlayer->srcRect.right = barLeftBound + (int)( barLength*( m_expIllusionPlayerProg->getRate() ) );
+
+	m_hpIllusionEnemy->srcRect.right = barLeftBound + (int)( barLength*( m_hpIllusionEnemyProg->getRate() ) );
+	m_csIllusionEnemy->srcRect.right = barLeftBound + (int)( barLength*( m_csIllusionEnemyProg->getRate() ) );
+
+	/*
+	m_SkillContentBox.frameMove(fElapsedTime);
+	m_StatSelectBox.frameMove( fElapsedTime );
+	m_hpBgPlayer.frameMove(fElapsedTime);
+	m_mpBgPlayer.frameMove(fElapsedTime);
+	m_expBgPlayer.frameMove(fElapsedTime);
+	m_hpBgEnemy.frameMove(fElapsedTime);
+	m_mpBgEnemy.frameMove(fElapsedTime);
+
+	m_hpIllusionPlayer.frameMove(fElapsedTime);
+	m_hpIllusionEnemy.frameMove(fElapsedTime);
+	m_mpIllusionPlayer.frameMove(fElapsedTime);
+	m_expIllusionPlayer.frameMove( fElapsedTime );
+
+	m_hpBarPlayer.frameMove(fElapsedTime);
+	m_mpBarPlayer.frameMove(fElapsedTime);
+	m_expBarPlayer.frameMove(fElapsedTime);
+
+	m_innerFire.frameMove(fElapsedTime);
+	m_innerFire.setPos( getHero()->getPos().x, getHero()->getPos().y, -3);
+
+	m_hpBarEnemy.frameMove(fElapsedTime);
+	m_mpBarEnemy.frameMove(fElapsedTime);
+
+	m_hpBarPlayer.changeRate((float)getHero()->getCurHp());
+	m_hpBarEnemy.changeRate((float)getFirstEnemy()->getCurHp());
+	m_hpIllusionPlayer.changeRate((float)getHero()->getCurHp());
+	m_hpIllusionEnemy.changeRate((float)getFirstEnemy()->getCurHp());
+	m_mpBarPlayer.changeRate((float)getHero()->getCurCs());
+	m_mpIllusionPlayer.changeRate((float)getHero()->getCurCs());
+	m_expBarPlayer.changeRate( (float) ( (Hero*)getHero() )->getCurExp() );
+	m_expIllusionPlayer.changeRate( (float) ( (Hero*)getHero() )->getCurExp() );
+	*/
 }

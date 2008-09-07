@@ -855,6 +855,7 @@ int EpRegisterIncident( void* ptr )
 
 ArnNode* EpGetNode( const char* nodeName )
 {
+	odprintf( " - [EP] INFO: EpGetNode(\"%s\") called.\n", nodeName );
 	return GetWorldManager().getCurWorld()->getNode( nodeName );
 
 } SCRIPT_CALLABLE_PV_PC( EpGetNode )

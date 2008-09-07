@@ -5,7 +5,7 @@
 #----------------------------------------------------------------------------------#
 
 variable EpStartTopStateName		IntroState
-set EpStartWorldName				EpCeilingWorld
+set EpStartWorldName				EpA213World
 set EpWorldList						[ list EpCeilingWorld EpRoomWorld EpA213World EpTestStage ]
 set EpWindowMode					1
 

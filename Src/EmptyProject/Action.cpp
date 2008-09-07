@@ -362,17 +362,16 @@ Action* EpCreateTeleportAction( void* targetUnit, int x, int y )
 
 //////////////////////////////////////////////////////////////////////////
 
-CameraAction::CameraAction( int type, int duration, ArnCamera* arnCam )
+CameraAction::CameraAction( int type, int duration, const char* arnCamNodeName )
 {
-	m_type = type; 
-	m_arnCam = arnCam; 
+	m_type = type;
 	m_duration = duration;
+	m_arnCamNodeName = arnCamNodeName;
 }
 
 CameraAction::CameraAction( int type, int duration )
 {
 	m_type = type; 
-	m_arnCam = 0; 
 	m_duration = duration;
 }
 
@@ -389,8 +388,12 @@ void CameraAction::activate()
 		GetG().m_camera.begin( CAMERA_SMOOTH_ATTACH );
 		break;
 	case 1:
-		GetG().m_camera.setExternalCamera( m_arnCam );
-		GetG().m_camera.begin( CAMERA_EXTERNAL );
+		{
+			ArnSceneGraph* arnSceneGraph = GetWorldManager().getCurWorld()->getArnSceneGraphPt();
+			ArnCamera* arnCam = static_cast<ArnCamera*>( arnSceneGraph->getSceneRoot()->getNodeByName( m_arnCamNodeName ) );
+			GetG().m_camera.setExternalCamera( arnCam );
+			GetG().m_camera.begin( CAMERA_EXTERNAL );
+		}
 		break;
 	}
 
@@ -400,15 +403,12 @@ void CameraAction::activate()
 }
 
 Action* EpCreateCameraAction( const char* type, const char* extCamName, int durationMs  )
-{
-	ArnSceneGraph* arnSceneGraph = GetWorldManager().getCurWorld()->getArnSceneGraphPt();
-	ArnCamera* arnCam = static_cast<ArnCamera*>(arnSceneGraph->getSceneRoot()->getNodeByName( extCamName ));
-
+{	
 	if ( strcmp( type, "attach" ) == 0)
 		return new CameraAction( 0, durationMs );
 	else if ( strcmp( type, "external" ) == 0 )
 	{
-		return new CameraAction( 1, durationMs, arnCam );
+		return new CameraAction( 1, durationMs, extCamName );
 	}
 	else
 		throw std::runtime_error( "Type check failed" );

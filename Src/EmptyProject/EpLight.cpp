@@ -313,6 +313,10 @@ void EpLight::frameRender( IDirect3DDevice9* pd3dDevice )
 {
 	if ( m_bLightValueDirty )
 	{
+		float vDirLen = D3DXVec3Length( (D3DXVECTOR3*)&m_light.Direction );
+		if ( vDirLen < 1e-5 || vDirLen > 1e6 )
+			m_light.Direction = DX_CONSTS::D3DXVEC3_Z;
+
 		pd3dDevice->SetLight( 1, &m_light );
 		m_bLightValueDirty = false;
 		//printf("lightPos: %f %f %f \n", m_light.Position.x, m_light.Position.y, m_light.Position.z );

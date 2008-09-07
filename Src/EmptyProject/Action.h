@@ -227,15 +227,16 @@ class ArnCamera;
 class CameraAction : public Action
 {
 public:
-							CameraAction( int type, int duration, ArnCamera* arnCam );
+							CameraAction( int type, int duration, const char* arnCamNodeName );
 							CameraAction( int type, int duration );
 	virtual					~CameraAction() {}
 
 	virtual void			activate();
+
 private:
 	int						m_type;
 	int						m_duration;
-	ArnCamera*				m_arnCam;
+	std::string				m_arnCamNodeName;
 };
 
 //////////////////////////////////////////////////////////////////////////

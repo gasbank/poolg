@@ -74,13 +74,8 @@ namespace eval EpA213World::OldRatandGatekeeperQuest {
 		EpAddActionToSequence		$sqIncident	$action1
 
 		# ¹® ¿­±â ---------------------------------------------------------------------------------
-		set actions			[ EpCreateControllableAction	$EpA213World::pHeroUnit 0								]
-		lappend actions		[ EpCreateScriptAction			"EpSetDoAnim [ EpGetNode Blocking1  ] 1"	]
-		lappend actions		[ EpCreateScriptAction			"EpSetDoAnim [ EpGetNode Blocking2  ] 1"	]
-		lappend actions		[ EpCreateScriptAction			"EpSetDoAnim [ EpGetNode Blocking3  ] 1"	]
-		lappend actions		[ EpCreateScriptAction			"EpSetDoAnim [ EpGetNode GateRight  ] 1"	]
-		lappend actions		[ EpCreateScriptAction			"EpSetDoAnim [ EpGetNode GateLeft   ] 1"	]
-		lappend actions		[ EpCreateScriptAction			"EpSetDoAnim [ EpGetNode GateCamera ] 1"	]
+		set actions			[ EpCreateControllableAction	$EpA213World::pHeroUnit 0					]
+		lappend actions		[ EpCreateScriptAction			"EpA213World::OldRatandGatekeeperQuest::doGateOpenAnim"		]
 		lappend actions		[ EpCreateCameraAction			external GateCamera 0						]
 		#lappend actions		[ EpCreateScriptAction			"EpCameraSetShake 1"						]
 		lappend actions		[ EpCreateDelayAction			10000										]
@@ -102,6 +97,15 @@ namespace eval EpA213World::OldRatandGatekeeperQuest {
 		
 		set incCount		[ EpRegisterIncident $sqIncident ]
 		EpOutputDebugString " - Incident count: $incCount\n"
+	}
+	
+	proc doGateOpenAnim {} {
+		EpSetDoAnim [ EpGetNode Blocking1	] 1
+		EpSetDoAnim [ EpGetNode Blocking2	] 1
+		EpSetDoAnim [ EpGetNode Blocking3	] 1
+		EpSetDoAnim [ EpGetNode GateRight	] 1
+		EpSetDoAnim [ EpGetNode GateLeft	] 1
+		EpSetDoAnim [ EpGetNode GateCamera	] 1
 	}
 
 	proc registerIncident_pOldCat1 {} {

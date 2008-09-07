@@ -853,6 +853,22 @@
 				RelativePath=".\PictureMap.h"
 				>
 			</File>
+			<File
+				RelativePath=".\Sprite.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Sprite.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SpriteManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SpriteManager.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Tile"
@@ -871,6 +887,34 @@
 			</File>
 			<File
 				RelativePath=".\TileManager.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Skill"
+			>
+			<File
+				RelativePath=".\Skill.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Skill.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SkillManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SkillManager.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SkillSet.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SkillSet.h"
 				>
 			</File>
 		</Filter>
@@ -975,51 +1019,11 @@
 			>
 		</File>
 		<File
-			RelativePath=".\Skill.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\Skill.h"
-			>
-		</File>
-		<File
-			RelativePath=".\SkillManager.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\SkillManager.h"
-			>
-		</File>
-		<File
-			RelativePath=".\SkillSet.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\SkillSet.h"
-			>
-		</File>
-		<File
 			RelativePath=".\Sound.cpp"
 			>
 		</File>
 		<File
 			RelativePath=".\Sound.h"
-			>
-		</File>
-		<File
-			RelativePath=".\Sprite.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\Sprite.h"
-			>
-		</File>
-		<File
-			RelativePath=".\SpriteManager.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\SpriteManager.h"
 			>
 		</File>
 		<File

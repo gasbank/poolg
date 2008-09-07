@@ -17,7 +17,9 @@
 #include <assert.h>
 #include <time.h>
 #include <set>
+#include <algorithm>
 #include <process.h>
+
 
 #include "DXUT.h"
 #include "AranPCH.h"
@@ -60,8 +62,6 @@ inline bool WasKeyDown( BYTE key ) { return( (key & KEY_WAS_DOWN_MASK) == KEY_WA
 
 #define SCRIPT_FACTORY(className) class _script_factory_##className { public: static void init(); };
 
-typedef std::list<const char*> ConstCharList;
-
 
 template<typename T> void EpSafeReleaseAll( T& obj ) {
 	T::iterator it = obj.begin();
@@ -72,4 +72,20 @@ template<typename T> void EpSafeReleaseAll( T& obj ) {
 	obj.clear();	
 };
 
+template<typename T> void EpSafeReleaseAllMap( T& obj ) {
+	T::iterator it = obj.begin();
+	for ( ; it != obj.end(); ++it )
+	{
+		EP_SAFE_RELEASE( it->second );
+	}
+	obj.clear();	
+};
+
+
+
 #define FLOAT_POS_INF		(0x7f800000)
+
+enum BasicShapeType { BST_UNKNOWN, BST_TEAPOT, BST_SPHERE, BST_CUBE, BST_PLANE, BST_COUNT };
+
+
+#include "Typedefs.h"

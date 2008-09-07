@@ -11,16 +11,12 @@
 #include "Trigger.h"
 
 
-class Incident;
-class Unit;
-class Dialog;
+
 class Sound;
 class ArnMesh;
 class Hero;
 
-typedef std::set<Unit*> UnitSet;
-typedef std::list<Dialog*> DialogList;
-typedef std::list<Incident*> IncidentList;
+
 
 class World
 {

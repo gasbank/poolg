@@ -23,9 +23,6 @@ void SpriteManager::init()
 
 void SpriteManager::release()
 {
-	SAFE_RELEASE( m_d3dxSprite );
-	SAFE_RELEASE( m_d3dxObjectSprite );
-
 	SpriteMap::iterator it = m_spriteMap.begin();
 	for ( ; it != m_spriteMap.end(); ++it )
 	{
@@ -46,7 +43,7 @@ void SpriteManager::frameRender()
 				continue;
 
 			const Sprite::DrawRequestList& dr = it->second->getDrawRequestList();
-			if ( dr.size() )
+			if ( !dr.empty() )
 			{
 				Sprite::DrawRequestList::const_iterator itDr = dr.begin();
 				for ( ; itDr != dr.end(); ++itDr )
@@ -73,7 +70,7 @@ void SpriteManager::frameRender()
 				continue;
 
 			const Sprite::DrawRequestList& dr = it->second->getDrawReqXformableList();
-			if ( dr.size() )
+			if ( !dr.empty() )
 			{
 				Sprite::DrawRequestList::const_iterator itDr = dr.begin();
 				
@@ -126,7 +123,7 @@ void SpriteManager::frameRenderSpecificSprite( const char* spriteName )
 	assert( sprite->isCustomRendered() );
 	const Sprite::DrawRequestList& dr = sprite->getDrawRequestList();
 	
-	if ( dr.size() )
+	if ( !dr.empty() )
 	{
 		Sprite::DrawRequestList::const_iterator itDr = dr.begin();
 		for ( ; itDr != dr.end(); ++itDr )
@@ -144,11 +141,6 @@ HRESULT SpriteManager::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSUR
 {
 	HRESULT hr = S_OK;
 
-	m_dev = pd3dDevice;
-	
-	D3DXCreateSprite( m_dev, &m_d3dxSprite );
-	D3DXCreateSprite( m_dev, &m_d3dxObjectSprite );
-
 	V_RETURN( m_d3dxSprite->OnResetDevice() );
 	V_RETURN( m_d3dxObjectSprite->OnResetDevice() );
 
@@ -164,4 +156,27 @@ void SpriteManager::onLostDevice()
 {
 	m_d3dxSprite->OnLostDevice();
 	m_d3dxObjectSprite->OnLostDevice();
+
+	SpriteMap::iterator it = m_spriteMap.begin();
+	for ( ; it != m_spriteMap.end(); ++it )
+	{
+		it->second->onLostDevice();
+	}
+}
+
+HRESULT SpriteManager::onCreateDevice( IDirect3DDevice9* pd3dDevice )
+{
+	HRESULT hr = S_OK;
+	m_dev = pd3dDevice;
+
+	V_RETURN( D3DXCreateSprite( m_dev, &m_d3dxSprite ) );
+	V_RETURN( D3DXCreateSprite( m_dev, &m_d3dxObjectSprite ) );
+
+	return hr;
+}
+
+void SpriteManager::onDestroyDevice()
+{
+	m_d3dxSprite->Release();
+	m_d3dxObjectSprite->Release();
 }

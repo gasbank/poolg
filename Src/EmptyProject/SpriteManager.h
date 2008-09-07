@@ -18,9 +18,11 @@ public:
 
 	LPD3DXSPRITE getSpriteRenerer() const { return m_d3dxSprite; }
 
+	HRESULT onCreateDevice( IDirect3DDevice9* pd3dDevice );
 	HRESULT onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
 							void* pUserContext );
 	void onLostDevice();
+	void onDestroyDevice();
 private:
 	void init();
 	void release();

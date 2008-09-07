@@ -15,16 +15,14 @@ FieldState::~FieldState(void)
 {
 }
 
-HRESULT FieldState::enter()
+HRESULT FieldState::enter( double dStartTime )
 {
-	return S_OK;
+	return State::enter( dStartTime );
 }
 
 HRESULT FieldState::leave()
 {
-	m_startTime = -1.0f;
-
-	return S_OK;
+	return State::leave();
 }
 
 HRESULT FieldState::frameRender( IDirect3DDevice9* pd3dDevice, double fTime, float fElapsedTime )

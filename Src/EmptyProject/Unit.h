@@ -25,7 +25,7 @@ static const POINT g_moveAmount[4] = {
 class World;
 class ArnMesh;
 
-enum UnitType { UT_UNIT, UT_CHARACTER, UT_HERO, UT_ENEMY, UT_ATTACKOBJECT, UT_INNERFIRE, UT_STRUCTREOBJECT };
+enum UnitType { UT_UNIT, UT_CHARACTER, UT_HERO, UT_ENEMY, UT_ATTACKOBJECT, UT_INNERFIRE, UT_STRUCTREOBJECT, UT_SKILLOBJECT };
 
 class Unit
 {
@@ -37,17 +37,14 @@ public:
 	// Virtual Methods
 	virtual HRESULT					frameRender( double dTime, float fElapsedTime );
 	virtual LRESULT					handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
-	virtual bool					frameMove( float fElapsedTime );
-	virtual HRESULT onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
-									void* pUserContext );
-	virtual void onLostDevice();
+	virtual bool					frameMove( double dTime, float fElapsedTime );
+	virtual HRESULT					onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
+													void* pUserContext );
+	virtual void					onLostDevice();
 	virtual const D3DXVECTOR3&		getPos() const { return m_vPos; }
 
 
-	HRESULT							init( LPDIRECT3DDEVICE9 pd3dDevice, LPD3DXMESH mesh );
-	const D3DXVECTOR3&				getLowerLeft() const	{ return m_lowerLeft; }
-	const D3DXVECTOR3&				getUpperRight() const	{ return m_upperRight; }
-	LPD3DXMESH						getMesh() const			{ return m_d3dxMesh; }
+	HRESULT							init();
 	
 	void							release();
 	void							clearKey();
@@ -92,11 +89,15 @@ public:
 	UnitType						getType() const							{ return m_type; }
 	const char*						getTypeString() const;
 	World*							getCurWorld() const						{ return GetWorldManager().getCurWorld(); }
-	void							setDynamicMotion( DynamicMotion* dm );
 	void							setForcedMove( int i );
 	void							forcedMoveTest();
-	void							setArnMesh( ArnMesh* arnMesh );
-	ArnMesh*						getArnMesh() const						{ return m_arnMesh; }
+	
+	void							setArnMeshName( const char* arnMeshName )	{ m_arnMeshName = arnMeshName; }
+	const std::string&				getArnMeshName() const						{ return m_arnMeshName; }
+	ArnMesh*						getArnMesh() const							{ return m_arnMesh; }
+
+	void							setMesh( LPD3DXMESH d3dxMesh );
+	LPD3DXMESH						getMesh() const { return m_d3dxMesh; }
 
 	void							setColor( int r, int g, int b );
 	
@@ -108,11 +109,13 @@ public:
 	static Unit*					createUnit( LPD3DXMESH mesh, int tileX = 0, int tileY = 0, float posZ = 0 );
 
 
-	bool getSoulAnimation() { return m_bSoulAnimation; }
+	bool							getSoulAnimation() { return m_bSoulAnimation; }
 	void							setNameVisible( bool b ) { m_bNameVisible = b; }
 	void							setName( std::string str ) { m_name = str; }
 
 	void							printDebugInfo() const;
+	void							updateArnMesh();
+
 protected:
 									Unit( UnitType type );
 	virtual UnitInput				mapKey( UINT nKey ) const;
@@ -120,49 +123,41 @@ protected:
 	void							setLocalXformDirty()					{ m_bLocalXformDirty = true; }
 	HRESULT							rayTesting( UnitInput ui );
 
+	
+
 	BYTE							m_aKeys[UNIT_MAX_KEYS];
-	UINT							m_cKeysDown;            // Number of camera keys that are down.
+	UINT							m_cKeysDown;
 	D3DXVECTOR3						m_vKeyboardDirection;
 	D3DXVECTOR3						m_vVelocity;
-	LPD3DXMESH						m_d3dxMesh;
-	LPDIRECT3DTEXTURE9				m_d3dTex;
-
-	DynamicMotion*					m_dm;
-
-
+	
 private:
-
-	World*							getWorldState() const;
 	void							drawSoul();
 	void							updateSoulAnimation( float fElapsedTime );
 	void							drawName();
-
-	struct TeapotVertex
-	{
-		float x, y, z;
-		float nx, ny, nz;
-	};
 	void							updateLocalXform();
 	
-	D3DXVECTOR3						m_lowerLeft, m_upperRight; // bounding box params
-	D3DXVECTOR3						m_vRot, m_vPos, m_vScale;
+	D3DXVECTOR3						m_vRot;
+	D3DXVECTOR3						m_vPos;
+	D3DXVECTOR3						m_vScale;
+
 	bool							m_bLocalXformDirty;
 	D3DXMATRIX						m_localXform;
-	LPDIRECT3DDEVICE9				m_pd3dDevice;
 	D3DMATERIAL9					m_material;
 	
 	bool							m_removeFlag;
 	bool							m_bForcedMove;
-	
-	
-	
 
 	Point2Uint						m_tilePos;
 	Point2Uint						m_tileBufferPos;
 
 	UnitType						m_type;
 
+	// Pointer to mesh object. If ArnMesh is set for this Unit instance,
+	// you should set m_d3dxMesh to NULL. If ArnMesh is not set, you should
+	// assign non-NULL value to m_d3dxMesh. In short, you must set only one of those pointer.
 	ArnMesh*						m_arnMesh;
+	LPD3DXMESH						m_d3dxMesh;
+
 	bool							m_bMovable;
 
 	// For soul animation
@@ -178,6 +173,8 @@ private:
 	// For name drawing
 	std::string						m_name;
 	bool							m_bNameVisible;
+
+	std::string						m_arnMeshName;
 };
 
 SCRIPT_FACTORY( Unit )

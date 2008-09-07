@@ -2,10 +2,14 @@
 #include "Unit.h"
 #include "TileManager.h"
 
-
 class SkillSet;
 class SkillObject;
 class Trigger;
+class Skill;
+
+typedef std::list<SkillObject*> SkillObjectList;
+
+enum SkillLocation;
 
 //고정적 스탯. 레벨 업 시만 오르는.(simon ornen)
 struct Stat
@@ -22,17 +26,23 @@ public:
 
 	// Virtual Methods
 	virtual HRESULT						frameRender( double dTime, float fElapsedTime );
-	virtual bool						frameMove( float fElapsedTime );
+	virtual bool						frameMove( double dTime, float fElapsedTime );
 	virtual LRESULT						handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 	virtual const D3DXVECTOR3&			getPos() const { if ( m_moveImpulse != DX_CONSTS::D3DXVEC3_ZERO ) return m_curPos; else return Unit::getPos(); }
 	virtual void						pushUnitInFront( UnitInput dir );
 
-	/*스킬 함수*/
-	void doNormalAttack(int type, Character* enemy);
+	/* 스킬 관련 함수 */
+	//void doNormalAttack(int type, Character* enemy);
+	void								pushSkillObject( SkillObject* skillObj ) { m_skillObjects.push_back( skillObj ); }
+	void								pushSkillObjectList( const SkillObjectList soList );
+	const SkillSet*						getSkillSet() const { return m_skillSet; }
+	bool								deleteSkill( SkillLocation skillLoc );
+	bool								memorizeSkill( const Skill* skill );
+	bool								equipSkill( UINT slot, const Skill* skill );
 
-	void doCsBurn();
-	void recoverCs ();
-	void heal (int point);
+	void								doCsBurn();
+	void								recoverCs ();
+	void								heal (int point);
 
 	
 
@@ -59,9 +69,6 @@ public:
 
 	void								setControllable(bool bCtrl)		{ m_bControllable = bCtrl; }
 
-	void								pushSkillObject (SkillObject* skillObj);
-
-	SkillSet*							getSkillSet() const { return m_skillSet; }
 	
 protected:
 										Character( UnitType type );
@@ -69,23 +76,16 @@ protected:
 private:
 	void								boundaryTesting( UnitInput );
 
-	typedef std::list<SkillObject*> SkillObjectList;
-	SkillObjectList m_skillObjectList;
-
-	bool					m_bMoving;
-	float					m_fMovingTime;
+	bool								m_bMoving;
+	float								m_fMovingTime;
 
 	//유동적 스탯.
-	int						m_maxHp;
-	int						m_curHp;
-	int						m_maxCs;
-	int						m_curCs;
+	int									m_maxHp;
+	int									m_curHp;
+	int									m_maxCs;
+	int									m_curCs;
 
-
-
-
-	float					m_moveDuration; // A time needed to move one time(tile) in seconds
-	
+	float								m_moveDuration; // A time needed to move one time(tile) in seconds
 	
 	TileRegion							m_boundaryTileRect;
 
@@ -97,8 +97,9 @@ private:
 
 	bool								m_bControllable;
 
-	SkillSet*							m_skillSet;	
-	
+	SkillSet*							m_skillSet;
+	SkillObjectList						m_skillObjects;
+
 };
 
 

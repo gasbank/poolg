@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="Windows-1252"?>
+<?xml version="1.0" encoding="ks_c_5601-1987"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
@@ -157,10 +157,10 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/IGNORE:4089"
-				AdditionalDependencies="Aran.lib tcl85t.lib DXUT.lib DXUTOpt.lib dxerr.lib dxguid.lib d3dx9.lib d3dx10.lib d3d9.lib d3d10.lib winmm.lib comctl32.lib"
+				AdditionalDependencies="Aran_Release.lib tcl85t.lib DXUT.lib DXUTOpt.lib dxerr.lib dxguid.lib d3dx9.lib d3dx10.lib d3d9.lib d3d10.lib winmm.lib comctl32.lib"
 				OutputFile="$(OutDir)/EmptyProject_Release.exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="../Aran/lib;../DXUT/Core/Release;../DXUT/Optional/Release;../tcl/lib;"
+				AdditionalLibraryDirectories="../Aran/lib;../DXUT/Core/Release;../DXUT/Optional/Release;../tcl/lib"
 				GenerateManifest="false"
 				DelayLoadDLLs=""
 				GenerateDebugInformation="true"
@@ -571,70 +571,6 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="Top States"
-			>
-			<File
-				RelativePath=".\CreditState.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\CreditState.h"
-				>
-			</File>
-			<File
-				RelativePath=".\IntroState.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\IntroState.h"
-				>
-			</File>
-			<File
-				RelativePath=".\MainState.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\MainState.h"
-				>
-			</File>
-			<File
-				RelativePath=".\PlayState.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\PlayState.h"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="World States"
-			>
-			<File
-				RelativePath=".\BattleState.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\BattleState.h"
-				>
-			</File>
-			<File
-				RelativePath=".\FieldState.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\FieldState.h"
-				>
-			</File>
-			<File
-				RelativePath=".\MenuState.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\MenuState.h"
-				>
-			</File>
-		</Filter>
-		<Filter
 			Name="Shaders"
 			>
 			<File
@@ -730,14 +666,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\DynamicMotion.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\DynamicMotion.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Enemy.cpp"
 				>
 			</File>
@@ -754,11 +682,27 @@
 				>
 			</File>
 			<File
+				RelativePath=".\InnerFire.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\InnerFire.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Npc.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\Npc.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SkillObject.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SkillObject.h"
 				>
 			</File>
 			<File
@@ -813,6 +757,70 @@
 				RelativePath=".\WorldStateManager.h"
 				>
 			</File>
+			<Filter
+				Name="Top States"
+				>
+				<File
+					RelativePath=".\CreditState.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\CreditState.h"
+					>
+				</File>
+				<File
+					RelativePath=".\IntroState.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\IntroState.h"
+					>
+				</File>
+				<File
+					RelativePath=".\MainState.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\MainState.h"
+					>
+				</File>
+				<File
+					RelativePath=".\PlayState.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\PlayState.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="PlayState&apos;s Substates (World States)"
+				>
+				<File
+					RelativePath=".\BattleState.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\BattleState.h"
+					>
+				</File>
+				<File
+					RelativePath=".\FieldState.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\FieldState.h"
+					>
+				</File>
+				<File
+					RelativePath=".\MenuState.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\MenuState.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="UI"
@@ -853,6 +861,22 @@
 				RelativePath=".\PictureMap.h"
 				>
 			</File>
+			<File
+				RelativePath=".\Sprite.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Sprite.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SpriteManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SpriteManager.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Tile"
@@ -874,12 +898,48 @@
 				>
 			</File>
 		</Filter>
+		<Filter
+			Name="Skill"
+			>
+			<File
+				RelativePath=".\Skill.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Skill.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SkillManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SkillManager.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SkillSet.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SkillSet.h"
+				>
+			</File>
+		</Filter>
 		<File
 			RelativePath=".\Dialog.cpp"
 			>
 		</File>
 		<File
 			RelativePath=".\Dialog.h"
+			>
+		</File>
+		<File
+			RelativePath=".\DynamicMotion.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\DynamicMotion.h"
 			>
 		</File>
 		<File
@@ -939,14 +999,6 @@
 			>
 		</File>
 		<File
-			RelativePath=".\InnerFire.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\InnerFire.h"
-			>
-		</File>
-		<File
 			RelativePath=".\particlesystem.cpp"
 			>
 		</File>
@@ -975,22 +1027,6 @@
 			>
 		</File>
 		<File
-			RelativePath=".\Skill.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\Skill.h"
-			>
-		</File>
-		<File
-			RelativePath=".\SkillObject.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\SkillObject.h"
-			>
-		</File>
-		<File
 			RelativePath=".\Sound.cpp"
 			>
 		</File>
@@ -999,19 +1035,7 @@
 			>
 		</File>
 		<File
-			RelativePath=".\Sprite.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\Sprite.h"
-			>
-		</File>
-		<File
-			RelativePath=".\SpriteManager.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\SpriteManager.h"
+			RelativePath=".\Typedefs.h"
 			>
 		</File>
 		<File

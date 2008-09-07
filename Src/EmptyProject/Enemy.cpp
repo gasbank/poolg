@@ -25,15 +25,10 @@ Enemy::~Enemy(void)
 Unit* Enemy::createEnemy( LPD3DXMESH mesh, int tileX, int tileY, float posZ )
 {
 	Enemy* u = new Enemy();
-	u->init( GetG().m_dev, mesh );
+	u->init();
 	u->setTilePos( tileX, tileY );
 	u->setTileBufferPos( tileX, tileY );
-		
-	// As default, enemy's model is GwengYi
-	PlayState* ps = static_cast<PlayState*>(GetTopStateManager().getState( GAME_TOP_STATE_PLAY ));
-	ArnSceneGraph* charSceneGraph = ps->getCharacterSceneGraph();
-	ArnMesh* arnMesh = static_cast<ArnMesh*>(charSceneGraph->getSceneRoot()->getNodeByName( "GwengYiModel" ));
-	u->setArnMesh( arnMesh );
+	u->setArnMeshName( "GwengYiModel" );
 
 	return u;
 }
@@ -43,14 +38,14 @@ HRESULT Enemy::frameRender( double dTime, float fElapsedTime )
 	return Character::frameRender( dTime, fElapsedTime );
 }
 
-bool Enemy::frameMove( float fElapsedTime )
+bool Enemy::frameMove( double dTime, float fElapsedTime )
 {
 	WorldStateManager& rWsm = GetWorldStateManager();
 
 	if ( m_bRandomWalkable && rWsm.curStateEnum() == GAME_WORLD_STATE_FIELD )
 		walkRandomly();
 
-	return Character::frameMove( fElapsedTime );
+	return Character::frameMove( dTime, fElapsedTime );
 }
 
 LRESULT Enemy::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
@@ -105,13 +100,7 @@ void Enemy::walkRandomly()
 
 Unit* EpCreateEnemy( int tileX, int tileY )
 {
-	LPD3DXMESH d3dxMesh;
-	D3DXCreateTeapot( GetG().m_dev, &d3dxMesh, 0 );
-	return Enemy::createEnemy( 
-		d3dxMesh, 
-		tileX, 
-		tileY, 
-		0 );
+	return Enemy::createEnemy( 0, tileX, tileY, 0 );
 
 } SCRIPT_CALLABLE_PV_I_I( EpCreateEnemy )
 

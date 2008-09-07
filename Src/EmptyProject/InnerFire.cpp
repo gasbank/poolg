@@ -4,10 +4,13 @@
 InnerFire::InnerFire(void)
 : Unit( UT_INNERFIRE )
 {
-	m_bInit = false;
-	m_angle = 0;
-	m_angleVelocity = 0;
-	m_angleAccelRate = 0.1f;
+
+	m_d3dTex			= 0;
+
+	m_bInit				= false;
+	m_angle				= 0;
+	m_angleVelocity		= 0;
+	m_angleAccelRate	= 0.1f;
 }
 
 
@@ -32,15 +35,14 @@ void InnerFire::init(const TCHAR* imgFileName, float radius, float height, int a
 
 void InnerFire::release()
 {
-	SAFE_RELEASE(m_d3dxMesh);
-	SAFE_RELEASE(m_d3dTex);
+	
 }
 
 HRESULT InnerFire::draw(bool textured)
 {
 	HRESULT hr = S_OK;
 
-	if (m_d3dxMesh)
+	if ( getMesh() )
 	{
 		// Non-rhw drawing
 		GetG().m_dev->SetTransform(D3DTS_WORLD, &getLocalXform());
@@ -48,7 +50,7 @@ HRESULT InnerFire::draw(bool textured)
 			GetG().m_dev->SetTexture(0, m_d3dTex);
 		else
 			GetG().m_dev->SetTexture(0, 0);
-		m_d3dxMesh->DrawSubset(0);
+		getMesh()->DrawSubset(0);
 	}
 	else
 	{
@@ -57,7 +59,7 @@ HRESULT InnerFire::draw(bool textured)
 	return hr;
 }
 
-bool InnerFire::frameMove( float fElapsedTime )
+bool InnerFire::frameMove( double dTime, float fElapsedTime )
 {
 	m_angleVelocity += m_angleAccelRate;
 	m_angle += m_angleVelocity;
@@ -73,7 +75,7 @@ bool InnerFire::frameMove( float fElapsedTime )
 	setScaleY( 1.0f );
 	setScaleZ( 1.0f );
 
-	return Unit::frameMove( fElapsedTime );
+	return Unit::frameMove( dTime, fElapsedTime );
 }
 
 HRESULT InnerFire::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext )
@@ -87,14 +89,16 @@ HRESULT InnerFire::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE
 	UINT vertices = (m_angleNumber + 1) * 2;
 
 
-	assert( m_d3dxMesh == 0 );
-	if (FAILED(D3DXCreateMeshFVF(faces, vertices, D3DXMESH_MANAGED, D3DFVF_XYZ | D3DFVF_TEX1, pd3dDevice, &m_d3dxMesh)))
+	assert( getMesh() == 0 );
+	LPD3DXMESH d3dxMesh = 0;
+	if (FAILED(D3DXCreateMeshFVF(faces, vertices, D3DXMESH_MANAGED, D3DFVF_XYZ | D3DFVF_TEX1, pd3dDevice, &d3dxMesh)))
 	{
 		throw std::runtime_error("Mesh creation failed. Check your D3D device");
 	}
+	setMesh( d3dxMesh );
 
 	Vertex* v = 0;
-	m_d3dxMesh->LockVertexBuffer(0, (void**)&v);
+	getMesh()->LockVertexBuffer(0, (void**)&v);
 
 	int i, j;
 	for (i = 0; i < 2; ++i)
@@ -113,10 +117,10 @@ HRESULT InnerFire::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE
 	}
 
 
-	m_d3dxMesh->UnlockVertexBuffer();
+	getMesh()->UnlockVertexBuffer();
 
 	WORD* ind = 0;
-	m_d3dxMesh->LockIndexBuffer(0, (void**)&ind);
+	getMesh()->LockIndexBuffer(0, (void**)&ind);
 
 	for (i = 0; i < m_angleNumber; ++i)
 	{
@@ -130,7 +134,7 @@ HRESULT InnerFire::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE
 	}
 
 
-	m_d3dxMesh->UnlockIndexBuffer();
+	getMesh()->UnlockIndexBuffer();
 
 	if (FAILED(D3DXCreateTextureFromFile(pd3dDevice, m_imgFileName.c_str(), &m_d3dTex)))
 	{
@@ -156,5 +160,7 @@ HRESULT InnerFire::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE
 
 void InnerFire::onLostDevice()
 {
+	SAFE_RELEASE(m_d3dTex);
 
+	Unit::onLostDevice();
 }

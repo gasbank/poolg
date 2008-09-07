@@ -7,7 +7,9 @@
 #include "PlayState.h"
 #include "ArnMesh.h"
 #include "Skill.h"
+#include "SkillSet.h"
 #include "Sound.h"
+#include "SkillManager.h"
 
 Hero::Hero(void)
 : Character( UT_HERO )
@@ -26,34 +28,21 @@ Hero::~Hero(void)
 Unit* Hero::createHero( LPD3DXMESH mesh, int tileX, int tileY, float posZ )
 {
 	Hero* u = new Hero();
-	u->init( GetG().m_dev, mesh );
+	u->init();
 	u->setTilePos( tileX, tileY );
 	u->setTileBufferPos( tileX, tileY );
+	u->setArnMeshName( "PoolGModel" );
 
-	// As default, hero's model is PoolG
-	PlayState* ps = static_cast<PlayState*>(GetTopStateManager().getState( GAME_TOP_STATE_PLAY ));
-	ArnSceneGraph* charSceneGraph = ps->getCharacterSceneGraph();
-	ArnMesh* arnMesh = static_cast<ArnMesh*>(charSceneGraph->getSceneRoot()->getNodeByName( "PoolGModel" ));
-	u->setArnMesh( arnMesh );
-	
-	u->addToSkillSet( SL_FIRST );
+	// Acquire the most basic skill to our hero!
+	//u->addToSkillSet( SL_FIRST );
+	u->memorizeSkill( GetSKillManager().getSkill( "NormalAttack" ) );
+	u->equipSkill( 0, GetSKillManager().getSkill( "NormalAttack" ) );
 
+	u->memorizeSkill( GetSKillManager().getSkill( "TestSkill" ) );
+	u->equipSkill( 1, GetSKillManager().getSkill( "TestSkill" ) );
 	return u;
 }
 
-void Hero::addToSkillSet( SkillLocation sl )
-{
-	SkillSet* skillSet = getSkillSet();
-
-	switch ( sl )
-	{
-	case SL_FIRST: skillSet->setSkill (SL_FIRST, (Skill*) new NormalAttack()); break;
-	case SL_SECOND: skillSet->setSkill (SL_SECOND, (Skill*) new Heal()); break;
-	case SL_THIRD: skillSet->setSkill (SL_THIRD, (Skill*) new Goto()); break;
-	case SL_FOURTH: skillSet->setSkill (SL_FOURTH, (Skill*) new MultiThread());; break;
-	case SL_FIFTH: skillSet->setSkill (SL_FIFTH, (Skill*) new Meditation()); break;
-	}
-}
 
 void Hero::levelUp()
 {
@@ -87,10 +76,10 @@ int Hero::gainExp( int expPoint )
 }
 
 
-bool Hero::frameMove( float fElapsedTime )
+bool Hero::frameMove( double dTime, float fElapsedTime )
 {
 	//printf( "Tile X, Y : %d, %d \n", getTilePosX(), getTilePosY() );
-	return Character::frameMove( fElapsedTime );
+	return Character::frameMove( dTime, fElapsedTime );
 }
 
 LRESULT Hero::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
@@ -122,27 +111,25 @@ LRESULT Hero::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 
 Unit* EpCreateHero( Tcl_Obj* tilePos )
 {
-	LPD3DXMESH d3dxMesh;
-	D3DXCreateTeapot( GetG().m_dev, &d3dxMesh, 0 );
 	int tileX = 0, tileY = 0;
 	GetScriptManager().readTwoIntObj( tilePos, tileX, tileY );
-	return Hero::createHero( d3dxMesh, tileX, tileY, 0 );
+	return Hero::createHero( 0, tileX, tileY, 0 );
 
 } SCRIPT_CALLABLE_PV_OBJ( EpCreateHero )
 
-int EpAddSkillToHero( int skillNo )
-{
-	Hero* hero = (Hero*)GetWorldManager().getCurWorld()->getHeroUnit();
-	hero->addToSkillSet( (SkillLocation)skillNo );
-	return 0;
-} SCRIPT_CALLABLE_I_I( EpAddSkillToHero )
-
-int EpDeleteSkillFromHero( int skillNo )
-{
-	Hero* hero = (Hero*)GetWorldManager().getCurWorld()->getHeroUnit();
-	hero->getSkillSet()->deleteSkill(  ( SkillLocation )skillNo );
-	return 0;
-} SCRIPT_CALLABLE_I_I( EpDeleteSkillFromHero )
+//int EpAddSkillToHero( int skillNo )
+//{
+//	Hero* hero = (Hero*)GetWorldManager().getCurWorld()->getHeroUnit();
+//	hero->addToSkillSet( (SkillLocation)skillNo );
+//	return 0;
+//} SCRIPT_CALLABLE_I_I( EpAddSkillToHero )
+//
+//int EpDeleteSkillFromHero( int skillNo )
+//{
+//	Hero* hero = (Hero*)GetWorldManager().getCurWorld()->getHeroUnit();
+//	hero->deleteSkill(  ( SkillLocation )skillNo );
+//	return 0;
+//} SCRIPT_CALLABLE_I_I( EpDeleteSkillFromHero )
 
 int EpHeroSetEncounterEnemy( int b )
 {
@@ -154,7 +141,7 @@ int EpHeroSetEncounterEnemy( int b )
 
 START_SCRIPT_FACTORY(Hero)
 	CREATE_OBJ_COMMAND( EpCreateHero )
-	CREATE_OBJ_COMMAND( EpAddSkillToHero )
-	CREATE_OBJ_COMMAND( EpDeleteSkillFromHero )
+	/*CREATE_OBJ_COMMAND( EpAddSkillToHero )
+	CREATE_OBJ_COMMAND( EpDeleteSkillFromHero )*/
 	CREATE_OBJ_COMMAND( EpHeroSetEncounterEnemy )
 END_SCRIPT_FACTORY(Hero)

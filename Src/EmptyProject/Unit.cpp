@@ -19,29 +19,26 @@ extern LPD3DXFONT		g_unitNameFont;
 Unit::Unit( UnitType type )
 : m_type( type )
 {
-	m_d3dxMesh			= 0;
-	m_arnMesh			= 0;
-	m_pd3dDevice		= 0;
-	m_d3dTex			= 0;
+	m_d3dxMesh					= 0;
+	m_arnMesh					= 0;
 
 	m_fSoulAnimationDuration	= 1.0f;
 	m_fSoulAnimationHeight		= 10.0f;
 	m_fSoulAnimationTimer		= m_fSoulAnimationDuration;
 	m_bSoulAnimation			= false;
 
-	m_name				= "Unconfirmed Object";
+	m_name						= "Unconfirmed Object";
 	m_bNameVisible				= false;
 
-	m_tilePos			= Point2Uint::ZERO;
-	m_tileBufferPos		= m_tilePos;
+	m_tilePos					= Point2Uint::ZERO;
+	m_tileBufferPos				= m_tilePos;
 
-	m_vRot				= D3DXVECTOR3(0, 0, 0);
-	m_vPos				= D3DXVECTOR3(0, 0, 0);
-	m_vScale			= D3DXVECTOR3(1.0f, 1.0f, 1.0f);
-	m_bLocalXformDirty	= true;
-	m_removeFlag		= false;
-	m_bForcedMove		= false;
-	m_dm				= NULL;
+	m_vRot						= D3DXVECTOR3(0, 0, 0);
+	m_vPos						= D3DXVECTOR3(0, 0, 0);
+	m_vScale					= D3DXVECTOR3(1.0f, 1.0f, 1.0f);
+	m_bLocalXformDirty			= true;
+	m_removeFlag				= false;
+	m_bForcedMove				= false;
 
 	D3DXMatrixIdentity(&m_localXform);
 
@@ -55,22 +52,12 @@ Unit::Unit( UnitType type )
 }
 Unit::~Unit()
 {
-	SAFE_RELEASE(m_d3dxMesh);
 }
 
-HRESULT Unit::init( LPDIRECT3DDEVICE9 pd3dDevice, LPD3DXMESH mesh )
+HRESULT Unit::init()
 {
 	HRESULT hr = S_OK;
 
-	m_d3dxMesh = mesh;
-	m_pd3dDevice = pd3dDevice;
-
-	DWORD teapotFVF = m_d3dxMesh->GetFVF();
-	assert(teapotFVF == 18 && m_d3dxMesh->GetNumVertices() != 0);
-	TeapotVertex* v = 0;
-	m_d3dxMesh->LockVertexBuffer(0, (void**)&v);
-	V(D3DXComputeBoundingBox((const D3DXVECTOR3*)v, m_d3dxMesh->GetNumVertices(), sizeof(float)*6, &m_lowerLeft, &m_upperRight));
-	m_d3dxMesh->UnlockVertexBuffer();
 
 	return hr;
 }
@@ -94,20 +81,19 @@ HRESULT Unit::frameRender( double dTime, float fElapsedTime )
 {
 	HRESULT hr = S_OK;
 
-	m_pd3dDevice->SetTransform(D3DTS_WORLD, &m_localXform);
-	m_pd3dDevice->SetTexture(0, m_d3dTex);
-	m_pd3dDevice->SetMaterial(&m_material);
+	if ( !m_arnMesh && m_arnMeshName.length() )
+	{
+		updateArnMesh();
+	}
 
 	if ( m_arnMesh )
 	{
-		m_pd3dDevice->SetRenderState( D3DRS_CULLMODE, D3DCULL_CW );
+		GetG().m_dev->SetRenderState( D3DRS_CULLMODE, D3DCULL_CW );
 		GetG().m_videoMan.renderMeshesOnly( m_arnMesh, m_localXform );
-		m_pd3dDevice->SetRenderState( D3DRS_CULLMODE, D3DCULL_CCW );
+		GetG().m_dev->SetRenderState( D3DRS_CULLMODE, D3DCULL_CCW );
 
 		drawSoul();
 	}
-	else
-		m_d3dxMesh->DrawSubset(0);
 
 	drawName();
 
@@ -119,11 +105,9 @@ LRESULT Unit::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 	return FALSE;
 }
 
-bool Unit::frameMove( float fElapsedTime )
+bool Unit::frameMove( double dTime, float fElapsedTime )
 {	
 	bool flag = true;
-	if ( m_dm != NULL )
-		flag = m_dm->frameMove( fElapsedTime );
 
 	updateLocalXform();
 	if ( m_bForcedMove )
@@ -173,7 +157,7 @@ void Unit::clearKey()
 Unit* Unit::createUnit( LPD3DXMESH mesh, int tileX, int tileY, float posZ )
 {
 	Unit* u = new Unit( UT_UNIT );
-	u->init( GetG().m_dev, mesh );
+	u->init();
 	return u;
 }
 
@@ -297,16 +281,16 @@ void Unit::drawSoul()
 {	
 	if ( m_bSoulAnimation )
 	{
-		m_pd3dDevice->SetTransform(D3DTS_WORLD, &m_localXformSoul);
-		m_pd3dDevice->SetMaterial( &m_materialSoul );
+		GetG().m_dev->SetTransform(D3DTS_WORLD, &m_localXformSoul);
+		GetG().m_dev->SetMaterial( &m_materialSoul );
 
-		m_pd3dDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
-		m_pd3dDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-		m_pd3dDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
-		m_pd3dDevice->SetRenderState( D3DRS_CULLMODE, D3DCULL_CW );
+		GetG().m_dev->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+		GetG().m_dev->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+		GetG().m_dev->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
+		GetG().m_dev->SetRenderState( D3DRS_CULLMODE, D3DCULL_CW );
 		m_arnMesh->getD3DXMesh()->DrawSubset( 0 );
-		m_pd3dDevice->SetRenderState( D3DRS_CULLMODE, D3DCULL_CCW );
-		m_pd3dDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
+		GetG().m_dev->SetRenderState( D3DRS_CULLMODE, D3DCULL_CCW );
+		GetG().m_dev->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
 	}
 }
 
@@ -328,7 +312,10 @@ void Unit::updateSoulAnimation( float fElapsedTime )
 		if ( m_fSoulAnimationTimer < m_fSoulAnimationDuration )
 			m_fSoulAnimationTimer += fElapsedTime;
 		else
+		{
 			m_bSoulAnimation = false;
+			setRemoveFlag( true ); // Since soul animation is finished, we should set remove flag to true.
+		}
 
 		float ratio = sin( D3DXToRadian( m_fSoulAnimationTimer / m_fSoulAnimationDuration * 90.0f ) );
 		float height = ratio * m_fSoulAnimationHeight;
@@ -389,13 +376,6 @@ const char* Unit::getTypeString() const
 	return 0;
 }
 
-void Unit::setDynamicMotion( DynamicMotion* dm )
-{
-	if (m_dm != NULL)
-		delete m_dm;
-	m_dm = dm;
-}
-
 void Unit::printDebugInfo() const
 {
 	printf( "Unit: Type - %s ", getTypeString() );
@@ -451,35 +431,35 @@ void Unit::drawName()
 
 void Unit::release()
 {
-	SAFE_DELETE( m_dm );
-
-	SAFE_RELEASE( m_d3dxMesh );
 }
 
 HRESULT Unit::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext )
 {
+	updateArnMesh();
 	return S_OK;
 }
 
 void Unit::onLostDevice()
 {
+	SAFE_RELEASE( m_d3dxMesh );
 }
 
-void Unit::setArnMesh( ArnMesh* arnMesh )
+
+void Unit::updateArnMesh()
 {
-	assert( arnMesh ); 
-	m_arnMesh = arnMesh;
-
-	if ( m_arnMesh )
+	PlayState* ps = static_cast<PlayState*>( GetTopStateManager().getState( GAME_TOP_STATE_PLAY ) );
+	ArnNode* charSceneRoot = ps->getCharacterSceneGraph()->getSceneRoot();
+	ArnMesh* arnMesh = static_cast<ArnMesh*>( charSceneRoot->getNodeByName( m_arnMeshName.c_str() ));
+	if ( !arnMesh )
 	{
-		ArnNode* guardBallNode = getArnMesh()->getNodeByName("GuardBall");
-
-		if ( guardBallNode )
-		{
-			((ArnMesh*)guardBallNode)->setDoAnim( false );
-			((ArnMesh*)guardBallNode)->setVisible( false );
-		}
+		throw std::runtime_error( "Specified ArnMesh not found on Character model file." );
 	}
+	m_arnMesh = arnMesh;
+}
+
+void Unit::setMesh( LPD3DXMESH d3dxMesh )
+{
+	m_d3dxMesh = d3dxMesh;
 }
 //////////////////////////////////////////////////////////////////////////
 //
@@ -540,11 +520,6 @@ int EpUnitSetPosZ( void* ptr, double val )
 	return 0;
 } SCRIPT_CALLABLE_I_PV_D( EpUnitSetPosZ )
 
-double EpUnitGetUpperRightZ( void* ptr )
-{
-	Unit* instance = reinterpret_cast<Unit*>( ptr );
-	return instance->Unit::getUpperRight().z;
-} SCRIPT_CALLABLE_D_PV( EpUnitGetUpperRightZ )
 
 Tcl_Obj* EpUnitGetPos( void* ptr )
 {
@@ -568,15 +543,7 @@ int EpUnitPrintTilePos( void* ptr )
 int EpUnitSetArnMesh( void* ptr1, const char* ptr2 )
 {
 	Unit* instance1 = reinterpret_cast<Unit*>( ptr1 );
-	ArnMesh* arnMesh = 
-		static_cast<ArnMesh*>(
-		static_cast<PlayState*>(
-		GetTopStateManager().getState( GAME_TOP_STATE_PLAY ))->getCharacterSceneGraph()->getSceneRoot()->getNodeByName( ptr2 ));
-	if ( !arnMesh )
-	{
-		throw std::runtime_error( "Specified ArnMesh not found on Character model file." );
-	}
-	instance1->setArnMesh( arnMesh );
+	instance1->setArnMeshName( ptr2 );
 	return 0;
 } SCRIPT_CALLABLE_I_PV_PC( EpUnitSetArnMesh )
 
@@ -618,7 +585,6 @@ START_SCRIPT_FACTORY( Unit )
 	CREATE_OBJ_COMMAND( EpUnitSetRotY )
 	CREATE_OBJ_COMMAND( EpUnitSetRotZ )
 	CREATE_OBJ_COMMAND( EpUnitSetPosZ )
-	CREATE_OBJ_COMMAND( EpUnitGetUpperRightZ )
 	CREATE_OBJ_COMMAND( EpUnitPrintTilePos )
 	CREATE_OBJ_COMMAND( EpUnitGetPos )
 	CREATE_OBJ_COMMAND( EpUnitSetArnMesh )

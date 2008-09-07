@@ -36,6 +36,7 @@ IntroState::IntroState(void)
 	m_pPrologue = GetSpriteManager().registerSprite( "Prologue", "Images/PoolG_Prologue.png" );
 	m_pPrologue->registerRect( "Prologue", 0, 0, 512, 1024 );
 
+
 	D3DXVECTOR3 prologuePos( 0.0f, 0.0f, 0.0f );
 	D3DXCOLOR prologueColor( 1.0f, 1.0f, 1.0f, 1.0f );
 	m_pPrologueDrawRequest = m_pPrologue->drawRequestXformable( "Prologue" );
@@ -47,7 +48,7 @@ IntroState::~IntroState(void)
 {
 }
 
-HRESULT IntroState::enter()
+HRESULT IntroState::enter( double dStartTime )
 {
 	LPDIRECT3DDEVICE9 pd3dDevice = GetG().m_dev;
 
@@ -64,14 +65,17 @@ HRESULT IntroState::enter()
 
 	//pd3dDevice->SetTransform( D3DTS_WORLD, &DX_CONSTS::D3DXMAT_IDENTITY );
 
-	return S_OK;
+	return State::enter( dStartTime );
 }
 
 HRESULT IntroState::leave()
 {
-	m_startTime = -1.0f;
+	if ( m_pLogoDrawRequest != 0 )
+		m_pLogo->removeDrawRequest( m_pLogoDrawRequest );
+	if ( m_pPrologueDrawRequest != 0 )
+		m_pPrologue->removeDrawRequest( m_pPrologueDrawRequest );
 
-	return S_OK;
+	return State::leave();
 }
 
 HRESULT IntroState::frameMove( double fTime, float fElapsedTime )
@@ -133,8 +137,9 @@ HRESULT IntroState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, floa
 {
 	/*pd3dDevice->SetRenderState( D3DRS_LIGHTING, TRUE );*/
 	
-	//// Setup view and projection xforms - ?
-	//pd3dDevice->SetTexture(0, 0);
+
+	// Setup view and projection xforms - ?
+	pd3dDevice->SetTexture(0, 0);
 
 	//// Apply non-fixed camera
 	//pd3dDevice->SetTransform(D3DTS_VIEW, GetG().m_camera.GetViewMatrix());
@@ -161,6 +166,8 @@ HRESULT IntroState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 					m_pPrologue->removeDrawRequest( m_pPrologueDrawRequest );
 				TopStateManager::getSingleton().setNextState( m_nextState );
 			}
+			
+			TopStateManager::getSingleton().setNextState( GAME_TOP_STATE_PLAY );
 		}
 	}
 
@@ -171,14 +178,14 @@ HRESULT IntroState::release()
 {	
 	m_pBlack.release();
 
-	if ( m_pGalaxy )
+	/*if ( m_pGalaxy )
 		m_pGalaxy->release();
 	if ( m_pLogo ) 
 		m_pLogo->release();
 	if ( m_pLogoDrawRequest )
 		m_pLogoDrawRequest->release();
 	if ( m_pGalaxyDrawRequest )
-		m_pGalaxyDrawRequest->release();
+		m_pGalaxyDrawRequest->release();*/
 
 	return S_OK;
 }
@@ -201,6 +208,12 @@ void IntroState::setupCamera()
 
 HRESULT IntroState::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext )
 {
+	if ( m_pLogoDrawRequest )
+	{
+		D3DXVECTOR3 logoPos( GetG().m_scrWidth / 2.0f - 124.0f, GetG().m_scrHeight / 2.0f - 64.5f, 0.0f );
+		m_pLogoDrawRequest->position = logoPos;
+	}
+	
 	return S_OK;
 }
 

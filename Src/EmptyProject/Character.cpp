@@ -14,38 +14,39 @@
 #include "SkillObject.h"
 #include "DynamicMotion.h"
 #include "Skill.h"
+#include "SkillSet.h"
 #include "Utility.h"
 #include "Sound.h"
 
 extern TileManager tileManager;
 
-
-void Character::doNormalAttack( int type, Character* enemy )
-{
-	D3DXVECTOR3 fireDir = enemy->getPos() - getPos();
-	float dist = D3DXVec3Length( &fireDir );
-
-	D3DXVec3Normalize( &fireDir, &fireDir );
-
-
-
-	LPD3DXMESH mesh;
-	D3DXCreateSphere( GetG().m_dev, 0.3f, 16, 16, &mesh, 0 );
-	Unit* missile = Unit::createUnit(mesh, 0, 0, 0);
-
-	missile->setDynamicMotion(DynamicMotion::createDMfireUniformly
-		(missile, this->getPos(), fireDir, dist, 10.0f ));
-
-	SkillObject* so = SkillObject::createSOnormalAttack(this, enemy, missile);
-	m_skillObjectList.push_back(so);
-
-}
+//
+//void Character::doNormalAttack( int type, Character* enemy )
+//{
+//	D3DXVECTOR3 fireDir = enemy->getPos() - getPos();
+//	float dist = D3DXVec3Length( &fireDir );
+//
+//	D3DXVec3Normalize( &fireDir, &fireDir );
+//
+//
+//
+//	LPD3DXMESH mesh;
+//	D3DXCreateSphere( GetG().m_dev, 0.3f, 16, 16, &mesh, 0 );
+//	Unit* missile = Unit::createUnit(mesh, 0, 0, 0);
+//
+//	missile->setDynamicMotion(DynamicMotion::createDMfireUniformly
+//		(missile, this->getPos(), fireDir, dist, 10.0f ));
+//
+//	SkillObject* so = SkillObject::createSOnormalAttack(this, enemy, missile);
+//	m_skillObjectList.push_back(so);
+//
+//}
 
 
 
 void Character::doCsBurn ()
 {
-	LPD3DXMESH mesh;
+	/*LPD3DXMESH mesh;
 	D3DXCreateBox(GetG().m_dev, 5, 5, 0.5f, &mesh, 0);
 	Unit* effectObj = Unit::createUnit(mesh, 0, 0, 0);
 
@@ -53,7 +54,7 @@ void Character::doCsBurn ()
 		(effectObj, this->getPos(), 5, 0.03f, 50));
 
 	SkillObject* so = SkillObject::createSOcsBurn(this, effectObj);
-	m_skillObjectList.push_back(so);
+	m_skillObjectList.push_back(so);*/
 }
 
 
@@ -83,7 +84,7 @@ void Character::heal (int point)
 Unit* Character::createCharacter( LPD3DXMESH mesh, int tileX, int tileY, float posZ )
 {
 	Character* u = new Character( UT_CHARACTER );
-	u->init( GetG().m_dev, mesh );
+	u->init();
 	u->setTilePos( tileX, tileY );
 	u->setTileBufferPos( tileX, tileY );
 	return u;
@@ -93,17 +94,17 @@ Character::~Character()
 {
 
 	
-	SkillObjectList::iterator it = m_skillObjectList.begin();
-	for ( ; it != m_skillObjectList.end(); ++it)
+	SkillObjectList::iterator it = m_skillObjects.begin();
+	for ( ; it != m_skillObjects.end(); ++it)
 	{
 		SAFE_DELETE(*it);
 	}
 
-	m_skillObjectList.clear();
+	m_skillObjects.clear();
 	delete m_skillSet;
 }
 
-bool Character::frameMove( float fElapsedTime )
+bool Character::frameMove( double dTime, float fElapsedTime )
 {
 
 	if (m_bMoving == false)
@@ -175,14 +176,14 @@ bool Character::frameMove( float fElapsedTime )
 		}
 	}
 
-	SkillObjectList::iterator it = m_skillObjectList.begin();
-	for ( ; it != m_skillObjectList.end() ; )
+	SkillObjectList::iterator it = m_skillObjects.begin();
+	for ( ; it != m_skillObjects.end() ; )
 	{
-		bool ret = (*it)->frameMove( fElapsedTime );
-		if (!ret)
+		bool frameMoveInProgress = (*it)->frameMove( dTime, fElapsedTime );
+		if ( !frameMoveInProgress )
 		{
 			SAFE_DELETE(*it);
-			it = m_skillObjectList.erase( it );
+			it = m_skillObjects.erase( it );
 		}
 		else
 			++it;
@@ -207,13 +208,13 @@ bool Character::frameMove( float fElapsedTime )
 		setLocalXformDirty();
 	}
 
-	return Unit::frameMove( fElapsedTime );
+	return Unit::frameMove( dTime, fElapsedTime );
 }
 
 HRESULT Character::frameRender( double dTime, float fElapsedTime )
 {
-	SkillObjectList::iterator it = m_skillObjectList.begin();
-	for ( ; it != m_skillObjectList.end(); ++it )
+	SkillObjectList::iterator it = m_skillObjects.begin();
+	for ( ; it != m_skillObjects.end(); ++it )
 	{
 		(*it)->frameRender( dTime, fElapsedTime );
 	}
@@ -277,7 +278,7 @@ Character::Character( UnitType type )
 	
 	// Initialize random number
 	srand ( (unsigned)time(NULL) );
-	m_skillSet = new SkillSet();
+	m_skillSet = new SkillSet( this );
 }
 
 void Character::setCurHp( int curHp )
@@ -342,11 +343,6 @@ void Character::boundaryTesting( UnitInput mappedKey )
 void Character::setBoundaryRect( LONG x0, LONG y0, LONG x1, LONG y1 )
 {
 	m_boundaryTileRect = TileRegion( x0, y0, x1, y1 );
-}
-
-void Character::pushSkillObject (SkillObject* skillObj)
-{
-	m_skillObjectList.push_back( skillObj );
 }
 
 void Character::damage( int point )
@@ -414,8 +410,9 @@ void Character::pushUnitInFront( UnitInput dir )
 
 void Character::setDead()
 {
-	m_curHp = -1;
-	startSoulAnimation( 1.0f, 10.0f );
+	throw std::runtime_error( "Do not call this method." );
+	/*m_curHp = -1;
+	startSoulAnimation( 1.0f, 10.0f );*/
 }
 
 void Character::addMoveImpulse( const D3DXVECTOR3& impulse )
@@ -424,16 +421,45 @@ void Character::addMoveImpulse( const D3DXVECTOR3& impulse )
 	m_moveImpulse += impulse;
 	//printf( "Now impulse is " ); Utility::printValue( m_moveImpulse ); printf( "\n" );
 }
-//////////////////////////////////////////////////////////////////////////
 
-
-Unit* EpCreateCharacter( int tileX, int tileY )
+bool Character::deleteSkill( SkillLocation skillLoc )
 {
-	LPD3DXMESH d3dxMesh;
-	D3DXCreateTeapot( GetG().m_dev, &d3dxMesh, 0 );
-	return Character::createCharacter( d3dxMesh, tileX, tileY, 0 );
+	if ( m_skillSet->getSkill( skillLoc ) )
+	{
+		m_skillSet->deleteSkill( skillLoc );
+		return true;
+	}
+	return false;
+}
 
-} SCRIPT_CALLABLE_PV_I_I( EpCreateCharacter )
+bool Character::memorizeSkill( const Skill* skill )
+{
+	return m_skillSet->memorizeSkill( skill );
+}
+
+bool Character::equipSkill( UINT slot, const Skill* skill )
+{
+	return m_skillSet->equipSkill( slot, skill );
+}
+
+void Character::pushSkillObjectList( const SkillObjectList soList )
+{
+	SkillObjectList::const_iterator cit = soList.begin();
+	for ( ; cit != soList.end(); ++cit )
+	{
+		pushSkillObject( *cit );
+	}
+}
+//////////////////////////////////////////////////////////////////////////
+//
+//
+//Unit* EpCreateCharacter( int tileX, int tileY )
+//{
+//	LPD3DXMESH d3dxMesh;
+//	D3DXCreateTeapot( GetG().m_dev, &d3dxMesh, 0 );
+//	return Character::createCharacter( d3dxMesh, tileX, tileY, 0 );
+//
+//} SCRIPT_CALLABLE_PV_I_I( EpCreateCharacter )
 
 int EpCharacterSetCurHp( void* ptr, int curHp )
 {
@@ -498,7 +524,7 @@ int EpCharacterSetTilePos( void* ptr, Tcl_Obj* tilePos )
 } SCRIPT_CALLABLE_I_PV_OBJ( EpCharacterSetTilePos )
 
 START_SCRIPT_FACTORY(Character)
-	CREATE_OBJ_COMMAND( EpCreateCharacter )
+	//CREATE_OBJ_COMMAND( EpCreateCharacter )
 	CREATE_OBJ_COMMAND( EpCharacterSetCurHp )
 	CREATE_OBJ_COMMAND( EpCharacterSetCurCs )
 	CREATE_OBJ_COMMAND( EpCharacterSetMoveDuration )

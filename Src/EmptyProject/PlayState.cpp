@@ -15,12 +15,12 @@ PlayState::~PlayState(void)
 {
 }
 
-HRESULT PlayState::enter()
+HRESULT PlayState::enter( double dStartTime )
 {
 	if ( !getCurWorld() )
 		throw std::runtime_error( "m_nextWorld should be set before calling enter() method" );
 
-	return S_OK;
+	return State::enter( dStartTime );
 
 }
 
@@ -57,8 +57,6 @@ HRESULT PlayState::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 
 HRESULT PlayState::release()
 {
-	unloadArnModels();
-
 	return S_OK;
 }
 
@@ -69,7 +67,8 @@ ArnSceneGraph* PlayState::getCharacterSceneGraph()
 
 void PlayState::loadArnModels()
 {
-	// Hero model
+	// Character models are stored in 'Characters.arn' file
+	assert( m_CharactersArnFile == 0 && m_CharactersSg == 0 );
 	m_CharactersArnFile = new ArnFileData;
 	load_arnfile( _T("Characters.arn"), *m_CharactersArnFile );
 	m_CharactersSg = new ArnSceneGraph( *m_CharactersArnFile );
@@ -79,8 +78,8 @@ void PlayState::unloadArnModels()
 {
 	assert( m_CharactersArnFile && m_CharactersSg );
 	release_arnfile(*m_CharactersArnFile);
-	delete m_CharactersArnFile;
-	delete m_CharactersSg;
+	SAFE_DELETE( m_CharactersArnFile );
+	SAFE_DELETE( m_CharactersSg );
 }
 
 HRESULT PlayState::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext )

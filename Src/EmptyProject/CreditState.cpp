@@ -3,6 +3,10 @@
 #include "EpCamera.h"
 #include "TopStateManager.h"
 
+extern LPD3DXFONT						g_d3dxFont;			// Credit
+extern LPD3DXFONT						g_d3dxFontBig;		// Credit
+
+
 const float CreditState::s_period = 7.0f;
 const float CreditState::s_fadeIn = 2.0f;
 const float CreditState::s_fadeOut = 2.0f;
@@ -41,8 +45,6 @@ HRESULT createD3DXTextMesh( IDirect3DDevice9* pd3dDevice, LPCWSTR pStr, LPD3DXME
 
 CreditState::CreditState( void )
 {
-	m_d3dxFont			= 0;
-	m_d3dxFontBig		= 0;
 	m_textMatAlpha		= 0;
 	m_startTime			= -1.0f;
 	m_textColor			= D3DXCOLOR( 0.8f, 0.9f, 0.7f, 0.0f );
@@ -54,7 +56,7 @@ CreditState::~CreditState( void )
 	release();
 }
 
-HRESULT CreditState::enter()
+HRESULT CreditState::enter( double dStartTime )
 {
 	LPDIRECT3DDEVICE9& pd3dDevice = GetG().m_dev;
 	
@@ -62,8 +64,6 @@ HRESULT CreditState::enter()
 	pd3dDevice->SetTransform( D3DTS_VIEW, &GetG().g_fixedViewMat );
 	pd3dDevice->SetTransform( D3DTS_PROJECTION, &GetG().g_orthoProjMat );
 
-	D3DXCreateFont( pd3dDevice, 26, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T( "Palatino Linotype"), &m_d3dxFont );
-	D3DXCreateFont( pd3dDevice, 32, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T( "Palatino Linotype"), &m_d3dxFontBig );
 
 	setupLight();
 	
@@ -75,7 +75,7 @@ HRESULT CreditState::enter()
 	m_textMat.Ambient.a = m_textMat.Specular.a = m_textMat.Diffuse.a = 0.0f;
 	m_textMat.Power = 1.0f;
 
-	return S_OK;
+	return State::enter( dStartTime );
 }
 
 HRESULT CreditState::leave()
@@ -101,35 +101,35 @@ HRESULT CreditState::frameRender( IDirect3DDevice9* pd3dDevice, double fTime, fl
 
 	if ( fStateTime < s_period * 1)
 	{
-		m_d3dxFont->DrawTextW( 0, L"Lead Programmer", -1, &rc, DT_NOCLIP | DT_RIGHT, m_textColor );
+		g_d3dxFont->DrawTextW( 0, L"Lead Programmer", -1, &rc, DT_NOCLIP | DT_RIGHT, m_textColor );
 		rc.top += 25;
-		m_d3dxFont->DrawTextW( 0, L"Young Shin Kim", -1, &rc, DT_NOCLIP | DT_RIGHT, m_textColor );
+		g_d3dxFont->DrawTextW( 0, L"Young Shin Kim", -1, &rc, DT_NOCLIP | DT_RIGHT, m_textColor );
 		rc.top -= 25;
 	}
 	else if ( fStateTime < s_period * 2)
 	{
-		m_d3dxFont->DrawTextW( 0, L"Yun Uk Eo", -1, &rc, DT_NOCLIP | DT_BOTTOM, m_textColor );
+		g_d3dxFont->DrawTextW( 0, L"Yun Uk Eo", -1, &rc, DT_NOCLIP | DT_BOTTOM, m_textColor );
 		rc.bottom -= 25;
-		m_d3dxFont->DrawTextW( 0, L"User Interface Designer", -1, &rc, DT_NOCLIP | DT_BOTTOM, m_textColor );
+		g_d3dxFont->DrawTextW( 0, L"User Interface Designer", -1, &rc, DT_NOCLIP | DT_BOTTOM, m_textColor );
 		rc.bottom += 25;
 	}
 	else if ( fStateTime < s_period * 3)
 	{
-		m_d3dxFont->DrawTextW( 0, L"Battle System Programmer", -1, &rc, DT_NOCLIP, m_textColor );
+		g_d3dxFont->DrawTextW( 0, L"Battle System Programmer", -1, &rc, DT_NOCLIP, m_textColor );
 		rc.top += 25;
-		m_d3dxFont->DrawTextW( 0, L"Jae Woo Kim", -1, &rc, DT_NOCLIP, m_textColor );
+		g_d3dxFont->DrawTextW( 0, L"Jae Woo Kim", -1, &rc, DT_NOCLIP, m_textColor );
 		rc.top -= 25;
 	}
 	else if ( fStateTime < s_period * 4)
 	{
 		rc.top -= 20*2;
-		m_d3dxFontBig->DrawTextW( 0, L"Sound Programmer", -1, &rc, DT_NOCLIP | DT_CENTER | DT_VCENTER, m_textColor );
+		g_d3dxFontBig->DrawTextW( 0, L"Sound Programmer", -1, &rc, DT_NOCLIP | DT_CENTER | DT_VCENTER, m_textColor );
 		rc.top += 40*2;
-		m_d3dxFontBig->DrawTextW( 0, L"Min Seok Baek", -1, &rc, DT_NOCLIP | DT_CENTER | DT_VCENTER, m_textColor );
+		g_d3dxFontBig->DrawTextW( 0, L"Min Seok Baek", -1, &rc, DT_NOCLIP | DT_CENTER | DT_VCENTER, m_textColor );
 	}
 	else if ( fStateTime < s_period * 5)
 	{
-		m_d3dxFont->DrawTextW( 0, L"2008 PoolC Game Project", -1, &rc, DT_NOCLIP | DT_CENTER | DT_VCENTER, m_textColor );
+		g_d3dxFont->DrawTextW( 0, L"2008 PoolC Game Project", -1, &rc, DT_NOCLIP | DT_CENTER | DT_VCENTER, m_textColor );
 	}
 
 	pd3dDevice->SetRenderState( D3DRS_LIGHTING, TRUE );
@@ -182,8 +182,6 @@ HRESULT CreditState::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 
 HRESULT CreditState::release()
 {
-	SAFE_RELEASE( m_d3dxFont );
-	SAFE_RELEASE( m_d3dxFontBig );
 	return S_OK;
 }
 

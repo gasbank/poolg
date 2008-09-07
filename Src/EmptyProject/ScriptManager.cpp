@@ -14,6 +14,8 @@
 #include "StructureObject.h"
 #include "TileManager.h"
 #include "SequentialIncident.h"
+#include "SkillObject.h"
+#include "DynamicMotion.h"
 
 int Tcl_AppInit(Tcl_Interp *interp);
 
@@ -45,10 +47,11 @@ HRESULT ScriptManager::release()
 	return S_OK;
 }
 
-void ScriptManager::execute( const char* command )
+Tcl_Obj* ScriptManager::execute( const char* command )
 {
 	if ( Tcl_Eval( m_interp, command ) != TCL_OK )
 		throwScriptErrorWithMessage( m_interp );
+	return Tcl_GetObjResult( m_interp );
 }
 
 void ScriptManager::executeFile( const char* fileName )
@@ -131,7 +134,7 @@ bool ScriptManager::readCharPtrList( const char* variableName, ConstCharList& st
 	{
 		throw std::runtime_error( "Requested string list not found on script file" );
 	}
-	assert( strList.size() == 0 );
+	assert( strList.empty() );
 	UINT i;
 	for ( i = 0; i < (UINT)retObjLength; ++i )
 	{
@@ -173,6 +176,8 @@ void ScriptManager::initScriptBindings()
 	INIT_BINDING( Trigger );
 	INIT_BINDING( StructureObject );
 	INIT_BINDING( SequentialIncident );
+	INIT_BINDING( SkillObject );
+	INIT_BINDING( DynamicMotion );
 }
 #undef INIT_BINDING
 

@@ -1,36 +1,51 @@
 #include "EmptyProjectPCH.h"
 #include "DynamicMotion.h"
+#include "ScriptManager.h"
 
-bool DynamicMotion::frameMove(float fElapsedTime)
+DynamicMotion::DynamicMotion( Unit* motionTarget )
+: m_motionTarget( motionTarget )
+, m_fireUnit( 0 )
+, m_targetUnit( 0 )
 {
-	return true;
 }
 
-DynamicMotion* DynamicMotion::createDMfireUniformly ( Unit* target, const D3DXVECTOR3& initPos, const D3DXVECTOR3& fireDir, float retainDist, float velocity )
+DynamicMotion::DynamicMotion( const DynamicMotion& dm )
+: m_motionTarget( dm.m_motionTarget )
+, m_fireUnit( dm.m_fireUnit )
+, m_targetUnit( dm.m_targetUnit )
 {
-	DynamicMotion* dm = new DMfireUniformly (target, initPos, fireDir, retainDist, velocity);
-	return dm;
 }
 
-DynamicMotion* DynamicMotion::createDMspinAround (Unit* target, const D3DXVECTOR3& fireDest, float radius, float radiusVelocity, float angularVelocity)
+DynamicMotion* DynamicMotion::createDynamicMotion( DynamicMotionType dmt )
 {
-	DynamicMotion* dm = new DMspinAround (target, fireDest, radius, radiusVelocity, angularVelocity);
-	return dm;
+	// TODO DynamicMotion factory method
+	return new RandomCurveDynamicMotion( ( Unit* )0, 1.0f );
 }
 
-DynamicMotion* DynamicMotion::createDMpuff (Unit* target, const D3DXVECTOR3& initPos, float puffRate, float puffSpeed)
+DynamicMotion* DynamicMotion::createRandomCurveDynamicMotion( float duration )
 {
-	DynamicMotion* dm = new DMpuff (target, initPos, puffRate, puffSpeed);
-	return dm;
+	return new RandomCurveDynamicMotion( ( Unit* )0, duration );
 }
+
+//////////////////////////////////////////////////////////////////////////
+
+DynamicMotion* EpCreateRandomCurveDynamicMotion( double duration )
+{
+	return DynamicMotion::createRandomCurveDynamicMotion( (float)duration );
+} SCRIPT_CALLABLE_PV_D( EpCreateRandomCurveDynamicMotion )
+
+START_SCRIPT_FACTORY( DynamicMotion )
+	CREATE_OBJ_COMMAND( EpCreateRandomCurveDynamicMotion )
+END_SCRIPT_FACTORY( DynamicMotion )
+
 
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool DMfireUniformly::frameMove(float fElapsedTime)
+bool FireUniformlyDynamicMotion::frameMove(float fElapsedTime)
 {
-	D3DXVECTOR3 newPos = m_target->getPos() + m_fireDir * m_velocity * fElapsedTime;
+	D3DXVECTOR3 newPos = getMotionTarget()->getPos() + m_fireDir * m_velocity * fElapsedTime;
 	D3DXVECTOR3 vMoved = m_initPos - newPos;
 	
 	float distToInitPos = D3DXVec3Length( &vMoved );
@@ -39,24 +54,34 @@ bool DMfireUniformly::frameMove(float fElapsedTime)
 	{
 		return false;
 	}
-	m_target->setPos(newPos);
+	getMotionTarget()->setPos(newPos);
 	return true;
 }
 
-DMfireUniformly::DMfireUniformly ( Unit* target, const D3DXVECTOR3& initPos, const D3DXVECTOR3& fireDir, float retainDist, float velocity )
+FireUniformlyDynamicMotion::FireUniformlyDynamicMotion ( Unit* target, const D3DXVECTOR3& initPos, const D3DXVECTOR3& fireDir, float retainDist, float velocity )
+: DynamicMotion( target )
 {
-	m_target = target;
 	m_initPos = initPos;
 	m_fireDir = fireDir;
 	m_retainDist = retainDist;
 	m_velocity = velocity;
 
-	m_target->setPos(m_initPos);
+	getMotionTarget()->setPos(m_initPos);
+}
+
+FireUniformlyDynamicMotion::FireUniformlyDynamicMotion( const FireUniformlyDynamicMotion& dm )
+: DynamicMotion( dm )
+{
+}
+
+DynamicMotion* FireUniformlyDynamicMotion::clone() const
+{
+	return new FireUniformlyDynamicMotion( *this );
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool DMspinAround::frameMove(float fElapsedTime)
+bool SpinAroundDynamicMotion::frameMove(float fElapsedTime)
 {
 	/*
 	D3DXVECTOR3 newPos = m_target->getPos() + m_fireDir * m_velocity;
@@ -74,7 +99,7 @@ bool DMspinAround::frameMove(float fElapsedTime)
 	float angle = D3DXToRadian (m_angle);
 	newPos.x = m_fireDest.x + m_radius * cos (angle);
 	newPos.y = m_fireDest.y + m_radius * sin (angle);
-	newPos.z = m_target->getPos().z - (m_radiusVelocity/1.5f);
+	newPos.z = getMotionTarget()->getPos().z - (m_radiusVelocity/1.5f);
 
 	if ( m_radius <= 0 )
 	{
@@ -82,13 +107,13 @@ bool DMspinAround::frameMove(float fElapsedTime)
 		return false;
 	}
 
-	m_target->setPos( newPos );
+	getMotionTarget()->setPos( newPos );
 	return true;
 }
 
-DMspinAround::DMspinAround ( Unit* target, const D3DXVECTOR3& fireDest, float radius, float radiusVelocity, float angularVelocity )
+SpinAroundDynamicMotion::SpinAroundDynamicMotion ( Unit* target, const D3DXVECTOR3& fireDest, float radius, float radiusVelocity, float angularVelocity )
+: DynamicMotion( target )
 {
-	m_target = target;
 	m_fireDest = fireDest;
 	m_radius = radius;
 	m_radiusVelocity = radiusVelocity;
@@ -107,20 +132,27 @@ DMspinAround::DMspinAround ( Unit* target, const D3DXVECTOR3& fireDest, float ra
 	target->setPos( newPos );
 }
 
+SpinAroundDynamicMotion::SpinAroundDynamicMotion( const SpinAroundDynamicMotion& dm )
+: DynamicMotion( dm )
+{
+}
 
-
+DynamicMotion* SpinAroundDynamicMotion::clone() const
+{
+	return new SpinAroundDynamicMotion( *this );
+}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool DMpuff::frameMove(float fElapsedTime)
+bool PuffDynamicMotion::frameMove(float fElapsedTime)
 {
 	m_scaleX += m_puffSpeed;
 	m_scaleY += m_puffSpeed;
 	m_scaleZ += m_puffSpeed;
 
-	m_target->setScaleX(m_scaleX);
-	m_target->setScaleY(m_scaleY);
-	m_target->setScaleZ(m_scaleZ);
+	getMotionTarget()->setScaleX(m_scaleX);
+	getMotionTarget()->setScaleY(m_scaleY);
+	getMotionTarget()->setScaleZ(m_scaleZ);
 
 	if ( m_scaleX > m_puffRate )
 	{
@@ -131,16 +163,79 @@ bool DMpuff::frameMove(float fElapsedTime)
 	return true;
 }
 
-DMpuff::DMpuff (Unit* target, const D3DXVECTOR3& initPos, float puffRate, float puffSpeed)
+PuffDynamicMotion::PuffDynamicMotion (Unit* target, const D3DXVECTOR3& initPos, float puffRate, float puffSpeed)
+: DynamicMotion( target )
 {
-	m_target = target;
 	m_puffRate = puffRate;
 	m_puffSpeed = puffSpeed;
 
-	m_target->setPos (initPos);
+	getMotionTarget()->setPos (initPos);
 	m_scaleX = 1;
 	m_scaleY = 1;
 	m_scaleZ = 1;
 }
 
+PuffDynamicMotion::PuffDynamicMotion( const PuffDynamicMotion& dm )
+: DynamicMotion( dm )
+{
+}
 
+DynamicMotion* PuffDynamicMotion::clone() const
+{
+	return new PuffDynamicMotion( *this );
+}
+
+//////////////////////////////////////////////////////////////////////////
+
+RandomCurveDynamicMotion::RandomCurveDynamicMotion( Unit* motionTarget, float duration )
+: DynamicMotion( motionTarget )
+, m_totalElapsedTime( 0 )
+, m_duration( duration )
+{
+}
+
+RandomCurveDynamicMotion::RandomCurveDynamicMotion( const RandomCurveDynamicMotion& dm )
+: DynamicMotion( dm )
+, m_totalElapsedTime( dm.m_totalElapsedTime )
+, m_duration( dm.m_duration )
+{
+	assert( m_duration > 0 );
+}
+
+bool RandomCurveDynamicMotion::frameMove( float fElapsedTime )
+{
+	assert( getMotionTarget() );
+	assert( getMotionTarget()->getType() == UT_SKILLOBJECT );
+
+	m_totalElapsedTime += fElapsedTime;
+	D3DXVECTOR3 targetPos = DX_CONSTS::D3DXVEC3_ZERO;
+	if ( m_totalElapsedTime < m_duration )
+	{
+		float zeroToOne = m_totalElapsedTime / m_duration;
+		D3DXVec3Lerp( &targetPos, &getFireUnit()->getPos(), &getTargetUnit()->getPos(), zeroToOne );
+		
+		D3DXVECTOR3 zDelta( 0, 0, 3.0f * zeroToOne * (zeroToOne - 1 ) );
+		
+
+		D3DXVECTOR3 fireDir = getTargetUnit()->getPos() - getFireUnit()->getPos();
+		D3DXMATRIX mat;
+		D3DXMatrixRotationAxis( &mat, &fireDir, D3DXToRadian( (zeroToOne * 360 - 180) * 2 ) );
+		D3DXVec3TransformCoord( &zDelta, &zDelta, &mat );
+
+		targetPos += zDelta;
+	}
+	else
+	{
+		targetPos = getTargetUnit()->getPos();
+	}
+
+	getMotionTarget()->setPos( targetPos );
+	return true;
+}
+
+DynamicMotion* RandomCurveDynamicMotion::clone() const
+{
+	return new RandomCurveDynamicMotion( *this );
+}
+
+//////////////////////////////////////////////////////////////////////////

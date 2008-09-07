@@ -4,8 +4,6 @@
 #include "TileManager.h"
 
 
-typedef std::vector<std::string> StringVector;
-
 class Dialog
 {
 public:
@@ -34,6 +32,8 @@ public:
 	const std::string& getDialogName() const { return m_dialogName; }
 	bool getRemoveFlag() const { return m_bRemoveFlag; }
 	void setRemoveFlag(bool val) { m_bRemoveFlag = val; }
+
+	void updateDialogPosition();
 
 	void printDebugInfo() const;
 private:

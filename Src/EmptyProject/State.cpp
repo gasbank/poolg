@@ -10,10 +10,16 @@ State::~State(void)
 {
 }
 
-double State::getStateTime(double fTime)
+HRESULT State::enter( double dStartTime )
 {
-	if (m_startTime < 0.0f)
-		m_startTime = fTime;
-	return fTime - m_startTime;
+	assert( m_startTime < 0 );
+	m_startTime = dStartTime;
+	return S_OK;
 }
 
+HRESULT State::leave()
+{
+	assert( m_startTime > 0 );
+	m_startTime = -1.0f;
+	return S_OK;
+}

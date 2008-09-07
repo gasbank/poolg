@@ -12,7 +12,7 @@ MainState::~MainState(void)
 {
 }
 
-HRESULT MainState::enter()
+HRESULT MainState::enter( double dStartTime )
 {
 	return S_OK;
 }

@@ -626,7 +626,7 @@ MenuState::~MenuState()
 
 }
 
-HRESULT MenuState::enter()
+HRESULT MenuState::enter( double dStartTime )
 {
 	TopStateManager& ts = GetTopStateManager();
 	World* ws = getCurWorld();
@@ -651,7 +651,7 @@ HRESULT MenuState::enter()
 	loc = 0;
 	slb = 0;
 
-	return S_OK;
+	return State::enter( dStartTime );
 }
 
 HRESULT MenuState::leave()

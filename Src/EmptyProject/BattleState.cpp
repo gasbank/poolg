@@ -17,8 +17,16 @@
 #include "ProgressUi.h"
 #include "WindowMover.h"
 #include "InnerFire.h"
+#include "SkillSet.h"
 
 extern PostSepiaShader*				g_postSepiaShader;
+extern LPD3DXFONT					m_lblHYnamL;
+extern LPD3DXFONT					m_lblREB;
+extern LPD3DXFONT					m_lblSkill;
+extern LPD3DXFONT					m_lblSkillDescription;
+extern LPD3DXFONT					m_lblStatSelect;
+
+
 
 BattleState::BattleState()
 {
@@ -162,8 +170,8 @@ BattleState::BattleState()
 	m_statSelect = SS_HEALTH;
 	m_statCount = 0;
 
-	m_curTurnType = TT_NATURAL;
-	m_nextTurnType = TT_NATURAL;
+	m_curSubBattleState = SBS_PLAYER_TURN;
+	m_nextSubBattleState = SBS_PLAYER_TURN;
 
 	//////ProgressUi Assigning
 	m_hpBarPlayerProg = new ProgressUi( PM_BAR );
@@ -177,6 +185,7 @@ BattleState::BattleState()
 	m_expIllusionPlayerProg = new ProgressUi( PM_ILLUSION );
 	m_hpIllusionEnemyProg = new ProgressUi( PM_ILLUSION );
 	m_csIllusionEnemyProg = new ProgressUi( PM_ILLUSION );
+
 }
 
 BattleState::~BattleState()
@@ -185,20 +194,20 @@ BattleState::~BattleState()
 }
 
 /* 전투 시작 시 다음 함수가 호출됨*/
-HRESULT BattleState::enter()
+HRESULT BattleState::enter( double dStartTime )
 {
 	getHero()->clearKey();
 
+	ZeroMemory( m_aKeys, sizeof( m_aKeys ) );
+
 	GetAudioState().enterBattle();
-
-
 
 	updateBarRate();
 
 	/*스킬 대상 설정*/
-	SkillSet* skillSet = getHero()->getSkillSet();
-	skillSet->setCharacter (getHero(), getFirstEnemy());
-	skillSet->setBattleState(this);
+	m_heroSkillSet = getHero()->getSkillSet();
+	m_curSelSkill = 0;
+
 	m_noneSkillSelectedCount = 0;
 	m_levelProgress = false;
 	m_levelUpFlag = false;
@@ -208,28 +217,35 @@ HRESULT BattleState::enter()
 	//m_StatSelectBox.setOff();
 
 	setupCamera();
-	
 
+	assert( m_enemies.size() > 0 );
+	printBattleStateEnterDebugMessage();
+
+	// TODO Which side will attack first in BattleState?
 	m_battleLog.push_back(std::string("전투 개시~~~~~~~~~!!!"));
-	m_battleWinner = PS_NOTSET;
-	setNextTurnType( TT_PLAYER );
+	m_nextSubBattleState = SBS_PLAYER_TURN;
 	passTurn();
 
 
 	// TODO Anim test
-	ArnNode* guardBallNode = getHero()->getArnMesh()->getNodeByName("GuardBall");
-	((ArnMesh*)guardBallNode)->setDoAnim( true );
-	((ArnMesh*)guardBallNode)->setVisible( true );
-
+	if ( getHero()->getArnMesh() )
+	{
+		ArnNode* guardBallNode = getHero()->getArnMesh()->getNodeByName("GuardBall");
+		((ArnMesh*)guardBallNode)->setDoAnim( true );
+		((ArnMesh*)guardBallNode)->setVisible( true );
+	}
 	m_desaturation = 0;
 
-	return S_OK;
+	return State::enter( dStartTime );
 }
 
 HRESULT BattleState::leave()
 {
-	m_startTime = -1.0f;
 	m_battleLog.clear();
+
+	m_deadEnemies.clear();
+
+	printf( " - BattleState leave.\n" );
 
 	GetAudioState().leaveBattle();
 
@@ -250,11 +266,12 @@ HRESULT BattleState::leave()
 	camera.setSmoothCameraDuration( 1.0f );
 	camera.begin( CAMERA_SMOOTH_ATTACH );
 
-	return S_OK;
+	return State::leave();
 }
 
-HRESULT BattleState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, float fElapsedTime)
+HRESULT BattleState::frameRender( IDirect3DDevice9* pd3dDevice, double fTime, float fElapsedTime )
 {
+
 	pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 	pd3dDevice->SetTransform(D3DTS_VIEW, &GetG().g_fixedViewMat);
 	pd3dDevice->SetTransform(D3DTS_PROJECTION, &GetG().g_orthoProjMat);
@@ -282,133 +299,63 @@ HRESULT BattleState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, flo
 	pd3dDevice->SetTransform(D3DTS_VIEW, GetG().m_camera.GetViewMatrix());
 	pd3dDevice->SetTransform(D3DTS_PROJECTION, GetG().m_camera.GetProjMatrix());
 
-	if (this->m_curTurnType == TT_PLAYER)
-		m_innerFire->draw();
+	/*if (this->m_curTurnType == TT_PLAYER)
+		m_innerFire->draw();*/
 
 	renderFixedText(GetG().m_scrWidth, GetG().m_scrHeight);
 
 	return S_OK;
 }
 
-HRESULT BattleState::frameMove(double fTime, float fElapsedTime)
+HRESULT BattleState::frameMove( double dTime, float fElapsedTime )
 {
-	double fStateTime = getStateTime(fTime);
-
-	//박스 위치 갱신
-	m_skillContentBoxMover->frameMove( fElapsedTime );
-	m_statSelectBoxMover->frameMove( fElapsedTime );
-
-	m_skillContentBox->position = m_skillContentBoxMover->getPos();
-	m_statSelectBox->position = m_statSelectBoxMover->getPos();
-
-
-
-	//현재 수치 적용
-	m_hpBarPlayerProg->setCurVal( getHero()->getCurHp() );
-	m_csBarPlayerProg->setCurVal( getHero()->getCurCs() );
-	m_expBarPlayerProg->setCurVal( ((Hero*)getHero() )->getCurExp() );
-	m_hpBarEnemyProg->setCurVal( getFirstEnemy()->getCurHp() );
-	m_csBarEnemyProg->setCurVal( getFirstEnemy()->getCurCs() );
-
-	m_hpIllusionPlayerProg->setCurVal( getHero()->getCurHp() );
-	m_csIllusionPlayerProg->setCurVal( getHero()->getCurCs() );
-	m_expIllusionPlayerProg->setCurVal( ((Hero*)getHero() )->getCurExp() );
-	m_hpIllusionEnemyProg->setCurVal( getFirstEnemy()->getCurHp() );
-	m_csIllusionEnemyProg->setCurVal( getFirstEnemy()->getCurCs() );
-
-	//수치 이동
-	m_hpBarPlayerProg->setRate( fElapsedTime );
-	m_csBarPlayerProg->setRate( fElapsedTime );
-	m_expBarPlayerProg->setRate( fElapsedTime );
-	m_hpBarEnemyProg->setRate( fElapsedTime );
-	m_csBarEnemyProg->setRate( fElapsedTime );
-
-	m_hpIllusionPlayerProg->setRate( fElapsedTime );
-	m_csIllusionPlayerProg->setRate( fElapsedTime );
-	m_expIllusionPlayerProg->setRate( fElapsedTime );
-	m_hpIllusionEnemyProg->setRate( fElapsedTime );
-	m_csIllusionEnemyProg->setRate( fElapsedTime );
-
-
-
-	//수치를 그림에 적용
-	//원 크기는 333에서 443까지.
-	//따라서 right = 333 + 110 * rate;
-	int barLeftBound = 333;
-	int	barLength = 110;
-
-	m_hpBarPlayer->srcRect.right = barLeftBound + (int)( barLength*( m_hpBarPlayerProg->getRate() ) );
-	m_csBarPlayer->srcRect.right = barLeftBound + (int)( barLength*( m_csBarPlayerProg->getRate() ) );
-	m_expBarPlayer->srcRect.right = barLeftBound + (int)( barLength*( m_expBarPlayerProg->getRate() ) );
-
-	m_hpBarEnemy->srcRect.right = barLeftBound + (int)( barLength*( m_hpBarEnemyProg->getRate() ) );
-	m_csBarEnemy->srcRect.right = barLeftBound + (int)( barLength*( m_hpBarEnemyProg->getRate() ) );
-
-
-	m_hpIllusionPlayer->srcRect.right = barLeftBound + (int)( barLength*( m_hpIllusionPlayerProg->getRate() ) );
-	m_csIllusionPlayer->srcRect.right = barLeftBound + (int)( barLength*( m_csIllusionPlayerProg->getRate() ) );
-	m_expIllusionPlayer->srcRect.right = barLeftBound + (int)( barLength*( m_expIllusionPlayerProg->getRate() ) );
-
-	m_hpIllusionEnemy->srcRect.right = barLeftBound + (int)( barLength*( m_hpIllusionEnemyProg->getRate() ) );
-	m_csIllusionEnemy->srcRect.right = barLeftBound + (int)( barLength*( m_csIllusionEnemyProg->getRate() ) );
-
-/*
-	m_SkillContentBox.frameMove(fElapsedTime);
-	m_StatSelectBox.frameMove( fElapsedTime );
-	m_hpBgPlayer.frameMove(fElapsedTime);
-	m_mpBgPlayer.frameMove(fElapsedTime);
-	m_expBgPlayer.frameMove(fElapsedTime);
-	m_hpBgEnemy.frameMove(fElapsedTime);
-	m_mpBgEnemy.frameMove(fElapsedTime);
-
-	m_hpIllusionPlayer.frameMove(fElapsedTime);
-	m_hpIllusionEnemy.frameMove(fElapsedTime);
-	m_mpIllusionPlayer.frameMove(fElapsedTime);
-	m_expIllusionPlayer.frameMove( fElapsedTime );
-
-	m_hpBarPlayer.frameMove(fElapsedTime);
-	m_mpBarPlayer.frameMove(fElapsedTime);
-	m_expBarPlayer.frameMove(fElapsedTime);
-
-	m_innerFire.frameMove(fElapsedTime);
-	m_innerFire.setPos( getHero()->getPos().x, getHero()->getPos().y, -3);
-
-	m_hpBarEnemy.frameMove(fElapsedTime);
-	m_mpBarEnemy.frameMove(fElapsedTime);
-
-	m_hpBarPlayer.changeRate((float)getHero()->getCurHp());
-	m_hpBarEnemy.changeRate((float)getFirstEnemy()->getCurHp());
-	m_hpIllusionPlayer.changeRate((float)getHero()->getCurHp());
-	m_hpIllusionEnemy.changeRate((float)getFirstEnemy()->getCurHp());
-	m_mpBarPlayer.changeRate((float)getHero()->getCurCs());
-	m_mpIllusionPlayer.changeRate((float)getHero()->getCurCs());
-	m_expBarPlayer.changeRate( (float) ( (Hero*)getHero() )->getCurExp() );
-	m_expIllusionPlayer.changeRate( (float) ( (Hero*)getHero() )->getCurExp() );
-*/
+	frameMoveUserInterfaces( dTime, fElapsedTime );
 
 	// TODO Anim test
-
-	ArnNode* guardBallNode = getHero()->getArnMesh()->getNodeByName("GuardBall");
-	guardBallNode->update( fTime, fElapsedTime );
-	if ( ((ArnXformable*)guardBallNode)->isAnimSeqEnded() )
+	if ( getHero()->getArnMesh() )
 	{
-		((ArnXformable*)guardBallNode)->resetAnimSeqTime();
-		((ArnXformable*)guardBallNode)->setDoAnim( true );
+		ArnNode* guardBallNode = getHero()->getArnMesh()->getNodeByName("GuardBall");
+		guardBallNode->update( dTime, fElapsedTime );
+		if ( ((ArnXformable*)guardBallNode)->isAnimSeqEnded() )
+		{
+			((ArnXformable*)guardBallNode)->resetAnimSeqTime();
+			((ArnXformable*)guardBallNode)->setDoAnim( true );
+		}
 	}
-	
-	//// WorldState에 접근하기 위한 코드.
-	//TopStateManager& tsm = TopStateManager::getSingleton();
-	//WorldState* ws = static_cast<WorldState*>( tsm.getCurState() );
-	//const D3DXVECTOR3& vEnemyPos = ws->getEnemyPos();
-	//const D3DXVECTOR3& vHeroPos = ws->getHeroPos();
 
-	// 주인공이 적과 멀어지거나(충돌 상태가 아니거나), 승자가 결정되면 FieldState로 돌아간다.
-	//if ( ws->isCollide( &vEnemyPos, &vHeroPos ) == false || m_battleWinner != PS_NOTSET )
+	// Check for dead enemy and the end of battle.
+	// m_enemies and m_deadEnemies are maintained at World::frameMove() level.
+	// You do not need to call Enemy::frameMove() here.
+	EnemyList::iterator itEnemy = m_enemies.begin();
+	for ( ; itEnemy != m_enemies.end(); )
+	{
+		Enemy* enemy = *itEnemy;
 
-	// 승자가 결정되면 FieldState로 돌아간다.
-	if ( m_battleWinner != PS_NOTSET )
-		GetWorldStateManager().setNextState(GAME_WORLD_STATE_FIELD);
+		if ( enemy->isDead() && !enemy->getSoulAnimation() )
+		{
+			enemy->startSoulAnimation( 1.0f, 10.0f );
+			itEnemy = m_enemies.erase( itEnemy );
+			m_deadEnemies.push_back( enemy );
+		}
+		else
+		{
+			++itEnemy;
+		}
+	}
 
+	if ( m_enemies.empty() )
+	{
+		EnemyList::iterator itDeadEnemy = m_deadEnemies.begin();
+		bool allEnemiesRemoved = true;
+		for ( ; itDeadEnemy != m_deadEnemies.end(); ++itDeadEnemy )
+		{
+			allEnemiesRemoved = allEnemiesRemoved && (*itDeadEnemy)->getRemoveFlag();
+		}
+		if ( allEnemiesRemoved )
+			GetWorldStateManager().setNextState( GAME_WORLD_STATE_FIELD );
+	}
+
+	// If player is dead, make entire screen to gray scale.
 	if ( getHero()->getCurHp() <= 0 )
 	{
 		g_postSepiaShader->setDesaturation( m_desaturation );
@@ -420,299 +367,59 @@ HRESULT BattleState::frameMove(double fTime, float fElapsedTime)
 			m_desaturation += fElapsedTime * 0.5f;
 		}
 	}
-	return S_OK;
-}
-
-HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-{
 
 
+	//////////////////////////////////////////////////////////////////////////
 
-	if (uMsg == WM_KEYUP)
+	switch ( m_curSubBattleState )
 	{
-		if ( m_statSelectBoxMover->isOn() )
-		{
-			if (wParam == VK_UP)
-			{
-				statSelectMove('u');
-			}
-			if (wParam == VK_DOWN)
-			{
-				statSelectMove('d');
-			}
-			if (wParam == VK_RETURN)
-			{
-				Stat retStat = getHero()->getStat();
-				switch (m_statSelect)
-				{
-				case SS_HEALTH:
-					if (m_statCount != 0)
-					{
-						m_statCount--;
-						retStat.health ++;
-						getHero()->setStat(retStat.health, retStat.will, retStat.coding, retStat.def, retStat.sense, retStat.immunity);
-					}
-					break;
-				case SS_WILL:
-					if (m_statCount != 0)
-					{
-						m_statCount--;
-						retStat.will ++;
-						getHero()->setStat(retStat.health, retStat.will, retStat.coding, retStat.def, retStat.sense, retStat.immunity);
-					}
-					break;
-				case SS_CODING:
-					if (m_statCount != 0)
-					{
-						m_statCount--;
-						retStat.coding ++;
-						getHero()->setStat(retStat.health, retStat.will, retStat.coding, retStat.def, retStat.sense, retStat.immunity);
-					}
-					break;
-				case SS_DEF:
-					if (m_statCount != 0)
-					{
-						m_statCount--;
-						retStat.def ++;
-						getHero()->setStat(retStat.health, retStat.will, retStat.coding, retStat.def, retStat.sense, retStat.immunity);
-					}
-					break;
-				case SS_SENSE:
-					if (m_statCount != 0)
-					{
-						m_statCount--;
-						retStat.sense ++;
-						getHero()->setStat(retStat.health, retStat.will, retStat.coding, retStat.def, retStat.sense, retStat.immunity);
-					}
-					break;
-				case SS_IMMUNITY:
-					if (m_statCount != 0)
-					{
-						m_statCount--;
-						retStat.immunity ++;
-						getHero()->setStat(retStat.health, retStat.will, retStat.coding, retStat.def, retStat.sense, retStat.immunity);
-					}
-					break;
-				case SS_EXIT:
-					GetWorldStateManager().setNextState(GAME_WORLD_STATE_FIELD);
-					getFirstEnemy()->setRemoveFlag( true ); 
-					return S_OK;
-				}
-
-			}
-
-			return S_OK;
-		}
-		/*죽었을 시 enter 키를 입력하면 대상 파괴, 아니면 다른 키 안 받고 메시지 핸들링 종료*/
-		if ( getFirstEnemy()->getCurHp() <= 0 && !getFirstEnemy()->getSoulAnimation() )
-		{
-			if (wParam == VK_RETURN)
-			{
-				Hero* hero = ( Hero* )getHero();
-				Enemy* enemy = ( Enemy* )getFirstEnemy();
-
-				if (m_levelUpFlag == true)
-				{
-					hero->levelUp();
-					m_expBarPlayerProg->setMaxVal (( (Hero*)getHero() )->getMaxExp() );
-					m_expIllusionPlayerProg->setMaxVal (( (Hero*)getHero())->getMaxExp() );
-					m_expBarPlayerProg->setCurVal (( (Hero*)getHero() )->getMaxExp() );
-					m_expIllusionPlayerProg->setCurVal (( (Hero*)getHero())->getMaxExp() );
-					m_expBarPlayerProg->init();
-					m_expIllusionPlayerProg->init();
-
-					//m_expBarPlayerProg->setRatePerforce();
-					//m_expIllusionPlayerProg->setRatePerforce();
-					/*
-					m_expBarPlayer.initRate( (float) ( (Hero*)getHero() )->getMaxExp() );
-					m_expIllusionPlayer.initRate( (float) ( (Hero*)getHero() )->getMaxExp() );
-					m_expIllusionPlayer.setRate( (float) ( (Hero*)getHero() )->getCurExp() );
-					m_expBarPlayer.setRate ( (float) ( (Hero*)getHero() )->getCurExp() );
-*/
-					m_statCount += 5;
-				}
-
-
-				
-				int expReward = enemy->getExpReward();
-
-				if (expReward == 0)
-				{
-					GetWorldStateManager().setNextState(GAME_WORLD_STATE_FIELD);
-					getFirstEnemy()->setRemoveFlag( true ); // Should be deleted before next frame update
-				}
-
-				int remainExp = hero->gainExp( expReward );
-				printf("remainExp : %d\n" , remainExp);
-
-				//레벨업을 하고 경험치가 남지 않았을 때
-				if ( remainExp == -1 )
-				{
-					pushBattleLog("레벨업!");
-					enemy->setExpReward( 0 );
-					m_levelUpFlag = true;
-				}
-				//레벨업을 하고 경험치가 남았을 때
-				else if ( remainExp > 0 )
-				{
-					pushBattleLog("레벨업!");
-					enemy->setExpReward( remainExp );
-					m_levelUpFlag = true;
-				}
-				else
-				{
-					enemy->setExpReward( 0 );
-					if (m_levelUpFlag == true)
-					{
-						m_statSelectBoxMover->onBox();
-						m_levelUpFlag = false;
-						return S_OK;
-					}
-					return S_OK;
-				}
-			}
-			return S_OK;
-		}
-		/*자신이 죽었을 시 어떠한 키로도 반응하지 않는다. 메롱 */
-		else if (getHero()->getCurHp() <= 0 && !getHero()->getSoulAnimation() )
-		{
-			GetTopStateManager().setNextState( GAME_TOP_STATE_CREDIT );
-			return S_OK;
-		}
-		/*자신의 차례가 아닐 때에도 반응하지 않는다.*/
-		else if (m_curTurnType != TT_PLAYER)
-		{
-			return S_OK;
-		}
-
-		SkillSet* skillSet = this->getHero()->getSkillSet();
-		skillSet->setCharacter( getHero(), getFirstEnemy() );
-
-		/*화살표에 따라 기술 분기*/
-		if (wParam == VK_UP)
-		{
-			skillSet->moveSkillLocation('u');
-		}
-		if (wParam == VK_DOWN)
-		{
-			skillSet->moveSkillLocation('d');
-		}
-		if (wParam == VK_LEFT)
-		{
-			m_skillContentBoxMover->onBox();
-		}
-		if (wParam == VK_RIGHT)
-		{
-			m_skillContentBoxMover->offBox();
-		}
-		if (wParam == VK_RETURN)
-		{
-			m_curTurnType = TT_NATURAL;
-
-
-			if (!(skillSet->useSkill()))
-			{
-				//이부분에 스킬이 없습니다 라는 다이얼로그를 추가할수도.
-				//이스터 에그입니다. 마음껏 추가하시죠.
-				switch (m_noneSkillSelectedCount)
-				{
-				case 0:
-					m_battleLog.push_back(std::string("스킬이 없습니다."));
-					break;
-				case 1:
-					m_battleLog.push_back(std::string("스킬이 없는데요?"));
-					break;
-				case 2:
-					m_battleLog.push_back(std::string("스킬이 없다니까요!!?"));
-					break;
-				case 3:
-					m_battleLog.push_back(std::string("없는 스킬 자꾸 누르는 저의가 무엇이냐!"));
-					break;
-				case 4:
-					m_battleLog.push_back(std::string("뭥미???"));
-					break;
-				case 5:
-					m_battleLog.push_back(std::string("..."));
-					break;
-				case 6:
-					m_battleLog.push_back(std::string("..."));
-					break;
-				case 7:
-					m_battleLog.push_back(std::string("어쩔 수 없군. 몇 가지 팁을 제공하죠."));
-					break;
-				case 8:
-					m_battleLog.push_back(std::string("맵의 곳곳에 숨겨진 박카스가 존재하는 듯 하다."));
-					break;
-				case 9:
-					m_battleLog.push_back(std::string("박카스를 쟁취하려면 맵에 존재하는 갖가지 퍼즐을 풀어야 한다."));
-					break;
-				case 10:
-					m_battleLog.push_back(std::string("최종 보스와의 대전을 위해 물약을 최대한 많이 쟁겨놓으십시오."));
-					break;
-				case 11:
-					m_battleLog.push_back(std::string("신도 세미나실은 신성합니다. 존중해주시죠."));
-					break;
-				case 12:
-					m_battleLog.push_back(std::string("제육덮밥"));
-					break;
-				case 13:
-					m_battleLog.push_back(std::string("보스는 사실 거미를 무서워하는 듯 하다."));
-					break;
-				case 14:
-					m_battleLog.push_back(std::string("흐흥, 딱히 스크립트를 모르기 땜시 이런 switch문 노가다를 한건 아니야!"));
-					break;
-				case 15:
-					m_battleLog.push_back(std::string("goto문은 지양합시다."));
-					break;
-				case 16:
-					m_battleLog.push_back(std::string("1일 1코딩."));
-					break;
-				case 17:
-					m_battleLog.push_back(std::string("게임은 조금만 합시다."));
-					break;
-				case 18:
-					m_battleLog.push_back(std::string("코드에 주석은 필수."));
-					break;
-				case 19:
-					m_battleLog.push_back(std::string("제작 동안 OOO군의 프로젝트 말살 음모가 있었습니다."));
-					break;
-				case 20:
-					m_battleLog.push_back(std::string("맛의진미"));
-					break;
-				case 21:
-					m_battleLog.push_back(std::string("일부 스킬들은 연속기로 쓸 수 있습니다."));
-					break;
-				case 22:
-					m_battleLog.push_back( std::string( "OOO군은 무려 EP를 지우고, DXUT에 오타를 가하는 등의 음해를 가했습니다." ));
-					break;
-				default:
-					m_battleLog.push_back(std::string("훗, 더 이상의 자세한 팁은 생략한다."));;
-					break;
-				}
-				m_noneSkillSelectedCount++;
-				m_curTurnType = TT_PLAYER;
-			}
-		}
-
-			
+	case SBS_PLAYER_TURN:	handlePlayerTurnState();	break;
+	case SBS_ENEMY_TURN:	handleEnemyTurnState();	break;
+	case SBS_LEVEL_UP:		handleLevelUpState();		break;
 	}
 
 	return S_OK;
 }
 
+HRESULT BattleState::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
+{
+	switch( uMsg )
+	{
+	case WM_KEYDOWN:
+		{
+			InputEnum mappedKey = mapKey( ( UINT )wParam );
+			if( mappedKey != BSI_UNKNOWN )
+			{
+				if( FALSE == IsKeyDown( m_aKeys[mappedKey] ) )
+				{
+					m_aKeys[ mappedKey ] = KEY_WAS_DOWN_MASK | KEY_IS_DOWN_MASK;
+					++m_cKeysDown;
+				}
+			}
+			break;
+		}
+
+	case WM_KEYUP:
+		{
+			InputEnum mappedKey = mapKey( ( UINT )wParam );
+			if( mappedKey != BSI_UNKNOWN )
+			{
+				m_aKeys[ mappedKey ] &= ~KEY_IS_DOWN_MASK;
+				--m_cKeysDown;
+			}
+			break;
+		}
+	}
+	return FALSE;
+}
+
 HRESULT BattleState::release ()
 {
-	m_sprite->release();
+	//m_sprite->release();
 
 
 	EP_SAFE_RELEASE( m_innerFire );
 	
-	SAFE_RELEASE( m_lblHYnamL );
-	SAFE_RELEASE( m_lblREB );
-	SAFE_RELEASE( m_lblSkill );
-	SAFE_RELEASE( m_lblSkillDescription );
-	SAFE_RELEASE( m_lblStatSelect );
-
 	SAFE_DELETE( m_hpBarPlayerProg );
 	SAFE_DELETE( m_csBarPlayerProg );
 	SAFE_DELETE( m_expBarPlayerProg );
@@ -734,6 +441,7 @@ void BattleState::renderFixedText(int scrWidth, int scrHeight)
 	// Print battle log
 	const UINT maxDrawLogCount = 4;	// This is the number of lines of the battle log.
 	const UINT lineHeight = 15;
+	const DWORD drawTextFormat = DT_NOCLIP | DT_LEFT;
 	RECT rc;
 	rc.top		= 55;	// This is the height of the bottom line of the battle log.
 	rc.left		= 25;
@@ -749,7 +457,7 @@ void BattleState::renderFixedText(int scrWidth, int scrHeight)
 	UINT drawLogCount = 0;
 	for ( ; it != m_battleLog.rend(); ++it )
 	{
-		m_lblHYnamL->DrawTextA(0, (*it).c_str(), -1, &rc, DT_NOCLIP, D3DXCOLOR( 0.9f, 0.9f, 0.9f, 1.0f ) );
+		m_lblHYnamL->DrawTextA(0, (*it).c_str(), -1, &rc, drawTextFormat, D3DXCOLOR( 0.9f, 0.9f, 0.9f, 1.0f ) );
 		rc.top -= lineHeight;
 		drawLogCount++;
 		if ( drawLogCount >= maxDrawLogCount )
@@ -763,26 +471,26 @@ void BattleState::renderFixedText(int scrWidth, int scrHeight)
 	rc.top = (LONG)(statusBoxPlayersPositionY - 115);
 	rc.left = (LONG)(statusBoxPlayersPositionX + 5);
 	StringCchPrintf(textBuffer, 512, L"HP");
-	m_lblREB->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+	m_lblREB->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 	rc.top += (LONG)21.08;
 	StringCchPrintf(textBuffer, 512, L"CS");
-	m_lblREB->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+	m_lblREB->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 	rc.top += (LONG)21.08;
 	StringCchPrintf(textBuffer, 512, L"EX");
-	m_lblREB->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+	m_lblREB->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 	rc.top += (LONG)21.08;
 	StringCchPrintf(textBuffer, 512, L"Level : %d", ( ( Hero* )getHero() )->getLevel() );
-	m_lblREB->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+	m_lblREB->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 
 
 	/*적 status 라벨 그리기*/
 	rc.top = (LONG)18;
 	rc.left = (LONG)(scrWidth - 167);
 	StringCchPrintf(textBuffer, 512, L"HP");
-	m_lblREB->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+	m_lblREB->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 	rc.top += (LONG)21.08;
 	StringCchPrintf(textBuffer, 512, L"CS");
-	m_lblREB->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+	m_lblREB->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 
 
 	int skillLineInterval = 39;
@@ -790,74 +498,54 @@ void BattleState::renderFixedText(int scrWidth, int scrHeight)
 	rc.top = scrHeight - 190;
 	rc.left = scrWidth - 110;
 
-	SkillSet* skillSet = getHero()->getSkillSet();
 
-	StringCchPrintf(textBuffer, 512, skillSet->getSkillName(SL_FIRST).c_str());
-	m_lblSkill->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+	// Draw all equipped skill names of hero.
+	char textBufferA[512];
+	StringCchPrintfA(textBufferA, 512, m_heroSkillSet->getSkillName(SL_FIRST).c_str());
+	m_lblSkill->DrawTextA(0, textBufferA, -1, &rc, drawTextFormat, DX_CONSTS::D3DXCOLOR_WHITE );
 	rc.top += skillLineInterval;
-	StringCchPrintf(textBuffer, 512, skillSet->getSkillName(SL_SECOND).c_str());
-	m_lblSkill->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+	StringCchPrintfA(textBufferA, 512, m_heroSkillSet->getSkillName(SL_SECOND).c_str());
+	m_lblSkill->DrawTextA(0, textBufferA, -1, &rc, drawTextFormat, DX_CONSTS::D3DXCOLOR_WHITE );
 	rc.top += skillLineInterval;
-	StringCchPrintf(textBuffer, 512, skillSet->getSkillName(SL_THIRD).c_str());
-	m_lblSkill->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+	StringCchPrintfA(textBufferA, 512, m_heroSkillSet->getSkillName(SL_THIRD).c_str());
+	m_lblSkill->DrawTextA(0, textBufferA, -1, &rc, drawTextFormat, DX_CONSTS::D3DXCOLOR_WHITE );
 	rc.top += skillLineInterval;
-	StringCchPrintf(textBuffer, 512, skillSet->getSkillName(SL_FOURTH).c_str());
-	m_lblSkill->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+	StringCchPrintfA(textBufferA, 512, m_heroSkillSet->getSkillName(SL_FOURTH).c_str());
+	m_lblSkill->DrawTextA(0, textBufferA, -1, &rc, drawTextFormat, DX_CONSTS::D3DXCOLOR_WHITE );
 	rc.top += skillLineInterval;
-	StringCchPrintf(textBuffer, 512, skillSet->getSkillName(SL_FIFTH).c_str());
-	m_lblSkill->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+	StringCchPrintfA(textBufferA, 512, m_heroSkillSet->getSkillName(SL_FIFTH).c_str());
+	m_lblSkill->DrawTextA(0, textBufferA, -1, &rc, drawTextFormat, DX_CONSTS::D3DXCOLOR_WHITE );
 
-	/*스킬 라벨 그리기*/
-	switch (skillSet->getSkillLocation())
-	{
-	case SL_FIRST:
-		rc.top = scrHeight - 190;
-		StringCchPrintf(textBuffer, 512, skillSet->getSkillName(SL_FIRST).c_str());
-		break;
-	case SL_SECOND:
-		rc.top = scrHeight - 190 + skillLineInterval;
-		StringCchPrintf(textBuffer, 512, skillSet->getSkillName(SL_SECOND).c_str());
-		break;
-	case SL_THIRD:
-		rc.top = scrHeight - 190 + skillLineInterval*2;
-		StringCchPrintf(textBuffer, 512, skillSet->getSkillName(SL_THIRD).c_str());
-		break;
-	case SL_FOURTH:
-		rc.top = scrHeight - 190 + skillLineInterval*3;
-		StringCchPrintf(textBuffer, 512, skillSet->getSkillName(SL_FOURTH).c_str());
-		break;
-	case SL_FIFTH:
-		rc.top = scrHeight - 190 + skillLineInterval*4;
-		StringCchPrintf(textBuffer, 512, skillSet->getSkillName(SL_FIFTH).c_str());
-		break;
-	}
-	m_lblSkill->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 0.0f, 1.0f, 1.0f ) );
+	/* Draw currently selected skill of hero. */
+	rc.top = scrHeight - 190 + skillLineInterval * m_curSelSkill;
+	StringCchPrintfA(textBufferA, 512, m_heroSkillSet->getSkillName( m_curSelSkill ).c_str());
+	m_lblSkill->DrawTextA(0, textBufferA, -1, &rc, drawTextFormat, DX_CONSTS::D3DXCOLOR_RED );
+	
 
+	//rc.top = scrHeight - 190;
+	//rc.left = scrWidth - 410;
 
-	rc.top = scrHeight - 190;
-	rc.left = scrWidth - 410;
-
-	switch (skillSet->getSkillLocation())
-	{
-	case SL_FIRST:
-		StringCchPrintf(textBuffer, 512, skillSet->getDescription(SL_FIRST).c_str());
-		break;
-	case SL_SECOND:
-		StringCchPrintf(textBuffer, 512, skillSet->getDescription(SL_SECOND).c_str());
-		break;
-	case SL_THIRD:
-		StringCchPrintf(textBuffer, 512, skillSet->getDescription(SL_THIRD).c_str());
-		break;
-	case SL_FOURTH:
-		StringCchPrintf(textBuffer, 512, skillSet->getDescription(SL_FOURTH).c_str());
-		break;
-	case SL_FIFTH:
-		StringCchPrintf(textBuffer, 512, skillSet->getDescription(SL_FIFTH).c_str());
-		break;
-	}
+	//switch (skillSet->getSkillLocation())
+	//{
+	//case SL_FIRST:
+	//	StringCchPrintfA(textBufferA, 512, skillSet->getDescription(SL_FIRST).c_str());
+	//	break;
+	//case SL_SECOND:
+	//	StringCchPrintfA(textBufferA, 512, skillSet->getDescription(SL_SECOND).c_str());
+	//	break;
+	//case SL_THIRD:
+	//	StringCchPrintfA(textBufferA, 512, skillSet->getDescription(SL_THIRD).c_str());
+	//	break;
+	//case SL_FOURTH:
+	//	StringCchPrintfA(textBufferA, 512, skillSet->getDescription(SL_FOURTH).c_str());
+	//	break;
+	//case SL_FIFTH:
+	//	StringCchPrintfA(textBufferA, 512, skillSet->getDescription(SL_FIFTH).c_str());
+	//	break;
+	//}
 
 	if (m_skillContentBoxMover->isOn() && !m_skillContentBoxMover->isMoving())
-		m_lblSkillDescription->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 0.8f, 0.8f, 1.0f, 1.0f ) );
+		m_lblSkillDescription->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 0.8f, 0.8f, 1.0f, 1.0f ) );
 
 
 	if ( m_statSelectBoxMover->isOn() && !m_statSelectBoxMover->isMoving())
@@ -870,25 +558,25 @@ void BattleState::renderFixedText(int scrWidth, int scrHeight)
 
 
 		StringCchPrintf(textBuffer, 512, L"HEALTH");
-		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 		rc.top += statSelectInterval;
 		StringCchPrintf(textBuffer, 512, L"WILL");
-		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 		rc.top += statSelectInterval;
 		StringCchPrintf(textBuffer, 512, L"CODING");
-		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 		rc.top += statSelectInterval;
 		StringCchPrintf(textBuffer, 512, L"DEFENSE");
-		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 		rc.top += statSelectInterval;
 		StringCchPrintf(textBuffer, 512, L"SENSE");
-		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 		rc.top += statSelectInterval;
 		StringCchPrintf(textBuffer, 512, L"IMMUNITY");
-		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 		rc.top += statSelectInterval;
 		StringCchPrintf(textBuffer, 512, L"exit");
-		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 		rc.top += statSelectInterval;
 
 
@@ -926,7 +614,7 @@ void BattleState::renderFixedText(int scrWidth, int scrHeight)
 			break;
 		}
 
-		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 0.0f, 1.0f, 0.0f, 1.0f ) );
+		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 0.0f, 1.0f, 0.0f, 1.0f ) );
 
 
 
@@ -934,32 +622,32 @@ void BattleState::renderFixedText(int scrWidth, int scrHeight)
 		rc.left = statSelectX + 100;
 
 		StringCchPrintf(textBuffer, 512, L"%d", getHero()->getStat().health);
-		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 		rc.top += statSelectInterval;
 		StringCchPrintf(textBuffer, 512, L"%d", getHero()->getStat().will);
-		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 		rc.top += statSelectInterval;
 		StringCchPrintf(textBuffer, 512, L"%d", getHero()->getStat().coding);
-		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 		rc.top += statSelectInterval;
 		StringCchPrintf(textBuffer, 512, L"%d", getHero()->getStat().def);
-		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 		rc.top += statSelectInterval;
 		StringCchPrintf(textBuffer, 512, L"%d", getHero()->getStat().sense);
-		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 		rc.top += statSelectInterval;
 		StringCchPrintf(textBuffer, 512, L"%d", getHero()->getStat().immunity);
-		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 		rc.top += statSelectInterval * 2;
 
 		StringCchPrintf( textBuffer, 512, L"%d", m_statCount );
 		if (m_statCount != 0)
 		{
-			m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+			m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 		}
 		else
 		{
-			m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, DT_NOCLIP | DT_LEFT, D3DXCOLOR( 1.0f, 0.0f, 0.0f, 1.0f ) );
+			m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 0.0f, 0.0f, 1.0f ) );
 		}
 
 
@@ -971,24 +659,28 @@ void BattleState::renderFixedText(int scrWidth, int scrHeight)
 
 void BattleState::passTurn()
 {
-	m_curTurnType = m_nextTurnType;
-	m_nextTurnType = TT_NATURAL;
+	m_curSubBattleState = m_nextSubBattleState;
+	m_nextSubBattleState = SBS_NULLSTATE;
 
-	if (m_curTurnType == TT_PLAYER)
+	if ( m_curSubBattleState == SBS_PLAYER_TURN )
 	{
 		m_battleLog.push_back(std::string("당신이 공격할 차례입니다."));
 		getHero()->recoverCs();
 	}
-	else if (m_curTurnType == TT_COMPUTER)
+	else if ( m_curSubBattleState == SBS_ENEMY_TURN )
 	{
-		m_battleLog.push_back(std::string("콤퓨타 차례입니다."));
-		doComputerAction();
+		m_battleLog.push_back(std::string("적군 차례입니다."));
+		doEnemyAction();
+	}
+	else
+	{
+		throw std::runtime_error( "Cannot pass turn. Invalid next sub battle state." );
 	}
 }
 
-void BattleState::doComputerAction()
+void BattleState::doEnemyAction()
 {
-	getFirstEnemy()->doNormalAttack(0, getHero());
+	//getFirstEnemy()->doNormalAttack(0, getHero());
 }
 
 Character* BattleState::getHero()
@@ -997,7 +689,8 @@ Character* BattleState::getHero()
 }
 
 void BattleState::setupCamera()
-{//
+{
+	//
 	// 처음 시작시 주인공이 왼쪽 아래, 적이 오른쪽 위에 보이도록 카메라를 움직인다.
 	//
 
@@ -1113,47 +806,392 @@ void BattleState::updateBarRate()
 	m_hpIllusionEnemyProg->setRatePerforce();
 	m_csIllusionEnemyProg->setRatePerforce();
 
-	/*
-	m_hpBarPlayer.initRate((float)getHero()->getMaxHp());
-	m_hpIllusionPlayer.initRate((float)getHero()->getMaxHp());
-	m_hpBarEnemy.initRate((float)getFirstEnemy()->getMaxHp());
-	m_hpIllusionEnemy.initRate((float)getFirstEnemy()->getMaxHp());
-	m_mpBarPlayer.initRate((float)getHero()->getMaxCs());
-	m_mpIllusionPlayer.initRate((float)getHero()->getMaxCs());
-	m_expBarPlayer.initRate( (float) ( (Hero*)getHero() )->getMaxExp() );
-	m_expIllusionPlayer.initRate( (float) ( (Hero*)getHero() )->getMaxExp() );
+}
 
-	m_hpBarPlayer.setRate((float)getHero()->getCurHp());
-	m_hpBarEnemy.setRate((float)getFirstEnemy()->getCurHp());
-	m_mpBarPlayer.setRate((float)getHero()->getCurCs());
-	m_expBarPlayer.setRate ( (float) ( (Hero*)getHero() )->getCurExp() );
-	m_hpIllusionPlayer.setRate((float)getHero()->getCurHp());
-	m_hpIllusionEnemy.setRate((float)getFirstEnemy()->getCurHp());
-	m_mpIllusionPlayer.setRate((float)getHero()->getCurCs());
-	m_expIllusionPlayer.setRate( (float) ( (Hero*)getHero() )->getCurExp() );*/
+HRESULT BattleState::onCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext )
+{
+	return S_OK;
 }
 
 HRESULT BattleState::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext )
-{
-
-	D3DXCreateFont( pd3dDevice, 17, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblHYnamL );
-	D3DXCreateFont( pd3dDevice, 18, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Rockwell Extra Bold"), &m_lblREB );
-	D3DXCreateFont( pd3dDevice, 20, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblSkill );
-	D3DXCreateFont( pd3dDevice, 15, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblSkillDescription );
-	D3DXCreateFont( pd3dDevice, 17, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblStatSelect );
-
+{	
 	m_innerFire->onResetDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
-
 	return S_OK;
 }
 
 void BattleState::onLostDevice()
 {
+	m_innerFire->onLostDevice();
+}
+
+void BattleState::printEasterEggMessage()
+{
+
+	//이부분에 스킬이 없습니다 라는 다이얼로그를 추가할수도.
+	//이스터 에그입니다. 마음껏 추가하시죠.
+	switch (m_noneSkillSelectedCount)
+	{
+	case 0:
+		m_battleLog.push_back(std::string("스킬이 없습니다."));
+		break;
+	case 1:
+		m_battleLog.push_back(std::string("스킬이 없는데요?"));
+		break;
+	case 2:
+		m_battleLog.push_back(std::string("스킬이 없다니까요!!?"));
+		break;
+	case 3:
+		m_battleLog.push_back(std::string("없는 스킬 자꾸 누르는 저의가 무엇이냐!"));
+		break;
+	case 4:
+		m_battleLog.push_back(std::string("뭥미???"));
+		break;
+	case 5:
+		m_battleLog.push_back(std::string("..."));
+		break;
+	case 6:
+		m_battleLog.push_back(std::string("..."));
+		break;
+	case 7:
+		m_battleLog.push_back(std::string("어쩔 수 없군. 몇 가지 팁을 제공하죠."));
+		break;
+	case 8:
+		m_battleLog.push_back(std::string("맵의 곳곳에 숨겨진 박카스가 존재하는 듯 하다."));
+		break;
+	case 9:
+		m_battleLog.push_back(std::string("박카스를 쟁취하려면 맵에 존재하는 갖가지 퍼즐을 풀어야 한다."));
+		break;
+	case 10:
+		m_battleLog.push_back(std::string("최종 보스와의 대전을 위해 물약을 최대한 많이 쟁겨놓으십시오."));
+		break;
+	case 11:
+		m_battleLog.push_back(std::string("신도 세미나실은 신성합니다. 존중해주시죠."));
+		break;
+	case 12:
+		m_battleLog.push_back(std::string("제육덮밥"));
+		break;
+	case 13:
+		m_battleLog.push_back(std::string("보스는 사실 거미를 무서워하는 듯 하다."));
+		break;
+	case 14:
+		m_battleLog.push_back(std::string("흐흥, 딱히 스크립트를 모르기 땜시 이런 switch문 노가다를 한건 아니야!"));
+		break;
+	case 15:
+		m_battleLog.push_back(std::string("goto문은 지양합시다."));
+		break;
+	case 16:
+		m_battleLog.push_back(std::string("1일 1코딩."));
+		break;
+	case 17:
+		m_battleLog.push_back(std::string("게임은 조금만 합시다."));
+		break;
+	case 18:
+		m_battleLog.push_back(std::string("코드에 주석은 필수."));
+		break;
+	case 19:
+		m_battleLog.push_back(std::string("제작 동안 OOO군의 프로젝트 말살 음모가 있었습니다."));
+		break;
+	case 20:
+		m_battleLog.push_back(std::string("맛의진미"));
+		break;
+	case 21:
+		m_battleLog.push_back(std::string("일부 스킬들은 연속기로 쓸 수 있습니다."));
+		break;
+	case 22:
+		m_battleLog.push_back( std::string( "OOO군은 무려 EP를 지우고, DXUT에 오타를 가하는 등의 음해를 가했습니다." ));
+		break;
+	default:
+		m_battleLog.push_back(std::string("훗, 더 이상의 자세한 팁은 생략한다."));;
+		break;
+	}
+	m_noneSkillSelectedCount++;
+}
+
+void BattleState::frameMoveUserInterfaces( double dTime, float fElapsedTime )
+{
+	//박스 위치 갱신
+	m_skillContentBoxMover->frameMove( fElapsedTime );
+	m_statSelectBoxMover->frameMove( fElapsedTime );
+
+	m_skillContentBox->position = m_skillContentBoxMover->getPos();
+	m_statSelectBox->position = m_statSelectBoxMover->getPos();
+
+
+
+	//현재 수치 적용
+	Character* hero = getHero();
+	if ( hero )
+	{
+		m_hpBarPlayerProg->setCurVal( hero->getCurHp() );
+		m_csBarPlayerProg->setCurVal( hero->getCurCs() );
+		m_expBarPlayerProg->setCurVal( ((Hero*)hero)->getCurExp() );
+
+		m_hpIllusionPlayerProg->setCurVal( hero->getCurHp() );
+		m_csIllusionPlayerProg->setCurVal( hero->getCurCs() );
+		m_expIllusionPlayerProg->setCurVal( ((Hero*)hero)->getCurExp() );
+	}
+
+	Character* firstEnemy = getFirstEnemy();
+	if ( firstEnemy )
+	{
+		m_hpBarEnemyProg->setCurVal( firstEnemy->getCurHp() );
+		m_csBarEnemyProg->setCurVal( firstEnemy->getCurCs() );
+		m_hpIllusionEnemyProg->setCurVal( firstEnemy->getCurHp() );
+		m_csIllusionEnemyProg->setCurVal( firstEnemy->getCurCs() );
+	}
+	
+	//수치 이동
+	m_hpBarPlayerProg->setRate( fElapsedTime );
+	m_csBarPlayerProg->setRate( fElapsedTime );
+	m_expBarPlayerProg->setRate( fElapsedTime );
+	m_hpBarEnemyProg->setRate( fElapsedTime );
+	m_csBarEnemyProg->setRate( fElapsedTime );
+
+	m_hpIllusionPlayerProg->setRate( fElapsedTime );
+	m_csIllusionPlayerProg->setRate( fElapsedTime );
+	m_expIllusionPlayerProg->setRate( fElapsedTime );
+	m_hpIllusionEnemyProg->setRate( fElapsedTime );
+	m_csIllusionEnemyProg->setRate( fElapsedTime );
+
+
+
+	//수치를 그림에 적용
+	//원 크기는 333에서 443까지.
+	//따라서 right = 333 + 110 * rate;
+	int barLeftBound = 333;
+	int	barLength = 110;
+
+	m_hpBarPlayer->srcRect.right = barLeftBound + (int)( barLength*( m_hpBarPlayerProg->getRate() ) );
+	m_csBarPlayer->srcRect.right = barLeftBound + (int)( barLength*( m_csBarPlayerProg->getRate() ) );
+	m_expBarPlayer->srcRect.right = barLeftBound + (int)( barLength*( m_expBarPlayerProg->getRate() ) );
+
+	m_hpBarEnemy->srcRect.right = barLeftBound + (int)( barLength*( m_hpBarEnemyProg->getRate() ) );
+	m_csBarEnemy->srcRect.right = barLeftBound + (int)( barLength*( m_hpBarEnemyProg->getRate() ) );
+
+
+	m_hpIllusionPlayer->srcRect.right = barLeftBound + (int)( barLength*( m_hpIllusionPlayerProg->getRate() ) );
+	m_csIllusionPlayer->srcRect.right = barLeftBound + (int)( barLength*( m_csIllusionPlayerProg->getRate() ) );
+	m_expIllusionPlayer->srcRect.right = barLeftBound + (int)( barLength*( m_expIllusionPlayerProg->getRate() ) );
+
+	m_hpIllusionEnemy->srcRect.right = barLeftBound + (int)( barLength*( m_hpIllusionEnemyProg->getRate() ) );
+	m_csIllusionEnemy->srcRect.right = barLeftBound + (int)( barLength*( m_csIllusionEnemyProg->getRate() ) );
 
 }
 
-HRESULT BattleState::onCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext )
+void BattleState::printBattleStateEnterDebugMessage()
 {
-	m_pDev = pd3dDevice;
-	return S_OK;
+	printf( " - Encountered with enemy!\n" );
+	EnemyList::const_iterator cit = m_enemies.begin();
+	for ( ; cit != m_enemies.end(); ++cit )
+	{
+		const Enemy* enemy = *cit;
+		printf( "   Enemy Model: %s, HP: %d\n", enemy->getArnMeshName().c_str(), enemy->getCurHp() );
+	}
+}
+
+BattleState::InputEnum BattleState::mapKey( UINT nKey ) const
+{
+	switch ( m_curSubBattleState )
+	{
+	case SBS_PLAYER_TURN:
+		switch ( nKey )
+		{
+		case VK_UP:		return BSI_SKILL_MOVE_UP;
+		case VK_DOWN:	return BSI_SKILL_MOVE_DOWN;
+		case VK_LEFT:	return BSI_SKILLCONTENT_SHOW;
+		case VK_RIGHT:	return BSI_SKILLCONTENT_HIDE;
+		case 'Z':		return BSI_SKILL_USE;
+		}
+		break;
+	case SBS_LEVEL_UP:
+		switch ( nKey )
+		{
+		case VK_UP:		return BSI_LEVELUP_UP;
+		case VK_DOWN:	return BSI_LEVELUP_DOWN;
+		case VK_RETURN:	return BSI_LEVELUP_SET;
+		}
+		break;
+	}
+	
+	return BSI_UNKNOWN;
+}
+
+void BattleState::handleLevelUpState()
+{
+	//if (wParam == VK_UP)
+	//{
+	//	statSelectMove('u');
+	//}
+	//if (wParam == VK_DOWN)
+	//{
+	//	statSelectMove('d');
+	//}
+	//if (wParam == VK_RETURN)
+	//{
+	//	Stat retStat = getHero()->getStat();
+	//	switch (m_statSelect)
+	//	{
+	//	case SS_HEALTH:
+	//		if (m_statCount != 0)
+	//		{
+	//			m_statCount--;
+	//			retStat.health ++;
+	//			getHero()->setStat(retStat.health, retStat.will, retStat.coding, retStat.def, retStat.sense, retStat.immunity);
+	//		}
+	//		break;
+	//	case SS_WILL:
+	//		if (m_statCount != 0)
+	//		{
+	//			m_statCount--;
+	//			retStat.will ++;
+	//			getHero()->setStat(retStat.health, retStat.will, retStat.coding, retStat.def, retStat.sense, retStat.immunity);
+	//		}
+	//		break;
+	//	case SS_CODING:
+	//		if (m_statCount != 0)
+	//		{
+	//			m_statCount--;
+	//			retStat.coding ++;
+	//			getHero()->setStat(retStat.health, retStat.will, retStat.coding, retStat.def, retStat.sense, retStat.immunity);
+	//		}
+	//		break;
+	//	case SS_DEF:
+	//		if (m_statCount != 0)
+	//		{
+	//			m_statCount--;
+	//			retStat.def ++;
+	//			getHero()->setStat(retStat.health, retStat.will, retStat.coding, retStat.def, retStat.sense, retStat.immunity);
+	//		}
+	//		break;
+	//	case SS_SENSE:
+	//		if (m_statCount != 0)
+	//		{
+	//			m_statCount--;
+	//			retStat.sense ++;
+	//			getHero()->setStat(retStat.health, retStat.will, retStat.coding, retStat.def, retStat.sense, retStat.immunity);
+	//		}
+	//		break;
+	//	case SS_IMMUNITY:
+	//		if (m_statCount != 0)
+	//		{
+	//			m_statCount--;
+	//			retStat.immunity ++;
+	//			getHero()->setStat(retStat.health, retStat.will, retStat.coding, retStat.def, retStat.sense, retStat.immunity);
+	//		}
+	//		break;
+	//	case SS_EXIT:
+	//		GetWorldStateManager().setNextState(GAME_WORLD_STATE_FIELD);
+	//		getFirstEnemy()->setRemoveFlag( true ); 
+	//		return S_OK;
+	//	}
+
+	//}
+
+	////////////////////////////////////////////////////////////////////////////
+
+	//Hero* hero = ( Hero* )getHero();
+	//Enemy* enemy = ( Enemy* )getFirstEnemy();
+
+	//if (m_levelUpFlag == true)
+	//{
+	//	hero->levelUp();
+	//	m_expBarPlayerProg->setMaxVal (( (Hero*)getHero() )->getMaxExp() );
+	//	m_expIllusionPlayerProg->setMaxVal (( (Hero*)getHero())->getMaxExp() );
+	//	m_expBarPlayerProg->setCurVal (( (Hero*)getHero() )->getMaxExp() );
+	//	m_expIllusionPlayerProg->setCurVal (( (Hero*)getHero())->getMaxExp() );
+	//	m_expBarPlayerProg->init();
+	//	m_expIllusionPlayerProg->init();
+
+	//	//m_expBarPlayerProg->setRatePerforce();
+	//	//m_expIllusionPlayerProg->setRatePerforce();
+	//	/*
+	//	m_expBarPlayer.initRate( (float) ( (Hero*)getHero() )->getMaxExp() );
+	//	m_expIllusionPlayer.initRate( (float) ( (Hero*)getHero() )->getMaxExp() );
+	//	m_expIllusionPlayer.setRate( (float) ( (Hero*)getHero() )->getCurExp() );
+	//	m_expBarPlayer.setRate ( (float) ( (Hero*)getHero() )->getCurExp() );
+	//	*/
+	//	m_statCount += 5;
+	//}
+
+
+
+	//int expReward = enemy->getExpReward();
+
+	//if (expReward == 0)
+	//{
+	//	GetWorldStateManager().setNextState(GAME_WORLD_STATE_FIELD);
+	//	getFirstEnemy()->setRemoveFlag( true ); // Should be deleted before next frame update
+	//}
+
+	//int remainExp = hero->gainExp( expReward );
+	//printf("remainExp : %d\n" , remainExp);
+
+	////레벨업을 하고 경험치가 남지 않았을 때
+	//if ( remainExp == -1 )
+	//{
+	//	pushBattleLog("레벨업!");
+	//	enemy->setExpReward( 0 );
+	//	m_levelUpFlag = true;
+	//}
+	////레벨업을 하고 경험치가 남았을 때
+	//else if ( remainExp > 0 )
+	//{
+	//	pushBattleLog("레벨업!");
+	//	enemy->setExpReward( remainExp );
+	//	m_levelUpFlag = true;
+	//}
+	//else
+	//{
+	//	enemy->setExpReward( 0 );
+	//	if (m_levelUpFlag == true)
+	//	{
+	//		m_statSelectBoxMover->onBox();
+	//		m_levelUpFlag = false;
+	//		return S_OK;
+	//	}
+	//	return S_OK;
+	//}
+}
+
+void BattleState::handlePlayerTurnState()
+{
+	/*화살표에 따라 기술 분기*/
+	if ( IsKeyDown( m_aKeys[BSI_SKILL_MOVE_UP] ) )
+	{
+		if ( m_curSelSkill > 0 )
+			--m_curSelSkill;
+	}
+	if ( IsKeyDown( m_aKeys[BSI_SKILL_MOVE_DOWN] ) )
+	{
+		if ( m_curSelSkill < 4 )
+			++m_curSelSkill;
+	}
+	if ( IsKeyDown( m_aKeys[BSI_SKILLCONTENT_SHOW] ) )
+	{
+		m_skillContentBoxMover->onBox();
+	}
+	if ( IsKeyDown( m_aKeys[BSI_SKILLCONTENT_HIDE] ) )
+	{
+		m_skillContentBoxMover->offBox();
+	}
+
+	// Use skill only if there is an enemy.
+	if ( IsKeyDown( m_aKeys[BSI_SKILL_USE] ) && getFirstEnemy() )
+	{
+		bool skillStarted = m_heroSkillSet->useSkill( m_curSelSkill, getHero(), getFirstEnemy() );
+		if ( skillStarted )
+		{
+			//m_curTurnType = TT_NATURAL;
+		}
+		else
+		{
+			printEasterEggMessage();
+			//m_curTurnType = TT_PLAYER;
+		}
+	}
+}
+
+void BattleState::handleEnemyTurnState()
+{
+
 }

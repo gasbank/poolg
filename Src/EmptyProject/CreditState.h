@@ -8,7 +8,7 @@ public:
 	CreditState(void);
 	~CreditState(void);
 
-	virtual HRESULT enter();
+	virtual HRESULT enter( double dStartTime );
 	virtual HRESULT leave();
 
 	virtual HRESULT frameRender(IDirect3DDevice9* pd3dDevice, double fTime, float fElapsedTime);
@@ -27,8 +27,6 @@ public:
 private:
 	void setupLight();
 
-	LPD3DXFONT						m_d3dxFont;
-	LPD3DXFONT						m_d3dxFontBig;
 
 	D3DMATERIAL9					m_textMat;
 	float							m_textMatAlpha;

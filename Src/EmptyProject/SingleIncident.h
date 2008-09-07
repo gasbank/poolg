@@ -1,12 +1,8 @@
 #pragma once
 #include "Incident.h"
 
-class Trigger;
-class Action;
 class StartIncidentAction;
 
-typedef std::list<Trigger*> TriggerList;
-typedef std::list<Action*> ActionList;
 
 
 class SingleIncident :

@@ -15,19 +15,18 @@ ScreenFlash::~ScreenFlash(void)
 {
 }
 
-void ScreenFlash::setup()
+HRESULT ScreenFlash::onCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc )
 {
-	LPDIRECT3DDEVICE9& pd3dDevice = GetG().m_dev;
 
 	//////////////////////////////////////////////////////////////////////////
 	// Prepare alpha shading
 	m_alphaShader = new AlphaShader();
-	m_alphaShader->initShader( pd3dDevice, L"Shaders/Alpha.vsh" );
+	m_alphaShader->onCreateDevice( pd3dDevice, pBackBufferSurfaceDesc );
 	m_alphaShader->compileShader( "Alpha", "vs_2_0" );
 
-	D3DXCreatePolygon( pd3dDevice, 10.0f, 32, &m_testPolygon, 0 );
-	m_testPolygon->CloneMesh( D3DXMESH_WRITEONLY, m_alphaShader->getDecl(), pd3dDevice, &m_testPolygonCloned );
 	//////////////////////////////////////////////////////////////////////////
+
+	return S_OK;
 }
 
 HRESULT ScreenFlash::frameRender()
@@ -99,9 +98,6 @@ HRESULT ScreenFlash::frameMove( double fTime, float fElapsedTime )
 
 void ScreenFlash::release()
 {
-	SAFE_RELEASE( m_testPolygon );
-	SAFE_RELEASE( m_testPolygonCloned );
-	EP_SAFE_RELEASE( m_alphaShader );
 }
 
 HRESULT ScreenFlash::handleMessage( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
@@ -132,8 +128,23 @@ void ScreenFlash::screenFlashing( float durationSec, float r, float g, float b )
 	m_screenFlashAlphaAngle = 0.0f;
 }
 
-void ScreenFlash::reset( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
-						void* pUserContext )
+HRESULT ScreenFlash::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc )
 {
-	m_alphaShader->onResetDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
+	m_alphaShader->onResetDevice( pd3dDevice, pBackBufferSurfaceDesc, 0 );
+
+	D3DXCreatePolygon( pd3dDevice, 10.0f, 32, &m_testPolygon, 0 );
+	m_testPolygon->CloneMesh( D3DXMESH_WRITEONLY, m_alphaShader->getDecl(), pd3dDevice, &m_testPolygonCloned );
+	SAFE_RELEASE( m_testPolygon );
+
+	return S_OK;
+}
+
+void ScreenFlash::onDestroyDevice()
+{
+	EP_SAFE_RELEASE( m_alphaShader );
+}
+
+void ScreenFlash::onLostDevice()
+{
+	SAFE_RELEASE( m_testPolygonCloned );
 }

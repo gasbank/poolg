@@ -18,7 +18,7 @@ StructureObject::~StructureObject(void)
 Unit* StructureObject::createStructureObject( LPD3DXMESH mesh, int tileX, int tileY, float posZ, bool pushable )
 {
 	StructureObject* u = new StructureObject();
-	u->init( GetG().m_dev, mesh );
+	u->init();
 	u->setTilePos( tileX, tileY );
 	u->setTileBufferPos( tileX, tileY );
 	u->setPushable( pushable );
@@ -26,7 +26,7 @@ Unit* StructureObject::createStructureObject( LPD3DXMESH mesh, int tileX, int ti
 	return u;
 }
 
-bool StructureObject::frameMove( float fElapsedTime )
+bool StructureObject::frameMove( double dTime, float fElapsedTime )
 {
 	if (m_bMoving == false)
 	{
@@ -91,19 +91,19 @@ bool StructureObject::frameMove( float fElapsedTime )
 		}
 	}
 
-	return Unit::frameMove( fElapsedTime );
+	return Unit::frameMove( dTime, fElapsedTime );
 }
 
 Unit* EpCreateStructureObject( int tileX, int tileY, int p )
 {
-	LPD3DXMESH d3dxMesh;
-	D3DXCreateTeapot( GetG().m_dev, &d3dxMesh, 0 );
+	//LPD3DXMESH d3dxMesh;
+	//D3DXCreateTeapot( GetG().m_dev, &d3dxMesh, 0 );
 	bool pushable;
 	if ( p == 0 )
 		pushable = false;
 	else
 		pushable = true;
-	return StructureObject::createStructureObject( d3dxMesh, tileX, tileY, 0, pushable );
+	return StructureObject::createStructureObject( 0, tileX, tileY, 0, pushable );
 } SCRIPT_CALLABLE_PV_I_I_I( EpCreateStructureObject )
 
 START_SCRIPT_FACTORY( StructureObject )

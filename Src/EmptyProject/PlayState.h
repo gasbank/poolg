@@ -12,7 +12,7 @@ public:
 	PlayState(void);
 	~PlayState(void);
 
-	virtual HRESULT enter();
+	virtual HRESULT enter( double dStartTime );
 	virtual HRESULT leave();
 
 	virtual HRESULT frameRender(IDirect3DDevice9* pd3dDevice, double fTime, float fElapsedTime);

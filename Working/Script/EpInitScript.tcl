@@ -5,7 +5,7 @@
 #----------------------------------------------------------------------------------#
 
 variable EpStartTopStateName		IntroState
-set EpStartWorldName				EpCeilingWorld 
+set EpStartWorldName				EpTestStage
 set EpWorldList						[ list EpCeilingWorld EpRoomWorld EpA213World EpTestStage ]
 set EpWindowMode					1
 
@@ -13,9 +13,9 @@ set EpWindowMode					1
 # Application level one-time initialization and constants are defined here.
 proc EpInitApp {} {
 	# Screen Resolution
-	set w1 4
-	set h1 3
-	set multiplier 200
+	set w1 320
+	set h1 240
+	set multiplier 2
 	EpSetWindowSize [expr $w1 * $multiplier] [expr $h1 * $multiplier]
 }
 
@@ -51,7 +51,6 @@ proc getHero { tilePos } {
 		EpCharacterSetCurCs			$pHeroUnit -1
 		EpCharacterSetMoveDuration	$pHeroUnit [expr 0.2]
 		EpUnitSetColor				$pHeroUnit 255 0 255
-		EpUnitSetPosZ				$pHeroUnit -[EpUnitGetUpperRightZ $pHeroUnit]
 		EpUnitSetArnMesh			$pHeroUnit "PoolGModel"
 		EpRegisterToWorld			$curWorld $pHeroUnit
 	}

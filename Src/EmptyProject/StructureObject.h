@@ -9,7 +9,7 @@ public:
 	~StructureObject(void);
 	static Unit* createStructureObject( LPD3DXMESH mesh, int tileX, int tileY, float posZ, bool pushable );
 
-	virtual bool frameMove(float fElapsedTime);
+	virtual bool frameMove( double dTime, float fElapsedTime );
 
 	bool getPushable() const { return m_bPushable; }
 	void setPushable(bool val) { m_bPushable = val; }

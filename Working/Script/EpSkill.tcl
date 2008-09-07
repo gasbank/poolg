@@ -1,14 +1,26 @@
-set skillName [ list NormalAttackSkill HealSkill MultiThreadSkill MeditationSkill CsBurnSkill ]
-
+set EpSkillList [ list NormalAttackSkill TestSkill ]
 
 namespace eval NormalAttackSkill {
 	set name					"NormalAttack"
 	set description				"NormalAttack을 상대방에게 날립니다."
 	set csEssentials			2
-	set skillObjectCount		1
-	set dynamicmotion			DMfireUniformly				;#모션에 대한 정의
 	
-	
+	proc registerSkillObjects {} {
+		set soList						[ list ]
+		set healPerObject				-5
+		
+		set dm							[ EpCreateRandomCurveDynamicMotion 0.5 ]
+		set so							[ EpCreateSkillObject SPHERE 2.0 0xffff0000 $dm ]
+		EpSkillObjectAddOnHitAction		$so		[ EpCreateHealAction 0 $healPerObject ]
+		lappend							soList $so
+		
+		set dm							[ EpCreateRandomCurveDynamicMotion 1.0 ]
+		set so							[ EpCreateSkillObject CUBE 1.5 0xff0000ff $dm ]
+		EpSkillObjectAddOnHitAction		$so		[ EpCreateHealAction 0 $healPerObject ]
+		lappend							soList $so
+		
+		return							$soList
+	}
 	
 	proc onObjectHitTarget  { attackCount, user, target } {
 		set userCoding  	[ EpCharacterGetCoding $user ]
@@ -18,7 +30,43 @@ namespace eval NormalAttackSkill {
 	}
 }
 
-namespace eval HealSkill {
+
+namespace eval TestSkill {
+	set name					"TestSkill"
+	set description				"여러가지 실험을 위한 스킬이다."
+	set csEssentials			1
+	
+	proc registerSkillObjects {} {
+		set soList						[ list ]
+		set healPerObject				-10
+		
+		set dm							[ EpCreateRandomCurveDynamicMotion 0.3 ]
+		set so							[ EpCreateSkillObject SPHERE 2.0 0xffff0000 $dm ]
+		EpSkillObjectAddOnHitAction		$so		[ EpCreateHealAction 0 $healPerObject ]
+		lappend							soList $so
+		
+		set dm							[ EpCreateRandomCurveDynamicMotion 0.6 ]
+		set so							[ EpCreateSkillObject CUBE 1.5 0xff0000ff $dm ]
+		EpSkillObjectAddOnHitAction		$so		[ EpCreateHealAction 0 $healPerObject ]
+		EpSkillObjectAddOnHitAction		$so		[ EpCreateFlickerAction 250 50 255 255 255 ]
+		lappend							soList $so
+		
+		return							$soList
+	}
+}
+
+
+
+if 0 {
+	
+	
+	HealSkill\
+	MultiThreadSkill\
+	MeditationSkill\
+	CsBurnSkill\
+	
+	
+	namespace eval HealSkill {
 	set name					"Heal"
 	set description				"치유함."
 	set csEssentials			7
@@ -80,4 +128,7 @@ namespace eval CsBurnSkill {
 		EpCharacterSetCurCs $target 0
 		EpCharacterSetCurHp $target [ expr $targetCurHp/2 ]
 	}
+}
+
+	
 }

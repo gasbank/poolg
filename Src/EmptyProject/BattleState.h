@@ -18,16 +18,7 @@ enum StatSelect { SS_HEALTH, SS_WILL, SS_CODING, SS_DEF, SS_SENSE, SS_IMMUNITY, 
 
 typedef std::list<Enemy*> EnemyList;
 
-enum BattleStateInput
-{
-	BSI_SKILL_MOVE_UP		= 0,
-	BSI_SKILL_MOVE_DOWN		= 1,
-	BSI_SKILL_USE			= 2,
-	BSI_SKILLCONTENT_SHOW	= 3,
-	BSI_SKILLCONTENT_HIDE	= 4,
-	BSI_MAX_KEYS,
-	BSI_UNKNOWN				= 0xff
-};
+
 
 
 class BattleState : public State
@@ -57,7 +48,23 @@ public:
 	Enemy*					getFirstEnemy() { if ( m_enemies.empty() ) return 0; else return *m_enemies.begin(); }
 
 private:
-	BattleStateInput		mapKey( UINT nKey ) const;
+	enum InputEnum
+	{
+		BSI_SKILL_MOVE_UP		= 0,
+		BSI_SKILL_MOVE_DOWN		= 1,
+		BSI_SKILL_USE			= 2,
+		BSI_SKILLCONTENT_SHOW	= 3,
+		BSI_SKILLCONTENT_HIDE	= 4,
+
+		BSI_LEVELUP_UP			= 5,
+		BSI_LEVELUP_DOWN		= 6,
+		BSI_LEVELUP_SET			= 7,
+
+		BSI_MAX_KEYS,
+		BSI_UNKNOWN				= 0xff
+	};
+
+	InputEnum				mapKey( UINT nKey ) const;
 
 	void					frameMoveUserInterfaces( double dTime, float fElapsedTime );
 	void					printBattleStateEnterDebugMessage();
@@ -66,7 +73,10 @@ private:
 	void					setupCamera();
 	void					updateBarRate();
 	void					printEasterEggMessage();
-	void					handleLevelUpProcess();
+
+	void					handleLevelUpState();
+	void					handlePlayerTurnState();
+	void					handleEnemyTurnState();
 
 	SubBattleState			m_curSubBattleState;
 	SubBattleState			m_nextSubBattleState;

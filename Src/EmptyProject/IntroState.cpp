@@ -34,6 +34,7 @@ IntroState::IntroState(void)
 	m_pPrologue = GetSpriteManager().registerSprite( "Prologue", "Images/PoolG_Prologue.png" );
 	m_pPrologue->registerRect( "Prologue", 0, 0, 512, 1024 );
 
+
 	D3DXVECTOR3 prologuePos( 0.0f, 0.0f, 0.0f );
 	D3DXCOLOR prologueColor( 1.0f, 1.0f, 1.0f, 1.0f );
 	m_pPrologueDrawRequest = m_pPrologue->drawRequestXformable( "Prologue" );
@@ -69,6 +70,11 @@ HRESULT IntroState::enter( double dStartTime )
 
 HRESULT IntroState::leave()
 {
+	if ( m_pLogoDrawRequest != 0 )
+		m_pLogo->removeDrawRequest( m_pLogoDrawRequest );
+	if ( m_pPrologueDrawRequest != 0 )
+		m_pPrologue->removeDrawRequest( m_pPrologueDrawRequest );
+
 	return State::leave();
 }
 
@@ -118,6 +124,7 @@ HRESULT IntroState::frameRender(IDirect3DDevice9* pd3dDevice, double fTime, floa
 {
 	pd3dDevice->SetRenderState( D3DRS_LIGHTING, TRUE );
 	
+
 	// Setup view and projection xforms - ?
 	pd3dDevice->SetTexture(0, 0);
 
@@ -134,10 +141,7 @@ HRESULT IntroState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 	{
 		if ( wParam == VK_ESCAPE )
 		{
-			if ( m_pLogoDrawRequest != 0 )
-				m_pLogo->removeDrawRequest( m_pLogoDrawRequest );
-			if ( m_pPrologueDrawRequest != 0 )
-				m_pPrologue->removeDrawRequest( m_pPrologueDrawRequest );
+			
 			TopStateManager::getSingleton().setNextState( GAME_TOP_STATE_PLAY );
 		}
 	}

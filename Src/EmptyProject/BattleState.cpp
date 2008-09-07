@@ -371,46 +371,11 @@ HRESULT BattleState::frameMove( double dTime, float fElapsedTime )
 
 	//////////////////////////////////////////////////////////////////////////
 
-	if ( m_curSubBattleState == SBS_LEVEL_UP /*m_statSelectBoxMover->isOn()*/ )
+	switch ( m_curSubBattleState )
 	{
-		handleLevelUpProcess();
-	}
-	else if ( m_curSubBattleState == SBS_PLAYER_TURN )
-	{
-		/*화살표에 따라 기술 분기*/
-		if ( IsKeyDown( m_aKeys[BSI_SKILL_MOVE_UP] ) )
-		{
-			if ( m_curSelSkill > 0 )
-				--m_curSelSkill;
-		}
-		if ( IsKeyDown( m_aKeys[BSI_SKILL_MOVE_DOWN] ) )
-		{
-			if ( m_curSelSkill < 4 )
-				++m_curSelSkill;
-		}
-		if ( IsKeyDown( m_aKeys[BSI_SKILLCONTENT_SHOW] ) )
-		{
-			m_skillContentBoxMover->onBox();
-		}
-		if ( IsKeyDown( m_aKeys[BSI_SKILLCONTENT_HIDE] ) )
-		{
-			m_skillContentBoxMover->offBox();
-		}
-
-		// Use skill only if there is an enemy.
-		if ( IsKeyDown( m_aKeys[BSI_SKILL_USE] ) && getFirstEnemy() )
-		{
-			bool skillStarted = m_heroSkillSet->useSkill( m_curSelSkill, getHero(), getFirstEnemy() );
-			if ( skillStarted )
-			{
-				//m_curTurnType = TT_NATURAL;
-			}
-			else
-			{
-				printEasterEggMessage();
-				//m_curTurnType = TT_PLAYER;
-			}
-		}
+	case SBS_PLAYER_TURN:	handlePlayerTurnState();	break;
+	case SBS_ENEMY_TURN:	handleEnemyTurnState();	break;
+	case SBS_LEVEL_UP:		handleLevelUpState();		break;
 	}
 
 	return S_OK;
@@ -422,7 +387,7 @@ HRESULT BattleState::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 	{
 	case WM_KEYDOWN:
 		{
-			BattleStateInput mappedKey = mapKey( ( UINT )wParam );
+			InputEnum mappedKey = mapKey( ( UINT )wParam );
 			if( mappedKey != BSI_UNKNOWN )
 			{
 				if( FALSE == IsKeyDown( m_aKeys[mappedKey] ) )
@@ -436,7 +401,7 @@ HRESULT BattleState::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 
 	case WM_KEYUP:
 		{
-			BattleStateInput mappedKey = mapKey( ( UINT )wParam );
+			InputEnum mappedKey = mapKey( ( UINT )wParam );
 			if( mappedKey != BSI_UNKNOWN )
 			{
 				m_aKeys[ mappedKey ] &= ~KEY_IS_DOWN_MASK;
@@ -1024,20 +989,34 @@ void BattleState::printBattleStateEnterDebugMessage()
 	}
 }
 
-BattleStateInput BattleState::mapKey( UINT nKey ) const
+BattleState::InputEnum BattleState::mapKey( UINT nKey ) const
 {
-	switch ( nKey )
+	switch ( m_curSubBattleState )
 	{
-	case VK_UP:		return BSI_SKILL_MOVE_UP;
-	case VK_DOWN:	return BSI_SKILL_MOVE_DOWN;
-	case VK_LEFT:	return BSI_SKILLCONTENT_SHOW;
-	case VK_RIGHT:	return BSI_SKILLCONTENT_HIDE;
-	case 'Z':		return BSI_SKILL_USE;
+	case SBS_PLAYER_TURN:
+		switch ( nKey )
+		{
+		case VK_UP:		return BSI_SKILL_MOVE_UP;
+		case VK_DOWN:	return BSI_SKILL_MOVE_DOWN;
+		case VK_LEFT:	return BSI_SKILLCONTENT_SHOW;
+		case VK_RIGHT:	return BSI_SKILLCONTENT_HIDE;
+		case 'Z':		return BSI_SKILL_USE;
+		}
+		break;
+	case SBS_LEVEL_UP:
+		switch ( nKey )
+		{
+		case VK_UP:		return BSI_LEVELUP_UP;
+		case VK_DOWN:	return BSI_LEVELUP_DOWN;
+		case VK_RETURN:	return BSI_LEVELUP_SET;
+		}
+		break;
 	}
+	
 	return BSI_UNKNOWN;
 }
 
-void BattleState::handleLevelUpProcess()
+void BattleState::handleLevelUpState()
 {
 	//if (wParam == VK_UP)
 	//{
@@ -1172,4 +1151,47 @@ void BattleState::handleLevelUpProcess()
 	//	}
 	//	return S_OK;
 	//}
+}
+
+void BattleState::handlePlayerTurnState()
+{
+	/*화살표에 따라 기술 분기*/
+	if ( IsKeyDown( m_aKeys[BSI_SKILL_MOVE_UP] ) )
+	{
+		if ( m_curSelSkill > 0 )
+			--m_curSelSkill;
+	}
+	if ( IsKeyDown( m_aKeys[BSI_SKILL_MOVE_DOWN] ) )
+	{
+		if ( m_curSelSkill < 4 )
+			++m_curSelSkill;
+	}
+	if ( IsKeyDown( m_aKeys[BSI_SKILLCONTENT_SHOW] ) )
+	{
+		m_skillContentBoxMover->onBox();
+	}
+	if ( IsKeyDown( m_aKeys[BSI_SKILLCONTENT_HIDE] ) )
+	{
+		m_skillContentBoxMover->offBox();
+	}
+
+	// Use skill only if there is an enemy.
+	if ( IsKeyDown( m_aKeys[BSI_SKILL_USE] ) && getFirstEnemy() )
+	{
+		bool skillStarted = m_heroSkillSet->useSkill( m_curSelSkill, getHero(), getFirstEnemy() );
+		if ( skillStarted )
+		{
+			//m_curTurnType = TT_NATURAL;
+		}
+		else
+		{
+			printEasterEggMessage();
+			//m_curTurnType = TT_PLAYER;
+		}
+	}
+}
+
+void BattleState::handleEnemyTurnState()
+{
+
 }

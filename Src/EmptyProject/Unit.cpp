@@ -448,13 +448,21 @@ void Unit::onLostDevice()
 void Unit::updateArnMesh()
 {
 	PlayState* ps = static_cast<PlayState*>( GetTopStateManager().getState( GAME_TOP_STATE_PLAY ) );
-	ArnNode* charSceneRoot = ps->getCharacterSceneGraph()->getSceneRoot();
-	ArnMesh* arnMesh = static_cast<ArnMesh*>( charSceneRoot->getNodeByName( m_arnMeshName.c_str() ));
-	if ( !arnMesh )
+	if ( ps )
 	{
-		throw std::runtime_error( "Specified ArnMesh not found on Character model file." );
+		ArnNode* charSceneRoot = ps->getCharacterSceneGraph()->getSceneRoot();
+		ArnMesh* arnMesh = static_cast<ArnMesh*>( charSceneRoot->getNodeByName( m_arnMeshName.c_str() ));
+		if ( !arnMesh )
+		{
+			throw std::runtime_error( "Specified ArnMesh not found on Character model file." );
+		}
+		m_arnMesh = arnMesh;
 	}
-	m_arnMesh = arnMesh;
+	else
+	{
+		odprintf( "%s(%d): [EP] CAUTION: PlayState is not ready!\n", __FILE__, __LINE__ );
+	}
+	
 }
 
 void Unit::setMesh( LPD3DXMESH d3dxMesh )

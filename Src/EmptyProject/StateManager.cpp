@@ -36,7 +36,10 @@ void StateManager::transit( double dCurrentTime )
 State* StateManager::getState( GameState gs ) const
 {
 	StateMap::const_iterator cit = m_states.find( gs );
-	return cit->second;
+	if ( cit == m_states.end() )
+		return 0;
+	else
+		return cit->second;
 }
 
 void StateManager::release()

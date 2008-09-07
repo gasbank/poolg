@@ -40,53 +40,50 @@
 #include "Skill.h"
 #include "SkillManager.h"
 
-SCREEN_VERTEX g_Vertex[4];
-
 G								g_g;
-WorldManager*					g_wm					= 0;
-TopStateManager*				g_tsm					= 0;
-WorldStateManager*				g_wsm					= 0;
-ScriptManager*					g_scriptManager			= 0;		// Set to zero is 'CRUCIAL!'
-SkillManager*					g_skillManager			= 0;
-SpriteManager*					g_spriteManager			= 0;
-EpLight*						g_epLight				= 0;
+WorldManager*					g_wm							= 0;
+TopStateManager*				g_tsm							= 0;
+WorldStateManager*				g_wsm							= 0;
+ScriptManager*					g_scriptManager					= 0;		// Set to zero is 'CRUCIAL!'
+SkillManager*					g_skillManager					= 0;
+SpriteManager*					g_spriteManager					= 0;
+EpLight*						g_epLight						= 0;
+SCREEN_VERTEX					g_Vertex[4];
 
-
-LPD3DXEFFECT		            g_pEffect				= 0;
-D3DXHANDLE						g_tech					= 0;
-LPDIRECT3DVERTEXBUFFER9			g_lineElement			= 0;
-HANDLE							g_scriptBindingFinishedEvent				= 0;		// Signal object to resolve multi-threaded problems on console thread and main app thread
-HANDLE							g_consoleReleasedEvent = 0;		// Signal object to resolve multi-threaded problems on console thread and main app thread
-
+LPD3DXEFFECT					g_pEffect						= 0;
+D3DXHANDLE						g_tech							= 0;
+LPDIRECT3DVERTEXBUFFER9			g_lineElement					= 0;
+HANDLE							g_scriptBindingFinishedEvent	= 0;		// Signal object to resolve multi-threaded problems on console thread and main app thread
+HANDLE							g_consoleReleasedEvent			= 0;		// Signal object to resolve multi-threaded problems on console thread and main app thread
 
 LPD3DXMESH						g_bst[BST_COUNT];
 
 D3DCOLOR						g_fillColor;
 
-LPD3DXFONT						g_pFont					= 0;		// ... Some globally used font?
-LPD3DXFONT						g_unitNameFont			= 0;
-LPD3DXFONT						g_dlgNameFont			= 0;
-LPD3DXFONT						g_dlgContentFont		= 0;
+
+// LPD3DXFONTs will be managed at global scope.
+
+LPD3DXFONT						g_pFont							= 0;
+LPD3DXFONT						g_unitNameFont					= 0;
+LPD3DXFONT						g_dlgNameFont					= 0;
+LPD3DXFONT						g_dlgContentFont				= 0;
 // CreditState
-LPD3DXFONT						g_d3dxFont				= 0;
-LPD3DXFONT						g_d3dxFontBig			= 0;
+LPD3DXFONT						g_d3dxFont						= 0;
+LPD3DXFONT						g_d3dxFontBig					= 0;
 // Battle State
-LPD3DXFONT						m_lblHYnamL				= 0;
-LPD3DXFONT						m_lblREB				= 0;
-LPD3DXFONT						m_lblSkill				= 0;
-LPD3DXFONT						m_lblSkillDescription	= 0;
-LPD3DXFONT						m_lblStatSelect			= 0;
+LPD3DXFONT						g_fontBattle2					= 0;
+LPD3DXFONT						g_fontBattle					= 0;
+LPD3DXFONT						g_fontSkill						= 0;
+LPD3DXFONT						g_fontSkillDescription			= 0;
+LPD3DXFONT						g_fontStat						= 0;
 
 
-LOGMANAGER logMan;
+LOGMANAGER						logMan;
 
-Tcl_Interp*						g_consoleInterp			= 0;
+Tcl_Interp*						g_consoleInterp					= 0;
 
-std::wstring g_debugBuffer;
-bool							g_bTileGrid				= false;
-
-
-
+std::wstring					g_debugBuffer;
+bool							g_bTileGrid						= false;
 
 
 LPDIRECT3DTEXTURE9				g_pFullScreenRenderTarget		= 0;
@@ -100,21 +97,19 @@ LPDIRECT3DSURFACE9				g_radialBlurRenderTargetSurf	= 0;
 
 PostSepiaShader*				g_postSepiaShader				= 0;
 PostRadialBlurShader*			g_postRadialBlurShader			= 0;
+BombShader*						g_bombShader					= 0;
 
-//MotionBlurShader*				g_motionBlurShader		= 0;
-BombShader*						g_bombShader			= 0;
-
-
-int								g_nActiveSystem = 0;
-CParticleSystem					*g_pParticleSystems[6];
-bool							g_bParticleVisible = false;
+// Particle System related
+int								g_nActiveSystem					= 0;
+CParticleSystem*				g_pParticleSystems[6];
+bool							g_bParticleVisible				= false;
 
 //////////////////////////////////////////////////////////////////////////
 
 void ConfigureShaders( LPDIRECT3DDEVICE9 pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc );
 void ConfigureParticleSystem( LPDIRECT3DDEVICE9 pd3dDevice );
 void ConfigureTileGridGeometry( LPDIRECT3DDEVICE9 pd3dDevice );
-void ConfigureTestGeometry( LPDIRECT3DDEVICE9 pd3dDevice );			// TODO Not necessary on release build
+void ConfigureTestGeometry( LPDIRECT3DDEVICE9 pd3dDevice );
 
 void SetupFullscreenQuad( const D3DSURFACE_DESC* pBackBufferSurfaceDesc );
 
@@ -196,18 +191,17 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 	GetEpLight().setupLight();
 
 	// (5) Globally used fonts
-	
 	V_RETURN( D3DXCreateFont( pd3dDevice, 12, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Gulimche"), &g_pFont) );
 	V_RETURN( D3DXCreateFont( pd3dDevice, 26, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T( "Arial Black"), &g_unitNameFont ) );
 	V_RETURN( D3DXCreateFont( pd3dDevice, 12, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Gulim"), &g_dlgContentFont) );
 	V_RETURN( D3DXCreateFont( pd3dDevice, 12, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("msgothic"), &g_dlgNameFont) );
 	V_RETURN( D3DXCreateFont( pd3dDevice, 26, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T( "Palatino Linotype"), &g_d3dxFont ) );
 	V_RETURN( D3DXCreateFont( pd3dDevice, 32, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T( "Palatino Linotype"), &g_d3dxFontBig ) );
-	V_RETURN( D3DXCreateFont( pd3dDevice, 17, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblHYnamL ) );
-	V_RETURN( D3DXCreateFont( pd3dDevice, 18, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Rockwell Extra Bold"), &m_lblREB ) );
-	V_RETURN( D3DXCreateFont( pd3dDevice, 20, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblSkill ) );
-	V_RETURN( D3DXCreateFont( pd3dDevice, 15, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblSkillDescription ) );
-	V_RETURN( D3DXCreateFont( pd3dDevice, 17, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblStatSelect ) );
+	V_RETURN( D3DXCreateFont( pd3dDevice, 17, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &g_fontBattle2 ) );
+	V_RETURN( D3DXCreateFont( pd3dDevice, 18, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Rockwell Extra Bold"), &g_fontBattle ) );
+	V_RETURN( D3DXCreateFont( pd3dDevice, 20, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &g_fontSkill ) );
+	V_RETURN( D3DXCreateFont( pd3dDevice, 15, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &g_fontSkillDescription ) );
+	V_RETURN( D3DXCreateFont( pd3dDevice, 17, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &g_fontStat ) );
 
 
 	// (6) OnCreateDevice propagation
@@ -285,11 +279,11 @@ HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFA
 	g_dlgNameFont->OnResetDevice();
 	g_dlgContentFont->OnResetDevice();
 
-	m_lblHYnamL->OnResetDevice();
-	m_lblREB->OnResetDevice();
-	m_lblSkill->OnResetDevice();
-	m_lblSkillDescription->OnResetDevice();
-	m_lblStatSelect->OnResetDevice();
+	g_fontBattle2->OnResetDevice();
+	g_fontBattle->OnResetDevice();
+	g_fontSkill->OnResetDevice();
+	g_fontSkillDescription->OnResetDevice();
+	g_fontStat->OnResetDevice();
 
 
 	g_postRadialBlurShader->onResetDevice( pd3dDevice, pBackBufferSurfaceDesc );
@@ -682,11 +676,11 @@ void CALLBACK OnD3D9LostDevice( void* pUserContext )
 	g_dlgNameFont->OnLostDevice();
 	g_dlgContentFont->OnLostDevice();
 
-	m_lblHYnamL->OnLostDevice();
-	m_lblREB->OnLostDevice();
-	m_lblSkill->OnLostDevice();
-	m_lblSkillDescription->OnLostDevice();
-	m_lblStatSelect->OnLostDevice();
+	g_fontBattle2->OnLostDevice();
+	g_fontBattle->OnLostDevice();
+	g_fontSkill->OnLostDevice();
+	g_fontSkillDescription->OnLostDevice();
+	g_fontStat->OnLostDevice();
 
 
 	if ( SpriteManager::getSingletonPtr() )
@@ -768,11 +762,11 @@ void CALLBACK OnD3D9DestroyDevice( void* pUserContext )
 	}
 
 
-	SAFE_RELEASE( m_lblHYnamL );
-	SAFE_RELEASE( m_lblREB );
-	SAFE_RELEASE( m_lblSkill );
-	SAFE_RELEASE( m_lblSkillDescription );
-	SAFE_RELEASE( m_lblStatSelect );
+	SAFE_RELEASE( g_fontBattle2 );
+	SAFE_RELEASE( g_fontBattle );
+	SAFE_RELEASE( g_fontSkill );
+	SAFE_RELEASE( g_fontSkillDescription );
+	SAFE_RELEASE( g_fontStat );
 
 
 	GetSpriteManager().onDestroyDevice();

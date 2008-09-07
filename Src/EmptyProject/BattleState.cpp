@@ -20,11 +20,11 @@
 #include "SkillSet.h"
 
 extern PostSepiaShader*				g_postSepiaShader;
-extern LPD3DXFONT					m_lblHYnamL;
-extern LPD3DXFONT					m_lblREB;
-extern LPD3DXFONT					m_lblSkill;
-extern LPD3DXFONT					m_lblSkillDescription;
-extern LPD3DXFONT					m_lblStatSelect;
+extern LPD3DXFONT					g_fontBattle2;
+extern LPD3DXFONT					g_fontBattle;
+extern LPD3DXFONT					g_fontSkill;
+extern LPD3DXFONT					g_fontSkillDescription;
+extern LPD3DXFONT					g_fontStat;
 
 
 
@@ -457,7 +457,7 @@ void BattleState::renderFixedText(int scrWidth, int scrHeight)
 	UINT drawLogCount = 0;
 	for ( ; it != m_battleLog.rend(); ++it )
 	{
-		m_lblHYnamL->DrawTextA(0, (*it).c_str(), -1, &rc, drawTextFormat, D3DXCOLOR( 0.9f, 0.9f, 0.9f, 1.0f ) );
+		g_fontBattle2->DrawTextA(0, (*it).c_str(), -1, &rc, drawTextFormat, D3DXCOLOR( 0.9f, 0.9f, 0.9f, 1.0f ) );
 		rc.top -= lineHeight;
 		drawLogCount++;
 		if ( drawLogCount >= maxDrawLogCount )
@@ -471,26 +471,26 @@ void BattleState::renderFixedText(int scrWidth, int scrHeight)
 	rc.top = (LONG)(statusBoxPlayersPositionY - 115);
 	rc.left = (LONG)(statusBoxPlayersPositionX + 5);
 	StringCchPrintf(textBuffer, 512, L"HP");
-	m_lblREB->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+	g_fontBattle->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 	rc.top += (LONG)21.08;
 	StringCchPrintf(textBuffer, 512, L"CS");
-	m_lblREB->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+	g_fontBattle->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 	rc.top += (LONG)21.08;
 	StringCchPrintf(textBuffer, 512, L"EX");
-	m_lblREB->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+	g_fontBattle->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 	rc.top += (LONG)21.08;
 	StringCchPrintf(textBuffer, 512, L"Level : %d", ( ( Hero* )getHero() )->getLevel() );
-	m_lblREB->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+	g_fontBattle->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 
 
 	/*적 status 라벨 그리기*/
 	rc.top = (LONG)18;
 	rc.left = (LONG)(scrWidth - 167);
 	StringCchPrintf(textBuffer, 512, L"HP");
-	m_lblREB->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+	g_fontBattle->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 	rc.top += (LONG)21.08;
 	StringCchPrintf(textBuffer, 512, L"CS");
-	m_lblREB->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+	g_fontBattle->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 
 
 	int skillLineInterval = 39;
@@ -502,24 +502,24 @@ void BattleState::renderFixedText(int scrWidth, int scrHeight)
 	// Draw all equipped skill names of hero.
 	char textBufferA[512];
 	StringCchPrintfA(textBufferA, 512, m_heroSkillSet->getSkillName(SL_FIRST).c_str());
-	m_lblSkill->DrawTextA(0, textBufferA, -1, &rc, drawTextFormat, DX_CONSTS::D3DXCOLOR_WHITE );
+	g_fontSkill->DrawTextA(0, textBufferA, -1, &rc, drawTextFormat, DX_CONSTS::D3DXCOLOR_WHITE );
 	rc.top += skillLineInterval;
 	StringCchPrintfA(textBufferA, 512, m_heroSkillSet->getSkillName(SL_SECOND).c_str());
-	m_lblSkill->DrawTextA(0, textBufferA, -1, &rc, drawTextFormat, DX_CONSTS::D3DXCOLOR_WHITE );
+	g_fontSkill->DrawTextA(0, textBufferA, -1, &rc, drawTextFormat, DX_CONSTS::D3DXCOLOR_WHITE );
 	rc.top += skillLineInterval;
 	StringCchPrintfA(textBufferA, 512, m_heroSkillSet->getSkillName(SL_THIRD).c_str());
-	m_lblSkill->DrawTextA(0, textBufferA, -1, &rc, drawTextFormat, DX_CONSTS::D3DXCOLOR_WHITE );
+	g_fontSkill->DrawTextA(0, textBufferA, -1, &rc, drawTextFormat, DX_CONSTS::D3DXCOLOR_WHITE );
 	rc.top += skillLineInterval;
 	StringCchPrintfA(textBufferA, 512, m_heroSkillSet->getSkillName(SL_FOURTH).c_str());
-	m_lblSkill->DrawTextA(0, textBufferA, -1, &rc, drawTextFormat, DX_CONSTS::D3DXCOLOR_WHITE );
+	g_fontSkill->DrawTextA(0, textBufferA, -1, &rc, drawTextFormat, DX_CONSTS::D3DXCOLOR_WHITE );
 	rc.top += skillLineInterval;
 	StringCchPrintfA(textBufferA, 512, m_heroSkillSet->getSkillName(SL_FIFTH).c_str());
-	m_lblSkill->DrawTextA(0, textBufferA, -1, &rc, drawTextFormat, DX_CONSTS::D3DXCOLOR_WHITE );
+	g_fontSkill->DrawTextA(0, textBufferA, -1, &rc, drawTextFormat, DX_CONSTS::D3DXCOLOR_WHITE );
 
 	/* Draw currently selected skill of hero. */
 	rc.top = scrHeight - 190 + skillLineInterval * m_curSelSkill;
 	StringCchPrintfA(textBufferA, 512, m_heroSkillSet->getSkillName( m_curSelSkill ).c_str());
-	m_lblSkill->DrawTextA(0, textBufferA, -1, &rc, drawTextFormat, DX_CONSTS::D3DXCOLOR_RED );
+	g_fontSkill->DrawTextA(0, textBufferA, -1, &rc, drawTextFormat, DX_CONSTS::D3DXCOLOR_RED );
 	
 
 	//rc.top = scrHeight - 190;
@@ -545,7 +545,7 @@ void BattleState::renderFixedText(int scrWidth, int scrHeight)
 	//}
 
 	if (m_skillContentBoxMover->isOn() && !m_skillContentBoxMover->isMoving())
-		m_lblSkillDescription->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 0.8f, 0.8f, 1.0f, 1.0f ) );
+		g_fontSkillDescription->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 0.8f, 0.8f, 1.0f, 1.0f ) );
 
 
 	if ( m_statSelectBoxMover->isOn() && !m_statSelectBoxMover->isMoving())
@@ -558,25 +558,25 @@ void BattleState::renderFixedText(int scrWidth, int scrHeight)
 
 
 		StringCchPrintf(textBuffer, 512, L"HEALTH");
-		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+		g_fontStat->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 		rc.top += statSelectInterval;
 		StringCchPrintf(textBuffer, 512, L"WILL");
-		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+		g_fontStat->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 		rc.top += statSelectInterval;
 		StringCchPrintf(textBuffer, 512, L"CODING");
-		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+		g_fontStat->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 		rc.top += statSelectInterval;
 		StringCchPrintf(textBuffer, 512, L"DEFENSE");
-		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+		g_fontStat->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 		rc.top += statSelectInterval;
 		StringCchPrintf(textBuffer, 512, L"SENSE");
-		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+		g_fontStat->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 		rc.top += statSelectInterval;
 		StringCchPrintf(textBuffer, 512, L"IMMUNITY");
-		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+		g_fontStat->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 		rc.top += statSelectInterval;
 		StringCchPrintf(textBuffer, 512, L"exit");
-		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+		g_fontStat->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 		rc.top += statSelectInterval;
 
 
@@ -614,7 +614,7 @@ void BattleState::renderFixedText(int scrWidth, int scrHeight)
 			break;
 		}
 
-		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 0.0f, 1.0f, 0.0f, 1.0f ) );
+		g_fontStat->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 0.0f, 1.0f, 0.0f, 1.0f ) );
 
 
 
@@ -622,32 +622,32 @@ void BattleState::renderFixedText(int scrWidth, int scrHeight)
 		rc.left = statSelectX + 100;
 
 		StringCchPrintf(textBuffer, 512, L"%d", getHero()->getStat().health);
-		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+		g_fontStat->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 		rc.top += statSelectInterval;
 		StringCchPrintf(textBuffer, 512, L"%d", getHero()->getStat().will);
-		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+		g_fontStat->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 		rc.top += statSelectInterval;
 		StringCchPrintf(textBuffer, 512, L"%d", getHero()->getStat().coding);
-		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+		g_fontStat->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 		rc.top += statSelectInterval;
 		StringCchPrintf(textBuffer, 512, L"%d", getHero()->getStat().def);
-		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+		g_fontStat->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 		rc.top += statSelectInterval;
 		StringCchPrintf(textBuffer, 512, L"%d", getHero()->getStat().sense);
-		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+		g_fontStat->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 		rc.top += statSelectInterval;
 		StringCchPrintf(textBuffer, 512, L"%d", getHero()->getStat().immunity);
-		m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+		g_fontStat->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 		rc.top += statSelectInterval * 2;
 
 		StringCchPrintf( textBuffer, 512, L"%d", m_statCount );
 		if (m_statCount != 0)
 		{
-			m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
+			g_fontStat->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ) );
 		}
 		else
 		{
-			m_lblStatSelect->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 0.0f, 0.0f, 1.0f ) );
+			g_fontStat->DrawTextW(0, textBuffer, -1, &rc, drawTextFormat, D3DXCOLOR( 1.0f, 0.0f, 0.0f, 1.0f ) );
 		}
 
 

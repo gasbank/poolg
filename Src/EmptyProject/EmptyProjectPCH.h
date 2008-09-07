@@ -12,6 +12,9 @@
 #pragma warning(disable:4505) // disable 'unreferenced local function has been removed' warning
 #pragma warning(disable:4189) // disable 'local variable is initialized but not referenced' warning
 
+#include <stdio.h>
+#include <stdarg.h>
+#include <ctype.h>
 #include <tchar.h>
 #include <string>
 #include <assert.h>
@@ -87,5 +90,6 @@ template<typename T> void EpSafeReleaseAllMap( T& obj ) {
 
 enum BasicShapeType { BST_UNKNOWN, BST_TEAPOT, BST_SPHERE, BST_CUBE, BST_PLANE, BST_COUNT };
 
+void cdecl odprintf(const char *format, ...);
 
 #include "Typedefs.h"

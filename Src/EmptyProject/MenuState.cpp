@@ -24,6 +24,8 @@ bool op_lo = false;
 const UINT menuButtonWidth = 184;
 const UINT menuButtonHeight = 44;
 
+extern LPD3DXFONT	g_fontBattle;
+
 void MenuState::select(int move)
 {
 	if ( move == 0 )
@@ -305,40 +307,40 @@ HRESULT MenuState::frameRender(IDirect3DDevice9* pd3dDevice,  double fTime, floa
 		rc.left = (LONG)800-343;
 		rc.right = (LONG)800-205;
 		StringCchPrintf(textBuffer, 512, L"Health");
-		m_lblREB->DrawTextW(0, textBuffer, -1, &rc, dtProp, textColor);
+		g_fontBattle->DrawTextW(0, textBuffer, -1, &rc, dtProp, textColor);
 		rc.top += (LONG)47;
 		StringCchPrintf(textBuffer, 512, L"Will");
-		m_lblREB->DrawTextW(0, textBuffer, -1, &rc, dtProp, textColor );
+		g_fontBattle->DrawTextW(0, textBuffer, -1, &rc, dtProp, textColor );
 		rc.top += (LONG)47;
 		StringCchPrintf(textBuffer, 512, L"Coding");
-		m_lblREB->DrawTextW(0, textBuffer, -1, &rc, dtProp, textColor );
+		g_fontBattle->DrawTextW(0, textBuffer, -1, &rc, dtProp, textColor );
 		rc.top += (LONG)47;
 		StringCchPrintf(textBuffer, 512, L"Defence");
-		m_lblREB->DrawTextW(0, textBuffer, -1, &rc, dtProp, textColor );
+		g_fontBattle->DrawTextW(0, textBuffer, -1, &rc, dtProp, textColor );
 		rc.top += (LONG)47;
 		StringCchPrintf(textBuffer, 512, L"Sense");
-		m_lblREB->DrawTextW(0, textBuffer, -1, &rc, dtProp, textColor );
+		g_fontBattle->DrawTextW(0, textBuffer, -1, &rc, dtProp, textColor );
 		rc.top += (LONG)47;
 		StringCchPrintf(textBuffer, 512, L"Immunity");
-		m_lblREB->DrawTextW(0, textBuffer, -1, &rc, dtProp, textColor );
+		g_fontBattle->DrawTextW(0, textBuffer, -1, &rc, dtProp, textColor );
 		
 		StringCchPrintf(textBuffer, 512, L"%d", ws->getHeroUnit()->getStat().health );
-		m_lblREB->DrawTextW(0, textBuffer, -1, &rc2, dtProp, textColor );
+		g_fontBattle->DrawTextW(0, textBuffer, -1, &rc2, dtProp, textColor );
 		rc2.top += (LONG)47;
 		StringCchPrintf(textBuffer, 512, L"%d", ws->getHeroUnit()->getStat().will );
-		m_lblREB->DrawTextW(0, textBuffer, -1, &rc2, dtProp, textColor );
+		g_fontBattle->DrawTextW(0, textBuffer, -1, &rc2, dtProp, textColor );
 		rc2.top += (LONG)47;
 		StringCchPrintf(textBuffer, 512, L"%d", ws->getHeroUnit()->getStat().coding );
-		m_lblREB->DrawTextW(0, textBuffer, -1, &rc2, dtProp, textColor );
+		g_fontBattle->DrawTextW(0, textBuffer, -1, &rc2, dtProp, textColor );
 		rc2.top += (LONG)47;
 		StringCchPrintf(textBuffer, 512, L"%d", ws->getHeroUnit()->getStat().def );
-		m_lblREB->DrawTextW(0, textBuffer, -1, &rc2, dtProp, textColor );
+		g_fontBattle->DrawTextW(0, textBuffer, -1, &rc2, dtProp, textColor );
 		rc2.top += (LONG)47;
 		StringCchPrintf(textBuffer, 512, L"%d", ws->getHeroUnit()->getStat().sense );
-		m_lblREB->DrawTextW(0, textBuffer, -1, &rc2, dtProp, textColor );
+		g_fontBattle->DrawTextW(0, textBuffer, -1, &rc2, dtProp, textColor );
 		rc2.top += (LONG)47;
 		StringCchPrintf(textBuffer, 512, L"%d", ws->getHeroUnit()->getStat().immunity );
-		m_lblREB->DrawTextW(0, textBuffer, -1, &rc2, dtProp, textColor );
+		g_fontBattle->DrawTextW(0, textBuffer, -1, &rc2, dtProp, textColor );
 
 		StringCchPrintf(textBuffer, 512, L"PoolG" );
 		m_lblsREB->DrawTextW(0, textBuffer, -1, &rc3, DT_NOCLIP | DT_LEFT, textColor );
@@ -473,8 +475,6 @@ HRESULT MenuState::release()
 	m_slb2.release();
 	m_slb3.release();
 
-	SAFE_RELEASE( m_lblHYnamL );
-	SAFE_RELEASE( m_lblREB);
 	SAFE_RELEASE( m_lblsREB);
 
 	return S_OK;
@@ -675,9 +675,6 @@ void MenuState::onLostDevice()
 HRESULT MenuState::onCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext )
 {
 	HRESULT hr = S_OK;
-	V_RETURN( D3DXCreateFont( pd3dDevice, 17, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &m_lblHYnamL ) );
-	V_RETURN( D3DXCreateFont( pd3dDevice, 26, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Gulim"), &m_lblREB ) );
-	V_RETURN( D3DXCreateFont( pd3dDevice, 16, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Gulim"), &m_lblsREB ) );
 
 	return hr;
 }

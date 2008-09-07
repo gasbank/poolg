@@ -170,8 +170,8 @@ BattleState::BattleState()
 	m_statSelect = SS_HEALTH;
 	m_statCount = 0;
 
-	m_curTurnType = TT_NATURAL;
-	m_nextTurnType = TT_NATURAL;
+	m_curSubBattleState = SBS_PLAYER_TURN;
+	m_nextSubBattleState = SBS_PLAYER_TURN;
 
 	//////ProgressUi Assigning
 	m_hpBarPlayerProg = new ProgressUi( PM_BAR );
@@ -198,14 +198,13 @@ HRESULT BattleState::enter( double dStartTime )
 {
 	getHero()->clearKey();
 
+	ZeroMemory( m_aKeys, sizeof( m_aKeys ) );
+
 	GetAudioState().enterBattle();
 
 	updateBarRate();
 
 	/*스킬 대상 설정*/
-	/*SkillSet* skillSet = getHero()->getSkillSet();
-	skillSet->setCharacter (getHero(), getFirstEnemy());
-	skillSet->setBattleState(this);*/
 	m_heroSkillSet = getHero()->getSkillSet();
 	m_curSelSkill = 0;
 
@@ -224,7 +223,7 @@ HRESULT BattleState::enter( double dStartTime )
 
 	// TODO Which side will attack first in BattleState?
 	m_battleLog.push_back(std::string("전투 개시~~~~~~~~~!!!"));
-	setNextTurnType( TT_PLAYER );
+	m_nextSubBattleState = SBS_PLAYER_TURN;
 	passTurn();
 
 
@@ -324,6 +323,9 @@ HRESULT BattleState::frameMove( double dTime, float fElapsedTime )
 		}
 	}
 
+	// Check for dead enemy and the end of battle.
+	// m_enemies and m_deadEnemies are maintained at World::frameMove() level.
+	// You do not need to call Enemy::frameMove() here.
 	EnemyList::iterator itEnemy = m_enemies.begin();
 	for ( ; itEnemy != m_enemies.end(); )
 	{
@@ -365,191 +367,38 @@ HRESULT BattleState::frameMove( double dTime, float fElapsedTime )
 			m_desaturation += fElapsedTime * 0.5f;
 		}
 	}
-	return S_OK;
-}
 
-HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-{
-	if (uMsg == WM_KEYUP)
+
+	//////////////////////////////////////////////////////////////////////////
+
+	if ( m_curSubBattleState == SBS_LEVEL_UP /*m_statSelectBoxMover->isOn()*/ )
 	{
-		if ( m_statSelectBoxMover->isOn() )
-		{
-			if (wParam == VK_UP)
-			{
-				statSelectMove('u');
-			}
-			if (wParam == VK_DOWN)
-			{
-				statSelectMove('d');
-			}
-			if (wParam == VK_RETURN)
-			{
-				Stat retStat = getHero()->getStat();
-				switch (m_statSelect)
-				{
-				case SS_HEALTH:
-					if (m_statCount != 0)
-					{
-						m_statCount--;
-						retStat.health ++;
-						getHero()->setStat(retStat.health, retStat.will, retStat.coding, retStat.def, retStat.sense, retStat.immunity);
-					}
-					break;
-				case SS_WILL:
-					if (m_statCount != 0)
-					{
-						m_statCount--;
-						retStat.will ++;
-						getHero()->setStat(retStat.health, retStat.will, retStat.coding, retStat.def, retStat.sense, retStat.immunity);
-					}
-					break;
-				case SS_CODING:
-					if (m_statCount != 0)
-					{
-						m_statCount--;
-						retStat.coding ++;
-						getHero()->setStat(retStat.health, retStat.will, retStat.coding, retStat.def, retStat.sense, retStat.immunity);
-					}
-					break;
-				case SS_DEF:
-					if (m_statCount != 0)
-					{
-						m_statCount--;
-						retStat.def ++;
-						getHero()->setStat(retStat.health, retStat.will, retStat.coding, retStat.def, retStat.sense, retStat.immunity);
-					}
-					break;
-				case SS_SENSE:
-					if (m_statCount != 0)
-					{
-						m_statCount--;
-						retStat.sense ++;
-						getHero()->setStat(retStat.health, retStat.will, retStat.coding, retStat.def, retStat.sense, retStat.immunity);
-					}
-					break;
-				case SS_IMMUNITY:
-					if (m_statCount != 0)
-					{
-						m_statCount--;
-						retStat.immunity ++;
-						getHero()->setStat(retStat.health, retStat.will, retStat.coding, retStat.def, retStat.sense, retStat.immunity);
-					}
-					break;
-				case SS_EXIT:
-					GetWorldStateManager().setNextState(GAME_WORLD_STATE_FIELD);
-					getFirstEnemy()->setRemoveFlag( true ); 
-					return S_OK;
-				}
-
-			}
-
-			return S_OK;
-		}
-		/*죽었을 시 enter 키를 입력하면 대상 파괴, 아니면 다른 키 안 받고 메시지 핸들링 종료*/
-		if ( getFirstEnemy() && getFirstEnemy()->getCurHp() <= 0 && !getFirstEnemy()->getSoulAnimation() )
-		{
-			if (wParam == VK_RETURN)
-			{
-				Hero* hero = ( Hero* )getHero();
-				Enemy* enemy = ( Enemy* )getFirstEnemy();
-
-				if (m_levelUpFlag == true)
-				{
-					hero->levelUp();
-					m_expBarPlayerProg->setMaxVal (( (Hero*)getHero() )->getMaxExp() );
-					m_expIllusionPlayerProg->setMaxVal (( (Hero*)getHero())->getMaxExp() );
-					m_expBarPlayerProg->setCurVal (( (Hero*)getHero() )->getMaxExp() );
-					m_expIllusionPlayerProg->setCurVal (( (Hero*)getHero())->getMaxExp() );
-					m_expBarPlayerProg->init();
-					m_expIllusionPlayerProg->init();
-
-					//m_expBarPlayerProg->setRatePerforce();
-					//m_expIllusionPlayerProg->setRatePerforce();
-					/*
-					m_expBarPlayer.initRate( (float) ( (Hero*)getHero() )->getMaxExp() );
-					m_expIllusionPlayer.initRate( (float) ( (Hero*)getHero() )->getMaxExp() );
-					m_expIllusionPlayer.setRate( (float) ( (Hero*)getHero() )->getCurExp() );
-					m_expBarPlayer.setRate ( (float) ( (Hero*)getHero() )->getCurExp() );
-					*/
-					m_statCount += 5;
-				}
-
-
-				
-				int expReward = enemy->getExpReward();
-
-				if (expReward == 0)
-				{
-					GetWorldStateManager().setNextState(GAME_WORLD_STATE_FIELD);
-					getFirstEnemy()->setRemoveFlag( true ); // Should be deleted before next frame update
-				}
-
-				int remainExp = hero->gainExp( expReward );
-				printf("remainExp : %d\n" , remainExp);
-
-				//레벨업을 하고 경험치가 남지 않았을 때
-				if ( remainExp == -1 )
-				{
-					pushBattleLog("레벨업!");
-					enemy->setExpReward( 0 );
-					m_levelUpFlag = true;
-				}
-				//레벨업을 하고 경험치가 남았을 때
-				else if ( remainExp > 0 )
-				{
-					pushBattleLog("레벨업!");
-					enemy->setExpReward( remainExp );
-					m_levelUpFlag = true;
-				}
-				else
-				{
-					enemy->setExpReward( 0 );
-					if (m_levelUpFlag == true)
-					{
-						m_statSelectBoxMover->onBox();
-						m_levelUpFlag = false;
-						return S_OK;
-					}
-					return S_OK;
-				}
-			}
-			return S_OK;
-		}
-		/*자신이 죽었을 시 어떠한 키로도 반응하지 않는다. 메롱 */
-		else if (getHero()->getCurHp() <= 0 && !getHero()->getSoulAnimation() )
-		{
-			GetTopStateManager().setNextState( GAME_TOP_STATE_CREDIT );
-			return S_OK;
-		}
-		/*자신의 차례가 아닐 때에도 반응하지 않는다.*/
-		else if (m_curTurnType != TT_PLAYER)
-		{
-			return S_OK;
-		}
-
-		//const SkillSet* skillSet = this->getHero()->getSkillSet();
-		//skillSet->setCharacter( getHero(), getFirstEnemy() );
-
+		handleLevelUpProcess();
+	}
+	else if ( m_curSubBattleState == SBS_PLAYER_TURN )
+	{
 		/*화살표에 따라 기술 분기*/
-		if (wParam == VK_UP)
+		if ( IsKeyDown( m_aKeys[BSI_SKILL_MOVE_UP] ) )
 		{
 			if ( m_curSelSkill > 0 )
 				--m_curSelSkill;
 		}
-		if (wParam == VK_DOWN)
+		if ( IsKeyDown( m_aKeys[BSI_SKILL_MOVE_DOWN] ) )
 		{
 			if ( m_curSelSkill < 4 )
 				++m_curSelSkill;
 		}
-		if (wParam == VK_LEFT)
+		if ( IsKeyDown( m_aKeys[BSI_SKILLCONTENT_SHOW] ) )
 		{
 			m_skillContentBoxMover->onBox();
 		}
-		if (wParam == VK_RIGHT)
+		if ( IsKeyDown( m_aKeys[BSI_SKILLCONTENT_HIDE] ) )
 		{
 			m_skillContentBoxMover->offBox();
 		}
-		if ( wParam == 'Z' && getFirstEnemy() )
+
+		// Use skill only if there is an enemy.
+		if ( IsKeyDown( m_aKeys[BSI_SKILL_USE] ) && getFirstEnemy() )
 		{
 			bool skillStarted = m_heroSkillSet->useSkill( m_curSelSkill, getHero(), getFirstEnemy() );
 			if ( skillStarted )
@@ -559,14 +408,44 @@ HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 			else
 			{
 				printEasterEggMessage();
-				m_curTurnType = TT_PLAYER;
+				//m_curTurnType = TT_PLAYER;
 			}
 		}
-
-			
 	}
 
 	return S_OK;
+}
+
+HRESULT BattleState::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
+{
+	switch( uMsg )
+	{
+	case WM_KEYDOWN:
+		{
+			BattleStateInput mappedKey = mapKey( ( UINT )wParam );
+			if( mappedKey != BSI_UNKNOWN )
+			{
+				if( FALSE == IsKeyDown( m_aKeys[mappedKey] ) )
+				{
+					m_aKeys[ mappedKey ] = KEY_WAS_DOWN_MASK | KEY_IS_DOWN_MASK;
+					++m_cKeysDown;
+				}
+			}
+			break;
+		}
+
+	case WM_KEYUP:
+		{
+			BattleStateInput mappedKey = mapKey( ( UINT )wParam );
+			if( mappedKey != BSI_UNKNOWN )
+			{
+				m_aKeys[ mappedKey ] &= ~KEY_IS_DOWN_MASK;
+				--m_cKeysDown;
+			}
+			break;
+		}
+	}
+	return FALSE;
 }
 
 HRESULT BattleState::release ()
@@ -815,22 +694,26 @@ void BattleState::renderFixedText(int scrWidth, int scrHeight)
 
 void BattleState::passTurn()
 {
-	m_curTurnType = m_nextTurnType;
-	m_nextTurnType = TT_NATURAL;
+	m_curSubBattleState = m_nextSubBattleState;
+	m_nextSubBattleState = SBS_NULLSTATE;
 
-	if (m_curTurnType == TT_PLAYER)
+	if ( m_curSubBattleState == SBS_PLAYER_TURN )
 	{
 		m_battleLog.push_back(std::string("당신이 공격할 차례입니다."));
 		getHero()->recoverCs();
 	}
-	else if (m_curTurnType == TT_COMPUTER)
+	else if ( m_curSubBattleState == SBS_ENEMY_TURN )
 	{
-		m_battleLog.push_back(std::string("콤퓨타 차례입니다."));
-		doComputerAction();
+		m_battleLog.push_back(std::string("적군 차례입니다."));
+		doEnemyAction();
+	}
+	else
+	{
+		throw std::runtime_error( "Cannot pass turn. Invalid next sub battle state." );
 	}
 }
 
-void BattleState::doComputerAction()
+void BattleState::doEnemyAction()
 {
 	//getFirstEnemy()->doNormalAttack(0, getHero());
 }
@@ -841,7 +724,8 @@ Character* BattleState::getHero()
 }
 
 void BattleState::setupCamera()
-{//
+{
+	//
 	// 처음 시작시 주인공이 왼쪽 아래, 적이 오른쪽 위에 보이도록 카메라를 움직인다.
 	//
 
@@ -957,44 +841,22 @@ void BattleState::updateBarRate()
 	m_hpIllusionEnemyProg->setRatePerforce();
 	m_csIllusionEnemyProg->setRatePerforce();
 
-	/*
-	m_hpBarPlayer.initRate((float)getHero()->getMaxHp());
-	m_hpIllusionPlayer.initRate((float)getHero()->getMaxHp());
-	m_hpBarEnemy.initRate((float)getFirstEnemy()->getMaxHp());
-	m_hpIllusionEnemy.initRate((float)getFirstEnemy()->getMaxHp());
-	m_mpBarPlayer.initRate((float)getHero()->getMaxCs());
-	m_mpIllusionPlayer.initRate((float)getHero()->getMaxCs());
-	m_expBarPlayer.initRate( (float) ( (Hero*)getHero() )->getMaxExp() );
-	m_expIllusionPlayer.initRate( (float) ( (Hero*)getHero() )->getMaxExp() );
+}
 
-	m_hpBarPlayer.setRate((float)getHero()->getCurHp());
-	m_hpBarEnemy.setRate((float)getFirstEnemy()->getCurHp());
-	m_mpBarPlayer.setRate((float)getHero()->getCurCs());
-	m_expBarPlayer.setRate ( (float) ( (Hero*)getHero() )->getCurExp() );
-	m_hpIllusionPlayer.setRate((float)getHero()->getCurHp());
-	m_hpIllusionEnemy.setRate((float)getFirstEnemy()->getCurHp());
-	m_mpIllusionPlayer.setRate((float)getHero()->getCurCs());
-	m_expIllusionPlayer.setRate( (float) ( (Hero*)getHero() )->getCurExp() );*/
+HRESULT BattleState::onCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext )
+{
+	return S_OK;
 }
 
 HRESULT BattleState::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext )
-{
-
-	
+{	
 	m_innerFire->onResetDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
-
 	return S_OK;
 }
 
 void BattleState::onLostDevice()
 {
 	m_innerFire->onLostDevice();
-}
-
-HRESULT BattleState::onCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext )
-{
-
-	return S_OK;
 }
 
 void BattleState::printEasterEggMessage()
@@ -1149,39 +1011,6 @@ void BattleState::frameMoveUserInterfaces( double dTime, float fElapsedTime )
 	m_hpIllusionEnemy->srcRect.right = barLeftBound + (int)( barLength*( m_hpIllusionEnemyProg->getRate() ) );
 	m_csIllusionEnemy->srcRect.right = barLeftBound + (int)( barLength*( m_csIllusionEnemyProg->getRate() ) );
 
-	/*
-	m_SkillContentBox.frameMove(fElapsedTime);
-	m_StatSelectBox.frameMove( fElapsedTime );
-	m_hpBgPlayer.frameMove(fElapsedTime);
-	m_mpBgPlayer.frameMove(fElapsedTime);
-	m_expBgPlayer.frameMove(fElapsedTime);
-	m_hpBgEnemy.frameMove(fElapsedTime);
-	m_mpBgEnemy.frameMove(fElapsedTime);
-
-	m_hpIllusionPlayer.frameMove(fElapsedTime);
-	m_hpIllusionEnemy.frameMove(fElapsedTime);
-	m_mpIllusionPlayer.frameMove(fElapsedTime);
-	m_expIllusionPlayer.frameMove( fElapsedTime );
-
-	m_hpBarPlayer.frameMove(fElapsedTime);
-	m_mpBarPlayer.frameMove(fElapsedTime);
-	m_expBarPlayer.frameMove(fElapsedTime);
-
-	m_innerFire.frameMove(fElapsedTime);
-	m_innerFire.setPos( getHero()->getPos().x, getHero()->getPos().y, -3);
-
-	m_hpBarEnemy.frameMove(fElapsedTime);
-	m_mpBarEnemy.frameMove(fElapsedTime);
-
-	m_hpBarPlayer.changeRate((float)getHero()->getCurHp());
-	m_hpBarEnemy.changeRate((float)getFirstEnemy()->getCurHp());
-	m_hpIllusionPlayer.changeRate((float)getHero()->getCurHp());
-	m_hpIllusionEnemy.changeRate((float)getFirstEnemy()->getCurHp());
-	m_mpBarPlayer.changeRate((float)getHero()->getCurCs());
-	m_mpIllusionPlayer.changeRate((float)getHero()->getCurCs());
-	m_expBarPlayer.changeRate( (float) ( (Hero*)getHero() )->getCurExp() );
-	m_expIllusionPlayer.changeRate( (float) ( (Hero*)getHero() )->getCurExp() );
-	*/
 }
 
 void BattleState::printBattleStateEnterDebugMessage()
@@ -1193,4 +1022,154 @@ void BattleState::printBattleStateEnterDebugMessage()
 		const Enemy* enemy = *cit;
 		printf( "   Enemy Model: %s, HP: %d\n", enemy->getArnMeshName().c_str(), enemy->getCurHp() );
 	}
+}
+
+BattleStateInput BattleState::mapKey( UINT nKey ) const
+{
+	switch ( nKey )
+	{
+	case VK_UP:		return BSI_SKILL_MOVE_UP;
+	case VK_DOWN:	return BSI_SKILL_MOVE_DOWN;
+	case VK_LEFT:	return BSI_SKILLCONTENT_SHOW;
+	case VK_RIGHT:	return BSI_SKILLCONTENT_HIDE;
+	case 'Z':		return BSI_SKILL_USE;
+	}
+	return BSI_UNKNOWN;
+}
+
+void BattleState::handleLevelUpProcess()
+{
+	//if (wParam == VK_UP)
+	//{
+	//	statSelectMove('u');
+	//}
+	//if (wParam == VK_DOWN)
+	//{
+	//	statSelectMove('d');
+	//}
+	//if (wParam == VK_RETURN)
+	//{
+	//	Stat retStat = getHero()->getStat();
+	//	switch (m_statSelect)
+	//	{
+	//	case SS_HEALTH:
+	//		if (m_statCount != 0)
+	//		{
+	//			m_statCount--;
+	//			retStat.health ++;
+	//			getHero()->setStat(retStat.health, retStat.will, retStat.coding, retStat.def, retStat.sense, retStat.immunity);
+	//		}
+	//		break;
+	//	case SS_WILL:
+	//		if (m_statCount != 0)
+	//		{
+	//			m_statCount--;
+	//			retStat.will ++;
+	//			getHero()->setStat(retStat.health, retStat.will, retStat.coding, retStat.def, retStat.sense, retStat.immunity);
+	//		}
+	//		break;
+	//	case SS_CODING:
+	//		if (m_statCount != 0)
+	//		{
+	//			m_statCount--;
+	//			retStat.coding ++;
+	//			getHero()->setStat(retStat.health, retStat.will, retStat.coding, retStat.def, retStat.sense, retStat.immunity);
+	//		}
+	//		break;
+	//	case SS_DEF:
+	//		if (m_statCount != 0)
+	//		{
+	//			m_statCount--;
+	//			retStat.def ++;
+	//			getHero()->setStat(retStat.health, retStat.will, retStat.coding, retStat.def, retStat.sense, retStat.immunity);
+	//		}
+	//		break;
+	//	case SS_SENSE:
+	//		if (m_statCount != 0)
+	//		{
+	//			m_statCount--;
+	//			retStat.sense ++;
+	//			getHero()->setStat(retStat.health, retStat.will, retStat.coding, retStat.def, retStat.sense, retStat.immunity);
+	//		}
+	//		break;
+	//	case SS_IMMUNITY:
+	//		if (m_statCount != 0)
+	//		{
+	//			m_statCount--;
+	//			retStat.immunity ++;
+	//			getHero()->setStat(retStat.health, retStat.will, retStat.coding, retStat.def, retStat.sense, retStat.immunity);
+	//		}
+	//		break;
+	//	case SS_EXIT:
+	//		GetWorldStateManager().setNextState(GAME_WORLD_STATE_FIELD);
+	//		getFirstEnemy()->setRemoveFlag( true ); 
+	//		return S_OK;
+	//	}
+
+	//}
+
+	////////////////////////////////////////////////////////////////////////////
+
+	//Hero* hero = ( Hero* )getHero();
+	//Enemy* enemy = ( Enemy* )getFirstEnemy();
+
+	//if (m_levelUpFlag == true)
+	//{
+	//	hero->levelUp();
+	//	m_expBarPlayerProg->setMaxVal (( (Hero*)getHero() )->getMaxExp() );
+	//	m_expIllusionPlayerProg->setMaxVal (( (Hero*)getHero())->getMaxExp() );
+	//	m_expBarPlayerProg->setCurVal (( (Hero*)getHero() )->getMaxExp() );
+	//	m_expIllusionPlayerProg->setCurVal (( (Hero*)getHero())->getMaxExp() );
+	//	m_expBarPlayerProg->init();
+	//	m_expIllusionPlayerProg->init();
+
+	//	//m_expBarPlayerProg->setRatePerforce();
+	//	//m_expIllusionPlayerProg->setRatePerforce();
+	//	/*
+	//	m_expBarPlayer.initRate( (float) ( (Hero*)getHero() )->getMaxExp() );
+	//	m_expIllusionPlayer.initRate( (float) ( (Hero*)getHero() )->getMaxExp() );
+	//	m_expIllusionPlayer.setRate( (float) ( (Hero*)getHero() )->getCurExp() );
+	//	m_expBarPlayer.setRate ( (float) ( (Hero*)getHero() )->getCurExp() );
+	//	*/
+	//	m_statCount += 5;
+	//}
+
+
+
+	//int expReward = enemy->getExpReward();
+
+	//if (expReward == 0)
+	//{
+	//	GetWorldStateManager().setNextState(GAME_WORLD_STATE_FIELD);
+	//	getFirstEnemy()->setRemoveFlag( true ); // Should be deleted before next frame update
+	//}
+
+	//int remainExp = hero->gainExp( expReward );
+	//printf("remainExp : %d\n" , remainExp);
+
+	////레벨업을 하고 경험치가 남지 않았을 때
+	//if ( remainExp == -1 )
+	//{
+	//	pushBattleLog("레벨업!");
+	//	enemy->setExpReward( 0 );
+	//	m_levelUpFlag = true;
+	//}
+	////레벨업을 하고 경험치가 남았을 때
+	//else if ( remainExp > 0 )
+	//{
+	//	pushBattleLog("레벨업!");
+	//	enemy->setExpReward( remainExp );
+	//	m_levelUpFlag = true;
+	//}
+	//else
+	//{
+	//	enemy->setExpReward( 0 );
+	//	if (m_levelUpFlag == true)
+	//	{
+	//		m_statSelectBoxMover->onBox();
+	//		m_levelUpFlag = false;
+	//		return S_OK;
+	//	}
+	//	return S_OK;
+	//}
 }

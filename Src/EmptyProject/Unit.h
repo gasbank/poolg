@@ -126,7 +126,7 @@ protected:
 	
 
 	BYTE							m_aKeys[UNIT_MAX_KEYS];
-	UINT							m_cKeysDown;            // Number of camera keys that are down.
+	UINT							m_cKeysDown;
 	D3DXVECTOR3						m_vKeyboardDirection;
 	D3DXVECTOR3						m_vVelocity;
 	

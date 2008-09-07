@@ -13,10 +13,22 @@ class WindowMover;
 class InnerFire;
 class SkillSet;
 
-enum TurnType { TT_NATURAL, TT_COMPUTER, TT_PLAYER };
+enum SubBattleState { SBS_NULLSTATE, SBS_PLAYER_TURN, SBS_ENEMY_TURN, SBS_LEVEL_UP };
 enum StatSelect { SS_HEALTH, SS_WILL, SS_CODING, SS_DEF, SS_SENSE, SS_IMMUNITY, SS_EXIT };
 
 typedef std::list<Enemy*> EnemyList;
+
+enum BattleStateInput
+{
+	BSI_SKILL_MOVE_UP		= 0,
+	BSI_SKILL_MOVE_DOWN		= 1,
+	BSI_SKILL_USE			= 2,
+	BSI_SKILLCONTENT_SHOW	= 3,
+	BSI_SKILLCONTENT_HIDE	= 4,
+	BSI_MAX_KEYS,
+	BSI_UNKNOWN				= 0xff
+};
+
 
 class BattleState : public State
 {
@@ -26,44 +38,47 @@ public:
 
 	virtual HRESULT			enter( double dStartTime );
 	virtual HRESULT			leave();
-
 	virtual HRESULT			frameRender( IDirect3DDevice9* pd3dDevice, double fTime, float fElapsedTime );
 	virtual HRESULT			frameMove( double dTime, float fElapsedTime );
-
 	virtual HRESULT			handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
-	
 	virtual HRESULT			onCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext );
 	virtual HRESULT			onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext );
 	virtual void			onLostDevice();
-
 	virtual HRESULT			release ();
 
 	void					renderFixedText( int scrWidth, int scrHeight );
 
-	void					setNextTurnType( TurnType tt ) { m_nextTurnType = tt; }
 	void					passTurn();
 	void					pushBattleLog( const char* log ) { m_battleLog.push_back( log ); }	
 	void					statSelectMove( char choice );
 	
 	void					insertEnemy( Enemy* enemy ) { m_enemies.push_back( enemy ); }
 
-	// TODO Only one enemy supported yet!
 	Enemy*					getFirstEnemy() { if ( m_enemies.empty() ) return 0; else return *m_enemies.begin(); }
 
 private:
+	BattleStateInput		mapKey( UINT nKey ) const;
+
 	void					frameMoveUserInterfaces( double dTime, float fElapsedTime );
 	void					printBattleStateEnterDebugMessage();
-	void					doComputerAction();
+	void					doEnemyAction();
 	Character*				getHero();
 	void					setupCamera();
 	void					updateBarRate();
 	void					printEasterEggMessage();
+	void					handleLevelUpProcess();
+
+	SubBattleState			m_curSubBattleState;
+	SubBattleState			m_nextSubBattleState;
 
 	const SkillSet*			m_heroSkillSet;
 	UINT					m_curSelSkill;		// Currently selected skill slot index
 
 	EnemyList				m_enemies;			// Enemy pool of this battle session. Should be cleared at BattleState::leave
 	EnemyList				m_deadEnemies;
+
+	BYTE					m_aKeys[BSI_MAX_KEYS];
+	UINT					m_cKeysDown;
 
 	/*이곳부터가 컴포넌트*/
 	Sprite*					m_sprite;
@@ -105,9 +120,6 @@ private:
 
 	StringList				m_battleLog;
 	
-	TurnType				m_curTurnType;
-	TurnType				m_nextTurnType;
-
 	InnerFire*				m_innerFire;
 
 	int						m_noneSkillSelectedCount;

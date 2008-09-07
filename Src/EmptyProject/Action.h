@@ -244,6 +244,7 @@ class ControllableAction : public CharacterAction
 {
 public:
 							ControllableAction( Character* character, bool controllable );
+							~ControllableAction();
 
 	virtual void			activate();
 

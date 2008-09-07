@@ -165,6 +165,9 @@ HealAction::HealAction( Character* character, int healAmount )
 
 HealAction::~HealAction()
 {
+	// If we don't reset m_unit here, UnitAction's dtor will release our unit.
+	// It is not an expected behavior.
+	setUnit( 0 );
 }
 
 void HealAction::activate()
@@ -172,7 +175,6 @@ void HealAction::activate()
 	Action::activate();
 
 	getCharacter()->heal( m_healAmount );
-	setCharacter( 0 );
 
 	// HealAction is 'very' instantaneous, so deactivate() is called
 	// immediately after activate().
@@ -333,6 +335,9 @@ TeleportAction::TeleportAction( Unit* unit, int x, int y )
 
 TeleportAction::~TeleportAction()
 {
+	// If we don't reset m_unit here, UnitAction's dtor will release our unit.
+	// It is not an expected behavior.
+	setUnit( 0 );
 }
 
 void TeleportAction::activate()
@@ -341,7 +346,6 @@ void TeleportAction::activate()
 
 	getUnit()->setTileBufferPos( m_tileX, m_tileY );
 	getUnit()->setTilePos( m_tileX, m_tileY );
-	setUnit( 0 );
 
 	// TeleportAction is 'very' instantaneous, so deactivate() is called
 	// immediately after activate().
@@ -422,13 +426,18 @@ void ControllableAction::activate()
 
 	getCharacter()->clearKey();
 	getCharacter()->setControllable( m_bControllable );
-	setCharacter( 0 );
 	
 	// ControllableAction is 'very' instantaneous, so deactivate() is called
 	// immediately after activate().
 	deactivate();
 }
 
+ControllableAction::~ControllableAction()
+{
+	// If we don't reset m_unit here, UnitAction's dtor will release our unit.
+	// It is not an expected behavior.
+	setUnit( 0 );
+}
 Action* EpCreateControllableAction( void* target, int controllable )
 {
 	Character* c = reinterpret_cast<Character*>( target );

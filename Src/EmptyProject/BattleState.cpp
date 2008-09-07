@@ -325,11 +325,11 @@ HRESULT BattleState::frameMove( double dTime, float fElapsedTime )
 		getFirstEnemy()->startSoulAnimation( 1.0f, 10.0f );
 	}
 
-	EnemyList::iterator it = m_enemies.begin();
+	EnemyList::const_iterator cit = m_enemies.begin();
 	bool allEnemiesRemoved = true;
-	for ( ; it != m_enemies.end(); ++it )
+	for ( ; cit != m_enemies.end(); ++cit )
 	{
-		allEnemiesRemoved = allEnemiesRemoved && (*it)->getRemoveFlag();
+		allEnemiesRemoved = allEnemiesRemoved && (*cit)->getRemoveFlag();
 		if ( !allEnemiesRemoved )
 			break;
 	}

@@ -5,7 +5,7 @@
 #----------------------------------------------------------------------------------#
 
 variable EpStartTopStateName		PlayState
-set EpStartWorldName				EpTestStage
+set EpStartWorldName				EpCeilingWorld
 set EpWorldList						[ list EpCeilingWorld EpRoomWorld EpA213World EpTestStage ]
 set EpWindowMode					1
 
@@ -13,9 +13,9 @@ set EpWindowMode					1
 # Application level one-time initialization and constants are defined here.
 proc EpInitApp {} {
 	# Screen Resolution
-	set w1 4
-	set h1 3
-	set multiplier 200
+	set w1 640
+	set h1 480
+	set multiplier 1
 	EpSetWindowSize [expr $w1 * $multiplier] [expr $h1 * $multiplier]
 }
 

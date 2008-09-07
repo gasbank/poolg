@@ -80,7 +80,11 @@ void Unit::setTilePos( const Point2Uint& newPos )
 HRESULT Unit::frameRender( double dTime, float fElapsedTime )
 {
 	HRESULT hr = S_OK;
-	
+
+	if ( !m_arnMesh && m_arnMeshName.length() )
+	{
+		updateArnMesh();
+	}
 
 	if ( m_arnMesh )
 	{

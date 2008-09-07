@@ -16,7 +16,7 @@ class SkillSet;
 enum TurnType { TT_NATURAL, TT_COMPUTER, TT_PLAYER };
 enum StatSelect { SS_HEALTH, SS_WILL, SS_CODING, SS_DEF, SS_SENSE, SS_IMMUNITY, SS_EXIT };
 
-typedef std::set<Enemy*> EnemyList;
+typedef std::list<Enemy*> EnemyList;
 
 class BattleState : public State
 {
@@ -45,13 +45,14 @@ public:
 	void					pushBattleLog( const char* log ) { m_battleLog.push_back( log ); }	
 	void					statSelectMove( char choice );
 	
-	void					insertEnemy( Enemy* enemy ) { m_enemies.insert( enemy ); }
+	void					insertEnemy( Enemy* enemy ) { m_enemies.push_back( enemy ); }
 
 	// TODO Only one enemy supported yet!
-	Enemy*					getFirstEnemy() { assert( m_enemies.size() ); return *m_enemies.begin(); }
+	Enemy*					getFirstEnemy() { if ( m_enemies.empty() ) return 0; else return *m_enemies.begin(); }
 
 private:
 	void					frameMoveUserInterfaces( double dTime, float fElapsedTime );
+	void					printBattleStateEnterDebugMessage();
 	void					doComputerAction();
 	Character*				getHero();
 	void					setupCamera();
@@ -60,7 +61,9 @@ private:
 
 	const SkillSet*			m_heroSkillSet;
 	UINT					m_curSelSkill;		// Currently selected skill slot index
+
 	EnemyList				m_enemies;			// Enemy pool of this battle session. Should be cleared at BattleState::leave
+	EnemyList				m_deadEnemies;
 
 	/*이곳부터가 컴포넌트*/
 	Sprite*					m_sprite;

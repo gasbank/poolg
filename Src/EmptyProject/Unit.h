@@ -92,8 +92,9 @@ public:
 	void							setForcedMove( int i );
 	void							forcedMoveTest();
 	
-	void							setArnMeshName( const char* arnMeshName ) { m_arnMeshName = arnMeshName; }
-	ArnMesh*						getArnMesh() const						{ return m_arnMesh; }
+	void							setArnMeshName( const char* arnMeshName )	{ m_arnMeshName = arnMeshName; }
+	const std::string&				getArnMeshName() const						{ return m_arnMeshName; }
+	ArnMesh*						getArnMesh() const							{ return m_arnMesh; }
 
 	void							setMesh( LPD3DXMESH d3dxMesh );
 	LPD3DXMESH						getMesh() const { return m_d3dxMesh; }

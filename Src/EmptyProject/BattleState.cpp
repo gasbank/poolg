@@ -200,8 +200,6 @@ HRESULT BattleState::enter( double dStartTime )
 
 	GetAudioState().enterBattle();
 
-
-
 	updateBarRate();
 
 	/*스킬 대상 설정*/
@@ -220,8 +218,11 @@ HRESULT BattleState::enter( double dStartTime )
 	//m_StatSelectBox.setOff();
 
 	setupCamera();
-	
 
+	assert( m_enemies.size() > 0 );
+	printBattleStateEnterDebugMessage();
+
+	// TODO Which side will attack first in BattleState?
 	m_battleLog.push_back(std::string("전투 개시~~~~~~~~~!!!"));
 	setNextTurnType( TT_PLAYER );
 	passTurn();
@@ -242,6 +243,10 @@ HRESULT BattleState::enter( double dStartTime )
 HRESULT BattleState::leave()
 {
 	m_battleLog.clear();
+
+	m_deadEnemies.clear();
+
+	printf( " - BattleState leave.\n" );
 
 	GetAudioState().leaveBattle();
 
@@ -318,24 +323,34 @@ HRESULT BattleState::frameMove( double dTime, float fElapsedTime )
 			((ArnXformable*)guardBallNode)->setDoAnim( true );
 		}
 	}
-	
-	// TODO 승자가 결정되면 FieldState로 돌아간다.
-	if ( getFirstEnemy()->isDead() && !getFirstEnemy()->getSoulAnimation() )
+
+	EnemyList::iterator itEnemy = m_enemies.begin();
+	for ( ; itEnemy != m_enemies.end(); )
 	{
-		getFirstEnemy()->startSoulAnimation( 1.0f, 10.0f );
+		Enemy* enemy = *itEnemy;
+
+		if ( enemy->isDead() && !enemy->getSoulAnimation() )
+		{
+			enemy->startSoulAnimation( 1.0f, 10.0f );
+			itEnemy = m_enemies.erase( itEnemy );
+			m_deadEnemies.push_back( enemy );
+		}
+		else
+		{
+			++itEnemy;
+		}
 	}
 
-	EnemyList::const_iterator cit = m_enemies.begin();
-	bool allEnemiesRemoved = true;
-	for ( ; cit != m_enemies.end(); ++cit )
+	if ( m_enemies.empty() )
 	{
-		allEnemiesRemoved = allEnemiesRemoved && (*cit)->getRemoveFlag();
-		if ( !allEnemiesRemoved )
-			break;
-	}
-	if ( allEnemiesRemoved )
-	{
-		GetWorldStateManager().setNextState( GAME_WORLD_STATE_FIELD );
+		EnemyList::iterator itDeadEnemy = m_deadEnemies.begin();
+		bool allEnemiesRemoved = true;
+		for ( ; itDeadEnemy != m_deadEnemies.end(); ++itDeadEnemy )
+		{
+			allEnemiesRemoved = allEnemiesRemoved && (*itDeadEnemy)->getRemoveFlag();
+		}
+		if ( allEnemiesRemoved )
+			GetWorldStateManager().setNextState( GAME_WORLD_STATE_FIELD );
 	}
 
 	// If player is dead, make entire screen to gray scale.
@@ -431,7 +446,7 @@ HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 			return S_OK;
 		}
 		/*죽었을 시 enter 키를 입력하면 대상 파괴, 아니면 다른 키 안 받고 메시지 핸들링 종료*/
-		if ( getFirstEnemy()->getCurHp() <= 0 && !getFirstEnemy()->getSoulAnimation() )
+		if ( getFirstEnemy() && getFirstEnemy()->getCurHp() <= 0 && !getFirstEnemy()->getSoulAnimation() )
 		{
 			if (wParam == VK_RETURN)
 			{
@@ -534,7 +549,7 @@ HRESULT BattleState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 		{
 			m_skillContentBoxMover->offBox();
 		}
-		if (wParam == 'Z')
+		if ( wParam == 'Z' && getFirstEnemy() )
 		{
 			bool skillStarted = m_heroSkillSet->useSkill( m_curSelSkill, getHero(), getFirstEnemy() );
 			if ( skillStarted )
@@ -1077,18 +1092,27 @@ void BattleState::frameMoveUserInterfaces( double dTime, float fElapsedTime )
 
 
 	//현재 수치 적용
-	m_hpBarPlayerProg->setCurVal( getHero()->getCurHp() );
-	m_csBarPlayerProg->setCurVal( getHero()->getCurCs() );
-	m_expBarPlayerProg->setCurVal( ((Hero*)getHero() )->getCurExp() );
-	m_hpBarEnemyProg->setCurVal( getFirstEnemy()->getCurHp() );
-	m_csBarEnemyProg->setCurVal( getFirstEnemy()->getCurCs() );
+	Character* hero = getHero();
+	if ( hero )
+	{
+		m_hpBarPlayerProg->setCurVal( hero->getCurHp() );
+		m_csBarPlayerProg->setCurVal( hero->getCurCs() );
+		m_expBarPlayerProg->setCurVal( ((Hero*)hero)->getCurExp() );
 
-	m_hpIllusionPlayerProg->setCurVal( getHero()->getCurHp() );
-	m_csIllusionPlayerProg->setCurVal( getHero()->getCurCs() );
-	m_expIllusionPlayerProg->setCurVal( ((Hero*)getHero() )->getCurExp() );
-	m_hpIllusionEnemyProg->setCurVal( getFirstEnemy()->getCurHp() );
-	m_csIllusionEnemyProg->setCurVal( getFirstEnemy()->getCurCs() );
+		m_hpIllusionPlayerProg->setCurVal( hero->getCurHp() );
+		m_csIllusionPlayerProg->setCurVal( hero->getCurCs() );
+		m_expIllusionPlayerProg->setCurVal( ((Hero*)hero)->getCurExp() );
+	}
 
+	Character* firstEnemy = getFirstEnemy();
+	if ( firstEnemy )
+	{
+		m_hpBarEnemyProg->setCurVal( firstEnemy->getCurHp() );
+		m_csBarEnemyProg->setCurVal( firstEnemy->getCurCs() );
+		m_hpIllusionEnemyProg->setCurVal( firstEnemy->getCurHp() );
+		m_csIllusionEnemyProg->setCurVal( firstEnemy->getCurCs() );
+	}
+	
 	//수치 이동
 	m_hpBarPlayerProg->setRate( fElapsedTime );
 	m_csBarPlayerProg->setRate( fElapsedTime );
@@ -1158,4 +1182,15 @@ void BattleState::frameMoveUserInterfaces( double dTime, float fElapsedTime )
 	m_expBarPlayer.changeRate( (float) ( (Hero*)getHero() )->getCurExp() );
 	m_expIllusionPlayer.changeRate( (float) ( (Hero*)getHero() )->getCurExp() );
 	*/
+}
+
+void BattleState::printBattleStateEnterDebugMessage()
+{
+	printf( " - Encountered with enemy!\n" );
+	EnemyList::const_iterator cit = m_enemies.begin();
+	for ( ; cit != m_enemies.end(); ++cit )
+	{
+		const Enemy* enemy = *cit;
+		printf( "   Enemy Model: %s, HP: %d\n", enemy->getArnMeshName().c_str(), enemy->getCurHp() );
+	}
 }

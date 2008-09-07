@@ -199,7 +199,7 @@ HRESULT World::frameMove( double dTime, float fElapsedTime )
 		//DebugBreak();
 	}
 
-	if ( ((Hero*)getHeroUnit())->isEncounterEnemy() )
+	if ( ((Hero*)getHeroUnit())->isEncounterEnemy() && GetWorldStateManager().curStateEnum() != GAME_WORLD_STATE_BATTLE )
 		battleEventCheck();
 
 	wannaTalkingEventCheck();

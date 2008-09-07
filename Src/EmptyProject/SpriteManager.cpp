@@ -154,8 +154,8 @@ HRESULT SpriteManager::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSUR
 
 void SpriteManager::onLostDevice()
 {
-	m_d3dxSprite->OnLostDevice();
-	m_d3dxObjectSprite->OnLostDevice();
+	if ( m_d3dxSprite ) m_d3dxSprite->OnLostDevice();
+	if ( m_d3dxObjectSprite ) m_d3dxObjectSprite->OnLostDevice();
 
 	SpriteMap::iterator it = m_spriteMap.begin();
 	for ( ; it != m_spriteMap.end(); ++it )
@@ -177,6 +177,6 @@ HRESULT SpriteManager::onCreateDevice( IDirect3DDevice9* pd3dDevice )
 
 void SpriteManager::onDestroyDevice()
 {
-	m_d3dxSprite->Release();
-	m_d3dxObjectSprite->Release();
+	SAFE_RELEASE( m_d3dxSprite );
+	SAFE_RELEASE( m_d3dxObjectSprite );
 }

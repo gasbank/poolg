@@ -178,14 +178,18 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 	// (x) Screen Flash (Alpha shader) init
 	GetG().m_screenFlash.onCreateDevice( pd3dDevice, pBackBufferSurfaceDesc );
 
+	
 
 	// (2) Configure shaders and particle system
 	ConfigureShaders( pd3dDevice, pBackBufferSurfaceDesc );
 	//ConfigureParticleSystem( pd3dDevice );
+
+	
 	
 	// (3) Configure geometries (Vertex and index buffer manipulation)
 	ConfigureTileGridGeometry( pd3dDevice );
 	ConfigureTestGeometry( pd3dDevice );
+	
 	
 	// (4) Light setup
 	GetEpLight().setupLight();
@@ -204,11 +208,14 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 	V_RETURN( D3DXCreateFont( pd3dDevice, 17, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &g_fontStat ) );
 
 
+
+
 	// (6) OnCreateDevice propagation
 	GetTopStateManager().onCreateDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
 	GetWorldStateManager().onCreateDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
 	GetSpriteManager().onCreateDevice( pd3dDevice );
 	GetWorldManager().onCreateDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
+
 	return S_OK;
 }
 
@@ -288,7 +295,6 @@ HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFA
 
 	g_postRadialBlurShader->onResetDevice( pd3dDevice, pBackBufferSurfaceDesc );
 	g_postSepiaShader->onResetDevice( pd3dDevice, pBackBufferSurfaceDesc );
-	//g_motionBlurShader->onResetDevice( pd3dDevice, pBackBufferSurfaceDesc );
 	g_bombShader->onResetDevice( pd3dDevice, pBackBufferSurfaceDesc );
 
 	return hr;
@@ -300,7 +306,6 @@ HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFA
 //--------------------------------------------------------------------------------------
 void CALLBACK OnFrameMove( double fTime, float fElapsedTime, void* pUserContext )
 {
-
 	HRESULT hr;
 
 	UNREFERENCED_PARAMETER( hr );
@@ -471,7 +476,6 @@ void SetupFullscreenQuad( const D3DSURFACE_DESC* pBackBufferSurfaceDesc )
 //--------------------------------------------------------------------------------------
 void CALLBACK OnD3D9FrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float fElapsedTime, void* pUserContext )
 {
-
 	HRESULT hr;
 
 	LPDIRECT3DSURFACE9 originalRT = 0;
@@ -671,16 +675,18 @@ void CALLBACK OnD3D9LostDevice( void* pUserContext )
 {
 	OutputDebugString( _T( " - INFO: OnLostDevice() called.\n" ) );
 
-	g_pFont->OnLostDevice();
-	g_unitNameFont->OnLostDevice();
-	g_dlgNameFont->OnLostDevice();
-	g_dlgContentFont->OnLostDevice();
+#define SAFE_ONLOSTDEVICE(x) if (x) (x)->OnLostDevice();
 
-	g_fontBattle2->OnLostDevice();
-	g_fontBattle->OnLostDevice();
-	g_fontSkill->OnLostDevice();
-	g_fontSkillDescription->OnLostDevice();
-	g_fontStat->OnLostDevice();
+	SAFE_ONLOSTDEVICE( g_pFont );
+	SAFE_ONLOSTDEVICE( g_unitNameFont );
+	SAFE_ONLOSTDEVICE( g_dlgNameFont );
+	SAFE_ONLOSTDEVICE( g_dlgContentFont );
+	SAFE_ONLOSTDEVICE( g_fontBattle2 );
+	SAFE_ONLOSTDEVICE( g_fontBattle );
+	SAFE_ONLOSTDEVICE( g_fontSkill );
+	SAFE_ONLOSTDEVICE( g_fontSkillDescription );
+	SAFE_ONLOSTDEVICE( g_fontStat );
+
 
 
 	if ( SpriteManager::getSingletonPtr() )
@@ -702,10 +708,9 @@ void CALLBACK OnD3D9LostDevice( void* pUserContext )
 	SAFE_RELEASE( g_radialBlurRenderTarget );
 	SAFE_RELEASE( g_radialBlurRenderTargetSurf );
 
-	g_postRadialBlurShader->onLostDevice();
-	g_postSepiaShader->onLostDevice();
-	//g_motionBlurShader->onLostDevice();
-	g_bombShader->onLostDevice();
+	if ( g_postRadialBlurShader ) g_postRadialBlurShader->onLostDevice();
+	if ( g_postSepiaShader ) g_postSepiaShader->onLostDevice();
+	if ( g_bombShader ) g_bombShader->onLostDevice();
 
 	GetG().m_screenFlash.onLostDevice();
 
@@ -741,7 +746,6 @@ void CALLBACK OnD3D9DestroyDevice( void* pUserContext )
 
 	// Shaders
 	EP_SAFE_RELEASE( g_bombShader );
-	//EP_SAFE_RELEASE( g_motionBlurShader );
 	EP_SAFE_RELEASE( g_postSepiaShader );
 	EP_SAFE_RELEASE( g_postRadialBlurShader );
 
@@ -1260,10 +1264,6 @@ void ConfigureShaders( LPDIRECT3DDEVICE9 pd3dDevice, const D3DSURFACE_DESC* pBac
 	g_bombShader = new BombShader();
 	g_bombShader->onCreateDevice( pd3dDevice, pBackBufferSurfaceDesc );
 	g_bombShader->initMainTechnique();
-
-	/*assert( g_motionBlurShader == 0 );
-	g_motionBlurShader = new MotionBlurShader();
-	g_motionBlurShader->initShader( pd3dDevice, L"" );*/
 
 	assert( g_postSepiaShader == 0 );
 	g_postSepiaShader = new PostSepiaShader();

@@ -112,6 +112,7 @@ HRESULT CALLBACK Shader::onCreateDevice( LPDIRECT3DDEVICE9 pd3dDevice, const D3D
 
 
 BombShader::BombShader()
+: m_fireTexture( 0 )
 {
 
 }

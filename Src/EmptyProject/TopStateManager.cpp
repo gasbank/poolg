@@ -19,9 +19,9 @@ TopStateManager::~TopStateManager(void)
 void TopStateManager::init()
 {
 	m_states[GAME_TOP_STATE_INTRO]	= new IntroState();
-	//m_states[GAME_TOP_STATE_PLAY]	= new PlayState();
-	//m_states[GAME_TOP_STATE_CREDIT] = new CreditState();
-	//m_states[GAME_TOP_STATE_MAIN]	= new MainState();
+	m_states[GAME_TOP_STATE_PLAY]	= new PlayState();
+	m_states[GAME_TOP_STATE_CREDIT] = new CreditState();
+	m_states[GAME_TOP_STATE_MAIN]	= new MainState();
 
 	m_curStates = 0;
 	m_nextState = 0;
@@ -30,25 +30,25 @@ void TopStateManager::init()
 HRESULT TopStateManager::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext )
 {
 	m_states[GAME_TOP_STATE_INTRO]->onResetDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
-	//m_states[GAME_TOP_STATE_PLAY]->onResetDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
-	//m_states[GAME_TOP_STATE_CREDIT]->onResetDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
-	//m_states[GAME_TOP_STATE_MAIN]->onResetDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
+	m_states[GAME_TOP_STATE_PLAY]->onResetDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
+	m_states[GAME_TOP_STATE_CREDIT]->onResetDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
+	m_states[GAME_TOP_STATE_MAIN]->onResetDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
 	return S_OK;
 }
 
 void TopStateManager::onLostDevice()
 {
 	m_states[GAME_TOP_STATE_INTRO]->onLostDevice();
-	//m_states[GAME_TOP_STATE_PLAY]->onLostDevice();
-	//m_states[GAME_TOP_STATE_CREDIT]->onLostDevice();
-	//m_states[GAME_TOP_STATE_MAIN]->onLostDevice();
+	m_states[GAME_TOP_STATE_PLAY]->onLostDevice();
+	m_states[GAME_TOP_STATE_CREDIT]->onLostDevice();
+	m_states[GAME_TOP_STATE_MAIN]->onLostDevice();
 }
 
 HRESULT TopStateManager::onCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext )
 {
 	m_states[GAME_TOP_STATE_INTRO]->onCreateDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
-	//m_states[GAME_TOP_STATE_PLAY]->onCreateDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
-	//m_states[GAME_TOP_STATE_CREDIT]->onCreateDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
-	//m_states[GAME_TOP_STATE_MAIN]->onCreateDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
+	m_states[GAME_TOP_STATE_PLAY]->onCreateDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
+	m_states[GAME_TOP_STATE_CREDIT]->onCreateDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
+	m_states[GAME_TOP_STATE_MAIN]->onCreateDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
 	return S_OK;
 }

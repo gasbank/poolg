@@ -246,6 +246,9 @@ UnitMoveAction::UnitMoveAction( Unit* unit, std::string input )
 
 UnitMoveAction::~UnitMoveAction()
 {
+	// If we don't reset m_unit here, UnitAction's dtor will release our unit.
+	// It is not an expected behavior.
+	setUnit( 0 );
 }
 
 void UnitMoveAction::activate()
@@ -274,7 +277,6 @@ bool UnitMoveAction::update( double dTime, float fElapsedTime )
 	m_activateElapsedTime += fElapsedTime;
 	if ( m_activateElapsedTime > 2.0f )
 	{
-		setUnit( 0 );
 		deactivate();
 		return false;
 	}

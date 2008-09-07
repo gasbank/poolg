@@ -29,7 +29,7 @@ HRESULT ScreenFlash::onCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 	return S_OK;
 }
 
-HRESULT ScreenFlash::frameRender()
+HRESULT ScreenFlash::frameRender( IDirect3DDevice9* pd3dDevice )
 {
 	//////////////////////////////////////////////////////////////////////////
 	// Draw alpha animated plane
@@ -38,17 +38,16 @@ HRESULT ScreenFlash::frameRender()
 
 	if ( !m_bStop )
 	{
-		LPDIRECT3DDEVICE9& dev = GetG().m_dev;
-		dev->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
-		dev->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-		dev->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
-		dev->SetRenderState( D3DRS_LIGHTING, FALSE );
-		dev->SetRenderState( D3DRS_CULLMODE, D3DCULL_NONE );
-		dev->SetTexture( 0, 0 );
-		V_RETURN( GetG().m_dev->SetVertexShader( m_alphaShader->getVertexShader() ) );
+		pd3dDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+		pd3dDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+		pd3dDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+		pd3dDevice->SetRenderState( D3DRS_LIGHTING, FALSE );
+		pd3dDevice->SetRenderState( D3DRS_CULLMODE, D3DCULL_NONE );
+		pd3dDevice->SetTexture( 0, 0 );
+		V_RETURN( pd3dDevice->SetVertexShader( m_alphaShader->getVertexShader() ) );
 //		V_RETURN( m_testPolygonCloned->DrawSubset( 0 ) );
-		V_RETURN( GetG().m_dev->SetVertexShader( 0 ) );
-		dev->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
+		V_RETURN( pd3dDevice->SetVertexShader( 0 ) );
+		pd3dDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
 	}
 
 	//////////////////////////////////////////////////////////////////////////

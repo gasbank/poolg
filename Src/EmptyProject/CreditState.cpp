@@ -38,7 +38,8 @@ HRESULT createD3DXTextMesh( IDirect3DDevice9* pd3dDevice, LPCWSTR pStr, LPD3DXME
 	if ( SUCCEEDED( hr ) )
 		*ppTextMesh = pMeshNew;
 
-	return hr;
+	throw std::runtime_error( "This method should not be called." );
+	//return hr;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -57,17 +58,7 @@ CreditState::~CreditState( void )
 }
 
 HRESULT CreditState::enter( double dStartTime )
-{
-	LPDIRECT3DDEVICE9& pd3dDevice = GetG().m_dev;
-	
-	pd3dDevice->SetRenderState( D3DRS_CULLMODE, D3DCULL_CCW );
-	pd3dDevice->SetTransform( D3DTS_VIEW, &GetG().g_fixedViewMat );
-	pd3dDevice->SetTransform( D3DTS_PROJECTION, &GetG().g_orthoProjMat );
-
-
-	setupLight();
-	
-	
+{	
 	ZeroMemory( &m_textMat, sizeof( D3DMATERIAL9 ) );
 	m_textMat.Ambient.r = m_textMat.Ambient.g = m_textMat.Ambient.b = 0.9f;
 	m_textMat.Specular.r = m_textMat.Specular.g = m_textMat.Specular.b = 1.0f;
@@ -87,6 +78,11 @@ HRESULT CreditState::leave()
 
 HRESULT CreditState::frameRender( IDirect3DDevice9* pd3dDevice, double fTime, float fElapsedTime )
 {
+	pd3dDevice->SetRenderState( D3DRS_CULLMODE, D3DCULL_CCW );
+	pd3dDevice->SetTransform( D3DTS_VIEW, &GetG().g_fixedViewMat );
+	pd3dDevice->SetTransform( D3DTS_PROJECTION, &GetG().g_orthoProjMat );
+	setupLight( pd3dDevice );
+
 	RECT rc;
 	rc.top = 20;
 	rc.left = 20;
@@ -185,10 +181,9 @@ HRESULT CreditState::release()
 	return S_OK;
 }
 
-void CreditState::setupLight() 
+void CreditState::setupLight( IDirect3DDevice9* pd3dDevice ) 
 {
 	D3DLIGHT9& light = GetG().m_light;
-	LPDIRECT3DDEVICE9& pd3dDevice = GetG().m_dev;
 
 	ZeroMemory( &light, sizeof( D3DLIGHT9) );
 	light.Ambient.r = light.Ambient.g = light.Ambient.b = light.Ambient.a = 1.0f;

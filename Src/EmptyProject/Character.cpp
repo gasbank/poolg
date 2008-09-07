@@ -211,14 +211,14 @@ bool Character::frameMove( double dTime, float fElapsedTime )
 	return Unit::frameMove( dTime, fElapsedTime );
 }
 
-HRESULT Character::frameRender( double dTime, float fElapsedTime )
+HRESULT Character::frameRender( IDirect3DDevice9* pd3dDevice, double dTime, float fElapsedTime )
 {
 	SkillObjectList::iterator it = m_skillObjects.begin();
 	for ( ; it != m_skillObjects.end(); ++it )
 	{
-		(*it)->frameRender( dTime, fElapsedTime );
+		(*it)->frameRender( pd3dDevice, dTime, fElapsedTime );
 	}
-	Unit::frameRender( dTime, fElapsedTime );
+	Unit::frameRender( pd3dDevice, dTime, fElapsedTime );
 	return S_OK;
 }
 

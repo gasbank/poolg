@@ -207,6 +207,7 @@ void MenuState::saveloadselect(int select)
 
 HRESULT MenuState::frameMove(double fTime, float fElapsedTime)
 {
+	/*
 	m_menu.frameMove(fElapsedTime);
 
 	m_sanub.frameMove(fElapsedTime);
@@ -239,6 +240,7 @@ HRESULT MenuState::frameMove(double fTime, float fElapsedTime)
 	m_slb1.frameMove(fElapsedTime);
 	m_slb2.frameMove(fElapsedTime);
 	m_slb3.frameMove(fElapsedTime);
+	*/
 	
 	//m_selc.setPos(m_selc.getPos()->x, pos, m_selc.getPos()->z);
 
@@ -247,7 +249,7 @@ HRESULT MenuState::frameMove(double fTime, float fElapsedTime)
 
 HRESULT MenuState::frameRender(IDirect3DDevice9* pd3dDevice,  double fTime, float fElapsedTime)
 {
-	m_pDev->SetRenderState(D3DRS_LIGHTING, FALSE);
+	pd3dDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
 	pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 	pd3dDevice->SetTransform(D3DTS_VIEW, &GetG().g_fixedViewMat);
 	pd3dDevice->SetTransform(D3DTS_PROJECTION, &GetG().g_orthoProjMat);
@@ -263,13 +265,14 @@ HRESULT MenuState::frameRender(IDirect3DDevice9* pd3dDevice,  double fTime, floa
 	material.Emissive = cv;
 	material.Power = 1.0f;
 	material.Specular = cv2;
-	m_pDev->SetMaterial(&material);
+	pd3dDevice->SetMaterial(&material);
 
-	m_pDev->SetRenderState( D3DRS_ZENABLE, FALSE );
-	m_pDev->SetRenderState( D3DRS_ALPHABLENDENABLE, TRUE );
+	pd3dDevice->SetRenderState( D3DRS_ZENABLE, FALSE );
+	pd3dDevice->SetRenderState( D3DRS_ALPHABLENDENABLE, TRUE );
 
 	if ( op_st == true )
 	{
+		/*
 		m_stwin.draw();
 
 		m_hpbg.draw();
@@ -278,6 +281,7 @@ HRESULT MenuState::frameRender(IDirect3DDevice9* pd3dDevice,  double fTime, floa
 
 		m_hpbar.draw();
 		m_mpbar.draw();
+		*/
 
 		RECT rc;
 		RECT rc2;
@@ -343,24 +347,27 @@ HRESULT MenuState::frameRender(IDirect3DDevice9* pd3dDevice,  double fTime, floa
 		g_fontBattle->DrawTextW(0, textBuffer, -1, &rc2, dtProp, textColor );
 
 		StringCchPrintf(textBuffer, 512, L"PoolG" );
-		m_lblsREB->DrawTextW(0, textBuffer, -1, &rc3, DT_NOCLIP | DT_LEFT, textColor );
+		g_fontBattle->DrawTextW(0, textBuffer, -1, &rc3, DT_NOCLIP | DT_LEFT, textColor );
 		rc3.top += (LONG)25;
 		StringCchPrintf(textBuffer, 512, L"He is a mouse who live in the ceiling of" );
-		m_lblsREB->DrawTextW(0, textBuffer, -1, &rc3, DT_NOCLIP | DT_LEFT, textColor );
+		g_fontBattle->DrawTextW(0, textBuffer, -1, &rc3, DT_NOCLIP | DT_LEFT, textColor );
 		rc3.top += (LONG)19;
 		StringCchPrintf(textBuffer, 512, L"basement floor in Engineering Hall I." );
-		m_lblsREB->DrawTextW(0, textBuffer, -1, &rc3, DT_NOCLIP | DT_LEFT, textColor );
+		g_fontBattle->DrawTextW(0, textBuffer, -1, &rc3, DT_NOCLIP | DT_LEFT, textColor );
 		rc3.top += (LONG)19;
 		StringCchPrintf(textBuffer, 512, L"One day, People did 'Big Cleaning'." );
-		m_lblsREB->DrawTextW(0, textBuffer, -1, &rc3, DT_NOCLIP | DT_LEFT, textColor );
+		g_fontBattle->DrawTextW(0, textBuffer, -1, &rc3, DT_NOCLIP | DT_LEFT, textColor );
 		rc3.top += (LONG)19;
 		StringCchPrintf(textBuffer, 512, L"So, Living place of mice is decreased." );
-		m_lblsREB->DrawTextW(0, textBuffer, -1, &rc3, DT_NOCLIP | DT_LEFT, textColor );
+		g_fontBattle->DrawTextW(0, textBuffer, -1, &rc3, DT_NOCLIP | DT_LEFT, textColor );
 		rc3.top += (LONG)19;
 		StringCchPrintf(textBuffer, 512, L"And then he goes to repulse the enemy." );
-		m_lblsREB->DrawTextW(0, textBuffer, -1, &rc3, DT_NOCLIP | DT_LEFT, textColor );
+		g_fontBattle->DrawTextW(0, textBuffer, -1, &rc3, DT_NOCLIP | DT_LEFT, textColor );
 
 	}
+
+
+	/*
 	if ( op_sa == true )
 	{
 		m_sawin.draw();
@@ -399,9 +406,10 @@ HRESULT MenuState::frameRender(IDirect3DDevice9* pd3dDevice,  double fTime, floa
 			break;
 		}
 	}
+	*/
 	
-	m_pDev->SetRenderState( D3DRS_ZENABLE, TRUE );
-	m_pDev->SetRenderState( D3DRS_ALPHABLENDENABLE, FALSE );
+	pd3dDevice->SetRenderState( D3DRS_ZENABLE, TRUE );
+	pd3dDevice->SetRenderState( D3DRS_ALPHABLENDENABLE, FALSE );
 	return S_OK;
 	
 }
@@ -442,6 +450,7 @@ HRESULT MenuState::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 
 HRESULT MenuState::release()
 {
+	/*
 	m_menu.release();
 
 	m_sanub.release();
@@ -474,16 +483,14 @@ HRESULT MenuState::release()
 	m_slb1.release();
 	m_slb2.release();
 	m_slb3.release();
+	*/
 
-	SAFE_RELEASE( m_lblsREB);
 
 	return S_OK;
 }
 
 MenuState::MenuState()
 {
-	m_pDev = GetG().m_dev;
-
 	const UINT menuBoxWidth = 200;
 	const UINT menuBoxHeight = 264;
 	const int scrWidth_i = GetG().m_scrWidth;
@@ -643,9 +650,11 @@ HRESULT MenuState::enter( double dStartTime )
 		curExp = (float) ( (Hero*) ws->getHero() )->getCurExp();
 		maxExp = (float) ( (Hero*) ws->getHero() )->getMaxExp();
 
+		/*
 		m_hpbar.setSize(220 * (curHp / maxHp), 22);
 		m_mpbar.setSize(220 * (curCs / maxCs), 22);
 		m_expbar.setSize(220 * (curExp / maxExp), 22);
+		*/
 	}
 
 	loc = 0;

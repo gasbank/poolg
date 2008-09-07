@@ -41,7 +41,6 @@ namespace eval EpA213World::FinalBossQuest {
 		EpEnemySetFightRange	$boss			10
 		EpEnemySetTalkable		$boss			1
 		EpCharacterSetStat		$boss			7 5 7 5 5 5 ;# Health Will Coding Defence Sense Immunity
-		EpCharacterSetCurHp		$pHeroUnit		75
 	}
 	
 	proc registerDialogs {} {

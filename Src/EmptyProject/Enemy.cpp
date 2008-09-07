@@ -33,9 +33,9 @@ Unit* Enemy::createEnemy( LPD3DXMESH mesh, int tileX, int tileY, float posZ )
 	return u;
 }
 
-HRESULT Enemy::frameRender( double dTime, float fElapsedTime )
+HRESULT Enemy::frameRender( IDirect3DDevice9* pd3dDevice, double dTime, float fElapsedTime )
 {
-	return Character::frameRender( dTime, fElapsedTime );
+	return Character::frameRender( pd3dDevice, dTime, fElapsedTime );
 }
 
 bool Enemy::frameMove( double dTime, float fElapsedTime )

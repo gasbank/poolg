@@ -35,7 +35,7 @@ public:
 	virtual							~Unit();
 
 	// Virtual Methods
-	virtual HRESULT					frameRender( double dTime, float fElapsedTime );
+	virtual HRESULT					frameRender( IDirect3DDevice9* pd3dDevice, double dTime, float fElapsedTime );
 	virtual LRESULT					handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 	virtual bool					frameMove( double dTime, float fElapsedTime );
 	virtual HRESULT					onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
@@ -131,9 +131,9 @@ protected:
 	D3DXVECTOR3						m_vVelocity;
 	
 private:
-	void							drawSoul();
+	void							drawSoul( IDirect3DDevice9* pd3dDevice );
 	void							updateSoulAnimation( float fElapsedTime );
-	void							drawName();
+	void							drawName( IDirect3DDevice9* pd3dDevice );
 	void							updateLocalXform();
 	
 	D3DXVECTOR3						m_vRot;

@@ -156,9 +156,7 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 
 	// (1) Set D3D device global variable which is shared through the whole application lifetime.
 	//     GetG() related init
-	assert( GetG().m_dev == 0 );
 	assert( VideoMan::getSingleton().GetDev() == 0 );
-	GetG().m_dev = pd3dDevice;
 	VideoMan::getSingleton().SetDev( pd3dDevice );
 	GetG().m_scrWidth = pBackBufferSurfaceDesc->Width;
 	GetG().m_scrHeight = pBackBufferSurfaceDesc->Height;
@@ -192,7 +190,7 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 	
 	
 	// (4) Light setup
-	GetEpLight().setupLight();
+	GetEpLight().setupLight( pd3dDevice );
 
 	// (5) Globally used fonts
 	V_RETURN( D3DXCreateFont( pd3dDevice, 12, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Gulimche"), &g_pFont) );
@@ -228,7 +226,6 @@ HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFA
 {
 	OutputDebugString( _T(" - INFO: OnResetDevice() called.\n") );
 
-	GetG().m_dev = pd3dDevice;
 	VideoMan::getSingleton().SetDev( pd3dDevice );
 	GetG().m_scrWidth = pBackBufferSurfaceDesc->Width;
 	GetG().m_scrHeight = pBackBufferSurfaceDesc->Height;
@@ -395,19 +392,20 @@ void renderFixedElements( double fTime, float fElapsedTime )
 
 }
 
-HRESULT renderTileGrid()
+HRESULT renderTileGrid( IDirect3DDevice9* pd3dDevice )
 {
 	HRESULT hr = S_OK;
 
-	GetG().m_dev->SetVertexShader( 0 );
-	GetG().m_dev->SetRenderState( D3DRS_LIGHTING, FALSE );
-	GetG().m_dev->SetRenderState( D3DRS_CULLMODE, D3DCULL_NONE );
-	GetG().m_dev->SetTexture( 0, 0 );
+	pd3dDevice->SetVertexShader( 0 );
+	pd3dDevice->SetRenderState( D3DRS_LIGHTING, FALSE );
+	pd3dDevice->SetRenderState( D3DRS_CULLMODE, D3DCULL_NONE );
+	pd3dDevice->SetTexture( 0, 0 );
 
-	V( GetG().m_dev->SetTransform( D3DTS_VIEW, GetG().m_camera.GetViewMatrix() ) );
-	V( GetG().m_dev->SetTransform( D3DTS_PROJECTION, GetG().m_camera.GetProjMatrix() ) );
-	V( GetG().m_dev->SetFVF( D3DFVF_XYZ | D3DFVF_DIFFUSE ) );
-	V( GetG().m_dev->SetStreamSource( 0, g_lineElement, 0, 16 ) );
+	V( pd3dDevice->SetTransform( D3DTS_VIEW, GetG().m_camera.GetViewMatrix() ) );
+	V( pd3dDevice->SetTransform( D3DTS_PROJECTION, GetG().m_camera.GetProjMatrix() ) );
+	V( pd3dDevice->SetFVF( D3DFVF_XYZ | D3DFVF_DIFFUSE ) );
+	V( pd3dDevice->SetStreamSource( 0, g_lineElement, 0, 16 ) );
+
 	int i;
 	D3DXMATRIX mWorld, mTrans, mRot, mScaling;
 	D3DXMatrixScaling( &mScaling, (float)(s_xSize) * s_tileSize, 1.0f, 1.0f );
@@ -418,8 +416,8 @@ HRESULT renderTileGrid()
 			(float)i * s_tileSize,
 			0 );
 		mWorld = mScaling * mTrans;
-		V( GetG().m_dev->SetTransform( D3DTS_WORLD, &mWorld ) );
-		V( GetG().m_dev->DrawPrimitive( D3DPT_LINELIST, 0, 1 ) );
+		V( pd3dDevice->SetTransform( D3DTS_WORLD, &mWorld ) );
+		V( pd3dDevice->DrawPrimitive( D3DPT_LINELIST, 0, 1 ) );
 	}
 
 	D3DXMatrixScaling( &mScaling, (float)(s_ySize) * s_tileSize, 1.0f, 1.0f );
@@ -431,9 +429,9 @@ HRESULT renderTileGrid()
 			0,
 			0 );
 		mWorld = mScaling * mRot * mTrans;
-		V( GetG().m_dev->SetTransform( D3DTS_WORLD, &mWorld ) );
+		V( pd3dDevice->SetTransform( D3DTS_WORLD, &mWorld ) );
 		D3DPERF_BeginEvent( 0, L"Boundary Line Drawing" );
-		V( GetG().m_dev->DrawPrimitive( D3DPT_LINELIST, 0, 1 ) );
+		V( pd3dDevice->DrawPrimitive( D3DPT_LINELIST, 0, 1 ) );
 		D3DPERF_EndEvent();
 	}
 
@@ -492,17 +490,17 @@ void CALLBACK OnD3D9FrameRender( IDirect3DDevice9* pd3dDevice, double fTime, flo
 		//drawBurningTeapot( fTime, fElapsedTime );
 
 		if ( g_bTileGrid )
-			renderTileGrid();
+			renderTileGrid( pd3dDevice );
 
 		State* curState = GetTopStateManager().getCurState();
 
-		curState->frameRender(pd3dDevice, fTime, fElapsedTime);
+		curState->frameRender( pd3dDevice, fTime, fElapsedTime );
 
 		renderFixedElements( fTime, fElapsedTime );
 
 		g_spriteManager->frameRender();
 		
-
+		GetEpLight().frameRender( pd3dDevice );
 
 		//////////////////////////////////////////////////////////////////////////
 		V( pd3dDevice->EndScene() );
@@ -715,7 +713,6 @@ void CALLBACK OnD3D9LostDevice( void* pUserContext )
 	GetG().m_screenFlash.onLostDevice();
 
 	// GetG() related
-	GetG().m_dev = 0;
 	GetG().m_videoMan.SetDev(0);
 }
 
@@ -751,7 +748,6 @@ void CALLBACK OnD3D9DestroyDevice( void* pUserContext )
 
 
 	// GetG() related
-	GetG().m_dev = 0;
 	GetG().m_videoMan.SetDev(0);
 	GetG().m_screenFlash.onDestroyDevice();
 
@@ -1011,7 +1007,7 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 	// TODO: This is 'DO ONCE THROUGH THE WHOLE LIFETIME job.. not on every OnCreateDevice()!
 	const char* startWorldName = GetScriptManager().readString( "EpStartWorldName" );
 	GetWorldManager().setNextWorld( startWorldName );
-	GetWorldManager().changeToNextWorldIfExist();
+	//GetWorldManager().changeToNextWorldIfExist();
 
 	// (13) Determine Windowed or full screen mode
 	const char* windowMode = GetScriptManager().readString( "EpWindowMode" );

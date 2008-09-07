@@ -77,7 +77,7 @@ void Unit::setTilePos( const Point2Uint& newPos )
 	setTilePos( newPos.x, newPos.y );
 }
 
-HRESULT Unit::frameRender( double dTime, float fElapsedTime )
+HRESULT Unit::frameRender( IDirect3DDevice9* pd3dDevice, double dTime, float fElapsedTime )
 {
 	HRESULT hr = S_OK;
 
@@ -88,14 +88,14 @@ HRESULT Unit::frameRender( double dTime, float fElapsedTime )
 
 	if ( m_arnMesh )
 	{
-		GetG().m_dev->SetRenderState( D3DRS_CULLMODE, D3DCULL_CW );
+		pd3dDevice->SetRenderState( D3DRS_CULLMODE, D3DCULL_CW );
 		GetG().m_videoMan.renderMeshesOnly( m_arnMesh, m_localXform );
-		GetG().m_dev->SetRenderState( D3DRS_CULLMODE, D3DCULL_CCW );
+		pd3dDevice->SetRenderState( D3DRS_CULLMODE, D3DCULL_CCW );
 
-		drawSoul();
+		drawSoul( pd3dDevice );
 	}
 
-	drawName();
+	drawName( pd3dDevice );
 
 	return hr;
 }
@@ -277,20 +277,20 @@ HRESULT Unit::rayTesting( UnitInput mappedKey )
 	return hr;
 }
 
-void Unit::drawSoul()
+void Unit::drawSoul( IDirect3DDevice9* pd3dDevice )
 {	
 	if ( m_bSoulAnimation )
 	{
-		GetG().m_dev->SetTransform(D3DTS_WORLD, &m_localXformSoul);
-		GetG().m_dev->SetMaterial( &m_materialSoul );
+		pd3dDevice->SetTransform(D3DTS_WORLD, &m_localXformSoul);
+		pd3dDevice->SetMaterial( &m_materialSoul );
 
-		GetG().m_dev->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
-		GetG().m_dev->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-		GetG().m_dev->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
-		GetG().m_dev->SetRenderState( D3DRS_CULLMODE, D3DCULL_CW );
+		pd3dDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+		pd3dDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+		pd3dDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
+		pd3dDevice->SetRenderState( D3DRS_CULLMODE, D3DCULL_CW );
 		m_arnMesh->getD3DXMesh()->DrawSubset( 0 );
-		GetG().m_dev->SetRenderState( D3DRS_CULLMODE, D3DCULL_CCW );
-		GetG().m_dev->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
+		pd3dDevice->SetRenderState( D3DRS_CULLMODE, D3DCULL_CCW );
+		pd3dDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
 	}
 }
 
@@ -383,7 +383,7 @@ void Unit::printDebugInfo() const
 	printf( "\n" );
 }
 
-void Unit::drawName()
+void Unit::drawName( IDirect3DDevice9* pd3dDevice )
 {
 	if ( m_bNameVisible && !GetEpLight().isInFading() )
 	{
@@ -401,7 +401,7 @@ void Unit::drawName()
 			D3DXMatrixIdentity( &ident );
 
 			D3DVIEWPORT9 vp9;
-			GetG().m_dev->GetViewport( &vp9 );
+			pd3dDevice->GetViewport( &vp9 );
 			D3DXVec3Project( 
 				&vProj, &getPos(),
 				&vp9,
@@ -422,9 +422,9 @@ void Unit::drawName()
 			rc.left = (int)vProj.x - (int)(m_name.size() / 2.0f * tm.tmAveCharWidth);
 			rc.right = (int)vProj.x - (int)(m_name.size() / 2.0f * tm.tmAveCharWidth);
 			rc.bottom = (int)vProj.y + 30;
-			GetG().m_dev->SetRenderState( D3DRS_LIGHTING, FALSE );
+			pd3dDevice->SetRenderState( D3DRS_LIGHTING, FALSE );
 			g_unitNameFont->DrawTextA( 0, m_name.c_str(), -1, &rc, DT_NOCLIP, m_textColor );
-			GetG().m_dev->SetRenderState( D3DRS_LIGHTING, TRUE );
+			pd3dDevice->SetRenderState( D3DRS_LIGHTING, TRUE );
 		}
 	}
 }

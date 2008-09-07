@@ -9,7 +9,9 @@ public:
 	G(void);
 	~G(void);
 
-	LPDIRECT3DDEVICE9	m_dev;
+	// Wow! G::m_dev disappears and goes into the history of PoolG project.
+	// Thank a lot. It was big mistake to make you global.
+	//LPDIRECT3DDEVICE9	m_dev;
 	EpCamera			m_camera;
 	D3DLIGHT9			m_light;
 	VideoMan			m_videoMan;

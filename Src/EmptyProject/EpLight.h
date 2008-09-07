@@ -10,15 +10,15 @@ public:
 
 	virtual LRESULT handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 	virtual void frameMove( FLOAT fElapsedTime );
+	virtual void frameRender( IDirect3DDevice9* pd3dDevice );
 
 	bool isInFading() const { return m_bInFading; }
 
 	void setFadeDuration( float f ) { m_fFadeDuration = f; }
-	void setupLight();
+	void setupLight( IDirect3DDevice9* pd3dDevice );
 	void setColor( float r, float g, float b );
 	void setFlickerColor( D3DXCOLOR& color );
 	void setLightPos( D3DXVECTOR3& pos ) { m_light.Position = pos; m_bLightValueDirty = true; }
-	void setLightDir( D3DXVECTOR3& dir ) { m_light.Direction = dir; m_bLightValueDirty = true; }
 	void setBrightness( float b ) { m_fBrightness = b; }
 	void turnOnLight();
 	void turnOffLight();
@@ -59,6 +59,7 @@ private:
 	float				m_fDelay;
 
 	bool				m_bIsFlicker;
+	bool				m_bLightOn;
 };
 
 inline EpLight& GetEpLight() { return EpLight::getSingleton(); }

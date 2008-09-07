@@ -21,10 +21,8 @@ public:
 	virtual HRESULT enter( double dStartTime );
 	virtual HRESULT leave();
 
-	virtual HRESULT onCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
-		void* pUserContext );
-	virtual HRESULT onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
-		void* pUserContext );
+	virtual HRESULT onCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext );
+	virtual HRESULT onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext );
 	virtual void onLostDevice();
 	
 private:
@@ -39,12 +37,7 @@ private:
 	DrawRequest*	m_menuDr[5];
 	int				m_curSelMenu;
 
-	LPD3DXFONT		m_lblHYnamL;
-	LPD3DXFONT		m_lblREB;
-	LPD3DXFONT		m_lblsREB;
-	
-	LPDIRECT3DDEVICE9	m_pDev;
-
+	/*
 	Picture m_menu;
 
 	Picture m_stub;
@@ -76,4 +69,5 @@ private:
 	Picture m_slb1;
 	Picture m_slb2;
 	Picture m_slb3;
+	*/
 };

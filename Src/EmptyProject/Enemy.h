@@ -10,7 +10,7 @@ public:
 	virtual						~Enemy(void);
 
 	// VIrtual Methods
-	virtual HRESULT				frameRender( double dTime, float fElapsedTime );
+	virtual HRESULT				frameRender( IDirect3DDevice9* pd3dDevice, double dTime, float fElapsedTime );
 	virtual bool				frameMove( double dTime, float fElapsedTime );
 	virtual LRESULT				handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 

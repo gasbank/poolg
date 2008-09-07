@@ -42,20 +42,20 @@ HRESULT InnerFire::draw(bool textured)
 {
 	HRESULT hr = S_OK;
 
-	if ( getMesh() )
-	{
-		// Non-rhw drawing
-		GetG().m_dev->SetTransform(D3DTS_WORLD, &getLocalXform());
-		if (textured)
-			GetG().m_dev->SetTexture(0, m_d3dTex);
-		else
-			GetG().m_dev->SetTexture(0, 0);
-		getMesh()->DrawSubset(0);
-	}
-	else
-	{
-		assert( !"Should not be called" );
-	}
+	//if ( getMesh() )
+	//{
+	//	// Non-rhw drawing
+	//	GetG().m_dev->SetTransform(D3DTS_WORLD, &getLocalXform());
+	//	if (textured)
+	//		GetG().m_dev->SetTexture(0, m_d3dTex);
+	//	else
+	//		GetG().m_dev->SetTexture(0, 0);
+	//	getMesh()->DrawSubset(0);
+	//}
+	//else
+	//{
+	//	assert( !"Should not be called" );
+	//}
 	return hr;
 }
 

@@ -50,8 +50,6 @@ IntroState::~IntroState(void)
 
 HRESULT IntroState::enter( double dStartTime )
 {
-	LPDIRECT3DDEVICE9 pd3dDevice = GetG().m_dev;
-
 	m_logoVisible = true;
 	m_backgroundVisible = false;
 

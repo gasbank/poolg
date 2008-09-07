@@ -53,8 +53,6 @@ HRESULT World::init()
 	char command[128];
 	StringCchPrintfA( command, 128, "%s::init 0x%p", m_worldName.c_str(), this );
 	GetScriptManager().execute( command );
-
-	LPDIRECT3DDEVICE9& pd3dDevice =  GetG().m_dev;
 	
 	if ( !m_sound )
 	{
@@ -116,7 +114,7 @@ HRESULT World::frameRender(IDirect3DDevice9* pd3dDevice, double dTime, float fEl
 	for ( ; it != m_unitSet.end(); ++it )
 	{
 		if ( !(*it)->getRemoveFlag() )
-			(*it)->frameRender( dTime, fElapsedTime );
+			(*it)->frameRender( pd3dDevice, dTime, fElapsedTime );
 	}
 	
 	DialogList::iterator itDialog = m_scriptedDialog.begin();
@@ -342,7 +340,6 @@ HRESULT World::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 void World::setupLight() 
 {
 	D3DLIGHT9& light = GetG().m_light;
-	LPDIRECT3DDEVICE9& pd3dDevice = GetG().m_dev;
 
 	ZeroMemory(&light, sizeof(D3DLIGHT9));
 	D3DCOLORVALUE cv = { 0.5f, 0.5f, 0.5f, 1.0f };

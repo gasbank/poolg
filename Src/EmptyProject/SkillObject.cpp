@@ -92,7 +92,7 @@ bool SkillObject::frameMove( double dTime, float fElapsedTime )
 	return frameMoveInProgress;
 }
 
-HRESULT SkillObject::frameRender ( double dTime, float fElapsedTime )
+HRESULT SkillObject::frameRender ( IDirect3DDevice9* pd3dDevice, double dTime, float fElapsedTime )
 {
 	HRESULT f = 0;
 	D3DPERF_BeginEvent( 0, L"SkillObject Render" );

@@ -60,8 +60,8 @@ namespace eval EpA213World::LegendOfDinosaurQuest {
 		set triggerD0		[ EpCreateUnitPositionWithTraceTrigger $EpA213World::pHeroUnit $pGoodDinosaur 0x001 ]
 		set actionD0		[ EpCreateDialogAction "EpA213World::LegendOfDinosaurQuest::goodDinosaurDialog1" ]
 		set actionD1		[ EpCreateScriptAction "EpUnitSetArnMesh $pGoodDinosaur \"PoolGModel\"" ]
-		set actionD2		[ EpCreateScriptAction "EpAddSkillToHero 4" ]
-		set actionD3		[ EpCreateScriptAction "EpAddSkillToHero 3" ]
+		#set actionD2		[ EpCreateScriptAction "EpAddSkillToHero 4" ]
+		#set actionD3		[ EpCreateScriptAction "EpAddSkillToHero 3" ]
 
 
 		EpAddTriggerToSequence	$seqIncident $triggerA0
@@ -79,8 +79,8 @@ namespace eval EpA213World::LegendOfDinosaurQuest {
 		EpAddTriggerToSequence	$seqIncident $triggerD0
 		EpAddActionToSequence	$seqIncident $actionD0
 		EpAddActionToSequence	$seqIncident $actionD1
-		EpAddActionToSequence	$seqIncident $actionD2
-		EpAddActionToSequence	$seqIncident $actionD3
+		#EpAddActionToSequence	$seqIncident $actionD2
+		#EpAddActionToSequence	$seqIncident $actionD3
 
 		EpIncidentSetName	$seqIncident "LegendOfDinsaur sequential incident"
 

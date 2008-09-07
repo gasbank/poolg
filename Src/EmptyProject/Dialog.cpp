@@ -27,12 +27,12 @@ Dialog::Dialog( Speak* speakArray, UINT speakCount, const TileRegion* region, bo
 void Dialog::ctorDialogPane()
 {
 	// TODO Dialog pane images
-	m_contentPic.init(L"Images/dae-sa.png", GetG().m_dev);
+	/*m_contentPic.init(L"Images/dae-sa.png", GetG().m_dev);
 	m_contentPic.setPos (-(GetG().m_scrWidth / 2.0f), -(GetG().m_scrHeight / 2.0f), 2.8f);
 	m_contentPic.setSize(200, 200);
 	m_namePic.init(L"Images/name_window.png", GetG().m_dev);
 	m_namePic.setPos (-(GetG().m_scrWidth / 2.0f), -(GetG().m_scrHeight / 2.0f) + 200, 2.8f);
-	m_namePic.setSize(150, 60);
+	m_namePic.setSize(150, 60);*/
 
 	m_speakArray	= 0;
 	m_speakCount	= 0;
@@ -87,14 +87,14 @@ HRESULT Dialog::frameMove(double fTime, float fElapsedTime)
 	return S_OK;
 }
 
-HRESULT Dialog::frameRender(IDirect3DDevice9* pd3dDevice,  double fTime, float fElapsedTime)
+HRESULT Dialog::frameRender( IDirect3DDevice9* pd3dDevice,  double dTime, float fElapsedTime )
 {
 	if ( m_bInit )
 	{
-		GetG().m_dev->SetRenderState(D3DRS_LIGHTING, FALSE);
-		GetG().m_dev->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
-		GetG().m_dev->SetTransform(D3DTS_VIEW, &GetG().g_fixedViewMat);
-		GetG().m_dev->SetTransform(D3DTS_PROJECTION, &GetG().g_orthoProjMat);
+		pd3dDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
+		pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
+		pd3dDevice->SetTransform(D3DTS_VIEW, &GetG().g_fixedViewMat);
+		pd3dDevice->SetTransform(D3DTS_PROJECTION, &GetG().g_orthoProjMat);
 
 		D3DMATERIAL9 material;
 		D3DCOLORVALUE cv, cv2;
@@ -105,17 +105,17 @@ HRESULT Dialog::frameRender(IDirect3DDevice9* pd3dDevice,  double fTime, float f
 		material.Emissive = cv;
 		material.Power = 1.0f;
 		material.Specular = cv2;
-		GetG().m_dev->SetMaterial(&material);
+		pd3dDevice->SetMaterial(&material);
 
 		//drawFixedText(scrWidth, scrHeight);
 
-		GetG().m_dev->SetRenderState(D3DRS_ZENABLE, FALSE);
+		pd3dDevice->SetRenderState(D3DRS_ZENABLE, FALSE);
 
 		if( m_bTalking )
 		{
 			D3DPERF_BeginEvent(0x12345678, L"Draw Dialog Pane");
-			m_contentPic.draw();
-			m_namePic.draw();
+			//m_contentPic.draw();
+			//m_namePic.draw();
 			D3DPERF_EndEvent();
 
 			printDialog();
@@ -123,7 +123,7 @@ HRESULT Dialog::frameRender(IDirect3DDevice9* pd3dDevice,  double fTime, float f
 
 		}
 
-		GetG().m_dev->SetRenderState(D3DRS_ZENABLE, TRUE);
+		pd3dDevice->SetRenderState(D3DRS_ZENABLE, TRUE);
 	}
 	
 	return S_OK;

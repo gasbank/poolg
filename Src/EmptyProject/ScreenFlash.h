@@ -12,7 +12,7 @@ public:
 	void onLostDevice();
 	void onDestroyDevice();
 
-	HRESULT frameRender();
+	HRESULT frameRender( IDirect3DDevice9* pd3dDevice );
 	HRESULT frameMove( double fTime, float fElapsedTime );
 	HRESULT handleMessage( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 	

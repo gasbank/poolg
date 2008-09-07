@@ -17,6 +17,7 @@ EpLight::EpLight(void)
 	m_bInFading = false;
 	m_bIsFlicker = false;
 	m_fDelay = 0.0f;
+	m_bLightOn = false;
 
 	D3DXVECTOR3 dir( 0.0f, 0.0f, 1.0f );
 	D3DXVECTOR3 pos( -38.0f, -10.0f, -40.0f );
@@ -28,7 +29,7 @@ EpLight::~EpLight(void)
 {
 }
 
-void EpLight::setupLight()
+void EpLight::setupLight( IDirect3DDevice9* pd3dDevice )
 {
 	ZeroMemory(&m_light, sizeof(D3DLIGHT9));
 
@@ -54,8 +55,8 @@ void EpLight::setupLight()
 	m_light.Attenuation1 = 0.01f;
 	m_light.Attenuation2 = 0.0f;
 
-	GetG().m_dev->SetLight(1, &m_light);
-	GetG().m_dev->LightEnable( 1, TRUE );
+	pd3dDevice->SetLight(1, &m_light);
+	pd3dDevice->LightEnable( 1, TRUE );
 
 	m_cAmbient = cvAmb;
 	m_cDiffuse = cvDif;
@@ -143,7 +144,7 @@ void EpLight::frameMove( FLOAT fElapsedTime )
 	m_vDir = *GetG().m_camera.GetLookAtPt() - *GetG().m_camera.GetEyePt();
 	m_vPos = *GetG().m_camera.GetEyePt();
 
-	float vDirLen = D3DXVec3Length( (D3DXVECTOR3*)&m_light.Direction );
+	float vDirLen = D3DXVec3Length( &m_vDir );
 	if ( vDirLen < 1e-5 || vDirLen > 1e6 )
 		m_light.Direction = DX_CONSTS::D3DXVEC3_Z;
 	else
@@ -154,12 +155,7 @@ void EpLight::frameMove( FLOAT fElapsedTime )
 
 	m_bLightValueDirty = true;
 
-	if ( m_bLightValueDirty )
-	{
-		GetG().m_dev->SetLight( 1, &m_light );
-		m_bLightValueDirty = false;
-		//printf("lightPos: %f %f %f \n", m_light.Position.x, m_light.Position.y, m_light.Position.z );
-	}
+	
 
 	/*printf( "%f\n", m_fFadeTimer );
 	if ( m_bInFading )
@@ -203,12 +199,12 @@ void EpLight::fadeOutLight()
 
 void EpLight::turnOnLight()
 {
-	GetG().m_dev->LightEnable( 1, TRUE );
+	m_bLightOn = true;
 }
 
 void EpLight::turnOffLight()
 {
-	GetG().m_dev->LightEnable( 1, FALSE );
+	m_bLightOn = false;
 }
 
 void EpLight::updateFadeBrightness( float fElapsedTime )
@@ -310,7 +306,19 @@ void EpLight::stopFlicker()
 void EpLight::setLight( D3DLIGHT9* light )
 {
 	m_light = *light;
-	GetG().m_dev->SetLight( 1, &m_light );
+	m_bLightValueDirty = true;
+}
+
+void EpLight::frameRender( IDirect3DDevice9* pd3dDevice )
+{
+	if ( m_bLightValueDirty )
+	{
+		pd3dDevice->SetLight( 1, &m_light );
+		m_bLightValueDirty = false;
+		//printf("lightPos: %f %f %f \n", m_light.Position.x, m_light.Position.y, m_light.Position.z );
+	}
+
+	pd3dDevice->LightEnable( 1, m_bLightOn );
 }
 //////////////////////////////////////////////////////////////////////////
 

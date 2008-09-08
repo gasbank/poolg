@@ -27,6 +27,11 @@ class ArnMesh;
 
 enum UnitType { UT_UNIT, UT_CHARACTER, UT_HERO, UT_ENEMY, UT_ATTACKOBJECT, UT_INNERFIRE, UT_STRUCTREOBJECT, UT_SKILLOBJECT };
 
+/** It is responsible for a basic rendered entity.
+* Can have either a pointer of LPD3DXMESH or ArnMesh(but not both).
+* And it has local transformation matrix which contains position, scaling factor, orientation.
+* Also, there are 2D tile position and movement methods.
+*/
 class Unit
 {
 public:
@@ -47,6 +52,9 @@ public:
 	HRESULT							init();
 	
 	void							release();
+
+	/** Clear the keyboard buffer on this unit.
+	*/
 	void							clearKey();
 
 	void							setRotX( float rad ) { m_vRot.x = rad; m_bLocalXformDirty = true; }

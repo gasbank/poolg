@@ -33,6 +33,15 @@
 #include "G.h"
 
 
+// RakNet
+#include "MessageIdentifiers.h"
+#include "RakNetworkFactory.h"
+#include "RakPeerInterface.h"
+#include "RakNetStatistics.h"
+#include "RakNetTypes.h"
+#include "BitStream.h"
+#include "RakSleep.h"
+
 #ifndef EP_SAFE_RELEASE
 #define EP_SAFE_RELEASE(p)      { if (p) { (p)->release(); SAFE_DELETE(p); } }
 #endif

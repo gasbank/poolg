@@ -104,6 +104,9 @@ int								g_nActiveSystem					= 0;
 CParticleSystem*				g_pParticleSystems[6];
 bool							g_bParticleVisible				= false;
 
+// RakNet
+RakPeerInterface*				g_clientPeer					= 0;
+
 //////////////////////////////////////////////////////////////////////////
 
 void ConfigureShaders( LPDIRECT3DDEVICE9 pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc );
@@ -113,6 +116,8 @@ void ConfigureTestGeometry( LPDIRECT3DDEVICE9 pd3dDevice );
 
 void SetupFullscreenQuad( const D3DSURFACE_DESC* pBackBufferSurfaceDesc );
 
+void ConnectToServer();
+void DisconnectFromServer();
 
 //--------------------------------------------------------------------------------------
 // Rejects any D3D9 devices that aren't acceptable to the app by returning false
@@ -1014,6 +1019,9 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 	bool bWindowMode = (*windowMode)=='1'?true:false;
 
 
+	// (14) RakNet: Connect to server
+	ConnectToServer();
+
 
 
 	//////////////////////////////////////////////////////////////////////////
@@ -1061,6 +1069,9 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 	WaitForSingleObject( g_consoleReleasedEvent, INFINITE );
 	
 #endif
+
+
+	DisconnectFromServer();
 
 	// DO NOT USE EP_SAFE_RELEASE or SAFE_DELETE on these objects.
 	// It should be allocated once time through the application lifetime,
@@ -1305,4 +1316,222 @@ void ConfigureTestGeometry( LPDIRECT3DDEVICE9 pd3dDevice )
 	D3DXCreateSphere( pd3dDevice, 1.0f, 8, 8, &g_bst[BST_SPHERE], 0 );
 	D3DXCreateBox( pd3dDevice, 1.0f, 1.0f, 1.0f, &g_bst[BST_CUBE], 0 );
 	D3DXCreatePolygon( pd3dDevice, 1.0f, 4, &g_bst[BST_PLANE], 0 );
+}
+
+
+// Copied from Multiplayer.cpp
+// If the first byte is ID_TIMESTAMP, then we want the 5th byte
+// Otherwise we want the 1st byte
+unsigned char GetPacketIdentifier(Packet *p)
+{
+	if (p==0)
+		return 255;
+
+	if ((unsigned char)p->data[0] == ID_TIMESTAMP)
+	{
+		assert(p->length > sizeof(unsigned char) + sizeof(unsigned long));
+		return (unsigned char) p->data[sizeof(unsigned char) + sizeof(unsigned long)];
+	}
+	else
+		return (unsigned char) p->data[0];
+}
+
+
+void ConnectToServer()
+{
+	g_clientPeer = RakNetworkFactory::GetRakPeerInterface();
+
+	// Holds packets
+	Packet* p;
+
+	// GetPacketIdentifier returns this
+	unsigned char packetIdentifier;
+
+	// Just so we can remember where the packet came from
+	bool isServer;
+
+	// Record the first client that connects to us so we can pass it to the ping function
+	SystemAddress clientID = UNASSIGNED_SYSTEM_ADDRESS;
+
+	// Crude interface
+
+	// Holds user data
+	char ip[30], serverPort[30], clientPort[30];
+
+	// A client
+	isServer = false;
+
+	printf( "This is a sample implementation of a text based chat client.\n" );
+	printf( "Connect to the project 'Chat Example Server'.\n" );
+	printf( "Difficulty: Beginner\n\n" );
+
+	// Get our input
+	puts( "Enter the client port to listen on" );
+	/*gets( clientPort );
+	if ( clientPort[0] == 0 )
+		strcpy( clientPort, "0" );*/
+	strcpy_s( clientPort, 30, "0" );
+	
+
+	puts( "Enter IP to connect to" );
+	//gets( ip );
+	g_clientPeer->AllowConnectionResponseIPMigration(false);
+	//if (ip[0]==0)
+		strcpy_s(ip, 30, "127.0.0.1");
+
+
+	puts("Enter the port to connect to");
+	//gets(serverPort);
+	//if (serverPort[0]==0)
+		strcpy_s(serverPort, 30, "10000");
+
+	// Connecting the client is very simple.  0 means we don't care about
+	// a connectionValidationInteger, and false for low priority threads
+	SocketDescriptor socketDescriptor((unsigned short)atoi(clientPort),0);
+	g_clientPeer->Startup(1,30,&socketDescriptor, 1);
+	g_clientPeer->SetOccasionalPing(true);
+	bool b = g_clientPeer->Connect(ip, (unsigned short)atoi(serverPort), "Rumpelstiltskin", (int) strlen("Rumpelstiltskin"));	
+
+	if (b)
+	{
+		puts("Attempting connection");
+
+		//puts("'quit' to quit. 'stat' to show stats. 'ping' to ping. 'disconnect' to disconnect. Type to talk.");
+
+		bool doLoop = true;
+
+		while ( doLoop )
+		{
+			Sleep(30);
+
+			p = g_clientPeer->Receive();
+
+
+			if (p==0)
+				continue; // Didn't get any packets
+
+			// We got a packet, get the identifier with our handy function
+			packetIdentifier = GetPacketIdentifier(p);
+
+			// Check if this is a network message packet
+			switch (packetIdentifier)
+			{
+			case ID_DISCONNECTION_NOTIFICATION:
+				// Connection lost normally
+				printf("ID_DISCONNECTION_NOTIFICATION\n");
+				doLoop = false;
+				break;
+			case ID_ALREADY_CONNECTED:
+				// Connection lost normally
+				printf("ID_ALREADY_CONNECTED\n");
+				break;
+			case ID_REMOTE_DISCONNECTION_NOTIFICATION: // Server telling the clients of another client disconnecting gracefully.  You can manually broadcast this in a peer to peer enviroment if you want.
+				printf("ID_REMOTE_DISCONNECTION_NOTIFICATION\n");
+				break;
+			case ID_REMOTE_CONNECTION_LOST: // Server telling the clients of another client disconnecting forcefully.  You can manually broadcast this in a peer to peer enviroment if you want.
+				printf("ID_REMOTE_CONNECTION_LOST\n");
+				break;
+			case ID_REMOTE_NEW_INCOMING_CONNECTION: // Server telling the clients of another client connecting.  You can manually broadcast this in a peer to peer enviroment if you want.
+				printf("ID_REMOTE_NEW_INCOMING_CONNECTION\n");
+				break;
+			case ID_CONNECTION_BANNED: // Banned from this server
+				printf("We are banned from this server.\n");
+				break;			
+			case ID_CONNECTION_ATTEMPT_FAILED:
+				printf("Connection attempt failed\n");
+				doLoop = false;
+				break;
+			case ID_NO_FREE_INCOMING_CONNECTIONS:
+				// Sorry, the server is full.  I don't do anything here but
+				// A real app should tell the user
+				printf("ID_NO_FREE_INCOMING_CONNECTIONS\n");
+				break;
+			case ID_MODIFIED_PACKET:
+				// Cheater!
+				printf("ID_MODIFIED_PACKET\n");
+				break;
+
+			case ID_INVALID_PASSWORD:
+				printf("ID_INVALID_PASSWORD\n");
+				break;
+
+			case ID_CONNECTION_LOST:
+				// Couldn't deliver a reliable packet - i.e. the other system was abnormally
+				// terminated
+				printf("ID_CONNECTION_LOST\n");
+				break;
+
+			case ID_CONNECTION_REQUEST_ACCEPTED:
+				// This tells the client they have connected
+				printf("ID_CONNECTION_REQUEST_ACCEPTED\n");
+
+				doLoop = false;
+				break;
+			default:
+				// It's a client, so just show the message
+				printf( "%s\n", p->data );
+				break;
+			}
+
+
+			// We're done with the packet
+			g_clientPeer->DeallocatePacket( p );
+
+		}
+
+	}
+	else
+	{
+		puts( "Bad connection attempt.  Terminating." );
+		DebugBreak();
+	}
+}
+
+void DisconnectFromServer()
+{
+	if ( g_clientPeer == 0 )
+		return;
+
+	Packet* p;
+	unsigned char packetIdentifier;
+
+	if ( g_clientPeer->IsConnected( g_clientPeer->GetSystemAddressFromIndex( 0 ) ) )
+	{
+		g_clientPeer->CloseConnection( g_clientPeer->GetSystemAddressFromIndex( 0 ), true, 0 );
+		printf( "Disconnecting.\n" );
+
+		bool doLoop = true;
+		while ( doLoop )
+		{
+			Sleep(30);
+
+			p = g_clientPeer->Receive();
+
+
+			if ( p == 0 )
+				continue; // Didn't get any packets
+
+			// We got a packet, get the identifier with our handy function
+			packetIdentifier = GetPacketIdentifier( p );
+
+			// Check if this is a network message packet
+			switch ( packetIdentifier )
+			{
+			case ID_DISCONNECTION_NOTIFICATION:
+				// Connection lost normally
+				printf("ID_DISCONNECTION_NOTIFICATION\n");
+				doLoop = false;
+				break;
+			}
+
+			// We're done with the packet
+			g_clientPeer->DeallocatePacket( p );
+		}
+	}
+
+	// Be nice and let the server know we quit.
+	g_clientPeer->Shutdown( 300 );
+
+	// We're done with the network
+	RakNetworkFactory::DestroyRakPeerInterface( g_clientPeer );
 }

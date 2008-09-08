@@ -74,13 +74,11 @@ namespace eval EpA213World::OldRatandGatekeeperQuest {
 		EpAddActionToSequence		$sqIncident	$action1
 
 		# ¹® ¿­±â ---------------------------------------------------------------------------------
-		set actions			[ EpCreateControllableAction	$EpA213World::pHeroUnit 0					]
-		lappend actions		[ EpCreateScriptAction			"EpA213World::OldRatandGatekeeperQuest::doGateOpenAnim"		]
-		lappend actions		[ EpCreateCameraAction			external GateCamera 0						]
-		#lappend actions		[ EpCreateScriptAction			"EpCameraSetShake 1"						]
-		lappend actions		[ EpCreateDelayAction			10000										]
-		lappend actions		[ EpCreateCameraAction			attach xxx 1500								]
-		#lappend actions		[ EpCreateScriptAction			"EpCameraSetShake 0"						]
+		set actions			[ EpCreateControllableAction	$EpA213World::pHeroUnit 0								]
+		lappend actions		[ EpCreateScriptAction			"EpA213World::OldRatandGatekeeperQuest::doGateOpenAnim"	]
+		lappend actions		[ EpCreateCameraAction			external GateCamera 0									]
+		lappend actions		[ EpCreateDelayAction			10000													]
+		lappend actions		[ EpCreateCameraAction			attach xxx 1500											]
 		lappend actions		[ EpCreateControllableAction	$EpA213World::pHeroUnit 1								]
 
 		foreach act $actions {

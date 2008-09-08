@@ -50,7 +50,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	// for low priority threads
 	SocketDescriptor socketDescriptor( atoi( portstring ), 0 );
 	bool b = server->Startup( 32, 30, &socketDescriptor, 1 );
-	server->SetMaximumIncomingConnections( 2 );
+	server->SetMaximumIncomingConnections( 4 );
 	if ( b )
 		puts( "Server started, waiting for connections." );
 	else

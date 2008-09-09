@@ -32,7 +32,7 @@ enum UnitType { UT_UNIT, UT_CHARACTER, UT_HERO, UT_ENEMY, UT_ATTACKOBJECT, UT_IN
 * And it has local transformation matrix which contains position, scaling factor, orientation.
 * Also, there are 2D tile position and movement methods.
 */
-class Unit
+class Unit : public NetworkIDObject
 {
 public:
 	// Ctor and Dtor and create
@@ -75,6 +75,7 @@ public:
 
 	void							setHeadDir( UnitInput ui );
 
+	void							setTilePosRpc( int tileX, int tileY ) { setTileBufferPos(tileX, tileY); }
 	void							setTilePos( int tileX, int tileY );
 	void							setTilePos( const Point2Uint& newPos );
 	void							setTileBufferPos( int tileX, int tileY ) { m_tileBufferPos.x = tileX; m_tileBufferPos.y = tileY; }

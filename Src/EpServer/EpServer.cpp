@@ -2,15 +2,15 @@
 //
 
 #include "stdafx.h"
+#include "ClientPool.h"
+#include <windows.h>
 
-RakNet::RPC3 rpc3Inst;
+RakNet::RPC3 g_rpc3Inst;
+ClientPool g_clientPool;
+
+
 // We copy this from Multiplayer.cpp to keep things all in one file for this example
 unsigned char GetPacketIdentifier(Packet *p);
-
-void PrintHelloWorld( int a )
-{
-	return;
-}
 
 int _tmain(int argc, _TCHAR* argv[])
 {
@@ -21,9 +21,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	NetworkIDManager networkIDManager;
 	networkIDManager.SetIsNetworkIDAuthority(true);
-	rpc3Inst.SetNetworkIDManager(&networkIDManager);
-
-	RPC3_REGISTER_FUNCTION(&rpc3Inst, PrintHelloWorld);
+	g_rpc3Inst.SetNetworkIDManager(&networkIDManager);
 
 	// Pointers to the interfaces of our server and client.
 	// Note we can easily have both in the same program
@@ -39,7 +37,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	unsigned char packetIdentifier;
 
 	// Record the first client that connects to us so we can pass it to the ping function
-	SystemAddress clientID = UNASSIGNED_SYSTEM_ADDRESS;
+	//SystemAddress clientID = UNASSIGNED_SYSTEM_ADDRESS;
 
 	// Holds user data
 	char portstring[30];
@@ -75,7 +73,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	puts( "'quit' to quit. 'stat' to show stats. 'ping' to ping.\n'ban' to ban an IP from connecting.\n'kick to kick the first connected player.\nType to talk." );
 
-	server->AttachPlugin(&rpc3Inst);
+	server->AttachPlugin(&g_rpc3Inst);
 
 	char message[2048];
 
@@ -94,7 +92,7 @@ int _tmain(int argc, _TCHAR* argv[])
 			// Because the network engine was painstakingly written using threads.
 			gets_s( message, 2048 );
 
-			if ( strcmp( message, "quit" ) == 0 )
+			if ( strcmp( message, "quit" ) == 0 || strcmp( message, "q" ) == 0 )
 			{
 				puts( "Quitting." );
 				break;
@@ -112,16 +110,32 @@ int _tmain(int argc, _TCHAR* argv[])
 
 			if ( strcmp( message, "ping" ) == 0 )
 			{
-				server->Ping(clientID);
+				//server->Ping(clientID);
 
 				continue;
 			}
 
 			if ( strcmp( message, "kick" ) == 0 )
 			{
-				server->CloseConnection( clientID, true, 0 );
+				//server->CloseConnection( clientID, true, 0 );
 
 				continue;
+			}
+
+			if ( strcmp( message, "create" ) == 0 )
+			{
+				RakNet::RakString command( "createEnemy2 {12 60}" );
+				g_rpc3Inst.CallC( "EpRpcDoScript", command );
+
+				continue;
+			}
+
+			if ( strcmp( message, "move" ) == 0 )
+			{
+				NetworkID nid;
+				nid.localSystemAddress = 100;
+				int tilePosX = 0, tilePosY = 0;
+				g_rpc3Inst.CallCPP( "&Unit::setTilePosRpc", nid, tilePosX, tilePosY );
 			}
 
 
@@ -172,17 +186,20 @@ int _tmain(int argc, _TCHAR* argv[])
 		case ID_DISCONNECTION_NOTIFICATION:
 			// Connection lost normally
 			printf( "ID_DISCONNECTION_NOTIFICATION\n" );
+			g_clientPool.removeClient( p->systemAddress );
+			printf( "Current Clients: %d\n", g_clientPool.getClientCount() );
 			break;
 
 
 		case ID_NEW_INCOMING_CONNECTION:
 			// Somebody connected.  We have their IP now
 			printf( "ID_NEW_INCOMING_CONNECTION from %s\n", p->systemAddress.ToString() );
-			clientID = p->systemAddress; // Record the player ID of the client
-
+			//clientID = p->systemAddress; // Record the player ID of the client
+			g_clientPool.addClient( p->systemAddress );
+			printf( "Current Clients: %d\n", g_clientPool.getClientCount() );
 			{
 				int a = 2008;
-				rpc3Inst.CallC( "PrintHelloWorld", a );
+				g_rpc3Inst.CallC( "PrintHelloWorld", a );
 			}
 			
 			break;
@@ -190,14 +207,45 @@ int _tmain(int argc, _TCHAR* argv[])
 		case ID_MODIFIED_PACKET:
 			// Cheater!
 			printf( "ID_MODIFIED_PACKET\n" );
+			DebugBreak();
 			break;
 
 		case ID_CONNECTION_LOST:
 			// Couldn't deliver a reliable packet - i.e. the other system was abnormally
 			// terminated
 			printf( "ID_CONNECTION_LOST\n" );
+			g_clientPool.removeClient( p->systemAddress );
 			break;
-
+		case ID_RPC_REMOTE_ERROR:
+			{
+				// Recipient system returned an error
+				switch (p->data[1])
+				{
+				case RakNet::RPC_ERROR_NETWORK_ID_MANAGER_UNAVAILABLE:
+					printf("RPC_ERROR_NETWORK_ID_MANAGER_UNAVAILABLE\n");
+					break;
+				case RakNet::RPC_ERROR_OBJECT_DOES_NOT_EXIST:
+					printf("RPC_ERROR_OBJECT_DOES_NOT_EXIST\n");
+					break;
+				case RakNet::RPC_ERROR_FUNCTION_INDEX_OUT_OF_RANGE:
+					printf("RPC_ERROR_FUNCTION_INDEX_OUT_OF_RANGE\n");
+					break;
+				case RakNet::RPC_ERROR_FUNCTION_NOT_REGISTERED:
+					printf("RPC_ERROR_FUNCTION_NOT_REGISTERED\n");
+					break;
+				case RakNet::RPC_ERROR_FUNCTION_NO_LONGER_REGISTERED:
+					printf("RPC_ERROR_FUNCTION_NO_LONGER_REGISTERED\n");
+					break;
+				case RakNet::RPC_ERROR_CALLING_CPP_AS_C:
+					printf("RPC_ERROR_CALLING_CPP_AS_C\n");
+					break;
+				case RakNet::RPC_ERROR_CALLING_C_AS_CPP:
+					printf("RPC_ERROR_CALLING_C_AS_CPP\n");
+					break;
+				}
+				printf("Function: %s", p->data+2);
+			}
+			break;
 		default:
 			// The server knows the static data of all clients, so we can prefix the message
 			// With the name data

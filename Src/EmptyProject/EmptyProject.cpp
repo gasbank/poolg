@@ -108,7 +108,7 @@ bool							g_bParticleVisible				= false;
 // RakNet
 RakPeerInterface*				g_clientPeer					= 0;
 RakNet::RPC3					g_rpc3Inst;
-
+NetworkIDManager				g_networkIDManager;
 //////////////////////////////////////////////////////////////////////////
 
 void ConfigureShaders( LPDIRECT3DDEVICE9 pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc );
@@ -316,9 +316,63 @@ void OnFrameMoveNetworkProcess()
 {
 	if ( g_clientPeer )
 	{
-		Packet* p = g_clientPeer->Receive();
-		if ( p )
-			g_clientPeer->DeallocatePacket( p );
+		Packet* p;
+		for (p=g_clientPeer->Receive(); p; g_clientPeer->DeallocatePacket(p), p=g_clientPeer->Receive())
+		{
+			switch (p->data[0])
+			{
+			case ID_DISCONNECTION_NOTIFICATION:
+				printf("ID_DISCONNECTION_NOTIFICATION\n");
+				break;
+			case ID_ALREADY_CONNECTED:
+				printf("ID_ALREADY_CONNECTED\n");
+				break;
+			case ID_CONNECTION_ATTEMPT_FAILED:
+				printf("Connection attempt failed\n");
+				break;
+			case ID_NO_FREE_INCOMING_CONNECTIONS:
+				printf("ID_NO_FREE_INCOMING_CONNECTIONS\n");
+				break;
+			case ID_PONG:
+				break;
+			case ID_CONNECTION_REQUEST_ACCEPTED:
+				// This tells the client they have connected
+				printf("ID_CONNECTION_REQUEST_ACCEPTED\n");
+				break;
+			case ID_NEW_INCOMING_CONNECTION:
+				printf("ID_NEW_INCOMING_CONNECTION\n");
+				break;
+			case ID_RPC_REMOTE_ERROR:
+				{
+					// Recipient system returned an error
+					switch (p->data[1])
+					{
+					case RakNet::RPC_ERROR_NETWORK_ID_MANAGER_UNAVAILABLE:
+						printf("RPC_ERROR_NETWORK_ID_MANAGER_UNAVAILABLE\n");
+						break;
+					case RakNet::RPC_ERROR_OBJECT_DOES_NOT_EXIST:
+						printf("RPC_ERROR_OBJECT_DOES_NOT_EXIST\n");
+						break;
+					case RakNet::RPC_ERROR_FUNCTION_INDEX_OUT_OF_RANGE:
+						printf("RPC_ERROR_FUNCTION_INDEX_OUT_OF_RANGE\n");
+						break;
+					case RakNet::RPC_ERROR_FUNCTION_NOT_REGISTERED:
+						printf("RPC_ERROR_FUNCTION_NOT_REGISTERED\n");
+						break;
+					case RakNet::RPC_ERROR_FUNCTION_NO_LONGER_REGISTERED:
+						printf("RPC_ERROR_FUNCTION_NO_LONGER_REGISTERED\n");
+						break;
+					case RakNet::RPC_ERROR_CALLING_CPP_AS_C:
+						printf("RPC_ERROR_CALLING_CPP_AS_C\n");
+						break;
+					case RakNet::RPC_ERROR_CALLING_C_AS_CPP:
+						printf("RPC_ERROR_CALLING_C_AS_CPP\n");
+						break;
+					}
+					printf("Function: %s", p->data+2);
+				}
+			}
+		}
 	}
 }
 
@@ -1360,23 +1414,23 @@ unsigned char GetPacketIdentifier(Packet *p)
 		return (unsigned char) p->data[0];
 }
 
-
+void EpRpcDoScript( RakNet::RakString command )
+{
+	GetScriptManager().execute( command );
+}
 
 void ConnectToServer()
 {
 	//g_rpc3Inst = new RakNet::RPC3;
 
-	NetworkIDManager networkIDManager;
-	networkIDManager.SetIsNetworkIDAuthority( true );
-	g_rpc3Inst.SetNetworkIDManager( &networkIDManager );
+
+	g_networkIDManager.SetIsNetworkIDAuthority( true );
+	g_rpc3Inst.SetNetworkIDManager( &g_networkIDManager );
 
 	RPC3_REGISTER_FUNCTION( &g_rpc3Inst, PrintHelloWorld );
-	
-	RakNet::RakString rs("xxx");
+	RPC3_REGISTER_FUNCTION( &g_rpc3Inst, EpRpcDoScript );
+	RPC3_REGISTER_FUNCTION( &g_rpc3Inst, &Unit::setTilePosRpc );
 
-
-	
-	
 	
 	g_clientPeer = RakNetworkFactory::GetRakPeerInterface();
 

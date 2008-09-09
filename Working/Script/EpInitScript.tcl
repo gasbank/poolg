@@ -15,7 +15,7 @@ proc EpInitApp {} {
 	# Screen Resolution
 	set w1 320
 	set h1 240
-	set multiplier 2
+	set multiplier 1
 	EpSetWindowSize [expr $w1 * $multiplier] [expr $h1 * $multiplier]
 }
 

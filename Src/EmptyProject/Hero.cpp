@@ -11,6 +11,8 @@
 #include "Sound.h"
 #include "SkillManager.h"
 
+extern NetworkIDManager				g_networkIDManager;
+
 Hero::Hero(void)
 : Character( UT_HERO )
 {
@@ -40,6 +42,11 @@ Unit* Hero::createHero( LPD3DXMESH mesh, int tileX, int tileY, float posZ )
 
 	u->memorizeSkill( GetSKillManager().getSkill( "TestSkill" ) );
 	u->equipSkill( 1, GetSKillManager().getSkill( "TestSkill" ) );
+
+	NetworkID nid;
+	nid.localSystemAddress = 100;
+	u->SetNetworkIDManager( &g_networkIDManager );
+	u->SetNetworkID( nid );
 	return u;
 }
 
@@ -113,6 +120,7 @@ Unit* EpCreateHero( Tcl_Obj* tilePos )
 {
 	int tileX = 0, tileY = 0;
 	GetScriptManager().readTwoIntObj( tilePos, tileX, tileY );
+
 	return Hero::createHero( 0, tileX, tileY, 0 );
 
 } SCRIPT_CALLABLE_PV_OBJ( EpCreateHero )

@@ -40,6 +40,7 @@
 #include "Skill.h"
 #include "SkillManager.h"
 
+
 G								g_g;
 WorldManager*					g_wm							= 0;
 TopStateManager*				g_tsm							= 0;
@@ -106,6 +107,7 @@ bool							g_bParticleVisible				= false;
 
 // RakNet
 RakPeerInterface*				g_clientPeer					= 0;
+RakNet::RPC3					g_rpc3Inst;
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -118,6 +120,13 @@ void SetupFullscreenQuad( const D3DSURFACE_DESC* pBackBufferSurfaceDesc );
 
 void ConnectToServer();
 void DisconnectFromServer();
+
+
+
+void PrintHelloWorld( int number )
+{
+	odprintf( "Hello World from RPC!: %d\n", number );
+}
 
 //--------------------------------------------------------------------------------------
 // Rejects any D3D9 devices that aren't acceptable to the app by returning false
@@ -158,6 +167,7 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 	HRESULT hr = S_OK;
 
 	UNREFERENCED_PARAMETER( hr );
+
 
 	// (1) Set D3D device global variable which is shared through the whole application lifetime.
 	//     GetG() related init
@@ -302,6 +312,16 @@ HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFA
 	return hr;
 }
 
+void OnFrameMoveNetworkProcess()
+{
+	if ( g_clientPeer )
+	{
+		Packet* p = g_clientPeer->Receive();
+		if ( p )
+			g_clientPeer->DeallocatePacket( p );
+	}
+}
+
 
 //--------------------------------------------------------------------------------------
 // Handle updates to the scene.  This is called regardless of which D3D API is used
@@ -340,6 +360,8 @@ void CALLBACK OnFrameMove( double fTime, float fElapsedTime, void* pUserContext 
 	g_debugBuffer.append( msg );
 	
 	GetG().m_screenFlash.frameMove( fTime, fElapsedTime );
+
+	OnFrameMoveNetworkProcess();
 }
 
 
@@ -905,7 +927,6 @@ void CreateScriptManagerIfNotExist()
 }
 
 
-
 //--------------------------------------------------------------------------------------
 // Initialize everything and go into a render loop
 //--------------------------------------------------------------------------------------
@@ -1072,6 +1093,9 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 
 
 	DisconnectFromServer();
+
+	// No more RakNet job.
+	RakNet::RakString::FreeMemory();
 
 	// DO NOT USE EP_SAFE_RELEASE or SAFE_DELETE on these objects.
 	// It should be allocated once time through the application lifetime,
@@ -1337,8 +1361,23 @@ unsigned char GetPacketIdentifier(Packet *p)
 }
 
 
+
 void ConnectToServer()
 {
+	//g_rpc3Inst = new RakNet::RPC3;
+
+	NetworkIDManager networkIDManager;
+	networkIDManager.SetIsNetworkIDAuthority( true );
+	g_rpc3Inst.SetNetworkIDManager( &networkIDManager );
+
+	RPC3_REGISTER_FUNCTION( &g_rpc3Inst, PrintHelloWorld );
+	
+	RakNet::RakString rs("xxx");
+
+
+	
+	
+	
 	g_clientPeer = RakNetworkFactory::GetRakPeerInterface();
 
 	// Holds packets
@@ -1391,6 +1430,8 @@ void ConnectToServer()
 	g_clientPeer->Startup(1,30,&socketDescriptor, 1);
 	g_clientPeer->SetOccasionalPing(true);
 	bool b = g_clientPeer->Connect(ip, (unsigned short)atoi(serverPort), "Rumpelstiltskin", (int) strlen("Rumpelstiltskin"));	
+
+	g_clientPeer->AttachPlugin( &g_rpc3Inst );
 
 	if (b)
 	{
@@ -1529,9 +1570,14 @@ void DisconnectFromServer()
 		}
 	}
 
+	
+
 	// Be nice and let the server know we quit.
 	g_clientPeer->Shutdown( 300 );
 
 	// We're done with the network
 	RakNetworkFactory::DestroyRakPeerInterface( g_clientPeer );
+
+	//SAFE_DELETE( g_rpc3Inst );
+	
 }

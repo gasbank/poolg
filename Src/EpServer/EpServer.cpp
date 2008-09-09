@@ -3,10 +3,14 @@
 
 #include "stdafx.h"
 
-
+RakNet::RPC3 rpc3Inst;
 // We copy this from Multiplayer.cpp to keep things all in one file for this example
 unsigned char GetPacketIdentifier(Packet *p);
 
+void PrintHelloWorld( int a )
+{
+	return;
+}
 
 int _tmain(int argc, _TCHAR* argv[])
 {
@@ -14,6 +18,12 @@ int _tmain(int argc, _TCHAR* argv[])
 #if defined(DEBUG) | defined(_DEBUG)
 	_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 #endif
+
+	NetworkIDManager networkIDManager;
+	networkIDManager.SetIsNetworkIDAuthority(true);
+	rpc3Inst.SetNetworkIDManager(&networkIDManager);
+
+	RPC3_REGISTER_FUNCTION(&rpc3Inst, PrintHelloWorld);
 
 	// Pointers to the interfaces of our server and client.
 	// Note we can easily have both in the same program
@@ -64,6 +74,9 @@ int _tmain(int argc, _TCHAR* argv[])
 
 
 	puts( "'quit' to quit. 'stat' to show stats. 'ping' to ping.\n'ban' to ban an IP from connecting.\n'kick to kick the first connected player.\nType to talk." );
+
+	server->AttachPlugin(&rpc3Inst);
+
 	char message[2048];
 
 	// Loop for input
@@ -166,6 +179,12 @@ int _tmain(int argc, _TCHAR* argv[])
 			// Somebody connected.  We have their IP now
 			printf( "ID_NEW_INCOMING_CONNECTION from %s\n", p->systemAddress.ToString() );
 			clientID = p->systemAddress; // Record the player ID of the client
+
+			{
+				int a = 2008;
+				rpc3Inst.CallC( "PrintHelloWorld", a );
+			}
+			
 			break;
 
 		case ID_MODIFIED_PACKET:
@@ -202,6 +221,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	RakNetworkFactory::DestroyRakPeerInterface( server );
 
 
+	RakNet::RakString::FreeMemory();
 	return 0;
 }
 

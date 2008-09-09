@@ -15,6 +15,7 @@
 // TODO: reference additional headers your program requires here
 
 // RakNet
+#include "RPC3.h"
 #include "MessageIdentifiers.h"
 #include "RakNetworkFactory.h"
 #include "RakPeerInterface.h"

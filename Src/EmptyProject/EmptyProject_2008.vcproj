@@ -45,15 +45,14 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../Aran/include;../DXUT/Core;../DXUT/Optional;../tcl/include;../RakNet/include"
-				PreprocessorDefinitions="WIN32;_DEBUG;DEBUG;PROFILE;_WINDOWS"
+				AdditionalIncludeDirectories="../RakNet/include;../RakNet_RPC3;../Aran/include;../DXUT/Core;../DXUT/Optional;../tcl/include"
+				PreprocessorDefinitions="WIN32;_DEBUG;DEBUG;_WINDOWS"
 				MinimalRebuild="true"
-				BasicRuntimeChecks="0"
+				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="EmptyProjectPCH.h"
-				WarningLevel="4"
-				WarnAsError="true"
+				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
 			/>
@@ -69,7 +68,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/IGNORE:4089"
-				AdditionalDependencies="Aran.lib tcl85g.lib DXUT.lib DXUTOpt.lib dxerr.lib dxguid.lib d3dx10d.lib d3d10.lib d3dx9d.lib d3d9.lib winmm.lib comctl32.lib RakNetDLLDebug.lib"
+				AdditionalDependencies="Aran.lib tcl85g.lib DXUT.lib DXUTOpt.lib dxerr.lib dxguid.lib d3dx10d.lib d3d10.lib d3dx9d.lib d3d9.lib winmm.lib comctl32.lib RakNetDLLDebug.lib RakNet_RPC3.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="../Aran/lib;../DXUT/Core/Debug;../DXUT/Optional/Debug;../tcl/lib;../RakNet/lib"
 				GenerateManifest="false"
@@ -78,7 +77,6 @@
 				ProgramDatabaseFile="$(OutDir)/EmptyProject.pdb"
 				SubSystem="1"
 				RandomizedBaseAddress="1"
-				DataExecutionPrevention="0"
 				TargetMachine="1"
 			/>
 			<Tool

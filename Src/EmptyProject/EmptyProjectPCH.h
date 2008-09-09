@@ -7,13 +7,38 @@
 #endif
 
 
+// The following macros define the minimum required platform.  The minimum required platform
+// is the earliest version of Windows, Internet Explorer etc. that has the necessary features to run 
+// your application.  The macros work by enabling all features available on platform versions up to and 
+// including the version specified.
+
+// Modify the following defines if you have to target a platform prior to the ones specified below.
+// Refer to MSDN for the latest info on corresponding values for different platforms.
+#ifndef _WIN32_WINNT            // Specifies that the minimum required platform is Windows Vista.
+#define _WIN32_WINNT 0x0600     // Change this to the appropriate value to target other versions of Windows.
+#endif
+
+
+
 #pragma warning(disable:4201)
 #pragma warning(disable:4100)
 #pragma warning(disable:4505) // disable 'unreferenced local function has been removed' warning
 #pragma warning(disable:4189) // disable 'local variable is initialized but not referenced' warning
 
+
+
+#include <iostream>
+#include <stdlib.h>
+#include <malloc.h>
+#include <memory.h>
+#include <map>
+#include <fstream>
+#include <list>
+#include <vector>
 #include <stdio.h>
 #include <stdarg.h>
+#include <stdlib.h>
+#include <string.h>
 #include <ctype.h>
 #include <tchar.h>
 #include <string>
@@ -25,15 +50,24 @@
 
 
 #include "DXUT.h"
-#include "AranPCH.h"
 #include <xact3.h>
 #include "DXUTcamera.h"
 #include "tcl.h"
 
+
+// Aran Lib
+#include "Macros.h"
+#include "Singleton.h"
+#include "Log.h"
+#include "Structs.h"
+#include "MyError.h"
+
 #include "G.h"
 
 
+
 // RakNet
+#include "RPC3.h"
 #include "MessageIdentifiers.h"
 #include "RakNetworkFactory.h"
 #include "RakPeerInterface.h"

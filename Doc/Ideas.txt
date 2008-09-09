@@ -1,0 +1,80 @@
+
+All PoolG Components
+
+* C++ as programming language
+* Visual Studio 2008 as IDE
+* Direct3D 9 as rendering library
+* HLSL as shader language
+* XACT as sound engine
+* Tcl language as game script
+* RakNet as network engine (tentative)
+
+
+FROM FAIRLY EASY ONE TO TIME-CONSUMING ONE... :)
+
+
+- Particle system: Source code availble which was acquired from internet, but runs too slowly.
+
+                   Should optimize/remove minute factors to accelerate calculation.
+
+
+- Item & Inventory: Items such as 'HP potion' can be implemeneted easily.
+
+                    Put the item on the tile and make a player can get it.
+                    
+                    It is optional to make inventory when there are no equippable item.
+
+                    Equippable items like armor or sword, maybe harder.
+                    
+                    Related UI can be tough, too.
+
+
+- Multi-enemy Battle/Skill System: There are some incompleted code snippets about this feature.
+
+                                   This is fairly coupled with multiplayer system and user interface.
+                                   
+                                   There are no turn-control system either.
+
+
+- Sound System: Original author had left the team and he will not come back. Sound system is
+
+                implemented with XACT, so anyone who want to learn the Microsoft philosophy about
+                
+                authoring application please contribute to this one.
+                
+                Almost features are works nicely, but there are some bugs on sound system.
+
+
+- Skeleton Animation: The old version of Aran library has a skeleton animation feature, but
+
+                      not on the current Aran library which is used at PoolG project.
+                      
+                      The old Aran library was built on 3ds Max. However, new one is based on
+                      
+                      Blender. Therefore you should rewrite code to make skeletal animation at
+                      
+                      the new Aran library. This item is very separate one, so you can implement
+                      
+                      this with no care about others.
+
+
+- Extensible User Interface: There is too many hard coded UI snippets. No extension is possible.
+
+                             Menu, Button, IME (for chat), etc ...
+                             
+                             Or just use DXUT? Mouse interface?
+
+
+- Multiplayer system: Implement very simple MMORPG system to the existing PoolG.
+
+                      Write from scratch or try to integrate RakNet engine?
+                      
+                      Database and/or web-site integrated system?
+
+
+
+
+
+
+
+

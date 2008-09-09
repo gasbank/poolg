@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="9.00"
 	Name="TitleValidationDB_PostgreSQL"
 	ProjectGUID="{1F766A24-4508-4EAB-8E54-8AACBB751196}"
 	Keyword="Win32Proj"
+	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
 		<Platform

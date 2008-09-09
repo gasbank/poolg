@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="9.00"
 	Name="TestDLL"
 	ProjectGUID="{6E58C3CC-5323-4C29-9AA0-AFF0C627DB04}"
 	RootNamespace="TestDLL"
 	Keyword="Win32Proj"
+	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
 		<Platform
@@ -67,6 +68,8 @@
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/TestDLL.pdb"
 				SubSystem="1"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -86,9 +89,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -145,6 +145,8 @@
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -164,9 +166,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"

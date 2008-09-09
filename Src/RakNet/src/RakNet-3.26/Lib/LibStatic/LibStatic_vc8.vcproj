@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="9.00"
 	Name="LibStatic"
 	ProjectGUID="{6533BDAE-0F0C-45E4-8FE7-ADD0F37FE063}"
 	RootNamespace="LibStatic"
 	Keyword="Win32Proj"
+	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
 		<Platform

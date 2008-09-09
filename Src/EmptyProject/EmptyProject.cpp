@@ -1424,7 +1424,7 @@ void ConnectToServer()
 	//g_rpc3Inst = new RakNet::RPC3;
 
 
-	g_networkIDManager.SetIsNetworkIDAuthority( true );
+	g_networkIDManager.SetIsNetworkIDAuthority( false );
 	g_rpc3Inst.SetNetworkIDManager( &g_networkIDManager );
 
 	RPC3_REGISTER_FUNCTION( &g_rpc3Inst, PrintHelloWorld );

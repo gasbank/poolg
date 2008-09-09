@@ -5,8 +5,8 @@
 #----------------------------------------------------------------------------------#
 
 variable EpStartTopStateName		IntroState
-set EpStartWorldName				EpA213World
-set EpWorldList						[ list EpCeilingWorld EpRoomWorld EpA213World EpTestStage ]
+set EpStartWorldName				EpLobbyWorld
+set EpWorldList						[ list EpCeilingWorld EpRoomWorld EpA213World EpTestStage EpLobbyWorld ]
 set EpWindowMode					1
 
 # This callback procedure is called when the D3D device is not created yet.

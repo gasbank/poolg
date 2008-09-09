@@ -7,6 +7,8 @@
 
 RakNet::RPC3 g_rpc3Inst;
 ClientPool g_clientPool;
+// The system that performs most of our functionality for this demo
+RakNet::ReplicaManager2 replicaManager;
 
 
 // We copy this from Multiplayer.cpp to keep things all in one file for this example

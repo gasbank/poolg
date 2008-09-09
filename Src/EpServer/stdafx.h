@@ -23,6 +23,9 @@
 #include "RakNetTypes.h"
 #include "BitStream.h"
 #include "RakSleep.h"
+#include "ReplicaManager2.h"
+#include "FormatString.h"
+#include "StringCompressor.h"
 
 #ifdef _WIN32
 #include "Kbhit.h"

@@ -40,6 +40,10 @@
 #include "Skill.h"
 #include "SkillManager.h"
 
+#include "EpReplicaManagerConnection.h"
+#include "EpUser.h"
+
+
 
 G								g_g;
 WorldManager*					g_wm							= 0;
@@ -109,6 +113,15 @@ bool							g_bParticleVisible				= false;
 RakPeerInterface*				g_clientPeer					= 0;
 RakNet::RPC3					g_rpc3Inst;
 NetworkIDManager				g_networkIDManager;
+// The system that performs most of our functionality for this demo
+RakNet::ReplicaManager2			g_replicaManager;
+// Instance of the class that creates the object we use to represent connections
+EpReplicaManagerConnectionFactory g_connectionFactory;
+
+// Called from EpCommonLibrary
+NetworkIDManager& GetNetworkIdManager() { return g_networkIDManager; }
+RakPeerInterface* GetRakPeer() { return g_clientPeer; }
+
 //////////////////////////////////////////////////////////////////////////
 
 void ConfigureShaders( LPDIRECT3DDEVICE9 pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc );
@@ -1423,6 +1436,8 @@ void ConnectToServer()
 {
 	//g_rpc3Inst = new RakNet::RPC3;
 
+	UnitBase::mySoldier=0;
+	EpUser::myUser=0;
 
 	g_networkIDManager.SetIsNetworkIDAuthority( false );
 	g_rpc3Inst.SetNetworkIDManager( &g_networkIDManager );
@@ -1433,6 +1448,7 @@ void ConnectToServer()
 
 	
 	g_clientPeer = RakNetworkFactory::GetRakPeerInterface();
+	g_clientPeer->SetNetworkIDManager( &g_networkIDManager );
 
 	// Holds packets
 	Packet* p;
@@ -1482,6 +1498,11 @@ void ConnectToServer()
 	// a connectionValidationInteger, and false for low priority threads
 	SocketDescriptor socketDescriptor((unsigned short)atoi(clientPort),0);
 	g_clientPeer->Startup(1,30,&socketDescriptor, 1);
+	g_clientPeer->AttachPlugin( &g_replicaManager );
+	// Just test this
+	g_replicaManager.SetAutoAddNewConnections( false );
+	// Register our custom connection factory
+	g_replicaManager.SetConnectionFactory( &g_connectionFactory );
 	g_clientPeer->SetOccasionalPing(true);
 	bool b = g_clientPeer->Connect(ip, (unsigned short)atoi(serverPort), "Rumpelstiltskin", (int) strlen("Rumpelstiltskin"));	
 
@@ -1559,6 +1580,7 @@ void ConnectToServer()
 			case ID_CONNECTION_REQUEST_ACCEPTED:
 				// This tells the client they have connected
 				printf("ID_CONNECTION_REQUEST_ACCEPTED\n");
+				g_replicaManager.AddNewConnection( p->systemAddress );
 
 				doLoop = false;
 				break;

@@ -1,18 +1,31 @@
 // EpServer.cpp : Defines the entry point for the console application.
 //
 
-#include "stdafx.h"
+#include "EpServerPCH.h"
 #include "ClientPool.h"
-#include <windows.h>
+#include "EpReplicaManagerConnection.h"
+#include "EpUser.h"
+#include "UnitBase.h"
 
 RakNet::RPC3 g_rpc3Inst;
 ClientPool g_clientPool;
-// The system that performs most of our functionality for this demo
-RakNet::ReplicaManager2 replicaManager;
 
+// The system that performs most of our functionality for this demo
+RakNet::ReplicaManager2 g_replicaManager;
+// Instance of the class that creates the object we use to represent connections
+EpReplicaManagerConnectionFactory g_connectionFactory;
+
+NetworkIDManager networkIDManager;
+
+RakPeerInterface *server;
 
 // We copy this from Multiplayer.cpp to keep things all in one file for this example
 unsigned char GetPacketIdentifier(Packet *p);
+
+// Called from EpCommonLibrary
+NetworkIDManager& GetNetworkIdManager() { return networkIDManager; }
+RakPeerInterface* GetRakPeer() { return server; }
+
 
 int _tmain(int argc, _TCHAR* argv[])
 {
@@ -21,13 +34,18 @@ int _tmain(int argc, _TCHAR* argv[])
 	_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 #endif
 
-	NetworkIDManager networkIDManager;
+	UnitBase::mySoldier=0;
+	EpUser::myUser=0;
+	
 	networkIDManager.SetIsNetworkIDAuthority(true);
 	g_rpc3Inst.SetNetworkIDManager(&networkIDManager);
 
 	// Pointers to the interfaces of our server and client.
 	// Note we can easily have both in the same program
-	RakPeerInterface *server = RakNetworkFactory::GetRakPeerInterface();
+	server = RakNetworkFactory::GetRakPeerInterface();
+
+	server->SetNetworkIDManager( &networkIDManager );
+
 	RakNetStatistics *rss = 0;
 	int i = server->GetNumberOfAddresses();
 	server->SetIncomingPassword( "Rumpelstiltskin", (int)strlen( "Rumpelstiltskin" ) );
@@ -60,6 +78,12 @@ int _tmain(int argc, _TCHAR* argv[])
 	// for low priority threads
 	SocketDescriptor socketDescriptor( atoi( portstring ), 0 );
 	bool b = server->Startup( 32, 30, &socketDescriptor, 1 );
+	server->AttachPlugin( &g_replicaManager );
+	// Just test this
+	g_replicaManager.SetAutoAddNewConnections( false );
+	// Register our custom connection factory
+	g_replicaManager.SetConnectionFactory( &g_connectionFactory );
+
 	server->SetMaximumIncomingConnections( 4 );
 	if ( b )
 		puts( "Server started, waiting for connections." );
@@ -76,6 +100,15 @@ int _tmain(int argc, _TCHAR* argv[])
 	puts( "'quit' to quit. 'stat' to show stats. 'ping' to ping.\n'ban' to ban an IP from connecting.\n'kick to kick the first connected player.\nType to talk." );
 
 	server->AttachPlugin(&g_rpc3Inst);
+
+	// Here I use the string table class to efficiently send strings I know in advance.
+	// The encoding is used in in Replica2::SerializeConstruct
+	// The decoding is used in in Connection_RM2::Construct
+	// The stringTable class will also send strings that weren't registered but this just falls back to the stringCompressor and wastes 1 extra bit on top of that
+	// 2nd parameter of false means a static string so it's not necessary to copy it
+	RakNet::StringTable::Instance()->AddString("UnitBase", false);
+	RakNet::StringTable::Instance()->AddString("EpUser", false);
+
 
 	char message[2048];
 
@@ -140,6 +173,13 @@ int _tmain(int argc, _TCHAR* argv[])
 				g_rpc3Inst.CallCPP( "&Unit::setTilePosRpc", nid, tilePosX, tilePosY );
 			}
 
+			if ( strcmp( message, "user" ) == 0 )
+			{
+				printf("%i Users:\n", EpUser::users.Size());
+				for (unsigned i=0; i < EpUser::users.Size(); i++)
+					printf("%i. ptr=%p systemAddress=%s soldier=%p\n", i+1, EpUser::users[i], EpUser::users[i]->systemAddress.ToString(), EpUser::users[i]->soldier);
+			}
+
 
 			if ( strcmp(message, "ban") == 0 )
 			{
@@ -190,19 +230,37 @@ int _tmain(int argc, _TCHAR* argv[])
 			printf( "ID_DISCONNECTION_NOTIFICATION\n" );
 			g_clientPool.removeClient( p->systemAddress );
 			printf( "Current Clients: %d\n", g_clientPool.getClientCount() );
+			EpUser::DeleteUserByAddress( p->systemAddress );
 			break;
 
 
 		case ID_NEW_INCOMING_CONNECTION:
-			// Somebody connected.  We have their IP now
-			printf( "ID_NEW_INCOMING_CONNECTION from %s\n", p->systemAddress.ToString() );
-			//clientID = p->systemAddress; // Record the player ID of the client
-			g_clientPool.addClient( p->systemAddress );
-			printf( "Current Clients: %d\n", g_clientPool.getClientCount() );
 			{
+				// Somebody connected.  We have their IP now
+				printf( "ID_NEW_INCOMING_CONNECTION from %s\n", p->systemAddress.ToString() );
+				//clientID = p->systemAddress; // Record the player ID of the client
+				g_clientPool.addClient( p->systemAddress );
+				printf( "Current Clients: %d\n", g_clientPool.getClientCount() );
+				
+				// RPC3 functionality test
 				int a = 2008;
 				g_rpc3Inst.CallC( "PrintHelloWorld", a );
+
+				// Necessary with SetAutoAddNewConnections(false);
+				g_replicaManager.AddNewConnection( p->systemAddress );
+				// The server should create a User class for each new connection.
+				EpUser *newUser = new EpUser;
+				// In order to use any networked member functions of Replica2, you must first call SetReplicaManager
+				newUser->SetReplicaManager( &g_replicaManager );
+				// Store which address this user is associated with
+				newUser->systemAddress = p->systemAddress;
+				// Tell the user to automatically serialize our data members every 100 milliseconds (if changed)
+				// This way if we change the system address or the Soldier* we don't have to call user->BroadcastSerialize();
+				newUser->AddAutoSerializeTimer( 100 );
+				// Send out this new user to all systems. Unlike the old system (ReplicaManager) all sends are done immediately.
+				newUser->BroadcastConstruction();
 			}
+			
 			
 			break;
 
@@ -217,6 +275,7 @@ int _tmain(int argc, _TCHAR* argv[])
 			// terminated
 			printf( "ID_CONNECTION_LOST\n" );
 			g_clientPool.removeClient( p->systemAddress );
+			EpUser::DeleteUserByAddress( p->systemAddress );
 			break;
 		case ID_RPC_REMOTE_ERROR:
 			{

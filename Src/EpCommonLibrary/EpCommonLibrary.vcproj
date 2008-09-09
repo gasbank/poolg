@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="EpServer"
-	ProjectGUID="{93A48367-C950-4FBC-BD35-41A089E7ECBA}"
-	RootNamespace="EpServer"
+	Name="EpCommonLibrary"
+	ProjectGUID="{077728F8-8D6F-44E4-86F0-FB71A4F4F671}"
+	RootNamespace="EpCommonLibrary"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -18,9 +18,9 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="../../Working"
+			OutputDirectory="$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="1"
+			ConfigurationType="4"
 			CharacterSet="1"
 			>
 			<Tool
@@ -41,13 +41,13 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../RakNet/include;../RakNet_RPC3;../EpCommonLibrary"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
+				AdditionalIncludeDirectories="../RakNet/include;../RakNet_RPC3"
+				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="2"
-				PrecompiledHeaderThrough="EpServerPCH.h"
+				PrecompiledHeaderThrough="EpCommonLibraryPCH.h"
 				WarningLevel="3"
 				DebugInformationFormat="4"
 			/>
@@ -61,19 +61,10 @@
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLinkerTool"
-				AdditionalDependencies="RakNetDLLDebug.lib RakNet_RPC3.lib EpCommonLibrary.lib"
-				LinkIncremental="2"
-				AdditionalLibraryDirectories="../RakNet/lib;../EpCommonLibrary/Debug"
-				GenerateDebugInformation="true"
-				SubSystem="1"
-				TargetMachine="1"
+				Name="VCLibrarianTool"
 			/>
 			<Tool
 				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -85,9 +76,6 @@
 				Name="VCFxCopTool"
 			/>
 			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
@@ -95,7 +83,7 @@
 			Name="Release|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="1"
+			ConfigurationType="4"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
 			>
@@ -118,7 +106,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
+				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="2"
@@ -135,19 +123,10 @@
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLinkerTool"
-				LinkIncremental="1"
-				GenerateDebugInformation="true"
-				SubSystem="1"
-				OptimizeReferences="2"
-				EnableCOMDATFolding="2"
-				TargetMachine="1"
+				Name="VCLibrarianTool"
 			/>
 			<Tool
 				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -157,9 +136,6 @@
 			/>
 			<Tool
 				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -175,15 +151,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\ClientPool.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\EpServer.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\EpServerPCH.cpp"
+				RelativePath=".\EpCommonLibraryPCH.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -202,6 +170,18 @@
 					/>
 				</FileConfiguration>
 			</File>
+			<File
+				RelativePath=".\EpReplicaManagerConnection.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\EpUser.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\UnitBase.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -209,15 +189,23 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\ClientPool.h"
+				RelativePath=".\EpCommonLibraryPCH.h"
 				>
 			</File>
 			<File
-				RelativePath=".\EpServerPCH.h"
+				RelativePath=".\EpReplicaManagerConnection.h"
+				>
+			</File>
+			<File
+				RelativePath=".\EpUser.h"
 				>
 			</File>
 			<File
 				RelativePath=".\targetver.h"
+				>
+			</File>
+			<File
+				RelativePath=".\UnitBase.h"
 				>
 			</File>
 		</Filter>

@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "EpServerPCH.h"
 #include "ClientPool.h"
 
 ClientPool::ClientPool(void)

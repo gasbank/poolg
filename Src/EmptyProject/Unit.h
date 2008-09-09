@@ -1,4 +1,6 @@
 #pragma once
+
+#include "UnitBase.h"
 #include "WorldManager.h"
 #include "TileManager.h"
 
@@ -32,7 +34,7 @@ enum UnitType { UT_UNIT, UT_CHARACTER, UT_HERO, UT_ENEMY, UT_ATTACKOBJECT, UT_IN
 * And it has local transformation matrix which contains position, scaling factor, orientation.
 * Also, there are 2D tile position and movement methods.
 */
-class Unit : public NetworkIDObject
+class Unit : public UnitBase
 {
 public:
 	// Ctor and Dtor and create

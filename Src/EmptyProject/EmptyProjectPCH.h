@@ -75,6 +75,10 @@
 #include "RakNetTypes.h"
 #include "BitStream.h"
 #include "RakSleep.h"
+#include "ReplicaManager2.h"
+#include "FormatString.h"
+#include "StringCompressor.h"
+#include "StringTable.h"
 
 #ifndef EP_SAFE_RELEASE
 #define EP_SAFE_RELEASE(p)      { if (p) { (p)->release(); SAFE_DELETE(p); } }

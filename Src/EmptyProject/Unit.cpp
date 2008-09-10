@@ -17,7 +17,7 @@ extern LPD3DXFONT		g_unitNameFont;
 //////////////////////////////////////////////////////////////////////////
 
 Unit::Unit( UnitType type )
-: m_type( type )
+: UnitBase( type )
 {
 	m_d3dxMesh					= 0;
 	m_arnMesh					= 0;
@@ -30,17 +30,7 @@ Unit::Unit( UnitType type )
 	m_name						= "Unconfirmed Object";
 	m_bNameVisible				= false;
 
-	m_tilePos					= Point2Uint::ZERO;
-	m_tileBufferPos				= m_tilePos;
-
-	m_vRot						= D3DXVECTOR3(0, 0, 0);
-	m_vPos						= D3DXVECTOR3(0, 0, 0);
-	m_vScale					= D3DXVECTOR3(1.0f, 1.0f, 1.0f);
-	m_bLocalXformDirty			= true;
-	m_removeFlag				= false;
 	m_bForcedMove				= false;
-
-	D3DXMatrixIdentity(&m_localXform);
 
 	ZeroMemory(&m_material, sizeof(D3DMATERIAL9));
 	m_material.Ambient.r = m_material.Ambient.g = m_material.Ambient.b = 0.6f;
@@ -62,20 +52,6 @@ HRESULT Unit::init()
 	return hr;
 }
 
-void Unit::setTilePos( int tileX, int tileY )
-{
-	m_tilePos.x = tileX;
-	m_tilePos.y = tileY;
-
-	setPos( D3DXVECTOR3( (float)(tileX - (s_xSize / 2)) * s_tileSize, (float)(tileY  - (s_ySize / 2)) * s_tileSize, 0 ) );
-
-	//printf( "%s: setTilePos called (%d, %d)\n", typeid(this).name(), tileX, tileY );
-}
-
-void Unit::setTilePos( const Point2Uint& newPos )
-{
-	setTilePos( newPos.x, newPos.y );
-}
 
 HRESULT Unit::frameRender( IDirect3DDevice9* pd3dDevice, double dTime, float fElapsedTime )
 {
@@ -89,7 +65,7 @@ HRESULT Unit::frameRender( IDirect3DDevice9* pd3dDevice, double dTime, float fEl
 	if ( m_arnMesh )
 	{
 		pd3dDevice->SetRenderState( D3DRS_CULLMODE, D3DCULL_CW );
-		GetG().m_videoMan.renderMeshesOnly( m_arnMesh, m_localXform );
+		GetG().m_videoMan.renderMeshesOnly( m_arnMesh, getLocalXform() );
 		pd3dDevice->SetRenderState( D3DRS_CULLMODE, D3DCULL_CCW );
 
 		drawSoul( pd3dDevice );
@@ -120,17 +96,19 @@ bool Unit::frameMove( double dTime, float fElapsedTime )
 
 void Unit::updateLocalXform()
 {
-	if ( m_bLocalXformDirty )
+	if ( isLocalXformDirty() )
 	{
 		D3DXMATRIX mRotX, mRotY, mRotZ, mScale, mTrans, mWorld;
-		D3DXMatrixRotationX(&mRotX, m_vRot.x);
-		D3DXMatrixRotationY(&mRotY, m_vRot.y);
-		D3DXMatrixRotationZ(&mRotZ, m_vRot.z);
-		D3DXMatrixScaling(&mScale, m_vScale.x, m_vScale.y, m_vScale.z);
-		D3DXMatrixTranslation(&mTrans, getPos().x, getPos().y, getPos().z);
-		m_localXform = mRotX * mRotY * mRotZ * mScale * mTrans;
+		D3DXMatrixRotationX( &mRotX, getRotX() );
+		D3DXMatrixRotationY( &mRotY, getRotY() );
+		D3DXMatrixRotationZ( &mRotZ, getRotZ() );
+		D3DXMatrixScaling( &mScale, getScaleX(), getScaleY(), getScaleZ() );
+		D3DXMatrixTranslation( &mTrans, getPos().x, getPos().y, getPos().z );
+		
+		D3DXMATRIX localXform = mRotX * mRotY * mRotZ * mScale * mTrans;
+		setLocalXformRaw( &localXform );
 
-		m_bLocalXformDirty = false;
+		setLocalXformDirty( false );
 	}
 }
 
@@ -242,7 +220,7 @@ void Unit::setForcedMove( int i )
 
 void Unit::forcedMoveTest()
 {
-	if ( m_tilePos != m_tileBufferPos )
+	if ( getTilePos() != getTileBufferPos() )
 	{
 		for ( int j = 0; j < UNIT_MAX_KEYS; j++ )
 		{
@@ -301,7 +279,7 @@ void Unit::startSoulAnimation( float duration, float height )
 	m_fSoulAnimationHeight = height;
 	m_bSoulAnimation = true;
 
-	m_prevLocalXform = m_localXform;
+	m_prevLocalXform = *(D3DXMATRIX*)&getLocalXformRaw();
 	m_prevMaterial = m_material;
 }
 
@@ -358,30 +336,7 @@ void Unit::setVisible (bool choice)
 	updateLocalXform();
 }
 
-const char* Unit::getTypeString() const
-{
-#define CASE_ENUM_TO_STRING(x) case x: return #x
-	switch ( getType() )
-	{
-		CASE_ENUM_TO_STRING( UT_UNIT );
-		CASE_ENUM_TO_STRING( UT_CHARACTER );
-		CASE_ENUM_TO_STRING( UT_HERO );
-		CASE_ENUM_TO_STRING( UT_ENEMY );
-		CASE_ENUM_TO_STRING( UT_STRUCTREOBJECT );
-		CASE_ENUM_TO_STRING( UT_ATTACKOBJECT );
-		CASE_ENUM_TO_STRING( UT_INNERFIRE );
-	default:
-		_ASSERTE( !"Type string is not found" );
-	}
-	return 0;
-}
 
-void Unit::printDebugInfo() const
-{
-	printf( "Unit: Type - %s ", getTypeString() );
-	Utility::printValue( getPos() );
-	printf( "\n" );
-}
 
 void Unit::drawName( IDirect3DDevice9* pd3dDevice )
 {
@@ -427,10 +382,6 @@ void Unit::drawName( IDirect3DDevice9* pd3dDevice )
 			pd3dDevice->SetRenderState( D3DRS_LIGHTING, TRUE );
 		}
 	}
-}
-
-void Unit::release()
-{
 }
 
 HRESULT Unit::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext )
@@ -482,9 +433,10 @@ void Unit::setMesh( LPD3DXMESH d3dxMesh )
 
 int EpReleaseUnit( void* pv )
 {
-	Unit* u = reinterpret_cast<Unit*>(pv);
-	EP_SAFE_RELEASE( u );
-	return 0;
+	throw std::runtime_error( "Should not call this function!" );
+	/*Unit* u = reinterpret_cast<Unit*>(pv);
+	SAFE_DELETE( u );
+	return 0;*/
 
 } SCRIPT_CALLABLE_I_PV( EpReleaseUnit )
 

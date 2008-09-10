@@ -28,6 +28,7 @@ EpUser::~EpUser()
 	{
 		// Unfortunately BroadcastDestruction() cannot be called automatically in the destructor of Replica2, because virtual functions can not call to derived classes.
 		// It is in the derived class QueryIsDestructionAuthority() that we give the client authority to network delete the object
+		
 		soldier->BroadcastDestruction();
 
 		delete soldier;
@@ -81,7 +82,7 @@ UnitBase* EpUser::CreateSoldier(void)
 {
 	if (soldier==0)
 	{
-		soldier = new UnitBase;
+		soldier = new UnitBase( UT_UNITBASE );
 		return soldier;
 	}
 	return 0;
@@ -122,5 +123,20 @@ void EpUser::Deserialize(RakNet::BitStream *bitStream, RakNet::SerializationType
 	if (soldier)
 		printf("EpUser at address %s updated. Has soldier with name: %s.\n", systemAddress.ToString(), soldier->getRepName());
 	else
-		printf("EpUser at address %s updated. No soldier spawned.\n", systemAddress.ToString(), soldier->getRepName());
+		printf("EpUser at address %s updated. No soldier spawned.\n", systemAddress.ToString() );
+}
+
+void EpUser::DeleteAllUsers()
+{
+
+	while ( users.Size() )
+	{
+		// This function is called during the termination process of client-side,
+		// so you do not need to broadcast destruction event. It will done by server-side.
+		// (But, is it okay?)
+
+		//users[0]->BroadcastDestruction();
+
+		delete users[0];
+	}
 }

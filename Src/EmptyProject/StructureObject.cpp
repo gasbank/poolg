@@ -78,7 +78,9 @@ bool StructureObject::frameMove( double dTime, float fElapsedTime )
 		// Simple euler method to calculate position delta
 		D3DXVECTOR3 vPosDelta = m_vVelocity * fElapsedTime;
 		m_fMovingTime += fElapsedTime;
-		setPos(getPos() + vPosDelta);
+
+		D3DXVECTOR3 finalPos = getPos() + vPosDelta;
+		setPos( finalPos.x, finalPos.y, finalPos.z );
 	}
 	else
 	{

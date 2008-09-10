@@ -71,6 +71,7 @@ HRESULT World::init()
 	
 	// Hero and enemies are defined afterwards
 
+	// CAUTION To be set by RakNet ReplicaManager
 	assert( m_heroUnit );
 
 	m_curDialog = 0;
@@ -230,7 +231,7 @@ HRESULT World::release()
 	m_avatar.release();
 
 	EpSafeReleaseAll( m_scriptedDialog );
-	EpSafeReleaseAll( m_unitSet );
+	SafeDeleteAll( m_unitSet );
 	EpSafeReleaseAll( m_incidents );
 
 	unloadWorldModel();
@@ -363,7 +364,7 @@ void World::setupLight()
 	//pd3dDevice->SetRenderState( D3DRS_LIGHTING, TRUE );
 }
 
-UINT World::addUnit( Unit* u )
+UINT World::addUnit( UnitBase* u )
 {
 	m_unitSet.insert(u);
 	if ( u->getType() == UT_HERO )
@@ -444,16 +445,27 @@ Dialog* World::startDialog( const char* dialogName )
 		throw std::runtime_error( "Current dialog already exists! Cannot start a new dialog" );
 }
 
+bool World::detachUnit( UnitBase* pUnit )
+{
+	UnitSet::iterator it = m_unitSet.find( pUnit );
+	if ( it != m_unitSet.end() )
+	{
+		m_unitSet.erase( it );
+		return true;
+	}
+	else
+		return false;
+}
 
 // 유닛의 포인터를 받아서, UnitSet에서 해당 유닛을 찾아 지운다.
-UnitSet::iterator World::removeUnit( Unit* pUnit )
+UnitSet::iterator World::removeUnit( UnitBase* pUnit )
 {
 	UnitSet::iterator it = m_unitSet.begin();
 	for ( ; it != m_unitSet.end(); it++ )
 	{
 		if ( *it == pUnit )
 		{
-			EP_SAFE_RELEASE( pUnit );
+			SAFE_DELETE( pUnit );
 			return m_unitSet.erase( it );
 		}
 	}
@@ -488,9 +500,9 @@ UnitSet::iterator World::removeUnit( Unit* pUnit )
 	}
 } */
 
-Unit* World::findUnitAtTile( UINT x, UINT y )
+UnitBase* World::findUnitAtTile( UINT x, UINT y )
 {
-	Unit* ret = 0;
+	UnitBase* ret = 0;
 	UnitSet::iterator it = m_unitSet.begin();
 	for ( ; it != m_unitSet.end(); ++it )
 	{

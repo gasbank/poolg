@@ -50,3 +50,5 @@
 #define new DEBUG_NEW
 #endif
 #endif
+
+#include "CommonStructs.h"

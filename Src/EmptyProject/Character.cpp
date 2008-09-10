@@ -163,7 +163,8 @@ bool Character::frameMove( double dTime, float fElapsedTime )
 		// Simple euler method to calculate position delta
 		D3DXVECTOR3 vPosDelta = m_vVelocity * fElapsedTime;
 		m_fMovingTime += fElapsedTime;
-		setPos(getPos() + vPosDelta);
+		D3DXVECTOR3 finalPos = getPos() + vPosDelta;
+		setPos( finalPos.x, finalPos.y, finalPos.z );
 	}
 	else
 	{
@@ -390,7 +391,7 @@ void Character::pushUnitInFront( UnitInput dir )
 {
 	if ( this->getType() == UT_HERO )
 	{
-		Unit* u = GetWorldManager().getCurWorld()->findUnitAtTile( 
+		UnitBase* u = GetWorldManager().getCurWorld()->findUnitAtTile( 
 		getTileBufferPos().x + g_moveAmount[ (int)dir ].x,
 		getTileBufferPos().y + g_moveAmount[ (int)dir ].y );
 

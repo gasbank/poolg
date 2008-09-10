@@ -37,13 +37,14 @@ public:
 	void							enter();
 
 	const std::string&				getWorldName() { return m_worldName; }
-	UINT							addUnit( Unit* u );
+	UINT							addUnit( UnitBase* u );
 	UINT							addIncident( Incident* inc );
 	UINT							addDialog( Dialog* dlg ) { m_scriptedDialog.push_back( dlg ); return m_scriptedDialog.size(); }
 
 	Incident*						getIncident( UINT idx ) const;
 
-	UnitSet::iterator				removeUnit( Unit* pUnit );
+	bool							detachUnit( UnitBase* pUnit );
+	UnitSet::iterator				removeUnit( UnitBase* pUnit );
 	
 	
 	const D3DXVECTOR3&				getHeroPos();
@@ -60,7 +61,7 @@ public:
 	ArnSceneGraph*					getArnSceneGraphPt() { return m_modelSg; }
 
 	Dialog*							startDialog( const char* dialogName );
-	Unit*							findUnitAtTile( UINT x, UINT y );
+	UnitBase*						findUnitAtTile( UINT x, UINT y );
 	const Dialog*					getCurDialog() const { return m_curDialog; }
 
 

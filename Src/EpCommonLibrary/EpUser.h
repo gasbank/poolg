@@ -23,6 +23,8 @@ public:
 	// Helper function to free memory when someone disconnections.
 	static void DeleteUserByAddress(SystemAddress systemAddress);
 
+	static void DeleteAllUsers();
+
 	// Helper function to lookup the user in users by systemAddress
 	static EpUser* GetUserByAddress(SystemAddress systemAddress);
 

@@ -25,7 +25,13 @@ unsigned char GetPacketIdentifier(Packet *p);
 // Called from EpCommonLibrary
 NetworkIDManager& GetNetworkIdManager() { return networkIDManager; }
 RakPeerInterface* GetRakPeer() { return server; }
+bool QueryIsNetworkServer() { return true; }
 
+
+void AddToCurrentWorld( UnitBase* unitBase )
+{
+	// Client-side job
+}
 
 int _tmain(int argc, _TCHAR* argv[])
 {
@@ -175,9 +181,17 @@ int _tmain(int argc, _TCHAR* argv[])
 
 			if ( strcmp( message, "user" ) == 0 )
 			{
+				printf("%i Soldiers:\n", UnitBase::soldiers.Size());
+				for (unsigned i=0; i < UnitBase::soldiers.Size(); i++)
+					printf("%i. ptr=%p name=%s isCloaked=%i owner=%p Position=%s\n",
+						i+1, UnitBase::soldiers[i], UnitBase::soldiers[i]->getRepName().C_String(),
+						UnitBase::soldiers[i]->isHidden(), UnitBase::soldiers[i]->getOwner(),
+						UnitBase::soldiers[i]->getPositionAsString() );
+
 				printf("%i Users:\n", EpUser::users.Size());
 				for (unsigned i=0; i < EpUser::users.Size(); i++)
-					printf("%i. ptr=%p systemAddress=%s soldier=%p\n", i+1, EpUser::users[i], EpUser::users[i]->systemAddress.ToString(), EpUser::users[i]->soldier);
+					printf("%i. ptr=%p systemAddress=%s soldier=%p\n",
+						i+1, EpUser::users[i], EpUser::users[i]->systemAddress.ToString(), EpUser::users[i]->soldier);
 			}
 
 

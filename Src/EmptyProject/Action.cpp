@@ -600,5 +600,5 @@ END_SCRIPT_FACTORY( Action )
 
 UnitAction::~UnitAction()
 {
-	EP_SAFE_RELEASE( m_unit );
+	SAFE_DELETE( m_unit );
 }

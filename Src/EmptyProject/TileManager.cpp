@@ -1,7 +1,7 @@
 #include "EmptyProjectPCH.h"
 #include "TileManager.h"
 
-Point2Uint Point2Uint::ZERO = Point2Uint( 0, 0 );
+
 
 
 //////////////////////////////////////////////////////////////////////////

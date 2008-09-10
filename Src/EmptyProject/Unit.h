@@ -27,8 +27,6 @@ static const POINT g_moveAmount[4] = {
 class World;
 class ArnMesh;
 
-enum UnitType { UT_UNIT, UT_CHARACTER, UT_HERO, UT_ENEMY, UT_ATTACKOBJECT, UT_INNERFIRE, UT_STRUCTREOBJECT, UT_SKILLOBJECT };
-
 /** It is responsible for a basic rendered entity.
 * Can have either a pointer of LPD3DXMESH or ArnMesh(but not both).
 * And it has local transformation matrix which contains position, scaling factor, orientation.
@@ -48,13 +46,12 @@ public:
 	virtual HRESULT					onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
 													void* pUserContext );
 	virtual void					onLostDevice();
-	virtual const D3DXVECTOR3&		getPos() const { return m_vPos; }
+	virtual const D3DXVECTOR3&		getPos() const { return *(D3DXVECTOR3*)&getPosRaw(); }
 
+	virtual void					updateArnMesh();
 
 	HRESULT							init();
 	
-	void							release();
-
 	/** Clear the keyboard buffer on this unit.
 	*/
 	void							clearKey();
@@ -64,48 +61,17 @@ public:
 	Here are the list of public getter/setter methods.
 	*/
 	//@{
-	void							setRotX( float rad ) { m_vRot.x = rad; m_bLocalXformDirty = true; }
-	void							setRotY( float rad ) { m_vRot.y = rad; m_bLocalXformDirty = true; }
-	void							setRotZ( float rad ) { m_vRot.z = rad; m_bLocalXformDirty = true; }
-
-	void							setUniformScale( float val ) { m_vScale.x = m_vScale.y = m_vScale.z = val; m_bLocalXformDirty = true; }
-	void							setScaleX( float val )		{ m_vScale.x = val; m_bLocalXformDirty = true; }
-	void							setScaleY( float val )		{ m_vScale.y = val; m_bLocalXformDirty = true; }
-	void							setScaleZ( float val )		{ m_vScale.z = val; m_bLocalXformDirty = true; }
-
-	void							setPos( float x, float y, float z )	{ m_vPos.x = x; m_vPos.y = y; m_vPos.z = z; m_bLocalXformDirty = true; }
-	void							setPos( const D3DXVECTOR3& val )	{ m_vPos = val; m_bLocalXformDirty = true; }
-	void							setPosX( float val )				{ m_vPos.x = val; m_bLocalXformDirty = true; }
-	void							setPosY( float val )				{ m_vPos.y = val; m_bLocalXformDirty = true; }
-	void							setPosZ( float val )				{ m_vPos.z = val; m_bLocalXformDirty = true; }
-	
 
 	void							setHeadDir( UnitInput ui );
 
-	void							setTilePosRpc( int tileX, int tileY ) { setTileBufferPos(tileX, tileY); }
-	void							setTilePos( int tileX, int tileY );
-	void							setTilePos( const Point2Uint& newPos );
-	void							setTileBufferPos( int tileX, int tileY ) { m_tileBufferPos.x = tileX; m_tileBufferPos.y = tileY; }
 	
+	const D3DXMATRIX&				getLocalXform() const					{ return *(D3DXMATRIX*)&getLocalXformRaw(); }
 
-
-	UINT							getTilePosX() const						{ return m_tilePos.x; }
-	UINT							getTilePosY() const						{ return m_tilePos.y; }
-	void							getTilePos( UINT& x, UINT& y ) const	{ x = m_tilePos.x; y = m_tilePos.y; }
 	
-	const D3DXMATRIX&				getLocalXform() const					{ return m_localXform; }
-
-	const Point2Uint&				getTilePos() const						{ return m_tilePos; }
-	const Point2Uint&				getTileBufferPos() const				{ return m_tileBufferPos; }
-	
-	void							setRemoveFlag( bool flag )				{ m_removeFlag = flag; }
-	bool							getRemoveFlag() const					{ return m_removeFlag; }
 
 	bool							getMovable() const						{ return m_bMovable; }
 	void							setMovable( bool val )					{ m_bMovable = val; }
 
-	UnitType						getType() const							{ return m_type; }
-	const char*						getTypeString() const;
 	World*							getCurWorld() const						{ return GetWorldManager().getCurWorld(); }
 	void							setForcedMove( int i );
 
@@ -132,14 +98,14 @@ public:
 	static Unit*					createUnit( LPD3DXMESH mesh, int tileX = 0, int tileY = 0, float posZ = 0 );
 	
 	void							forcedMoveTest();
-	void							printDebugInfo() const;
-	void							updateArnMesh();
+	
+	
 	void							startSoulAnimation( float duration, float height );
 protected:
 									Unit( UnitType type );
 	virtual UnitInput				mapKey( UINT nKey ) const;
 
-	void							setLocalXformDirty()					{ m_bLocalXformDirty = true; }
+	
 	HRESULT							rayTesting( UnitInput ui );
 
 	
@@ -155,21 +121,11 @@ private:
 	void							drawName( IDirect3DDevice9* pd3dDevice );
 	void							updateLocalXform();
 	
-	D3DXVECTOR3						m_vRot;
-	D3DXVECTOR3						m_vPos;
-	D3DXVECTOR3						m_vScale;
-
-	bool							m_bLocalXformDirty;
-	D3DXMATRIX						m_localXform;
 	D3DMATERIAL9					m_material;
 	
-	bool							m_removeFlag;
+	
 	bool							m_bForcedMove;
 
-	Point2Uint						m_tilePos;
-	Point2Uint						m_tileBufferPos;
-
-	UnitType						m_type;
 
 	// Pointer to mesh object. If ArnMesh is set for this Unit instance,
 	// you should set m_d3dxMesh to NULL. If ArnMesh is not set, you should

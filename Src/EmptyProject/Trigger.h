@@ -3,15 +3,12 @@
 #include "Action.h"
 
 class World;
-class Unit;
 
 enum UnitPositionTriggerType {
 	UPTT_ENTER  = 0x001,
 	UPTT_LEAVE  = 0x010,
 	UPTT_STAY	= 0x100 
 };
-
-typedef std::set<Unit*> UnitSet;
 
 class Trigger
 {

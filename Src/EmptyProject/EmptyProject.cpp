@@ -124,7 +124,12 @@ EpReplicaManagerConnectionFactory g_connectionFactory;
 // Called from EpCommonLibrary
 NetworkIDManager& GetNetworkIdManager() { return g_networkIDManager; }
 RakPeerInterface* GetRakPeer() { return g_clientPeer; }
+bool QueryIsNetworkServer() { return false; }
 
+void AddToCurrentWorld( UnitBase* unitBase )
+{
+	GetWorldManager().getCurWorld()->addUnit( unitBase );
+}
 //////////////////////////////////////////////////////////////////////////
 
 void ConfigureShaders( LPDIRECT3DDEVICE9 pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc );
@@ -1251,11 +1256,12 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 	
 #endif
 
+	Unit* hero = GetWorldManager().getCurWorld()->getHero();
+	
+	GetWorldManager().getCurWorld()->detachUnit( hero );
 
 	DisconnectFromServer();
 
-	// No more RakNet job.
-	RakNet::RakString::FreeMemory();
 
 	// DO NOT USE EP_SAFE_RELEASE or SAFE_DELETE on these objects.
 	// It should be allocated once time through the application lifetime,
@@ -1275,6 +1281,10 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 	delete g_epLight;
 	
 	Tcl_Finalize();
+
+	// This should be done at the last stage of termination since
+	// many replica objects have RakNet::RakString.
+	RakNet::RakString::FreeMemory();
 
 	return DXUTGetExitCode();
 }
@@ -1555,8 +1565,6 @@ void ConnectToServer()
 	// Record the first client that connects to us so we can pass it to the ping function
 	SystemAddress clientID = UNASSIGNED_SYSTEM_ADDRESS;
 
-	// Crude interface
-
 	// Holds user data
 	char ip[30], serverPort[30], clientPort[30];
 
@@ -1600,6 +1608,10 @@ void ConnectToServer()
 	bool b = g_clientPeer->Connect(ip, (unsigned short)atoi(serverPort), "Rumpelstiltskin", (int) strlen("Rumpelstiltskin"));	
 
 	g_clientPeer->AttachPlugin( &g_rpc3Inst );
+
+	RakNet::StringTable::Instance()->AddString( "UnitBase", false );
+	RakNet::StringTable::Instance()->AddString( "EpUser", false );
+
 
 	if (b)
 	{
@@ -1730,6 +1742,7 @@ void DisconnectFromServer()
 			case ID_DISCONNECTION_NOTIFICATION:
 				// Connection lost normally
 				printf("ID_DISCONNECTION_NOTIFICATION\n");
+				EpUser::DeleteAllUsers();
 				doLoop = false;
 				break;
 			}

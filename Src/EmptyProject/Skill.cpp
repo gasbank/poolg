@@ -88,7 +88,7 @@ Skill::~Skill()
 
 void Skill::release()
 {
-	EpSafeReleaseAll( m_skillObjects );
+	SafeDeleteAll( m_skillObjects );
 }
 
 bool Skill::getClonedSkillObjects( SkillObjectList& soList, Character* user, Character* target ) const

@@ -122,6 +122,16 @@ template<typename T> void EpSafeReleaseAll( T& obj ) {
 	obj.clear();	
 };
 
+
+template<typename T> void SafeDeleteAll( T& obj ) {
+	T::iterator it = obj.begin();
+	for ( ; it != obj.end(); ++it )
+	{
+		SAFE_DELETE( *it );
+	}
+	obj.clear();	
+};
+
 template<typename T> void EpSafeReleaseAllMap( T& obj ) {
 	T::iterator it = obj.begin();
 	for ( ; it != obj.end(); ++it )
@@ -140,3 +150,4 @@ enum BasicShapeType { BST_UNKNOWN, BST_TEAPOT, BST_SPHERE, BST_CUBE, BST_PLANE, 
 void cdecl odprintf(const char *format, ...);
 
 #include "Typedefs.h"
+#include "CommonStructs.h"

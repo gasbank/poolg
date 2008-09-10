@@ -153,7 +153,7 @@ HRESULT InnerFire::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE
 		m_texHeight = (float)texDesc.Height;
 	}
 
-	setPos( DX_CONSTS::D3DXVEC3_ZERO );
+	setPos( 0, 0, 0 );
 
 	return S_OK;
 }

@@ -26,7 +26,9 @@ RakNet::Replica2* EpReplicaManagerConnection::Construct( RakNet::BitStream *repl
 			
 			soldier->setOwner( EpUser::GetUserByAddress( sender ) );
 			soldier->getOwner()->soldier = soldier;
-
+		}
+		else
+		{
 			AddToCurrentWorld( soldier );
 		}
 		return soldier;

@@ -119,7 +119,7 @@ private:
 	void							drawSoul( IDirect3DDevice9* pd3dDevice );
 	void							updateSoulAnimation( float fElapsedTime );
 	void							drawName( IDirect3DDevice9* pd3dDevice );
-	void							updateLocalXform();
+
 	
 	D3DMATERIAL9					m_material;
 	

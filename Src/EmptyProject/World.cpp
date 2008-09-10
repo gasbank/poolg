@@ -22,7 +22,8 @@
 IMPLEMENT_SINGLETON( TileManager );
 TileManager	tileManager;
 
-extern std::wstring g_debugBuffer;
+extern std::wstring						g_debugBuffer;
+extern LPD3DXMESH						g_bst[BST_COUNT];
 
 World::World( const char* worldName, const TCHAR* modelFilePath )
 {
@@ -115,7 +116,19 @@ HRESULT World::frameRender(IDirect3DDevice9* pd3dDevice, double dTime, float fEl
 	for ( ; it != m_unitSet.end(); ++it )
 	{
 		if ( !(*it)->getRemoveFlag() )
-			(*it)->frameRender( pd3dDevice, dTime, fElapsedTime );
+		{
+			if ( (*it)->getType() != UT_UNITBASE )
+			{
+				// Locally created instance. Almost by script file.
+				(*it)->frameRender( pd3dDevice, dTime, fElapsedTime );
+			}
+			else
+			{
+				// Remotely created instance by RakNet ReplicaManager.
+				pd3dDevice->SetTransform( D3DTS_WORLD, (D3DMATRIX*)&((*it)->getLocalXformRaw()) );
+				g_bst[BST_TEAPOT]->DrawSubset( 0 );
+			}
+		}
 	}
 	
 	DialogList::iterator itDialog = m_scriptedDialog.begin();
@@ -366,7 +379,9 @@ void World::setupLight()
 
 UINT World::addUnit( UnitBase* u )
 {
-	m_unitSet.insert(u);
+	m_unitSet.push_back( u );
+	u->setAttachedWorld( this );
+
 	if ( u->getType() == UT_HERO )
 	{
 		/*주인공 유닛 설정*/
@@ -447,14 +462,8 @@ Dialog* World::startDialog( const char* dialogName )
 
 bool World::detachUnit( UnitBase* pUnit )
 {
-	UnitSet::iterator it = m_unitSet.find( pUnit );
-	if ( it != m_unitSet.end() )
-	{
-		m_unitSet.erase( it );
-		return true;
-	}
-	else
-		return false;
+	m_unitSet.remove( pUnit );
+	return true;
 }
 
 // 유닛의 포인터를 받아서, UnitSet에서 해당 유닛을 찾아 지운다.
@@ -840,6 +849,23 @@ HRESULT World::onCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DE
 
 
 	return S_OK;
+}
+
+bool World::detachAllUnitBaseType()
+{
+	UnitSet::iterator it = m_unitSet.begin();
+	for ( ; it != m_unitSet.end(); )
+	{
+		if ( (*it)->getType() == UT_UNITBASE )
+		{
+			it = m_unitSet.erase( it );
+		}
+		else
+		{
+			++it;
+		}
+	}
+	return true;
 }
 //////////////////////////////////////////////////////////////////////////
 

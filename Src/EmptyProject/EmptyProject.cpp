@@ -1258,7 +1258,8 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 
 	Unit* hero = GetWorldManager().getCurWorld()->getHero();
 	
-	GetWorldManager().getCurWorld()->detachUnit( hero );
+	GetWorldManager().getCurWorld()->detachUnit( hero );		// Detach from world since Hero will be deallocated by ReplicaManager.
+	GetWorldManager().getCurWorld()->detachAllUnitBaseType();	// Detach from world since UnitBase typed instances will be deallocated by ReplicaManager.
 
 	DisconnectFromServer();
 

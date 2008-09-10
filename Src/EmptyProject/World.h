@@ -1,5 +1,6 @@
 #pragma once
-#include "state.h"
+#include "CommonWorldInterface.h"
+#include "State.h"
 #include "ArnFile.h"
 #include "ArnSceneGraph.h"
 #include "ArnNode.h"
@@ -18,11 +19,13 @@ class Hero;
 
 
 
-class World
+class World : public CommonWorldInterface
 {
 public:
 	static World*					createWorld( const char* worldName, TCHAR* modelFilePath, bool preloadDlg );
 									~World(void);
+
+	virtual bool					detachUnit( UnitBase* pUnit );
 
 	HRESULT							init();
 	HRESULT							frameRender(IDirect3DDevice9* pd3dDevice, double dTime, float fElapsedTime);
@@ -43,7 +46,8 @@ public:
 
 	Incident*						getIncident( UINT idx ) const;
 
-	bool							detachUnit( UnitBase* pUnit );
+	
+	bool							detachAllUnitBaseType();
 	UnitSet::iterator				removeUnit( UnitBase* pUnit );
 	
 	

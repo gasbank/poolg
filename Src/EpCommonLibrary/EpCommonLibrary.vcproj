@@ -155,6 +155,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CommonWorldInterface.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\EpCommonLibraryPCH.cpp"
 				>
 				<FileConfiguration
@@ -194,6 +198,10 @@
 			>
 			<File
 				RelativePath=".\CommonStructs.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CommonWorldInterface.h"
 				>
 			</File>
 			<File

@@ -1,6 +1,8 @@
 #include "EpCommonLibraryPCH.h"
 #include "UnitBase.h"
 #include "EpUser.h"
+#include "CommonWorldInterface.h"
+
 
 bool QueryIsNetworkServer();
 NetworkIDManager& GetNetworkIdManager();
@@ -11,17 +13,12 @@ UnitBase *UnitBase::mySoldier;
 
 UnitBase::UnitBase( UnitType type )
 {
-	m_type = type;
+	m_type						= type;
 	m_removeFlag				= false;
-
-	soldiers.Insert( this );
-	m_owner = 0;
-	m_repName = "DefaultName";
-	m_bHidden = false;
-
-	m_syncX = 1.0f;
-	m_syncY = 2.0f;
-	m_syncZ = 3.0f;
+	
+	m_owner						= 0;
+	m_repName					= "DefaultName";
+	m_bHidden					= false;
 
 	m_tilePos					= Point2Uint::ZERO;
 	m_tileBufferPos				= m_tilePos;
@@ -31,13 +28,19 @@ UnitBase::UnitBase( UnitType type )
 	m_vScale					= Point3Float::ONE;
 	m_bLocalXformDirty			= true;
 
-	// Set matrix as identity;
-	m_localXform.m[0][0] = m_localXform.m[1][1] = m_localXform.m[2][2] = m_localXform.m[3][3] = 1.0f;
+	m_attachedWorld				= 0;
 
+	// Set matrix as identity;
+	Mat4Float::MakeIdentity( &m_localXform );
+
+	soldiers.Insert( this );
 }
 
 UnitBase::~UnitBase(void)
 {
+	if ( m_attachedWorld && getType() == UT_UNITBASE )
+		m_attachedWorld->detachUnit( this );
+
 	soldiers.RemoveAtIndex( soldiers.GetIndexOf( this ) );
 	if ( UnitBase::mySoldier == this )
 	{
@@ -64,10 +67,13 @@ bool UnitBase::Serialize( RakNet::BitStream *bitStream, RakNet::SerializationCon
 	// The server writes the name when sending to systems other than the one that owns this soldier.
 	if ( QueryIsNetworkServer() == false || serializationContext->recipientAddress != m_owner->systemAddress )
 	{
-		StringCompressor::Instance()->EncodeString( m_repName, m_repName.GetLength(), bitStream );
-		bitStream->Write( m_syncX );
-		bitStream->Write( m_syncY );
-		bitStream->Write( m_syncZ );
+		StringCompressor::Instance()->EncodeString( m_repName, m_repName.GetLength() + 1, bitStream );
+		bitStream->Write( m_vPos.x );
+		bitStream->Write( m_vPos.y );
+		bitStream->Write( m_vPos.z );
+		bitStream->Write( m_vRot.x );
+		bitStream->Write( m_vRot.y );
+		bitStream->Write( m_vRot.z );
 	}
 
 	// Only the owner client needs to write the status of cloak, since this variable is only used by the server
@@ -89,9 +95,12 @@ void UnitBase::Deserialize( RakNet::BitStream *bitStream, RakNet::SerializationT
 	if ( QueryIsNetworkServer() || UnitBase::mySoldier != this )
 	{
 		StringCompressor::Instance()->DecodeString( &m_repName, 128, bitStream );
-		bitStream->Read( m_syncX );
-		bitStream->Read( m_syncY );
-		bitStream->Read( m_syncZ );
+		bitStream->Read( m_vPos.x );
+		bitStream->Read( m_vPos.y );
+		bitStream->Read( m_vPos.z );
+		bitStream->Read( m_vRot.x );
+		bitStream->Read( m_vRot.y );
+		bitStream->Read( m_vRot.z );
 	}
 
 	// Only the server reads isCloaked
@@ -110,14 +119,68 @@ void UnitBase::Deserialize( RakNet::BitStream *bitStream, RakNet::SerializationT
 		m_owner->soldier = this;
 	}
 
-	printf("Soldier %s updated.\n", getRepName() );
+	printf("Soldier %s updated.\n", getRepName().C_String() );
+
+	setLocalXformDirty( true );
+	updateLocalXform();
 }
+
+// Implemented member of Replica2: Should this object be visible to this connection? If not visible, Serialize() will not be sent to that system.
+RakNet::BooleanQueryResult UnitBase::QueryVisibility( RakNet::Connection_RM2 *connection )
+{
+	if ( QueryIsNetworkServer() )
+		return m_bHidden == false ? RakNet::BQR_YES : RakNet::BQR_NO;
+	else
+		return RakNet::BQR_ALWAYS; // You never cloak your own updates to the server
+}
+// Implemented member of Replica2: Called when our visibility changes. While not visible, we will not get updates from Serialize() for affected connection(s)
+void UnitBase::DeserializeVisibility( RakNet::BitStream *bitStream, RakNet::SerializationType serializationType, SystemAddress sender, RakNetTime timestamp )
+{
+	if ( m_owner )
+	{
+		if ( RakNet::SerializationContext::IsVisible( serializationType ) )
+			printf( "Soldier named %s owned by user at address %s has become visible.\n", getRepName().C_String(), m_owner->systemAddress.ToString() );
+		else
+			printf( "Soldier named %s owned by user at address %s no longer visible.\n", getRepName().C_String(), m_owner->systemAddress.ToString() );
+	}
+	else
+	{
+		// Visibility message comes in before deserialize, and it is deserialize that contains the owner.
+		// However, construction comes before visibility.
+		// We could have thus just written the owner in Soldier::SerializeConstruction() and read and assigned it in ReplicaManager2DemoConnection::Construct()
+		if ( RakNet::SerializationContext::IsVisible( serializationType ) )
+			printf( "Soldier named %s has become visible.\n", getRepName().C_String() );
+		else
+			printf( "Soldier named %s is no longer visible.\n", getRepName().C_String() );
+	}
+}
+
+bool UnitBase::QueryIsDestructionAuthority(void) const
+{
+	// Since we allow the controlling client to locally destroy the soldier, and transmit this across the network, the client must be the destruction authority
+	// Were this function not overridden, if the client deleted the soldier it would only be deleted locally.
+	// If the server were the only system deleting this object, it would not be necessary to override this function
+	return QueryIsNetworkServer() || UnitBase::mySoldier == this;
+}
+
+bool UnitBase::QueryIsVisibilityAuthority(void) const
+{
+	// Same as QueryIsDestructionAuthority, but for QueryVisibility.
+	return QueryIsNetworkServer() || UnitBase::mySoldier==this;
+}
+
+bool UnitBase::QueryIsSerializationAuthority(void) const
+{
+	// Same as QueryIsDestructionAuthority, but for Serialize and AddAutoSerializeTimer.
+	return QueryIsNetworkServer() || UnitBase::mySoldier==this;
+}
+
 
 const char* UnitBase::getPositionAsString() const
 {
 	// TODO not thread safe?
 	static char ret[30];
-	sprintf_s( ret, 30, "%.2f, %.2f, %.2f", m_syncX, m_syncY, m_syncZ );
+	sprintf_s( ret, 30, "%.2f, %.2f, %.2f", m_vPos.x, m_vPos.y, m_vPos.z );
 	return ret;
 }
 
@@ -163,4 +226,31 @@ void UnitBase::printDebugInfo() const
 {
 	printf( "Unit: Type - %s ", getTypeString() );
 	printf( "(%.2f, %.2f, %.2f)\n", getPosRaw().x, getPosRaw().y, getPosRaw().z );
+}
+
+
+void UnitBase::updateLocalXform()
+{
+	if ( isLocalXformDirty() )
+	{
+		/*
+		D3DXMATRIX mRotX, mRotY, mRotZ, mScale, mTrans, mWorld;
+		D3DXMatrixRotationX( &mRotX, getRotX() );
+		D3DXMatrixRotationY( &mRotY, getRotY() );
+		D3DXMatrixRotationZ( &mRotZ, getRotZ() );
+		D3DXMatrixScaling( &mScale, getScaleX(), getScaleY(), getScaleZ() );
+		D3DXMatrixTranslation( &mTrans, getPos().x, getPos().y, getPos().z );
+
+		D3DXMATRIX localXform = mRotX * mRotY * mRotZ * mScale * mTrans;
+		setLocalXformRaw( &localXform );
+		*/
+
+
+		// TODO Rotation and Scale transformation was omitted!
+		Mat4Float mRotZ;
+		Mat4Float::MakeRotationZ( &mRotZ, getRotZ() );
+		Mat4Float::MakeTranslation( &m_localXform, getPosRaw().x, getPosRaw().y, getPosRaw().z );
+		Mat4Float::MakeMultiplication( &m_localXform, &mRotZ, &m_localXform );
+		setLocalXformDirty( false );
+	}
 }

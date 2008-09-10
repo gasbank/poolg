@@ -119,7 +119,7 @@ template<typename T> void EpSafeReleaseAll( T& obj ) {
 	{
 		EP_SAFE_RELEASE( *it );
 	}
-	obj.clear();	
+	obj.clear();
 };
 
 
@@ -129,7 +129,7 @@ template<typename T> void SafeDeleteAll( T& obj ) {
 	{
 		SAFE_DELETE( *it );
 	}
-	obj.clear();	
+	obj.clear();
 };
 
 template<typename T> void EpSafeReleaseAllMap( T& obj ) {
@@ -138,7 +138,7 @@ template<typename T> void EpSafeReleaseAllMap( T& obj ) {
 	{
 		EP_SAFE_RELEASE( it->second );
 	}
-	obj.clear();	
+	obj.clear();
 };
 
 

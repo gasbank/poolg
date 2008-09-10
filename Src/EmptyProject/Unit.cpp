@@ -94,24 +94,6 @@ bool Unit::frameMove( double dTime, float fElapsedTime )
 	return flag;
 }
 
-void Unit::updateLocalXform()
-{
-	if ( isLocalXformDirty() )
-	{
-		D3DXMATRIX mRotX, mRotY, mRotZ, mScale, mTrans, mWorld;
-		D3DXMatrixRotationX( &mRotX, getRotX() );
-		D3DXMatrixRotationY( &mRotY, getRotY() );
-		D3DXMatrixRotationZ( &mRotZ, getRotZ() );
-		D3DXMatrixScaling( &mScale, getScaleX(), getScaleY(), getScaleZ() );
-		D3DXMatrixTranslation( &mTrans, getPos().x, getPos().y, getPos().z );
-		
-		D3DXMATRIX localXform = mRotX * mRotY * mRotZ * mScale * mTrans;
-		setLocalXformRaw( &localXform );
-
-		setLocalXformDirty( false );
-	}
-}
-
 UnitInput Unit::mapKey( UINT nKey ) const
 {
 	switch( nKey )

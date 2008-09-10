@@ -30,7 +30,8 @@ bool QueryIsNetworkServer() { return true; }
 
 void AddToCurrentWorld( UnitBase* unitBase )
 {
-	// Client-side job
+	// Client-exclusive function
+	throw std::runtime_error( "Should not be called on server-side." );
 }
 
 int _tmain(int argc, _TCHAR* argv[])

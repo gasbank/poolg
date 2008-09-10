@@ -121,9 +121,9 @@ void EpUser::Deserialize(RakNet::BitStream *bitStream, RakNet::SerializationType
 		EpUser::myUser=this;
 	// The soldier pointer may be NULL, since you spawn in soldiers, rather than have them created immediately on connection as are EpUsers
 	if (soldier)
-		printf("EpUser at address %s updated. Has soldier with name: %s.\n", systemAddress.ToString(), soldier->getRepName());
+		printf( "EpUser at address %s updated. Has soldier with name: %s.\n", systemAddress.ToString(), soldier->getRepName().C_String() );
 	else
-		printf("EpUser at address %s updated. No soldier spawned.\n", systemAddress.ToString() );
+		printf( "EpUser at address %s updated. No soldier spawned.\n", systemAddress.ToString() );
 }
 
 void EpUser::DeleteAllUsers()

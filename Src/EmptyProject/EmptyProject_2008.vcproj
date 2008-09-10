@@ -934,6 +934,10 @@
 			>
 		</File>
 		<File
+			RelativePath=".\doxygen_main.h"
+			>
+		</File>
+		<File
 			RelativePath=".\DynamicMotion.cpp"
 			>
 		</File>

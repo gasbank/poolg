@@ -1,22 +1,25 @@
-﻿//--------------------------------------------------------------------------------------
-// File: EmptyProject.cpp
-//	
-// Copyright (c) Microsoft Corporation. All rights reserved.
-//
-// Modified PoolG Team, a Division of PoolC
-//
-//
-// Lifetime of the application
-//
-// Window and full screen Mode: Launch and Terminate
-//		(1) WinMain
-//		(2) OnCreateDevice
-//		(3) OnResetDevice
-//		(4) OnFrameMove / OnFrameRender loop
-//		(5) OnLostDevice
-//		(6) OnDestroyDevice
-//
-//--------------------------------------------------------------------------------------
+﻿/**
+	@file EmptyProject.cpp
+	@brief main()/WinMain() 함수가 있는 파일입니다.
+	EP 전반에서 쓰이는 전역 변수의 할당/초기화/해제를 담당하고 있습니다.
+	@details
+	EP는 DXUT(DirectX Utility Kit) 소스 코드를 기반으로 작성되었습니다.
+	DXUT는 DirectX 라이브러리를 좀 더 편리하게 사용할 수 있도록 도와주는 랩퍼 라이브러리라고
+	볼 수 있습니다.
+	DXUT는 화면 출력이나 입력, UI, 카메라 관련 클래스 및 비디오 게임에서 자주 사용되는
+	아주 많은 요소에 대해 다양한 프레임워크와 클래스를 제공하지만 EP에서 사용된
+	주된 기능은 화면 출력을 위한 프레임워크 및 카메라 클래스입니다. 이외의 기능은 사용하지
+	않았습니다.\n
+	본 프로그램이 처음으로 실행되었을 상태부터 끝날때까지의 함수 호출 순서는 다음과 같습니다.
+
+		- WinMain
+		- OnCreateDevice
+		- OnResetDevice
+		- OnFrameMove / OnFrameRender loop (주 루프)
+		- OnLostDevice
+		- OnDestroyDevice
+*/
+
 #include "EmptyProjectPCH.h"
 #include "EmptyProject.h"
 #include "resource.h"
@@ -325,6 +328,14 @@ HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFA
 	return hr;
 }
 
+
+/** \fn void OnFrameMoveNetworkProcess()
+*  \brief A member function.
+*  \param c a character.
+*  \param n an integer.
+*  \exception std::out_of_range parameter is out of range.
+*  \return a character pointer.
+*/
 void OnFrameMoveNetworkProcess()
 {
 	if ( g_clientPeer )
@@ -994,6 +1005,18 @@ void CreateScriptManagerIfNotExist()
 }
 
 
+/*!
+	@brief 메인 함수입니다. 프로그램 실행시 자동 호출되는 시작함수입니다.
+	@details
+	본 함수는 main()이거나 wWinMain()일 수 있습니다. EP 디버그 빌드에서는 윈도우 콘솔창에
+	디버그 정보를 나타내기 위해 main()을 사용하고, EP 릴리즈 빌드에서는 콘솔창이 필요없으므로
+	wWinMain()을 사용하도록 전처리계가 설정되어 있습니다.\n
+	본 함수에서는 D3D Device(LPDIRECT3DDEVICE9 혹은IDirect3DDevice9*)과 무관한 부분을 초기화합니다.
+	그리고 DXUT가 설정한 각종 콜백 함수를 등록하게 됩니다. 여기에는 OnD3D9CreateDevice, OnD3D9ResetDevice,
+	OnD3D9FrameRender, OnFrmaeMove, OnD3D9LostDevice, OnD3D9DestroyDevice 등이 포함됩니다.
+	콜백 함수 이름에서 알 수 있듯이 OnFrameMove는 D3D9/D3D10을 구분하지 않는 루틴입니다. 이는 다시 말해
+	OnFrameMove에서는 D3D Device와 연관된 코드를 작성하지 않아야 함을 의미합니다.
+*/
 //--------------------------------------------------------------------------------------
 // Initialize everything and go into a render loop
 //--------------------------------------------------------------------------------------
@@ -1013,11 +1036,22 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 	ZeroMemory( g_bst, sizeof(LPD3DXMESH) * 4 );
 
 	// TODO: Perform any application-level initialization here
-	// There is no dependency on D3D device in application-level init step.(and should be)
+	/*!
+	애플리케이션 레벨의 초기화는 이 부분에서 일어납니다.
+	D3D device를 얻기 전이므로 이와 연관된 초기화를 수행해서는 안됩니다.
+
+	현재 프로그램 실행파일이 있는 위치로 working directory를 변경합니다.
+	*/
 	SetCurrentWorkingDirectory();
 	g_debugBuffer.resize( 2048 );
 	
-	// (1) Script Manager Initialization
+	/*!
+	(1) ScriptManager 초기화\n
+	Tcl 스크립트 언어를 해석하고 바인딩해주는 ScriptManager를 할당하고 초기화합니다.
+	ScriptManager가 생성되어있지 않은 경우에만 생성해줍니다. 생성 여부를 체크하는 이유는
+	이 ScriptManager가 다른 스레드에서 먼저 생성되는 경우도 있기 때문입니다.
+	이후 게임 전반에 사용되는 스크립트 파일을 등록하게 됩니다.\n
+	*/
 	CreateScriptManagerIfNotExist();
 	GetScriptManager().executeFile( "Script/EpInitScript.tcl" );
 	GetScriptManager().executeFile( "Script/EpDialog1.tcl" );
@@ -1025,12 +1059,21 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 	GetScriptManager().execute( "EpInitApp" );
 
 
-	// (9) Sprite manager
+	/*!
+	(2) SpriteManager 초기화\n
+	2D 그래픽을 단순히 찍어야 하는 경우(UI 등)에 사용하는 스프라이트를 관리해주는
+	SpriteManager를 할당하고 초기화합니다. 반드시 SpriteManager는 이곳에서 초기화되어야 합니다.
+	초기화 단계에서 미리 등록되는 스프라이트는 없으며, 이후에 명시적으로 등록한 후 사용해야 합니다.\n
+	*/
 	assert( g_spriteManager == 0 );
 	g_spriteManager = new SpriteManager();
 
-	// (2) Top State Manager (tsm)
-	// TODO: State preservation is needed!!! NO CREATION ON EVERY OnCreateDevice()!
+
+	/*!
+	(3) TopStateManager (tsm) 초기화\n
+	게임의 최상위 스테이트를 관리해주는 tsm을 초기화합니다. 최상위 스테이트에는 게임 실행시 처음으로 설정되는
+	IntroState, 게임 플레이 중을 나타내는 PlayState, 제작자 목록을 보여주는 CreditState등이 있습니다.\n
+	*/
 	assert( g_tsm == 0 );
 	g_tsm = new TopStateManager();
 	g_tsm->init();

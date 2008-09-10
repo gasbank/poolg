@@ -12,12 +12,12 @@
 	않았습니다.\n
 	본 프로그램이 처음으로 실행되었을 상태부터 끝날때까지의 함수 호출 순서는 다음과 같습니다.
 
-		- WinMain
-		- OnCreateDevice
-		- OnResetDevice
-		- OnFrameMove / OnFrameRender loop (주 루프)
-		- OnLostDevice
-		- OnDestroyDevice
+		-# WinMain
+		-# OnCreateDevice
+		-# OnResetDevice
+		-# OnFrameMove / OnFrameRender loop (주 루프)
+		-# OnLostDevice
+		-# OnDestroyDevice
 */
 
 #include "EmptyProjectPCH.h"
@@ -113,7 +113,7 @@ CParticleSystem*				g_pParticleSystems[6];
 bool							g_bParticleVisible				= false;
 
 // RakNet
-RakPeerInterface*				g_clientPeer					= 0;
+RakPeerInterface*				g_clientPeer					= 0; ///< RakNet Client Peer
 RakNet::RPC3					g_rpc3Inst;
 NetworkIDManager				g_networkIDManager;
 // The system that performs most of our functionality for this demo
@@ -329,12 +329,13 @@ HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFA
 }
 
 
-/** \fn void OnFrameMoveNetworkProcess()
-*  \brief A member function.
-*  \param c a character.
-*  \param n an integer.
-*  \exception std::out_of_range parameter is out of range.
-*  \return a character pointer.
+
+/*!
+	\brief 매 OnFrameMove() 시마다 RakNet 패킷 핸들링을 합니다.
+	\details
+	OnFrameMove() 마지막에 호출되는 함수입니다. 만일 클라이언트 피어 객체(::g_clientPeer)가
+	존재한다면 RakNet이 초기화되었다는 뜻이므로 여기서 지난 프레임부터 현재프레임 사이에
+	발생한 수신 패킷을 처리합니다.
 */
 void OnFrameMoveNetworkProcess()
 {
@@ -574,9 +575,21 @@ void SetupFullscreenQuad( const D3DSURFACE_DESC* pBackBufferSurfaceDesc )
 	g_Vertex[3].tex1 = D3DXVECTOR2( 0.0f, fTexHeight1 );
 }
 
-//--------------------------------------------------------------------------------------
-// Render the scene using the D3D9 device
-//--------------------------------------------------------------------------------------
+
+
+/*!
+	\brief D3D9 디바이스를 이용해 화면에 렌더합니다.
+	\param pd3dDevice D3D9 디바이스
+	\param fTime 프로그램이 시작된 후 현재까지 흐른 시간을 초 단위로 나타냅니다.
+	\param fElapsedTime 지난 프레임부터 현재 프레임까지 걸린 시간을 초 단위로 나타냅니다.
+	\param pUserContext 사용하지 않는 매개변수
+	\details
+	DXUT에서 정의된 콜백 함수입니다.
+	모든 게임 루프의 최상위에 위치하는 렌더링 루틴입니다. 매 프레임이 그려질 때 본 함수가
+	호출됩니다. Child node의 OnFrameRender 함수가 재귀적으로 호출되는 곳도 여기입니다.
+	\warning 이 함수와 독립적으로 호출되는(즉, 이 함수로부터 호출되지 않는) 렌더 관련 함수는
+	구조적으로 잘못된 것입니다.
+*/
 void CALLBACK OnD3D9FrameRender( IDirect3DDevice9* pd3dDevice, double fTime, float fElapsedTime, void* pUserContext )
 {
 	HRESULT hr;
@@ -585,7 +598,7 @@ void CALLBACK OnD3D9FrameRender( IDirect3DDevice9* pd3dDevice, double fTime, flo
 	V( pd3dDevice->GetRenderTarget( 0, &originalRT ) );
 
 
-	// Clear the render target and the zbuffer 
+	// Clear the render target and the zbuffer
 	V( pd3dDevice->SetRenderTarget( 0, g_radialBlurRenderTargetSurf	 ) );
 	V( pd3dDevice->Clear( 0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, g_fillColor, 1.0f, 0 ) );
 	V( pd3dDevice->SetRenderState( D3DRS_ZENABLE, TRUE ) );
@@ -1006,20 +1019,17 @@ void CreateScriptManagerIfNotExist()
 
 
 /*!
-	@brief 메인 함수입니다. 프로그램 실행시 자동 호출되는 시작함수입니다.
+	@brief 모든 전역변수를 초기화하고 렌더 루프로 돌입합니다.
 	@details
 	본 함수는 main()이거나 wWinMain()일 수 있습니다. EP 디버그 빌드에서는 윈도우 콘솔창에
 	디버그 정보를 나타내기 위해 main()을 사용하고, EP 릴리즈 빌드에서는 콘솔창이 필요없으므로
 	wWinMain()을 사용하도록 전처리계가 설정되어 있습니다.\n
 	본 함수에서는 D3D Device(LPDIRECT3DDEVICE9 혹은IDirect3DDevice9*)과 무관한 부분을 초기화합니다.
 	그리고 DXUT가 설정한 각종 콜백 함수를 등록하게 됩니다. 여기에는 OnD3D9CreateDevice, OnD3D9ResetDevice,
-	OnD3D9FrameRender, OnFrmaeMove, OnD3D9LostDevice, OnD3D9DestroyDevice 등이 포함됩니다.
+	OnD3D9FrameRender(), OnFrmaeMove, OnD3D9LostDevice, OnD3D9DestroyDevice 등이 포함됩니다.
 	콜백 함수 이름에서 알 수 있듯이 OnFrameMove는 D3D9/D3D10을 구분하지 않는 루틴입니다. 이는 다시 말해
 	OnFrameMove에서는 D3D Device와 연관된 코드를 작성하지 않아야 함을 의미합니다.
 */
-//--------------------------------------------------------------------------------------
-// Initialize everything and go into a render loop
-//--------------------------------------------------------------------------------------
 #ifdef DEBUG
 int main()
 {
@@ -1039,14 +1049,17 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 	/*!
 	애플리케이션 레벨의 초기화는 이 부분에서 일어납니다.
 	D3D device를 얻기 전이므로 이와 연관된 초기화를 수행해서는 안됩니다.
+	*/
 
+	/**
+	- Working Directory 설정\n
 	현재 프로그램 실행파일이 있는 위치로 working directory를 변경합니다.
 	*/
 	SetCurrentWorkingDirectory();
 	g_debugBuffer.resize( 2048 );
 	
 	/*!
-	(1) ScriptManager 초기화\n
+	- ScriptManager 초기화\n
 	Tcl 스크립트 언어를 해석하고 바인딩해주는 ScriptManager를 할당하고 초기화합니다.
 	ScriptManager가 생성되어있지 않은 경우에만 생성해줍니다. 생성 여부를 체크하는 이유는
 	이 ScriptManager가 다른 스레드에서 먼저 생성되는 경우도 있기 때문입니다.
@@ -1060,7 +1073,7 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 
 
 	/*!
-	(2) SpriteManager 초기화\n
+	- SpriteManager 초기화\n
 	2D 그래픽을 단순히 찍어야 하는 경우(UI 등)에 사용하는 스프라이트를 관리해주는
 	SpriteManager를 할당하고 초기화합니다. 반드시 SpriteManager는 이곳에서 초기화되어야 합니다.
 	초기화 단계에서 미리 등록되는 스프라이트는 없으며, 이후에 명시적으로 등록한 후 사용해야 합니다.\n
@@ -1069,26 +1082,40 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 	g_spriteManager = new SpriteManager();
 
 
-	/*!
-	(3) TopStateManager (tsm) 초기화\n
+	/*! - TopStateManager (tsm) 초기화\n
 	게임의 최상위 스테이트를 관리해주는 tsm을 초기화합니다. 최상위 스테이트에는 게임 실행시 처음으로 설정되는
-	IntroState, 게임 플레이 중을 나타내는 PlayState, 제작자 목록을 보여주는 CreditState등이 있습니다.\n
+	IntroState, 게임 플레이 중을 나타내는 PlayState, 제작자 목록을 보여주는 CreditState등이 있습니다.
+	tsm의 초기화는 반드시 여기서, 그리고 프로그램 실행 주기에 단 한번 일어나야 합니다.\n
 	*/
 	assert( g_tsm == 0 );
 	g_tsm = new TopStateManager();
 	g_tsm->init();
 
-	// (3) World State Manager (wsm)
-	// TODO: State preservation is needed!!! NO CREATION ON EVERY OnCreateDevice()!
+	/** - WorldStateManager (wsm) 초기화\n
+	TopStateManager 중 가장 큰 비중을 차지하는 PlayState는 또 몇 개의 하위 스테이트로 나누어져 있습니다.
+	이러한 PlayState의 하위 스테이트를 관리해주는 클래스가 바로 wsm입니다.
+	wsm의 초기화는 반드시 여기서, 그리고 프로그램 실행 주기에 단 한번 일어나야 합니다.\n
+	*/
 	assert( g_wsm == 0 );
 	g_wsm = new WorldStateManager();
 	g_wsm->init();
 	
-	// (4) World Manager
+	/** - WorldManager (wm) 초기화\n
+	EP의 구조상 레벨(맵) 개념은 World란 단어로 정의됩니다. 플레이어는 몇 개의 World를
+	왔다갔다 할 수 있습니다. 이 공간은 비연속적일 수 있습니다. 이러한 World 객체를 관리해주는
+	클래스가 바로 WorldManager입니다. WorldStateManager (wsm)과 혼동하지 않도록 주의하십시오.
+	wm의 초기화는 반드시 여기서, 그리고 프로그램 실행 주기에 단 한번 일어나야 합니다.\n
+	*/
 	assert( g_wm == 0 );
 	g_wm = new WorldManager();
 
-	// (5) Read all world script files
+	/** - 모든 World 스크립트 파일을 읽어오기\n
+	각 World는 하나의 World 스크립트 파일에 의해 정의됩니다. 이전에 초기화된 ScriptManager를 이용해
+	EpWorldList 스크립트 변수를 읽어들여 어떤 World가 정의되어있는지 파악한 후, 각 World 스크립트 파일을
+	순차적으로 로드합니다. 이때, 각 World는 하나의 modelFilePath 스크립트 변수를 가지고 있는데,
+	이것이 화면에 렌더링될 레벨의 ARN 모델 파일이 됩니다. 물론 지금은 D3D9 디바이스가 초기화되기 전이므로
+	ARN 파일 이름만 로드해올 뿐 다른 일은 하지 않습니다.
+	*/
 	assert( GetWorldManager().getWorldCount() == 0 );
 	ConstCharList worldList;
 	GetScriptManager().readCharPtrList( "EpWorldList", worldList );
@@ -1109,26 +1136,43 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 		GetWorldManager().addWorld( world );
 	}
 
-	// (6) Camera Setup
+	/** - 전역 카메라(G::m_camera) 초기화\n
+	<미작성된 부분>
+	*/
 	GetG().m_camera.SetAttachCameraToModel( true );
 	GetG().m_camera.SetEnablePositionMovement( true );
 
-	// (7) EpLight
+	/** - 전역 광원(::g_epLight) 초기화\n
+	<미작성된 부분>
+	*/
 	assert( g_epLight == 0 );
 	g_epLight = new EpLight();
 
-	// (8) Ep Console Thread
+	/** - 콘솔 스레드 초기화\n
+	초기의 EP에서는 디버그 목적으로 콘솔 스레드가 따로 구성되어 있었습니다.
+	그렇지만 시간이 지나면서 동기화 문제 및 메모리 누수 문제가 생겨 결국에는 콘솔 스레드를
+	생성했다가 바로 해제하고 있는 상태입니다.
+	*/
 	g_scriptBindingFinishedEvent = CreateEvent( NULL, TRUE, FALSE, NULL );
 	ResetEvent( g_scriptBindingFinishedEvent );
 	uintptr_t t = _beginthread( EpConsoleThreadMain, 0, 0 );
 	WaitForSingleObject( g_scriptBindingFinishedEvent, INFINITE );
 
 
-
-	// (10) Script side callback invocation (Do at the end of this function.)
+	/** - 스크립트 측 초기화 프로시저 실행\n
+	EpInitScript.tcl 파일에 정의된 EpOnCreateDevice 프로시저가 실행됩니다.
+	현재 OnCreateDevice 상태는 아니지만 소스 코드가 어떻게 계속 바뀌다보니 이렇게 이상한
+	이름이 된 상태입니다. 차후 정정할 예정입니다. :(
+	*/
 	GetScriptManager().execute( "EpOnCreateDevice" );
 
-	// (11) Setup SkillManager
+
+	/** - SkillManager 초기화\n
+	Skill은 EP에서 정의한 '전투 중 가능한 행동'입니다. 이러한 행동은 매우 다양해질 수 있으므로
+	이를 관리할 수 있는 SkillManager를 만들었습니다. SkillManager는 WorldManager와 마찬가지로
+	스크립트 측에서 정의된 스킬 목록을 가져와서 초기화하게 됩니다. 이는 EpSkill.tcl에 정의된
+	EpSkillList라는 스크립트 변수에서 확인할 수 있습니다.
+	*/
 	SkillManager* g_skillManager = new SkillManager();
 	ConstCharList skillList;
 	GetScriptManager().readCharPtrList( "EpSkillList", skillList );
@@ -1139,21 +1183,27 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 		GetSKillManager().registerSkill( Skill::createSkillByScript( skillName ) );
 	}
 
-	// (12) Set the first world
-	// TODO: This is 'DO ONCE THROUGH THE WHOLE LIFETIME job.. not on every OnCreateDevice()!
+	/** - 초기 World를 설정\n
+	기본적으로 IntroState 이후 PlayState에 진입하게 되는데, PlayState에서는 여러 개의
+	로드된 World 중에 하나를 선택해야 합니다. 이러한 초기 World를 여기서 설정해줍니다.
+	어떤 World가 초기 월드가 되는지는 EpInitScript.tcl 파일의 EpStartWorldName 스크립트	변수에
+	정의되어 있습니다.
+	*/
 	const char* startWorldName = GetScriptManager().readString( "EpStartWorldName" );
 	GetWorldManager().setNextWorld( startWorldName );
 	//GetWorldManager().changeToNextWorldIfExist();
 
-	// (13) Determine Windowed or full screen mode
+	/** - 창모드 혹은 전체화면 모드 설정\n
+	*/
 	const char* windowMode = GetScriptManager().readString( "EpWindowMode" );
 	bool bWindowMode = (*windowMode)=='1'?true:false;
 
 
-	// (14) RakNet: Connect to server
+	/** - RakNet 초기화 및 서버 접속 시도\n
+	RakNet 라이브러리는 멀티플레이어 게임 엔진입니다. RakNet을 적용한지 얼마 안되었으므로
+	이 부분은 자주, 그리고 급격히 변경될 수 있습니다.
+	*/
 	ConnectToServer();
-
-
 
 	//////////////////////////////////////////////////////////////////////////
 

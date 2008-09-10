@@ -59,6 +59,11 @@ public:
 	*/
 	void							clearKey();
 
+	/**
+	@name Getter/Setter Methods
+	Here are the list of public getter/setter methods.
+	*/
+	//@{
 	void							setRotX( float rad ) { m_vRot.x = rad; m_bLocalXformDirty = true; }
 	void							setRotY( float rad ) { m_vRot.y = rad; m_bLocalXformDirty = true; }
 	void							setRotZ( float rad ) { m_vRot.z = rad; m_bLocalXformDirty = true; }
@@ -82,6 +87,8 @@ public:
 	void							setTilePos( const Point2Uint& newPos );
 	void							setTileBufferPos( int tileX, int tileY ) { m_tileBufferPos.x = tileX; m_tileBufferPos.y = tileY; }
 	
+
+
 	UINT							getTilePosX() const						{ return m_tilePos.x; }
 	UINT							getTilePosY() const						{ return m_tilePos.y; }
 	void							getTilePos( UINT& x, UINT& y ) const	{ x = m_tilePos.x; y = m_tilePos.y; }
@@ -101,8 +108,7 @@ public:
 	const char*						getTypeString() const;
 	World*							getCurWorld() const						{ return GetWorldManager().getCurWorld(); }
 	void							setForcedMove( int i );
-	void							forcedMoveTest();
-	
+
 	void							setArnMeshName( const char* arnMeshName )	{ m_arnMeshName = arnMeshName; }
 	const std::string&				getArnMeshName() const						{ return m_arnMeshName; }
 	ArnMesh*						getArnMesh() const							{ return m_arnMesh; }
@@ -113,20 +119,22 @@ public:
 	void							setColor( int r, int g, int b );
 	
 	bool							isForcedMove() const					{ return m_bForcedMove; }
-	void							startSoulAnimation( float duration, float height );
+	
 	void							setViewAt( const D3DXVECTOR3* at );
 
 	void							setVisible (bool choice);
-	static Unit*					createUnit( LPD3DXMESH mesh, int tileX = 0, int tileY = 0, float posZ = 0 );
-
-
+	
 	bool							getSoulAnimation() { return m_bSoulAnimation; }
 	void							setNameVisible( bool b ) { m_bNameVisible = b; }
 	void							setName( std::string str ) { m_name = str; }
+	//@}
 
+	static Unit*					createUnit( LPD3DXMESH mesh, int tileX = 0, int tileY = 0, float posZ = 0 );
+	
+	void							forcedMoveTest();
 	void							printDebugInfo() const;
 	void							updateArnMesh();
-
+	void							startSoulAnimation( float duration, float height );
 protected:
 									Unit( UnitType type );
 	virtual UnitInput				mapKey( UINT nKey ) const;
@@ -136,8 +144,8 @@ protected:
 
 	
 
-	BYTE							m_aKeys[UNIT_MAX_KEYS];
-	UINT							m_cKeysDown;
+	BYTE							m_aKeys[UNIT_MAX_KEYS];		///< Keyboard input buffer
+	UINT							m_cKeysDown;				///< Number of keys down
 	D3DXVECTOR3						m_vKeyboardDirection;
 	D3DXVECTOR3						m_vVelocity;
 	

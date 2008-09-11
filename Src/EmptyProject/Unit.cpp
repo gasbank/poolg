@@ -44,14 +44,6 @@ Unit::~Unit()
 {
 }
 
-HRESULT Unit::init()
-{
-	HRESULT hr = S_OK;
-
-
-	return hr;
-}
-
 
 HRESULT Unit::frameRender( IDirect3DDevice9* pd3dDevice, double dTime, float fElapsedTime )
 {
@@ -117,7 +109,6 @@ void Unit::clearKey()
 Unit* Unit::createUnit( LPD3DXMESH mesh, int tileX, int tileY, float posZ )
 {
 	Unit* u = new Unit( UT_UNIT );
-	u->init();
 	return u;
 }
 

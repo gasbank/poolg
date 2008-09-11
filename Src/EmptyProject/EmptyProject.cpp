@@ -9,7 +9,8 @@
 	DXUT는 화면 출력이나 입력, UI, 카메라 관련 클래스 및 비디오 게임에서 자주 사용되는
 	아주 많은 요소에 대해 다양한 프레임워크와 클래스를 제공하지만 EP에서 사용된
 	주된 기능은 화면 출력을 위한 프레임워크 및 카메라 클래스입니다. 이외의 기능은 사용하지
-	않았습니다.\n
+	않았습니다.
+
 	본 프로그램이 처음으로 실행되었을 상태부터 끝날때까지의 함수 호출 순서는 다음과 같습니다.
 
 		-# WinMain
@@ -176,10 +177,30 @@ bool CALLBACK ModifyDeviceSettings( DXUTDeviceSettings* pDeviceSettings, void* p
 	return true;
 }
 
-//--------------------------------------------------------------------------------------
-// Create any D3D9 resources that will live through a device reset (D3DPOOL_MANAGED)
-// and aren't tied to the back buffer size
-//--------------------------------------------------------------------------------------
+
+/*!
+	\brief 디바이스 리셋 이벤트에도 살아남는 개체를 생성합니다.
+	\param pd3dDevice D3D9 디바이스
+	\param pBackBufferSurfaceDesc 백 버퍼 서피스 설정값을 참조하기 위한 포인터
+	\param pUserContext 사용하지 않는 매개변수
+	\details
+	DXUT에서 정의된 콜백 함수입니다.
+
+	본 함수는 D3D9 디바이스가 얻어진 이후 실행됩니다. 이 함수에서는 디바이스 리셋 이벤트와
+	상관없이 항상(디바이스 로스트 전까지) 유효한 D3D 개체를 생성하게 됩니다. 일반적으로 디바이스
+	리셋 이벤트가 발생한 경우 D3D9 디바이스가 재생성되기 때문에 이에 의존적인 모든 개체를 다시 생성하거나
+	갱신해야만 합니다. 그러나 D3DPOOL_MANAGED 플래그로 생성된 D3DX 관련 개체는 디바이스 리셋 이벤트시
+	Direct3D가 자동으로 개체의 갱신을 책임지게 됩니다. 이렇듯 디바이스 리셋 이벤트에도
+	'살아남는' 개체의 경우 본 함수에서 생성하도록 합니다. 디바이스 리셋 이벤트에서
+	'살아남지 못하는' 개체의 할당 및 초기화는 OnD3D9ResetDevice()에서 호출해 주십시오.
+
+	참고로 처음 DXUT 소스 코드에는 아래와 같은 커맨트가 있었습니다.
+
+	Create any D3D9 resources that will live through a device reset (D3DPOOL_MANAGED)
+	and aren't tied to the back buffer size
+
+	이후는 본 함수에서 일어나는 일 중 중요한 것을 나열한 것입니다.
+*/
 HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
 									void* pUserContext )
 {
@@ -190,14 +211,14 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 	UNREFERENCED_PARAMETER( hr );
 
 
-	// (1) Set D3D device global variable which is shared through the whole application lifetime.
-	//     GetG() related init
+	/// - Aran 라이브러리의 D3D9 디바이스 값을 설정합니다.
 	assert( VideoMan::getSingleton().GetDev() == 0 );
 	VideoMan::getSingleton().SetDev( pd3dDevice );
+	/// - 화면 해상도 값을 전역 변수 객체인 GetG()에 설정합니다.
 	GetG().m_scrWidth = pBackBufferSurfaceDesc->Width;
 	GetG().m_scrHeight = pBackBufferSurfaceDesc->Height;
 	
-	// Orthogonal and fixed view xforms for GUI or fixed element rendering
+	/// - GUI 요소나 고정된 2D 그래픽을 출력하기 위해 사용하는 orthogonal 뷰 변환 행렬을 설정합니다.
 	D3DXVECTOR3 eye(0, 0, -50.0f), at(0, 0, 0), up(0, 1.0f, 0);
 	D3DXMatrixOrthoLH(&GetG().g_orthoProjMat, (FLOAT)pBackBufferSurfaceDesc->Width, (FLOAT)pBackBufferSurfaceDesc->Height, 0.1f, 100.0f);
 	D3DXMatrixLookAtLH(&GetG().g_fixedViewMat,	&eye, &at, &up);
@@ -209,26 +230,23 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 	float fAspectRatio = pBackBufferSurfaceDesc->Width / ( FLOAT )pBackBufferSurfaceDesc->Height;
 	GetG().m_camera.SetProjParams( D3DX_PI / 4, fAspectRatio, 1.0f, 1000.0f );
 	
-	// (x) Screen Flash (Alpha shader) init
+	/// - G::m_screenFlash를 초기화
 	GetG().m_screenFlash.onCreateDevice( pd3dDevice, pBackBufferSurfaceDesc );
 
-	
-
-	// (2) Configure shaders and particle system
+	/// - 쉐이더 초기화
 	ConfigureShaders( pd3dDevice, pBackBufferSurfaceDesc );
-	//ConfigureParticleSystem( pd3dDevice );
 
+	/// - 파티클 시스템 초기화 (현재는 사용하지 않습니다.)
+	//ConfigureParticleSystem( pd3dDevice );
 	
-	
-	// (3) Configure geometries (Vertex and index buffer manipulation)
+	/// - 타일 격자를 그리기 위한 프리미티브 및 기본 도형(::g_bst)을 초기화합니다.
 	ConfigureTileGridGeometry( pd3dDevice );
 	ConfigureTestGeometry( pd3dDevice );
 	
-	
-	// (4) Light setup
+	/// - 전역 광원을 설정합니다.
 	GetEpLight().setupLight( pd3dDevice );
 
-	// (5) Globally used fonts
+	/// - 프로그램 전반에 쓰이는 폰트(LPD3DXFONT) 초기화
 	V_RETURN( D3DXCreateFont( pd3dDevice, 12, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Gulimche"), &g_pFont) );
 	V_RETURN( D3DXCreateFont( pd3dDevice, 26, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T( "Arial Black"), &g_unitNameFont ) );
 	V_RETURN( D3DXCreateFont( pd3dDevice, 12, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Gulim"), &g_dlgContentFont) );
@@ -242,9 +260,7 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 	V_RETURN( D3DXCreateFont( pd3dDevice, 17, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_RASTER_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("HYnamL"), &g_fontStat ) );
 
 
-
-
-	// (6) OnCreateDevice propagation
+	/// - 본 함수에서의 기본 초기화는 끝났습니다. 하부 구성원에게 OnCreateDevice 메시지를 전달합니다.
 	GetTopStateManager().onCreateDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
 	GetWorldStateManager().onCreateDevice( pd3dDevice, pBackBufferSurfaceDesc, pUserContext );
 	GetSpriteManager().onCreateDevice( pd3dDevice );
@@ -407,25 +423,51 @@ void OnFrameMoveNetworkProcess()
 }
 
 
-//--------------------------------------------------------------------------------------
-// Handle updates to the scene.  This is called regardless of which D3D API is used
-//--------------------------------------------------------------------------------------
+
+
+/*!
+	\brief 매 프레임마다 렌더링 이외의 게임 로직을 계산합니다.
+	\param fTime 프로그램이 시작된 후 현재까지 흐른 시간을 초 단위로 나타냅니다.
+	\param fElapsedTime 지난 프레임부터 현재 프레임까지 걸린 시간을 초 단위로 나타냅니다.
+	\param pUserContext 사용하지 않는 매개변수
+	\warning 이 함수와 독립적으로 호출되는(즉, 이 함수로부터 호출되지 않는) 프레임 무브 관련 함수는
+	구조적으로 잘못된 것입니다.
+	\details
+	DXUT에서 정의된 콜백 함수입니다.
+
+	이 함수는 프레임이 렌더링 렌더링 될때마다 그 직전에 호출됩니다.
+	화면에 그리는 작업 이외의 대부분 작업이 여기서 일어납니다. 카메라의 위치를 바꾼다거나,
+	적군이 근처에 있어서 플레이어가 전투에 돌입해야하는지 판단한다거나 하는 일을 합니다.
+	Child node의 OnFrameMove 함수가 재귀적으로 호출되는 곳도 여기입니다.
+	함수명과 파라미터에서 알 수 있듯이 이것은 D3D9/10 디바이스와는 완전히 독립적으로 움직입니다.
+	즉, 본 함수에서 D3D9 디바이스와 관련된 어떠한 변경이나 작업도 일어나서는 안됩니다.
+
+	참고로 처음 DXUT 소스 코드에는 아래와 같은 커맨트가 있었습니다.
+
+	Handle updates to the scene.  This is called regardless of which D3D API is used
+
+	이후는 본 함수에서 일어나는 일 중 중요한 것을 나열한 것입니다.
+*/
 void CALLBACK OnFrameMove( double fTime, float fElapsedTime, void* pUserContext )
 {
 	HRESULT hr;
 
 	UNREFERENCED_PARAMETER( hr );
 
+	/// - 만일 WorldManager에 변경해야 할 다음 World가 설정되어 있다면 변경합니다.
 	GetWorldManager().changeToNextWorldIfExist();
 
-	//////////////////////////////////////////////////////////////////////////
+	/// - 만일 TopStateManager에 변경해야 할 다음 스테이트가 설정되어 있다면 변경합니다.
+	GetTopStateManager().transit( fTime );
 
-	TopStateManager::getSingleton().transit( fTime );
-
+	/// - 현재 TopState의 프레임 무브 함수를 호출합니다.
 	if (GetTopStateManager().getCurState())
 		GetTopStateManager().getCurState()->frameMove(fTime, fElapsedTime);
 
+	/// - G::m_camera의 프레임 무브 함수를 호출합니다.
 	GetG().m_camera.frameMove( fElapsedTime );
+
+	/// - EpLight의 프레임 무브 함수를 호출합니다.
 	GetEpLight().frameMove( fElapsedTime );
 
 
@@ -443,8 +485,10 @@ void CALLBACK OnFrameMove( double fTime, float fElapsedTime, void* pUserContext 
 		GetG().m_camera.GetLookAtPt()->z );
 	g_debugBuffer.append( msg );
 	
+	/// - G::m_screenFlash의 프레임 무브 함수를 호출합니다.
 	GetG().m_screenFlash.frameMove( fTime, fElapsedTime );
 
+	/// - RakNet 패킷을 처리하기 위해 OnFrameMoveNetworkProcess() 함수를 호출합니다.
 	OnFrameMoveNetworkProcess();
 }
 
@@ -942,8 +986,17 @@ void CALLBACK KeyboardProc( UINT nChar, bool bKeyDown, bool bAltDown, void* pUse
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
 
-
 static bool isCurrentWorkingDir = false;
+
+/*!
+	\brief 실행 파일이 있는 곳으로 작업 디렉토리를 변경합니다.
+	\details
+	개발 중에는 MSVC에서 프로그램을 실행시키는 경우가 많은데, 작업 디렉토리가
+	바뀌기가 쉬워서 경우에 따라 경로 설정을 다르게 해야하는 번거로움이 있습니다.
+	본 함수가 현재 실행 파일이 있는 디렉토리를 작업 디렉토리(working directory)로
+	만들어서 다른 모든 경로가 작업 디렉토리를 기준으로 상대 경로로 나타낼 수 있도록
+	도와줍니다.
+*/
 void SetCurrentWorkingDirectory()
 {
 	if ( isCurrentWorkingDir == false )
@@ -1030,8 +1083,8 @@ void CreateScriptManagerIfNotExist()
 	디버그 정보를 나타내기 위해 main()을 사용하고, EP 릴리즈 빌드에서는 콘솔창이 필요없으므로
 	wWinMain()을 사용하도록 전처리계가 설정되어 있습니다.\n
 	본 함수에서는 D3D Device(LPDIRECT3DDEVICE9 혹은IDirect3DDevice9*)과 무관한 부분을 초기화합니다.
-	그리고 DXUT가 설정한 각종 콜백 함수를 등록하게 됩니다. 여기에는 OnD3D9CreateDevice, OnD3D9ResetDevice,
-	OnD3D9FrameRender(), OnFrmaeMove, OnD3D9LostDevice, OnD3D9DestroyDevice 등이 포함됩니다.
+	그리고 DXUT가 설정한 각종 콜백 함수를 등록하게 됩니다. 여기에는 OnD3D9CreateDevice(), OnD3D9ResetDevice(),
+	OnD3D9FrameRender(), OnFrmaeMove(), OnD3D9LostDevice(), OnD3D9DestroyDevice() 등이 포함됩니다.
 	콜백 함수 이름에서 알 수 있듯이 OnFrameMove는 D3D9/D3D10을 구분하지 않는 루틴입니다. 이는 다시 말해
 	OnFrameMove에서는 D3D Device와 연관된 코드를 작성하지 않아야 함을 의미합니다.
 */

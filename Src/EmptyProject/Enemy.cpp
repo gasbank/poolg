@@ -25,7 +25,6 @@ Enemy::~Enemy(void)
 Unit* Enemy::createEnemy( LPD3DXMESH mesh, int tileX, int tileY, float posZ )
 {
 	Enemy* u = new Enemy();
-	u->init();
 	u->setTilePos( tileX, tileY );
 	u->setTileBufferPos( tileX, tileY );
 	u->setArnMeshName( "GwengYiModel" );

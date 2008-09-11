@@ -33,7 +33,6 @@ Hero::~Hero(void)
 Unit* Hero::createHero( LPD3DXMESH mesh, int tileX, int tileY, float posZ )
 {
 	Hero* u = new Hero();
-	u->init();
 	u->setTilePos( tileX, tileY );
 	u->setTileBufferPos( tileX, tileY );
 	u->setArnMeshName( "PoolGModel" );

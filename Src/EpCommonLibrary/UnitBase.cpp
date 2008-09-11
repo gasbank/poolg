@@ -39,16 +39,18 @@ UnitBase::UnitBase( UnitType type )
 UnitBase::~UnitBase(void)
 {
 	if ( m_attachedWorld && getType() == UT_UNITBASE )
+	{
 		m_attachedWorld->detachUnit( this );
+		if ( UnitBase::mySoldier != this )
+			printf( "Soldier named %s deleted.\n", getRepName().C_String() );
+	}
 
 	soldiers.RemoveAtIndex( soldiers.GetIndexOf( this ) );
 	if ( UnitBase::mySoldier == this )
 	{
 		printf( "My soldier deleted.\n" );
 		UnitBase::mySoldier = 0;
-	}
-	else
-		printf( "Soldier named %s deleted.\n", getRepName().C_String() );
+	}	
 
 	if ( m_owner )
 		m_owner->soldier = 0;

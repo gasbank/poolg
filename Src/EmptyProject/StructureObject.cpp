@@ -5,22 +5,24 @@
 
 StructureObject::StructureObject(void)
 : Unit ( UT_STRUCTREOBJECT )
+, m_bMoving( false )
+, m_bPickable( false )
+, m_fMovingTime( 0 )
+, m_moveDuration( 1.0f )
 {
-	m_bMoving			= false;
-	m_fMovingTime		= 0;
-	m_moveDuration		= 1.0f;
 }
 
 StructureObject::~StructureObject(void)
 {
 }
 
-Unit* StructureObject::createStructureObject( LPD3DXMESH mesh, int tileX, int tileY, float posZ, bool pushable )
+Unit* StructureObject::createStructureObject( LPD3DXMESH mesh, int tileX, int tileY, float posZ, bool pushable, bool pickable )
 {
 	StructureObject* u = new StructureObject();
 	u->setTilePos( tileX, tileY );
 	u->setTileBufferPos( tileX, tileY );
 	u->setPushable( pushable );
+	u->setPickable( pickable );
 
 	return u;
 }
@@ -95,18 +97,19 @@ bool StructureObject::frameMove( double dTime, float fElapsedTime )
 	return Unit::frameMove( dTime, fElapsedTime );
 }
 
-Unit* EpCreateStructureObject( int tileX, int tileY, int p )
+//////////////////////////////////////////////////////////////////////////
+
+Unit* EpCreateStructureObject( int tileX, int tileY, int pushable )
 {
-	//LPD3DXMESH d3dxMesh;
-	//D3DXCreateTeapot( GetG().m_dev, &d3dxMesh, 0 );
-	bool pushable;
-	if ( p == 0 )
-		pushable = false;
-	else
-		pushable = true;
-	return StructureObject::createStructureObject( 0, tileX, tileY, 0, pushable );
+	return StructureObject::createStructureObject( 0, tileX, tileY, 0, pushable?true:false, false );
 } SCRIPT_CALLABLE_PV_I_I_I( EpCreateStructureObject )
+
+Unit* EpCreateStructureObjectPickable( int tileX, int tileY )
+{
+	return StructureObject::createStructureObject( 0, tileX, tileY, 0, false, true );
+} SCRIPT_CALLABLE_PV_I_I( EpCreateStructureObjectPickable )
 
 START_SCRIPT_FACTORY( StructureObject )
 	CREATE_OBJ_COMMAND( EpCreateStructureObject )
+	CREATE_OBJ_COMMAND( EpCreateStructureObjectPickable )
 END_SCRIPT_FACTORY( StructureObject )

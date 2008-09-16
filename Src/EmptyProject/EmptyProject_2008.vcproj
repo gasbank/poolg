@@ -673,6 +673,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\EpItem.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\EpItem.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Hero.cpp"
 				>
 			</File>

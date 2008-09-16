@@ -16,6 +16,7 @@
 #include "SequentialIncident.h"
 #include "SkillObject.h"
 #include "DynamicMotion.h"
+#include "EpItem.h"
 
 int Tcl_AppInit(Tcl_Interp *interp);
 
@@ -178,6 +179,7 @@ void ScriptManager::initScriptBindings()
 	INIT_BINDING( SequentialIncident );
 	INIT_BINDING( SkillObject );
 	INIT_BINDING( DynamicMotion );
+	INIT_BINDING( EpItem );
 }
 #undef INIT_BINDING
 

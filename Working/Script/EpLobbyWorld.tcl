@@ -23,8 +23,12 @@ namespace eval EpLobbyWorld {
 		EpCharacterSetCurCs				$pHeroUnit -1
 		EpCharacterSetMoveDuration		$pHeroUnit [expr 0.05]
 		EpUnitSetColor					$pHeroUnit 255 128 255
-	
-	
+		
+		set curWorld					[ EpGetCurWorld ]
+		set item						[ EpCreateStructureObjectPickable 41 81 ]
+		EpUnitSetArnMesh				$item		"PushableBox"
+		EpRegisterToWorld				$curWorld	$item
+		
 		EpRegisterInitFadeInIncident
 	}
 	

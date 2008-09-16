@@ -12,7 +12,7 @@
 #include "SkillManager.h"
 
 extern NetworkIDManager					g_networkIDManager;
-extern RakNet::ReplicaManager2			g_replicaManager;
+extern RakNet::ReplicaManager2*			g_replicaManager;
 
 Hero::Hero(void)
 : Character( UT_HERO )
@@ -52,16 +52,20 @@ Unit* Hero::createHero( LPD3DXMESH mesh, int tileX, int tileY, float posZ )
 	u->SetNetworkIDManager( &g_networkIDManager );
 	u->SetNetworkID( nid );*/
 
-	// Spawn a new soldier
-	UnitBase::mySoldier = u;
-	// In order to use any networked member functions of Replica2, you must first call SetReplicaManager
-	UnitBase::mySoldier->SetReplicaManager( &g_replicaManager );
-	// Tell the system to automatically serialize our data members every 100 milliseconds (if changed)
-	// This way if we change the soldier's name we don't have to call Soldier::mySoldier->BroadcastSerialize();
-	UnitBase::mySoldier->AddAutoSerializeTimer( 100 );
-	// Send out this new user to all systems. Unlike the old system (ReplicaManager) all sends are done immediately.
-	UnitBase::mySoldier->BroadcastConstruction();
+	if ( g_replicaManager )
+	{
+		// Spawn a new soldier
+		UnitBase::mySoldier = u;
+		// In order to use any networked member functions of Replica2, you must first call SetReplicaManager
+		UnitBase::mySoldier->SetReplicaManager( g_replicaManager );
+		// Tell the system to automatically serialize our data members every 100 milliseconds (if changed)
+		// This way if we change the soldier's name we don't have to call Soldier::mySoldier->BroadcastSerialize();
+		UnitBase::mySoldier->AddAutoSerializeTimer( 100 );
+		// Send out this new user to all systems. Unlike the old system (ReplicaManager) all sends are done immediately.
+		UnitBase::mySoldier->BroadcastConstruction();
 
+	}
+	
 	return u;
 }
 

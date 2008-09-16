@@ -49,78 +49,78 @@
 
 
 
-G								g_g;
-WorldManager*					g_wm							= 0;
-TopStateManager*				g_tsm							= 0;
-WorldStateManager*				g_wsm							= 0;
-ScriptManager*					g_scriptManager					= 0;		// Set to zero is 'CRUCIAL!'
-SkillManager*					g_skillManager					= 0;
-SpriteManager*					g_spriteManager					= 0;
-EpLight*						g_epLight						= 0;
-SCREEN_VERTEX					g_Vertex[4];
+G									g_g;
+WorldManager*						g_wm							= 0;
+TopStateManager*					g_tsm							= 0;
+WorldStateManager*					g_wsm							= 0;
+ScriptManager*						g_scriptManager					= 0;		// Set to zero is 'CRUCIAL!'
+SkillManager*						g_skillManager					= 0;
+SpriteManager*						g_spriteManager					= 0;
+EpLight*							g_epLight						= 0;
+SCREEN_VERTEX						g_Vertex[4];
 
-LPD3DXEFFECT					g_pEffect						= 0;
-D3DXHANDLE						g_tech							= 0;
-LPDIRECT3DVERTEXBUFFER9			g_lineElement					= 0;
-HANDLE							g_scriptBindingFinishedEvent	= 0;		// Signal object to resolve multi-threaded problems on console thread and main app thread
-HANDLE							g_consoleReleasedEvent			= 0;		// Signal object to resolve multi-threaded problems on console thread and main app thread
+LPD3DXEFFECT						g_pEffect						= 0;
+D3DXHANDLE							g_tech							= 0;
+LPDIRECT3DVERTEXBUFFER9				g_lineElement					= 0;
+HANDLE								g_scriptBindingFinishedEvent	= 0;		// Signal object to resolve multi-threaded problems on console thread and main app thread
+HANDLE								g_consoleReleasedEvent			= 0;		// Signal object to resolve multi-threaded problems on console thread and main app thread
 
-LPD3DXMESH						g_bst[BST_COUNT];
+LPD3DXMESH							g_bst[BST_COUNT];
 
-D3DCOLOR						g_fillColor;
+D3DCOLOR							g_fillColor;
 
 
-// LPD3DXFONTs will be managed at global scope.
+// LPD3DXFONTs will be manag	ed at global scope.
 
-LPD3DXFONT						g_pFont							= 0;
-LPD3DXFONT						g_unitNameFont					= 0;
-LPD3DXFONT						g_dlgNameFont					= 0;
-LPD3DXFONT						g_dlgContentFont				= 0;
+LPD3DXFONT							g_pFont							= 0;
+LPD3DXFONT							g_unitNameFont					= 0;
+LPD3DXFONT							g_dlgNameFont					= 0;
+LPD3DXFONT							g_dlgContentFont				= 0;
 // CreditState
-LPD3DXFONT						g_d3dxFont						= 0;
-LPD3DXFONT						g_d3dxFontBig					= 0;
+LPD3DXFONT							g_d3dxFont						= 0;
+LPD3DXFONT							g_d3dxFontBig					= 0;
 // Battle State
-LPD3DXFONT						g_fontBattle2					= 0;
-LPD3DXFONT						g_fontBattle					= 0;
-LPD3DXFONT						g_fontSkill						= 0;
-LPD3DXFONT						g_fontSkillDescription			= 0;
-LPD3DXFONT						g_fontStat						= 0;
+LPD3DXFONT							g_fontBattle2					= 0;
+LPD3DXFONT							g_fontBattle					= 0;
+LPD3DXFONT							g_fontSkill						= 0;
+LPD3DXFONT							g_fontSkillDescription			= 0;
+LPD3DXFONT							g_fontStat						= 0;
 
 
-LOGMANAGER						logMan;
+LOGMANAGER							logMan;
 
-Tcl_Interp*						g_consoleInterp					= 0;
+Tcl_Interp*							g_consoleInterp					= 0;
 
-std::wstring					g_debugBuffer;
-bool							g_bTileGrid						= false;
+std::wstring						g_debugBuffer;
+bool								g_bTileGrid						= false;
 
 
-LPDIRECT3DTEXTURE9				g_pFullScreenRenderTarget		= 0;
-LPDIRECT3DSURFACE9				g_pFullScreenRenderTargetSurf	= 0;
+LPDIRECT3DTEXTURE9					g_pFullScreenRenderTarget		= 0;
+LPDIRECT3DSURFACE9					g_pFullScreenRenderTargetSurf	= 0;
 
-LPDIRECT3DTEXTURE9				g_sepiaRenderTarget				= 0;
-LPDIRECT3DSURFACE9				g_sepiaRenderTargetSurf			= 0;
+LPDIRECT3DTEXTURE9					g_sepiaRenderTarget				= 0;
+LPDIRECT3DSURFACE9					g_sepiaRenderTargetSurf			= 0;
 
-LPDIRECT3DTEXTURE9				g_radialBlurRenderTarget		= 0;
-LPDIRECT3DSURFACE9				g_radialBlurRenderTargetSurf	= 0;
+LPDIRECT3DTEXTURE9					g_radialBlurRenderTarget		= 0;
+LPDIRECT3DSURFACE9					g_radialBlurRenderTargetSurf	= 0;
 
-PostSepiaShader*				g_postSepiaShader				= 0;
-PostRadialBlurShader*			g_postRadialBlurShader			= 0;
-BombShader*						g_bombShader					= 0;
+PostSepiaShader*					g_postSepiaShader				= 0;
+PostRadialBlurShader*				g_postRadialBlurShader			= 0;
+BombShader*							g_bombShader					= 0;
 
 // Particle System related
-int								g_nActiveSystem					= 0;
-CParticleSystem*				g_pParticleSystems[6];
-bool							g_bParticleVisible				= false;
+int									g_nActiveSystem					= 0;
+CParticleSystem*					g_pParticleSystems[6];
+bool								g_bParticleVisible				= false;
 
 // RakNet
-RakPeerInterface*				g_clientPeer					= 0; ///< RakNet Client Peer
-RakNet::RPC3					g_rpc3Inst;
-NetworkIDManager				g_networkIDManager;
+RakPeerInterface*					g_clientPeer					= 0; ///< RakNet Client Peer
+RakNet::RPC3						g_rpc3Inst;
+NetworkIDManager					g_networkIDManager;
 // The system that performs most of our functionality for this demo
-RakNet::ReplicaManager2			g_replicaManager;
+RakNet::ReplicaManager2*			g_replicaManager				= 0;
 // Instance of the class that creates the object we use to represent connections
-EpReplicaManagerConnectionFactory g_connectionFactory;
+EpReplicaManagerConnectionFactory	g_connectionFactory;
 
 // Called from EpCommonLibrary
 NetworkIDManager& GetNetworkIdManager() { return g_networkIDManager; }
@@ -1261,7 +1261,9 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 	RakNet 라이브러리는 멀티플레이어 게임 엔진입니다. RakNet을 적용한지 얼마 안되었으므로
 	이 부분은 자주, 그리고 급격히 변경될 수 있습니다.
 	*/
-	ConnectToServer();
+	const char* networkMode = GetScriptManager().readString( "NetworkMode" );
+	if ( *networkMode == '1' )
+		ConnectToServer();
 
 	//////////////////////////////////////////////////////////////////////////
 
@@ -1309,13 +1311,25 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 	
 #endif
 
-	Unit* hero = GetWorldManager().getCurWorld()->getHero();
+	if ( g_clientPeer && g_clientPeer->IsConnected( g_clientPeer->GetSystemAddressFromIndex( 0 ) ) )
+	{
+		Unit* hero = GetWorldManager().getCurWorld()->getHero();
+
+		GetWorldManager().getCurWorld()->detachUnit( hero );		// Detach from world since Hero will be deallocated by ReplicaManager.
+		GetWorldManager().getCurWorld()->detachAllUnitBaseType();	// Detach from world since UnitBase typed instances will be deallocated by ReplicaManager.
+
+		DisconnectFromServer();
+	}
 	
-	GetWorldManager().getCurWorld()->detachUnit( hero );		// Detach from world since Hero will be deallocated by ReplicaManager.
-	GetWorldManager().getCurWorld()->detachAllUnitBaseType();	// Detach from world since UnitBase typed instances will be deallocated by ReplicaManager.
+	if ( g_clientPeer )
+	{
+		// Be nice and let the server know we quit.
+		g_clientPeer->Shutdown( 300 );
 
-	DisconnectFromServer();
-
+		// We're done with the network
+		RakNetworkFactory::DestroyRakPeerInterface( g_clientPeer );
+	}
+	SAFE_DELETE( g_replicaManager );
 
 	// DO NOT USE EP_SAFE_RELEASE or SAFE_DELETE on these objects.
 	// It should be allocated once time through the application lifetime,
@@ -1592,6 +1606,7 @@ void EpRpcDoScript( RakNet::RakString command )
 void ConnectToServer()
 {
 	//g_rpc3Inst = new RakNet::RPC3;
+	g_replicaManager = new RakNet::ReplicaManager2;
 
 	UnitBase::mySoldier=0;
 	EpUser::myUser=0;
@@ -1653,11 +1668,11 @@ void ConnectToServer()
 	// a connectionValidationInteger, and false for low priority threads
 	SocketDescriptor socketDescriptor((unsigned short)atoi(clientPort),0);
 	g_clientPeer->Startup(1,30,&socketDescriptor, 1);
-	g_clientPeer->AttachPlugin( &g_replicaManager );
+	g_clientPeer->AttachPlugin( g_replicaManager );
 	// Just test this
-	g_replicaManager.SetAutoAddNewConnections( false );
+	g_replicaManager->SetAutoAddNewConnections( false );
 	// Register our custom connection factory
-	g_replicaManager.SetConnectionFactory( &g_connectionFactory );
+	g_replicaManager->SetConnectionFactory( &g_connectionFactory );
 	g_clientPeer->SetOccasionalPing(true);
 	bool b = g_clientPeer->Connect(ip, (unsigned short)atoi(serverPort), "Rumpelstiltskin", (int) strlen("Rumpelstiltskin"));	
 
@@ -1739,7 +1754,7 @@ void ConnectToServer()
 			case ID_CONNECTION_REQUEST_ACCEPTED:
 				// This tells the client they have connected
 				printf("ID_CONNECTION_REQUEST_ACCEPTED\n");
-				g_replicaManager.AddNewConnection( p->systemAddress );
+				g_replicaManager->AddNewConnection( p->systemAddress );
 
 				doLoop = false;
 				break;
@@ -1808,12 +1823,7 @@ void DisconnectFromServer()
 
 	
 
-	// Be nice and let the server know we quit.
-	g_clientPeer->Shutdown( 300 );
-
-	// We're done with the network
-	RakNetworkFactory::DestroyRakPeerInterface( g_clientPeer );
-
+	
 	//SAFE_DELETE( g_rpc3Inst );
 	
 }

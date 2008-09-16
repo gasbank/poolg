@@ -236,8 +236,8 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 	/// - 쉐이더 초기화
 	ConfigureShaders( pd3dDevice, pBackBufferSurfaceDesc );
 
-	/// - 파티클 시스템 초기화 (현재는 사용하지 않습니다.)
-	//ConfigureParticleSystem( pd3dDevice );
+	/// - 파티클 시스템 초기화
+	ConfigureParticleSystem( pd3dDevice );
 	
 	/// - 타일 격자를 그리기 위한 프리미티브 및 기본 도형(::g_bst)을 초기화합니다.
 	ConfigureTileGridGeometry( pd3dDevice );
@@ -488,6 +488,12 @@ void CALLBACK OnFrameMove( double fTime, float fElapsedTime, void* pUserContext 
 	/// - G::m_screenFlash의 프레임 무브 함수를 호출합니다.
 	GetG().m_screenFlash.frameMove( fTime, fElapsedTime );
 
+	// The particle system will need to know how much time has passed since 
+	// the last time it was updated, so we'll need to keep track of how much   
+	// time has elapsed since the last frame update...
+	g_pParticleSystems[g_nActiveSystem]->Update( (float)fElapsedTime );
+
+
 	/// - RakNet 패킷을 처리하기 위해 OnFrameMoveNetworkProcess() 함수를 호출합니다.
 	OnFrameMoveNetworkProcess();
 }
@@ -669,6 +675,63 @@ void CALLBACK OnD3D9FrameRender( IDirect3DDevice9* pd3dDevice, double fTime, flo
 		
 		GetEpLight().frameRender( pd3dDevice );
 
+
+		if ( g_bParticleVisible )
+		{
+
+			//////////////////////////////////////////////////////////////////////////
+			//
+			// Transform for particle systems
+			//
+
+			pd3dDevice->SetTransform( D3DTS_VIEW, GetG().m_camera.GetViewMatrix() );
+			pd3dDevice->SetTransform( D3DTS_PROJECTION, GetG().m_camera.GetProjMatrix() );
+			D3DXMATRIX world;	
+			D3DXMATRIX scale;
+			D3DXMATRIX rotate;
+			D3DXMATRIX trans;
+			D3DXMatrixScaling( &scale, 0.5f, 0.5f, 0.5f );
+			D3DXMatrixRotationX( &rotate, D3DXToRadian( -90.0f ) );	
+			D3DXMatrixTranslation( &trans, -30.0f, -4.0f, 0.0f );
+			world = rotate * scale * trans;
+			pd3dDevice->SetTransform( D3DTS_WORLD, &world );
+
+			pd3dDevice->SetRenderState( D3DRS_ZENABLE, TRUE );
+
+
+			//
+			// Prepare to render particle system
+			//
+
+			//
+			// Setting D3DRS_ZWRITEENABLE to FALSE makes the Z-Buffer read-only, which 
+			// helps remove graphical artifacts generated from  rendering a list of 
+			// particles that haven't been sorted by distance to the eye.
+			//
+			// Setting D3DRS_ALPHABLENDENABLE to TRUE allows particles, which overlap, 
+			// to alpha blend with each other correctly.
+			//
+
+			pd3dDevice->SetRenderState( D3DRS_ZWRITEENABLE, FALSE );
+
+			pd3dDevice->SetRenderState( D3DRS_ALPHABLENDENABLE, TRUE );
+			pd3dDevice->SetRenderState( D3DRS_DESTBLEND, D3DBLEND_ONE );
+
+			//
+			// Render particle system
+			//
+
+			pd3dDevice->SetTexture( 0, g_pParticleSystems[g_nActiveSystem]->GetTextureObject() );
+			g_pParticleSystems[g_nActiveSystem]->Render( pd3dDevice );
+
+			//
+			// Reset render states...
+			//
+
+			pd3dDevice->SetRenderState( D3DRS_ZWRITEENABLE, TRUE );
+			pd3dDevice->SetRenderState( D3DRS_ALPHABLENDENABLE, FALSE );
+		}
+
 		//////////////////////////////////////////////////////////////////////////
 		V( pd3dDevice->EndScene() );
 	}
@@ -724,80 +787,7 @@ void CALLBACK OnD3D9FrameRender( IDirect3DDevice9* pd3dDevice, double fTime, flo
 	SAFE_RELEASE( originalRT );
 
 
-	if ( g_bParticleVisible )
-	{
-
-		//////////////////////////////////////////////////////////////////////////
-		//
-		// Transform for particle systems
-		//
-
-		pd3dDevice->SetTransform( D3DTS_VIEW, GetG().m_camera.GetViewMatrix() );
-		pd3dDevice->SetTransform( D3DTS_PROJECTION, GetG().m_camera.GetProjMatrix() );
-		D3DXMATRIX world;	
-		D3DXMATRIX scale;
-		D3DXMATRIX rotate;
-		D3DXMATRIX trans;
-		D3DXMatrixScaling( &scale, 0.5f, 0.5f, 0.5f );
-		D3DXMatrixRotationX( &rotate, D3DXToRadian( -90.0f ) );	
-		D3DXMatrixTranslation( &trans, -30.0f, -4.0f, 0.0f );
-		world = rotate * scale * trans;
-		pd3dDevice->SetTransform( D3DTS_WORLD, &world );
-
-		pd3dDevice->SetRenderState( D3DRS_ZENABLE, TRUE );
-		
-		//////////////////////////////////////////////////////////////////////////
-		//////////////////////////////////////////////////////////////////////////
-		//
-		// Render particle systems
-		//
-		// The particle system will need to know how much time has passed since 
-		// the last time it was updated, so we'll need to keep track of how much   
-		// time has elapsed since the last frame update...
-		//
-
-		g_pParticleSystems[g_nActiveSystem]->Update( (float)fElapsedTime );
-
-		pd3dDevice->BeginScene();
-
-		//
-		// Prepare to render particle system
-		//
-
-		//
-		// Setting D3DRS_ZWRITEENABLE to FALSE makes the Z-Buffer read-only, which 
-		// helps remove graphical artifacts generated from  rendering a list of 
-		// particles that haven't been sorted by distance to the eye.
-		//
-		// Setting D3DRS_ALPHABLENDENABLE to TRUE allows particles, which overlap, 
-		// to alpha blend with each other correctly.
-		//
-
-		pd3dDevice->SetRenderState( D3DRS_ZWRITEENABLE, FALSE );
-
-		pd3dDevice->SetRenderState( D3DRS_ALPHABLENDENABLE, TRUE );
-		pd3dDevice->SetRenderState( D3DRS_DESTBLEND, D3DBLEND_ONE );
-
-		//
-		// Render particle system
-		//
-
-		pd3dDevice->SetTexture( 0, g_pParticleSystems[g_nActiveSystem]->GetTextureObject() );
-		g_pParticleSystems[g_nActiveSystem]->Render( pd3dDevice );
-
-		//
-		// Reset render states...
-		//
-
-		pd3dDevice->SetRenderState( D3DRS_ZWRITEENABLE, TRUE );
-		pd3dDevice->SetRenderState( D3DRS_ALPHABLENDENABLE, FALSE );
-
-		pd3dDevice->EndScene();
-		pd3dDevice->Present( NULL, NULL, NULL, NULL );
-
-		//////////////////////////////////////////////////////////////////////////
-		//////////////////////////////////////////////////////////////////////////
-	}
+	
 }
 
 

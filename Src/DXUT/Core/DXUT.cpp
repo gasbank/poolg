@@ -1082,7 +1082,7 @@ bool DXUTGetCmdParam( WCHAR*& strCmdLine, WCHAR* strFlag )
 // call DXUTSetWindow() to use an existing window.  
 //--------------------------------------------------------------------------------------
 HRESULT WINAPI DXUTCreateWindow( const WCHAR* strWindowTitle, HINSTANCE hInstance,
-                                 HICON hIcon, HMENU hMenu, int x, int y )
+                                 HICON hIcon, HMENU hMenu, int x, int y, bool bResizable )
 {
     HRESULT hr;
 
@@ -1162,8 +1162,12 @@ HRESULT WINAPI DXUTCreateWindow( const WCHAR* strWindowTitle, HINSTANCE hInstanc
         WCHAR* strCachedWindowTitle = GetDXUTState().GetWindowTitle();
         StringCchCopy( strCachedWindowTitle, 256, strWindowTitle );
 
+
         // Create the render window
-        HWND hWnd = CreateWindow( L"Direct3DWindowClass", strWindowTitle, WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU /*WS_OVERLAPPEDWINDOW*/,
+		DWORD dwWindowStyle;
+		if ( bResizable ) dwWindowStyle = WS_OVERLAPPEDWINDOW;
+		else dwWindowStyle = WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU;
+        HWND hWnd = CreateWindow( L"Direct3DWindowClass", strWindowTitle, dwWindowStyle,
                                   x, y, ( rc.right - rc.left ), ( rc.bottom - rc.top ), 0,
                                   hMenu, hInstance, 0 );
         if( hWnd == NULL )

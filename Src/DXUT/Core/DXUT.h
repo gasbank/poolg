@@ -261,7 +261,7 @@ HRESULT WINAPI DXUTInit( bool bParseCommandLine = true, bool bShowMsgBoxOnError 
 // Choose either DXUTCreateWindow or DXUTSetWindow.  If using DXUTSetWindow, consider using DXUTStaticWndProc
 HRESULT WINAPI DXUTCreateWindow( const WCHAR* strWindowTitle = L"Direct3D Window", 
                           HINSTANCE hInstance = NULL, HICON hIcon = NULL, HMENU hMenu = NULL,
-                          int x = CW_USEDEFAULT, int y = CW_USEDEFAULT );
+                          int x = CW_USEDEFAULT, int y = CW_USEDEFAULT, bool bResizable = false );
 HRESULT WINAPI DXUTSetWindow( HWND hWndFocus, HWND hWndDeviceFullScreen, HWND hWndDeviceWindowed, bool bHandleMessages = true );
 LRESULT CALLBACK DXUTStaticWndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 

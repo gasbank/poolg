@@ -134,7 +134,8 @@ void AddToCurrentWorld( UnitBase* unitBase )
 //////////////////////////////////////////////////////////////////////////
 
 void ConfigureShaders( LPDIRECT3DDEVICE9 pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc );
-void ConfigureParticleSystem( LPDIRECT3DDEVICE9 pd3dDevice );
+void OnResetParticleSystem( LPDIRECT3DDEVICE9 pd3dDevice );
+void OnD3D9LostDeviceParticleSystem();
 void ConfigureTileGridGeometry( LPDIRECT3DDEVICE9 pd3dDevice );
 void ConfigureTestGeometry( LPDIRECT3DDEVICE9 pd3dDevice );
 
@@ -214,30 +215,12 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 	/// - Aran 라이브러리의 D3D9 디바이스 값을 설정합니다.
 	assert( VideoMan::getSingleton().GetDev() == 0 );
 	VideoMan::getSingleton().SetDev( pd3dDevice );
-	/// - 화면 해상도 값을 전역 변수 객체인 GetG()에 설정합니다.
-	GetG().m_scrWidth = pBackBufferSurfaceDesc->Width;
-	GetG().m_scrHeight = pBackBufferSurfaceDesc->Height;
-	
-	/// - GUI 요소나 고정된 2D 그래픽을 출력하기 위해 사용하는 orthogonal 뷰 변환 행렬을 설정합니다.
-	D3DXVECTOR3 eye(0, 0, -50.0f), at(0, 0, 0), up(0, 1.0f, 0);
-	D3DXMatrixOrthoLH(&GetG().g_orthoProjMat, (FLOAT)pBackBufferSurfaceDesc->Width, (FLOAT)pBackBufferSurfaceDesc->Height, 0.1f, 100.0f);
-	D3DXMatrixLookAtLH(&GetG().g_fixedViewMat,	&eye, &at, &up);
-
-	TCHAR scrSizeString[64];
-	StringCchPrintf( scrSizeString, 64, _T( "- INFO: Window width: %d / height: %d\n" ), GetG().m_scrWidth, GetG().m_scrHeight );
-	OutputDebugString( scrSizeString );
-
-	float fAspectRatio = pBackBufferSurfaceDesc->Width / ( FLOAT )pBackBufferSurfaceDesc->Height;
-	GetG().m_camera.SetProjParams( D3DX_PI / 4, fAspectRatio, 1.0f, 1000.0f );
 	
 	/// - G::m_screenFlash를 초기화
 	GetG().m_screenFlash.onCreateDevice( pd3dDevice, pBackBufferSurfaceDesc );
 
 	/// - 쉐이더 초기화
 	ConfigureShaders( pd3dDevice, pBackBufferSurfaceDesc );
-
-	/// - 파티클 시스템 초기화
-	ConfigureParticleSystem( pd3dDevice );
 	
 	/// - 타일 격자를 그리기 위한 프리미티브 및 기본 도형(::g_bst)을 초기화합니다.
 	ConfigureTileGridGeometry( pd3dDevice );
@@ -283,6 +266,22 @@ HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFA
 	GetG().m_scrHeight = pBackBufferSurfaceDesc->Height;
 
 	HRESULT hr = S_OK;
+
+	/// - 화면 해상도 값을 전역 변수 객체인 GetG()에 설정합니다.
+	GetG().m_scrWidth = pBackBufferSurfaceDesc->Width;
+	GetG().m_scrHeight = pBackBufferSurfaceDesc->Height;
+
+	TCHAR scrSizeString[64];
+	StringCchPrintf( scrSizeString, 64, _T( "- INFO: Window width: %d / height: %d\n" ), GetG().m_scrWidth, GetG().m_scrHeight );
+	OutputDebugString( scrSizeString );
+
+	/// - GUI 요소나 고정된 2D 그래픽을 출력하기 위해 사용하는 orthogonal 뷰 변환 행렬을 설정합니다.
+	D3DXVECTOR3 eye(0, 0, -50.0f), at(0, 0, 0), up(0, 1.0f, 0);
+	D3DXMatrixOrthoLH(&GetG().g_orthoProjMat, (FLOAT)pBackBufferSurfaceDesc->Width, (FLOAT)pBackBufferSurfaceDesc->Height, 0.1f, 100.0f);
+	D3DXMatrixLookAtLH(&GetG().g_fixedViewMat,	&eye, &at, &up);
+
+	float fAspectRatio = pBackBufferSurfaceDesc->Width / ( FLOAT )pBackBufferSurfaceDesc->Height;
+	GetG().m_camera.SetProjParams( D3DX_PI / 4, fAspectRatio, 1.0f, 1000.0f );
 
 	pd3dDevice->SetRenderState( D3DRS_DITHERENABLE, TRUE );
 	pd3dDevice->SetRenderState( D3DRS_SPECULARENABLE, TRUE );
@@ -341,6 +340,9 @@ HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFA
 	g_fontSkillDescription->OnResetDevice();
 	g_fontStat->OnResetDevice();
 
+
+	/// - 파티클 시스템 초기화
+	OnResetParticleSystem( pd3dDevice );
 
 	g_postRadialBlurShader->onResetDevice( pd3dDevice, pBackBufferSurfaceDesc );
 	g_postSepiaShader->onResetDevice( pd3dDevice, pBackBufferSurfaceDesc );
@@ -869,6 +871,8 @@ void CALLBACK OnD3D9LostDevice( void* pUserContext )
 
 	GetG().m_screenFlash.onLostDevice();
 
+	OnD3D9LostDeviceParticleSystem();
+
 	// GetG() related
 	GetG().m_videoMan.SetDev(0);
 }
@@ -911,13 +915,8 @@ void CALLBACK OnD3D9DestroyDevice( void* pUserContext )
 
 	for( int i = 0; i < 6; ++i )
 	{
-		if( g_pParticleSystems[i] != NULL )
-		{
-			delete g_pParticleSystems[i];
-			g_pParticleSystems[i] = NULL;
-		}
+		SAFE_DELETE( g_pParticleSystems[i] );
 	}
-
 
 	SAFE_RELEASE( g_fontBattle2 );
 	SAFE_RELEASE( g_fontBattle );
@@ -1273,7 +1272,7 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 	DXUTInit( true, true ); // Parse the command line and show msgboxes
 	DXUTSetHotkeyHandling( true, false, true );  // handle the default hotkeys
 	DXUTSetCursorSettings( true, true ); // Show the cursor and clip it when in full screen
-	DXUTCreateWindow( L"EmptyProject" );
+	DXUTCreateWindow( L"EmptyProject", 0, 0, 0, CW_USEDEFAULT, CW_USEDEFAULT, true );
 	if ( bWindowMode )
 	{
 		// Window size is determined by script
@@ -1347,8 +1346,16 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 	return DXUTGetExitCode();
 }
 
+void OnD3D9LostDeviceParticleSystem()
+{
+	UINT i;
+	for ( i = 0; i < 6; ++i )
+	{
+		SAFE_DELETE( g_pParticleSystems[i] );
+	}
+}
 
-void ConfigureParticleSystem( LPDIRECT3DDEVICE9 pd3dDevice )
+void OnResetParticleSystem( LPDIRECT3DDEVICE9 pd3dDevice )
 {
 	UINT i;
 	for ( i = 0; i < 6; ++i )

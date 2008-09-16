@@ -613,8 +613,7 @@ HRESULT CParticleSystem::RestoreDeviceObjects( LPDIRECT3DDEVICE9 pd3dDevice )
 //-----------------------------------------------------------------------------
 HRESULT CParticleSystem::InvalidateDeviceObjects()
 {
-	if( m_pVB != NULL )
-        m_pVB->Release();
+	SAFE_RELEASE( m_pVB );
 
     return S_OK;
 }

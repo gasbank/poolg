@@ -174,15 +174,13 @@ void Unit::setHeadDir( UnitInput unitInput )
 	}
 }
 
-void Unit::setForcedMove( int i )
+void Unit::setForcedMove( UnitInput dir )
 {
-	UnitInput mappedKey = (UnitInput)i ;
-
-	if( mappedKey != UNIT_UNKNOWN )
+	if( dir != UNIT_UNKNOWN )
 	{
-		if( FALSE == IsKeyDown( m_aKeys[mappedKey] ) )
+		if( FALSE == IsKeyDown( m_aKeys[dir] ) )
 		{
-			m_aKeys[ mappedKey ] = KEY_WAS_DOWN_MASK | KEY_IS_DOWN_MASK;
+			m_aKeys[ dir ] = KEY_WAS_DOWN_MASK | KEY_IS_DOWN_MASK;
 			++m_cKeysDown;
 		}
 	}

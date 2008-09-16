@@ -49,6 +49,7 @@ public:
 	DrawRequest* drawRequestXformable( const char* rectName );
 	LPDIRECT3DTEXTURE9 getTexture() const { assert( m_d3dTex ); return m_d3dTex; }
 
+	void clearDrawRequest();
 	void removeDrawRequest( DrawRequest*& dr );
 
 	bool isCustomRendered() const { return m_bCustomRendered; }

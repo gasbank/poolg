@@ -17,6 +17,7 @@
 #include "SkillSet.h"
 #include "Utility.h"
 #include "Sound.h"
+#include "PlayState.h"
 
 extern TileManager tileManager;
 
@@ -91,15 +92,8 @@ Unit* Character::createCharacter( LPD3DXMESH mesh, int tileX, int tileY, float p
 
 Character::~Character()
 {
-
-	
-	SkillObjectList::iterator it = m_skillObjects.begin();
-	for ( ; it != m_skillObjects.end(); ++it)
-	{
-		SAFE_DELETE(*it);
-	}
-
-	m_skillObjects.clear();
+	deleteAllSkills();
+	deleteAllItems();
 	delete m_skillSet;
 }
 
@@ -145,8 +139,8 @@ bool Character::frameMove( double dTime, float fElapsedTime )
 				}
 				// 가는 방향으로 머리를 돌린다.
 				this->setHeadDir( (UnitInput)i );
-				// 앞에 있는 유닛을 민다.
-				this->pushUnitInFront( (UnitInput)i );
+				// 앞에 있는 유닛을 밀거나 획득한다.
+				this->processUnitInFront( (UnitInput)i );
 
 				break;
 			}
@@ -218,8 +212,10 @@ HRESULT Character::frameRender( IDirect3DDevice9* pd3dDevice, double dTime, floa
 	{
 		(*it)->frameRender( pd3dDevice, dTime, fElapsedTime );
 	}
-	Unit::frameRender( pd3dDevice, dTime, fElapsedTime );
-	return S_OK;
+
+
+	
+	return Unit::frameRender( pd3dDevice, dTime, fElapsedTime );
 }
 
 LRESULT Character::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
@@ -386,22 +382,27 @@ void Character::setStat( int statHealth, int statWill, int statCoding, int statD
 	// Hp, Mp update goes here...
 }
 
-void Character::pushUnitInFront( UnitInput dir )
+void Character::processUnitInFront( UnitInput dir )
 {
 	if ( this->getType() == UT_HERO )
 	{
-		UnitBase* u = GetWorldManager().getCurWorld()->findUnitAtTile( 
-		getTileBufferPos().x + g_moveAmount[ (int)dir ].x,
-		getTileBufferPos().y + g_moveAmount[ (int)dir ].y );
+		const UINT nextTileX = getTileBufferPos().x + g_moveAmount[ (int)dir ].x;
+		const UINT nextTileY = getTileBufferPos().y + g_moveAmount[ (int)dir ].y;
+		UnitBase* u = GetWorldManager().getCurWorld()->findUnitAtTile( nextTileX, nextTileY );
 
 		if ( u )
 		{
-			if ( u->getType() == UT_STRUCTREOBJECT )
+			StructureObject* s = dynamic_cast<StructureObject*>( u );
+			if ( s )
 			{
-				StructureObject* s = reinterpret_cast<StructureObject*>(u);
-				if ( s->getPushable() )
+				if ( s->isPushable() )
 				{
-					s->setForcedMove( (int)dir );
+					s->setForcedMove( dir );
+				}
+				else if ( s->isPickable() )
+				{
+					s->getAttachedWorld()->detachUnit( s );
+					pickItem( s );
 				}
 			}
 		}
@@ -450,16 +451,33 @@ void Character::pushSkillObjectList( const SkillObjectList soList )
 		pushSkillObject( *cit );
 	}
 }
+
+void Character::pickItem( StructureObject* structureObj )
+{
+	assert( structureObj->getAttachedWorld() == 0 );
+	structureObj->setOwner( this );
+	m_items.push_back( structureObj );
+
+	PlayState* playState = dynamic_cast<PlayState*>( GetTopStateManager().getCurState() );
+	if ( playState )
+		playState->updateHeroItemListThumbnails();
+}
+
+void Character::deleteAllItems()
+{
+	SafeDeleteAll( m_items );
+}
+
+void Character::deleteAllSkills()
+{
+	SafeDeleteAll( m_skillObjects );
+}
+
+const std::string& Character::getItemThumbnailName( UINT idx ) const
+{
+	return m_items[idx]->getThumbnailName();
+}
 //////////////////////////////////////////////////////////////////////////
-//
-//
-//Unit* EpCreateCharacter( int tileX, int tileY )
-//{
-//	LPD3DXMESH d3dxMesh;
-//	D3DXCreateTeapot( GetG().m_dev, &d3dxMesh, 0 );
-//	return Character::createCharacter( d3dxMesh, tileX, tileY, 0 );
-//
-//} SCRIPT_CALLABLE_PV_I_I( EpCreateCharacter )
 
 int EpCharacterSetCurHp( void* ptr, int curHp )
 {

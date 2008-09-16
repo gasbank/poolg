@@ -229,9 +229,10 @@ public:
 	EpUser*									getOwner() const			{ return m_owner; }
 	//@}
 
+	CommonWorldInterface*					getAttachedWorld() const	{ return m_attachedWorld; }
+
 private:
 
-	CommonWorldInterface*					getAttachedWorld() const	{ return m_attachedWorld; }
 	void									setAttachedWorld( CommonWorldInterface* val )	{ m_attachedWorld = val; }
 
 	UnitType								m_type;

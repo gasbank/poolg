@@ -463,6 +463,7 @@ Dialog* World::startDialog( const char* dialogName )
 bool World::detachUnit( UnitBase* pUnit )
 {
 	m_unitSet.remove( pUnit );
+	pUnit->setAttachedWorld( 0 );
 	return true;
 }
 

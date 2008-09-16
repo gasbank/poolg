@@ -6,8 +6,11 @@ class SkillSet;
 class SkillObject;
 class Trigger;
 class Skill;
+class StructureObject;
 
 typedef std::list<SkillObject*> SkillObjectList;
+typedef std::list<StructureObject*> StructureObjectList;
+typedef std::vector<StructureObject*> StructureObjectVector;
 
 enum SkillLocation;
 
@@ -29,7 +32,7 @@ public:
 	virtual bool						frameMove( double dTime, float fElapsedTime );
 	virtual LRESULT						handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 	virtual const D3DXVECTOR3&			getPos() const { if ( m_moveImpulse != DX_CONSTS::D3DXVEC3_ZERO ) return m_curPos; else return Unit::getPos(); }
-	virtual void						pushUnitInFront( UnitInput dir );
+	virtual void						processUnitInFront( UnitInput dir );
 
 	/* 스킬 관련 함수 */
 	//void doNormalAttack(int type, Character* enemy);
@@ -69,12 +72,17 @@ public:
 
 	void								setControllable(bool bCtrl)		{ m_bControllable = bCtrl; }
 
+	const std::string&					getItemThumbnailName( UINT idx ) const;
+	UINT								getItemCount() const { return m_items.size(); }
 	
 protected:
 										Character( UnitType type );
 	
 private:
 	void								boundaryTesting( UnitInput );
+	void								pickItem( StructureObject* structureObj );
+	void								deleteAllSkills();
+	void								deleteAllItems();
 
 	bool								m_bMoving;
 	float								m_fMovingTime;
@@ -100,6 +108,7 @@ private:
 	SkillSet*							m_skillSet;
 	SkillObjectList						m_skillObjects;
 
+	StructureObjectVector				m_items;
 };
 
 

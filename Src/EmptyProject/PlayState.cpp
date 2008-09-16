@@ -3,12 +3,16 @@
 #include "World.h"
 #include "ArnSceneGraph.h"
 #include "ArnFile.h"
-
+#include "SpriteManager.h"
+#include "Sprite.h"
 
 PlayState::PlayState(void)
+: m_CharactersArnFile( 0 )
+, m_CharactersSg( 0 )
 {
-	m_CharactersArnFile			= 0;
-	m_CharactersSg				= 0;
+	m_sprite = GetSpriteManager().registerSprite( "PlayUI", "Images/PlayUI/Items.png" );
+	m_sprite->setCustomRendered( true );
+	m_sprite->registerRect( "GreenButtonBG", 0, 0, 32, 32 );
 }
 
 PlayState::~PlayState(void)
@@ -35,6 +39,10 @@ HRESULT PlayState::frameRender( IDirect3DDevice9* pd3dDevice, double fTime, floa
 {
 	getCurWorld()->frameRender( pd3dDevice, fTime, fElapsedTime );
 
+	
+	
+	GetSpriteManager().frameRenderSpecificSprite( "PlayUI" );
+
 	return S_OK;
 }
 
@@ -60,7 +68,7 @@ HRESULT PlayState::release()
 	return S_OK;
 }
 
-ArnSceneGraph* PlayState::getCharacterSceneGraph()
+ArnSceneGraph* PlayState::getCharacterSceneGraph() const
 {
 	return m_CharactersSg;
 }
@@ -96,4 +104,23 @@ void PlayState::onLostDevice()
 HRESULT PlayState::onCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext )
 {
 	return S_OK;
+}
+
+void PlayState::updateHeroItemListThumbnails()
+{
+	if ( m_sprite )
+	{
+		m_sprite->clearDrawRequest();
+		Character* hero = getCurWorld()->getHeroUnit();
+		if ( hero )
+		{
+			const UINT itemCount = hero->getItemCount();
+			UINT i;
+			for ( i = 0; i < itemCount; ++i )
+			{
+				const std::string& itemTnName = hero->getItemThumbnailName( i );
+				m_sprite->drawRequest( itemTnName.c_str(), 0, 32 * i, 0, 0, 0xffffffff );
+			}
+		}
+	}
 }

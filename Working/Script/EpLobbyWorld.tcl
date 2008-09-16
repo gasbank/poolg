@@ -29,6 +29,10 @@ namespace eval EpLobbyWorld {
 		EpUnitSetArnMesh				$item		"PushableBox"
 		EpRegisterToWorld				$curWorld	$item
 		
+		set item						[ EpCreateStructureObjectPickable 44 81 ]
+		EpUnitSetArnMesh				$item		"PushableBox"
+		EpRegisterToWorld				$curWorld	$item
+		
 		EpRegisterInitFadeInIncident
 	}
 	

@@ -62,11 +62,15 @@ public:
 	void							setHeadDir( UnitInput ui );
 	const D3DXMATRIX&				getLocalXform() const					{ return *(D3DXMATRIX*)&getLocalXformRaw(); }
 	World*							getCurWorld() const						{ return GetWorldManager().getCurWorld(); }
-	void							setForcedMove( int i );
+	
 	void							setColor( int r, int g, int b );
 	bool							isForcedMove() const					{ return m_bForcedMove; }
 	void							setViewAt( const D3DXVECTOR3* at );
 	void							forcedMoveTest();
+
+
+	/** 유닛을 특정 방향으로 한 타일 이동시킴 */
+	void							setForcedMove( UnitInput dir );
 
 	/** @name 이동 가능성
 	이 유닛이 이동 가능한지에 대해 설정하거나 가져올 수 있습니다.

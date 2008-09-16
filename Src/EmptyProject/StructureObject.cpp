@@ -23,6 +23,7 @@ Unit* StructureObject::createStructureObject( LPD3DXMESH mesh, int tileX, int ti
 	u->setTileBufferPos( tileX, tileY );
 	u->setPushable( pushable );
 	u->setPickable( pickable );
+	u->m_thumbnailName = "GreenButtonBG";
 
 	return u;
 }

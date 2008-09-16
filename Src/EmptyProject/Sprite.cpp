@@ -145,3 +145,8 @@ void Sprite::onLostDevice()
 {
 	SAFE_RELEASE( m_d3dTex );
 }
+
+void Sprite::clearDrawRequest()
+{
+	EpSafeReleaseAll( m_drawReqList );
+}

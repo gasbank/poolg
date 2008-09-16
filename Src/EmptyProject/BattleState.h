@@ -35,7 +35,7 @@ public:
 	virtual HRESULT			onCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext );
 	virtual HRESULT			onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext );
 	virtual void			onLostDevice();
-	virtual HRESULT			release ();
+	virtual HRESULT			release();
 
 	void					renderFixedText( int scrWidth, int scrHeight );
 

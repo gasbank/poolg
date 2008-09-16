@@ -190,7 +190,6 @@ BattleState::BattleState()
 
 BattleState::~BattleState()
 {
-	release();
 }
 
 /* 전투 시작 시 다음 함수가 호출됨*/
@@ -411,29 +410,6 @@ HRESULT BattleState::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 		}
 	}
 	return FALSE;
-}
-
-HRESULT BattleState::release ()
-{
-	//m_sprite->release();
-
-
-	EP_SAFE_RELEASE( m_innerFire );
-	
-	SAFE_DELETE( m_hpBarPlayerProg );
-	SAFE_DELETE( m_csBarPlayerProg );
-	SAFE_DELETE( m_expBarPlayerProg );
-	SAFE_DELETE( m_hpBarEnemyProg );
-	SAFE_DELETE( m_csBarEnemyProg );
-	SAFE_DELETE( m_hpIllusionPlayerProg );
-	SAFE_DELETE( m_csIllusionPlayerProg );
-	SAFE_DELETE( m_expIllusionPlayerProg );
-	SAFE_DELETE( m_hpIllusionEnemyProg );
-	SAFE_DELETE( m_csIllusionEnemyProg );
-	SAFE_DELETE( m_skillContentBoxMover );
-	SAFE_DELETE( m_statSelectBoxMover );
-
-	return S_OK;
 }
 
 void BattleState::renderFixedText(int scrWidth, int scrHeight)
@@ -1194,4 +1170,24 @@ void BattleState::handlePlayerTurnState()
 void BattleState::handleEnemyTurnState()
 {
 
+}
+
+HRESULT BattleState::release()
+{
+	EP_SAFE_RELEASE( m_innerFire );
+
+	SAFE_DELETE( m_hpBarPlayerProg );
+	SAFE_DELETE( m_csBarPlayerProg );
+	SAFE_DELETE( m_expBarPlayerProg );
+	SAFE_DELETE( m_hpBarEnemyProg );
+	SAFE_DELETE( m_csBarEnemyProg );
+	SAFE_DELETE( m_hpIllusionPlayerProg );
+	SAFE_DELETE( m_csIllusionPlayerProg );
+	SAFE_DELETE( m_expIllusionPlayerProg );
+	SAFE_DELETE( m_hpIllusionEnemyProg );
+	SAFE_DELETE( m_csIllusionEnemyProg );
+	SAFE_DELETE( m_skillContentBoxMover );
+	SAFE_DELETE( m_statSelectBoxMover );
+
+	return S_OK;
 }

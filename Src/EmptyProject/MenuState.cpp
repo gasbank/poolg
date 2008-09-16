@@ -630,7 +630,6 @@ MenuState::MenuState()
 
 MenuState::~MenuState()
 {
-
 }
 
 HRESULT MenuState::enter( double dStartTime )

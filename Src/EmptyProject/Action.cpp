@@ -255,16 +255,13 @@ void UnitMoveAction::activate()
 {
 	Action::activate();
 
-	int i = 4;
+	UnitInput i = UNIT_UNKNOWN;
 
-	if ( m_input == "LEFT" )
-		i = 2;
-	else if ( m_input == "RIGHT" )
-		i = 3;
-	else if ( m_input == "UP" )
-		i = 0;
-	else if ( m_input == "DOWN" )
-		i = 1;
+	if ( m_input == "LEFT" )		i = UNIT_MOVE_LEFT;
+	else if ( m_input == "RIGHT" )	i = UNIT_MOVE_RIGHT;
+	else if ( m_input == "UP" )		i = UNIT_MOVE_UP;
+	else if ( m_input == "DOWN" )	i = UNIT_MOVE_DOWN;
+	else throw std::runtime_error( "Unknown UnitInput value" );
 
 	getUnit()->setForcedMove( i );
 	m_activateElapsedTime = 0;

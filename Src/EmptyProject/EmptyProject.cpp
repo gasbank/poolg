@@ -474,6 +474,9 @@ void CALLBACK OnFrameMove( double fTime, float fElapsedTime, void* pUserContext 
 
 
 	WCHAR msg[128];
+
+	StringCchPrintf( msg, 128, L"FPS : %.2f\n", DXUTGetFPS() );
+	g_debugBuffer.append( msg );
 	
 	StringCchPrintf( msg, 128, L"Camera Pos : (%.2f, %.2f, %.2f)\n",
 		GetG().m_camera.GetEyePt()->x,

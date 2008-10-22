@@ -69,7 +69,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/IGNORE:4089"
-				AdditionalDependencies="Aran.lib tcl85g.lib DXUT.lib DXUTOpt.lib dxerr.lib dxguid.lib d3dx10d.lib d3d10.lib d3dx9d.lib d3d9.lib winmm.lib comctl32.lib RakNetDLLDebug.lib RakNet_RPC3.lib EpCommonLibrary.lib"
+				AdditionalDependencies="Aran.lib tcl85g.lib DXUT.lib DXUTOpt.lib dxerr.lib dxguid.lib d3dx9d.lib d3d9.lib winmm.lib comctl32.lib RakNetDLLDebug.lib RakNet_RPC3.lib EpCommonLibrary.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="../Aran/lib;../DXUT/Core/Debug;../DXUT/Optional/Debug;../tcl/lib;../RakNet/lib;../EpCommonLibrary/Debug"
 				GenerateManifest="false"

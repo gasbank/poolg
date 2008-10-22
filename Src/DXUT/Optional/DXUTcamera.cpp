@@ -1234,7 +1234,7 @@ void CDXUTDirectionWidget::StaticOnD3D9DestroyDevice()
     SAFE_RELEASE( s_pD3D9Mesh );
 }
 
-
+#ifdef COMPILE_D3D10_SPECIFIC
 //--------------------------------------------------------------------------------------
 HRESULT CDXUTDirectionWidget::StaticOnD3D10CreateDevice( ID3D10Device* pd3dDevice )
 {
@@ -1315,6 +1315,7 @@ HRESULT CDXUTDirectionWidget::StaticOnD3D10CreateDevice( ID3D10Device* pd3dDevic
 
     return S_OK;
 }
+#endif // COMPILE_D3D10_SPECIFIC
 
 //--------------------------------------------------------------------------------------
 HRESULT CDXUTDirectionWidget::OnRender10( D3DXCOLOR color, const D3DXMATRIX* pmView, const D3DXMATRIX* pmProj,

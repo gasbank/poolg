@@ -451,8 +451,11 @@ public:
         return m_pd3d9Device;
     }
 
+#ifdef COMPILE_D3D10_SPECIFIC
     // D3D10 specific
     HRESULT OnD3D10CreateDevice( ID3D10Device* pd3dDevice );
+#endif // COMPILED3D10_SPECIFIC
+
     HRESULT OnD3D10ResizedSwapChain( ID3D10Device* pd3dDevice, const DXGI_SURFACE_DESC* pBackBufferSurfaceDesc );
     void    OnD3D10ReleasingSwapChain();
     void    OnD3D10DestroyDevice();
@@ -507,7 +510,10 @@ protected:
     // D3D10 specific
     ID3D10Device* m_pd3d10Device;
     HRESULT CreateFont10( UINT index );
+
+#ifdef COMPILE_D3D10_SPECIFIC
     HRESULT CreateTexture10( UINT index );
+#endif
 
     CGrowableArray <DXUTTextureNode*> m_TextureCache;   // Shared textures
     CGrowableArray <DXUTFontNode*> m_FontCache;         // Shared fonts

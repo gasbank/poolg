@@ -302,7 +302,11 @@ public:
     static void WINAPI      StaticOnD3D9LostDevice();
     static void WINAPI      StaticOnD3D9DestroyDevice();
 
+#ifdef COMPILE_D3D10_SPECIFIC
     static HRESULT WINAPI   StaticOnD3D10CreateDevice( ID3D10Device* pd3dDevice );
+#endif
+
+
     HRESULT OnRender10( D3DXCOLOR color, const D3DXMATRIX* pmView, const D3DXMATRIX* pmProj, const D3DXVECTOR3* pEyePt );
     static void WINAPI      StaticOnD3D10DestroyDevice();
 

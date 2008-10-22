@@ -520,6 +520,7 @@ void CDXUTDialogResourceManager::OnD3D9DestroyDevice()
 
 
 //--------------------------------------------------------------------------------------
+#ifdef COMPILE_D3D10_SPECIFIC
 HRESULT CDXUTDialogResourceManager::OnD3D10CreateDevice( ID3D10Device* pd3dDevice )
 {
     m_pd3d10Device = pd3dDevice;
@@ -575,6 +576,7 @@ HRESULT CDXUTDialogResourceManager::OnD3D10CreateDevice( ID3D10Device* pd3dDevic
 
     return S_OK;
 }
+#endif // COMPILE_D3D10_SPECIFIC
 
 
 //--------------------------------------------------------------------------------------
@@ -2663,6 +2665,7 @@ HRESULT CDXUTDialogResourceManager::CreateTexture9( UINT iTexture )
 
 
 //--------------------------------------------------------------------------------------
+#ifdef COMPILE_D3D10_SPECIFIC
 HRESULT CDXUTDialogResourceManager::CreateTexture10( UINT iTexture )
 {
     HRESULT hr = S_OK;
@@ -2764,7 +2767,7 @@ HRESULT CDXUTDialogResourceManager::CreateTexture10( UINT iTexture )
 
     return hr;
 }
-
+#endif // #ifdef COMPILE_D3D10_SPECIFIC
 
 //--------------------------------------------------------------------------------------
 void CDXUTDialog::InitDefaultElements()

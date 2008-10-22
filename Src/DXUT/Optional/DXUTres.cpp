@@ -8293,6 +8293,7 @@ HRESULT WINAPI DXUTCreateGUITextureFromInternalArray9( LPDIRECT3DDEVICE9 pd3dDev
 
 
 //--------------------------------------------------------------------------------------
+#ifdef COMPILE_D3D10_SPECIFIC
 HRESULT WINAPI DXUTCreateGUITextureFromInternalArray10( ID3D10Device *pd3dDevice, ID3D10Texture2D** ppTexture, D3DX10_IMAGE_INFO* pInfo )
 {
     HRESULT hr;
@@ -8328,6 +8329,7 @@ HRESULT WINAPI DXUTCreateGUITextureFromInternalArray10( ID3D10Device *pd3dDevice
 
     return S_OK;
 }
+#endif // #ifdef COMPILE_D3D10_SPECIFIC
 
 //-----------------------------------------------------------------------------
 HRESULT WINAPI DXUTCreateArrowMeshFromInternalArray( LPDIRECT3DDEVICE9 pd3dDevice, ID3DXMesh** ppMesh )

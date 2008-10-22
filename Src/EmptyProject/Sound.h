@@ -29,12 +29,12 @@ public:
 	XACTCATEGORY iMusicCategory;
 	XACTCATEGORY iBGMCategory;
 
-	IXACT3Cue* pZeroLatencyWalkCue;
+	IXACTCue* pZeroLatencyWalkCue;
 
-    IXACT3Engine* pEngine;
-	IXACT3WaveBank* pInMemoryWaveBank;
-    IXACT3WaveBank* pStreamingWaveBank;
-    IXACT3SoundBank* pSoundBank;
+    IXACTEngine* pEngine;
+	IXACTWaveBank* pInMemoryWaveBank;
+    IXACTWaveBank* pStreamingWaveBank;
+    IXACTSoundBank* pSoundBank;
     
 	HANDLE hStreamingWaveBankFile; // Handles to audio files to be closed upon cleanup
     VOID* pbInMemoryWaveBank; // Handle to wave bank data.  Its memory mapped so call UnmapViewOfFile() upon cleanup to release file

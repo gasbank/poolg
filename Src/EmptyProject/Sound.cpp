@@ -49,7 +49,7 @@ HRESULT Sound::init()
         if( bAuditionMode ) dwCreationFlags |= XACT_FLAG_API_AUDITION_MODE;
         if( bDebugMode ) dwCreationFlags |= XACT_FLAG_API_DEBUG_MODE;
 
-        hr = XACT3CreateEngine( dwCreationFlags, &audioState.pEngine );
+        hr = XACTCreateEngine( dwCreationFlags, &audioState.pEngine );
     }
     if( FAILED( hr ) || audioState.pEngine == NULL )
         return E_FAIL;

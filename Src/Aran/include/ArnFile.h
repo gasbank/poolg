@@ -38,20 +38,24 @@ struct NodeMesh2 : public NodeBase
 	unsigned int m_materialCount;
 	ARN_MTD_Data* m_mtds;
 };
+
 struct NodeMesh3 : public NodeBase
 {
-	char* m_parentName;
-	char* m_ipoName;
-	D3DXMATRIX* m_localXform;
-	D3DXMATRIX* m_unusedXform;
+	const char* m_parentName;
+	const char* m_ipoName;
+	const D3DXMATRIX* m_localXform;
+	BOOL m_bArmature;
+	//D3DXMATRIX* m_unusedXform;
 	unsigned int m_materialCount;
 	unsigned int m_meshVerticesCount;
 	unsigned int m_meshFacesCount;
-	DWORD* m_attrToMaterialMap; // unused
-	std::vector<char*> m_matNameList;
-	ArnVertex* m_vertex;
-	unsigned short* m_faces;
-	DWORD* m_attr;
+	const DWORD* m_attrToMaterialMap; // unused
+	std::vector<const char*> m_matNameList;
+	const ArnVertex* m_vertex;
+	const unsigned short* m_faces;
+	const DWORD* m_attr;
+	const char* m_armatureName;
+	std::vector<Bone2> m_bones;
 };
 struct NodeAnim1 : public NodeBase
 {
@@ -67,17 +71,27 @@ struct NodeBone1 : public NodeBase
 	float* m_weights;
 };
 
+struct NodeBone2 : public NodeBase
+{
+	const char* m_parentBoneName;
+	D3DMATRIX* m_offsetMatrix;
+	unsigned int m_infVertCount;
+	BoneIndWeight* m_indWeightArray;
+};
+
 struct NodeSkeleton1 : public NodeBase
 {
 	char* m_associatedMeshName;
 	unsigned int m_maxWeightsPerVertex;
 	unsigned int m_boneCount;
 };
+
 struct NodeSkeleton2 : public NodeBase
 {
-	int m_dummy;
+	const char* m_parentName;
+	unsigned int m_boneCount;
+	std::vector<Bone2> m_bones;
 };
-
 
 
 struct NodeHierarchy1 : public NodeBase
@@ -169,6 +183,7 @@ void parse_nodeMaterial2(ArnBinaryFile& abf, NodeBase*& nodeBase);
 void parse_nodeMesh2(ArnBinaryFile& abf, NodeBase*& nodeBase);
 void parse_nodeMesh3(ArnBinaryFile& abf, NodeBase*& nodeBase);
 void parse_nodeSkeleton1(ArnBinaryFile& abf, NodeBase*& nodeBase);
+void parse_nodeSkeleton2(ArnBinaryFile& abf, NodeBase*& nodeBase);
 void parse_nodeHierarchy1(ArnBinaryFile& abf, NodeBase*& nodeBase);
 void parse_nodeLight1(ArnBinaryFile& abf, NodeBase*& nodeBase);
 void parse_nodeLight2(ArnBinaryFile& abf, NodeBase*& nodeBase);
@@ -176,6 +191,7 @@ void parse_nodeCamera1(ArnBinaryFile& abf, NodeBase*& nodeBase);
 void parse_nodeCamera2(ArnBinaryFile& abf, NodeBase*& nodeBase);
 void parse_nodeAnim1(ArnBinaryFile& abf, NodeBase*& nodeBase);
 void parse_nodeBone1(ArnBinaryFile& abf, NodeBase*& nodeBase);
+void parse_nodeBone2(ArnBinaryFile& abf, NodeBase*& nodeBase);
 void parse_nodeIpo1(ArnBinaryFile& abf, NodeBase*& nodeBase);
 void parse_nodeIpo2(ArnBinaryFile& abf, NodeBase*& nodeBase);
 void parse_nodeSymLink(ArnBinaryFile& abf, NodeBase*& nodeBase);

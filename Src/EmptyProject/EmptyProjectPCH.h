@@ -50,7 +50,11 @@
 
 
 #include "DXUT.h"
-#include <xact.h>
+#ifdef USE_XACT3
+	#include <xact3.h>
+#else
+	#include <xact.h>
+#endif
 #include "DXUTcamera.h"
 #include "tcl.h"
 

@@ -41,7 +41,7 @@ enum NODE_DATA_TYPE // or NDD_DATA_TYPE
 	NDT_LIGHT5,
 
 	NDT_SKELETON1			= 0x4000,	// ARN10, ARN11, ARN20
-	NDT_SKELETON2,
+	NDT_SKELETON2,						// ARN25 (Armature in Blender)
 	NDT_SKELETON3,
 	NDT_SKELETON4,
 	NDT_SKELETON5,
@@ -65,7 +65,7 @@ enum NODE_DATA_TYPE // or NDD_DATA_TYPE
 	NDT_CAMERA5,
 
 	NDT_BONE1				= 0x8000,	// ARN10, ARN11, ARN20
-	NDT_BONE2,
+	NDT_BONE2,							// ARN25 (Bone in Blender)
 	NDT_BONE3,
 	NDT_BONE4,
 	NDT_BONE5,
@@ -87,6 +87,12 @@ enum NODE_DATA_TYPE // or NDD_DATA_TYPE
 	NDT_SYMLINK3,
 	NDT_SYMLINK4,
 	NDT_SYMLINK5,
+
+	NDT_ACTION1				= 0xc000,
+	NDT_ACTION2,
+	NDT_ACTION3,
+	NDT_ACTION4,
+	NDT_ACTION5,
 
 	// Runtime objects RTTI
 	NDT_RT_CONTAINER		= 0x10000000,
@@ -148,6 +154,10 @@ enum CurveName
 	CN_RotX		= 0x00000100,
 	CN_RotY		= 0x00000200,
 	CN_RotZ		= 0x00000400,
+	CN_QuatW	= 0x00001000,
+	CN_QuatX	= 0x00002000,
+	CN_QuatY	= 0x00004000,
+	CN_QuatZ	= 0x00008000,
 
 	CN_SIZE = 9,
 	CN_UNKNOWN = 0x7fffffff, // error
@@ -193,6 +203,22 @@ struct BoneData
 	std::vector<DWORD>		indices;
 	std::vector<float>		weights;
 };
+struct BoneIndWeight
+{
+	DWORD ind;
+	float weight;
+};
+
+struct Bone2
+{
+	const char* boneName;
+	const char* boneParentName;
+	unsigned int indWeightCount;
+	BoneIndWeight* indWeight;
+	float* localXform; // 4x4 matrix
+};
+
+
 
 struct MyFrameDataShell
 {
@@ -215,6 +241,7 @@ public:
 	unsigned int faceCount;
 	unsigned int materialCount;
 	std::vector<STRING> matNameList;
+	STRING armatureName;
 };
 //////////////////////////////////////////////////////////////////////////
 // Unions

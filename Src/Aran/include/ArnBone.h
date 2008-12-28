@@ -3,6 +3,7 @@
 
 struct NodeBase;
 struct NodeBone1;
+struct NodeBone2;
 
 class ArnBone : public ArnNode
 {
@@ -17,6 +18,7 @@ public:
 
 private:
 	void				buildFrom(const NodeBone1* nb);
+	void				buildFrom(const NodeBone2* nb);
 
 	BoneData			m_data;
 	const MyFrameData*	m_frameData;

@@ -46,7 +46,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="../RakNet/include;../RakNet_RPC3;../Aran/include;../DXUT/Core;../DXUT/Optional;../tcl/include;../EpCommonLibrary"
-				PreprocessorDefinitions="WIN32;_DEBUG;DEBUG;_WINDOWS"
+				PreprocessorDefinitions="WIN32;_DEBUG;DEBUG;_WINDOWS;USE_XACT3"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"

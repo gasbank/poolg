@@ -26,10 +26,13 @@ public:
 	
 
 	D3DVERTEXELEMENT9*				getDecl() const { return m_decl; }
+	HRESULT							setMainTechnique();
+	bool							isMainTechniqueOkay() { return m_hDefaultTech?true:false; }
 
 protected:
 	virtual HRESULT					initEffect( LPDIRECT3DDEVICE9 pd3dDevice, const WCHAR* shaderFileName, DWORD dwShaderFlags = gs_shaderFlags );
 	virtual HRESULT					initShader( LPDIRECT3DDEVICE9 pd3dDevice, const WCHAR* shaderFileName );
+	
 
 	LPDIRECT3DDEVICE9				m_dev;
 
@@ -42,6 +45,9 @@ protected:
 	D3DVERTEXELEMENT9*				m_decl;
 	
 	WCHAR							m_shaderFileName[128];
+	D3DXHANDLE						m_hDefaultTech;
+
+private:
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -55,15 +61,14 @@ public:
 	virtual HRESULT CALLBACK		onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc );
 	virtual void CALLBACK			onLostDevice();
 
-	void							initMainTechnique() { m_hDefaultTech = m_effect->GetTechniqueByName( "Main" ); }
-	HRESULT							setMainTechnique() { return m_effect->SetTechnique( m_hDefaultTech ); }
+	//void							initMainTechnique();
+	
 	HRESULT							begin( UINT* passes, DWORD flags ) { return m_effect->Begin( passes, flags ); }
 	HRESULT							beginPass( UINT pass ) { return m_effect->BeginPass( pass ); }
 	HRESULT							endPass() { return m_effect->EndPass(); }
 	HRESULT							end() { return m_effect->End(); }
 	HRESULT							setWorldViewProj( double fTime, float fElapsedTime, const D3DXMATRIX* mWorld, const D3DXMATRIX* mView, const D3DXMATRIX* mProj );
 private:
-	D3DXHANDLE						m_hDefaultTech;
 	LPDIRECT3DTEXTURE9				m_fireTexture;
 };
 
@@ -76,16 +81,14 @@ public:
 	~PostSepiaShader();
 	virtual HRESULT CALLBACK		onCreateDevice( LPDIRECT3DDEVICE9 pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc );
 
-	void							initMainTechnique();
-	HRESULT							setMainTechnique() { return m_effect->SetTechnique( m_hDefaultTech ); }
+	//void							initMainTechnique();
 	HRESULT							begin( UINT* passes, DWORD flags ) { return m_effect->Begin( passes, flags ); }
 	HRESULT							beginPass( UINT pass ) { return m_effect->BeginPass( pass ); }
 	HRESULT							endPass() { return m_effect->EndPass(); }
 	HRESULT							end() { return m_effect->End(); }
 	HRESULT							setFullscreenTexture( LPDIRECT3DTEXTURE9 tex );
 	void							setDesaturation( float desat );
-private:
-	D3DXHANDLE						m_hDefaultTech;
+
 };
 //////////////////////////////////////////////////////////////////////////
 
@@ -96,16 +99,14 @@ public:
 	~PostRadialBlurShader() {}
 	virtual HRESULT CALLBACK		onCreateDevice( LPDIRECT3DDEVICE9 pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc );
 
-	void							initMainTechnique();
-	HRESULT							setMainTechnique() { return m_effect->SetTechnique( m_hDefaultTech ); }
+	//void							initMainTechnique();
 	HRESULT							begin( UINT* passes, DWORD flags ) { return m_effect->Begin( passes, flags ); }
 	HRESULT							beginPass( UINT pass ) { return m_effect->BeginPass( pass ); }
 	HRESULT							endPass() { return m_effect->EndPass(); }
 	HRESULT							end() { return m_effect->End(); }
 	HRESULT							setFullscreenTexture( LPDIRECT3DTEXTURE9 tex );
 	void							setBlurWidth( float blurWidth );
-private:
-	D3DXHANDLE						m_hDefaultTech;
+
 };
 
 //////////////////////////////////////////////////////////////////////////

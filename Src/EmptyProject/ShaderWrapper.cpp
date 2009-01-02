@@ -9,6 +9,7 @@ Shader::Shader(void)
 	m_pVertexDeclaration	= 0;
 	m_effect				= 0;
 	m_decl					= 0;
+	m_hDefaultTech			= 0;
 }
 
 Shader::~Shader(void)
@@ -76,7 +77,19 @@ HRESULT Shader::initEffect( LPDIRECT3DDEVICE9 pd3dDevice, const WCHAR* shaderFil
 
 	// If this fails, there should be debug output as to 
 	// they the .fx file failed to compile
-	V_RETURN( D3DXCreateEffectFromFile( m_dev, shaderFileName, NULL, NULL, dwShaderFlags, NULL, &m_effect, NULL ) );
+	if (FAILED(hr = D3DXCreateEffectFromFile( m_dev, shaderFileName, NULL, NULL, dwShaderFlags, NULL, &m_effect, NULL )))
+	{
+		OutputDebugString(_T("--D3DXCreateEffectFromFile() failed. Shader will not activated.\n"));
+		return hr;
+	}
+	
+	m_hDefaultTech = m_effect->GetTechniqueByName( "Main" );
+	hr = m_effect->ValidateTechnique(m_hDefaultTech);
+	if (FAILED(hr))
+	{
+		OutputDebugString(_T("*** ID3DXEffect::ValidateTechnique() failed. Check out the debug output messages related to 'D3DXCreateEffectFromFile()' call.\n"));
+		m_hDefaultTech = 0;
+	}
 	return hr;
 }
 
@@ -107,6 +120,20 @@ void CALLBACK Shader::onLostDevice()
 HRESULT CALLBACK Shader::onCreateDevice( LPDIRECT3DDEVICE9 pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc )
 {
 	return S_OK;
+}
+
+HRESULT Shader::setMainTechnique()
+{
+	HRESULT hr;
+	if (m_effect && m_hDefaultTech)
+	{
+		hr = m_effect->SetTechnique( m_hDefaultTech );
+	}
+	else
+	{
+		hr = E_FAIL;
+	}
+	return hr;
 }
 //////////////////////////////////////////////////////////////////////////
 
@@ -157,6 +184,7 @@ void CALLBACK BombShader::onLostDevice()
 
 	Shader::onLostDevice();
 }
+
 //////////////////////////////////////////////////////////////////////////()
 
 HRESULT CALLBACK AlphaShader::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext )
@@ -545,11 +573,6 @@ HRESULT PostSepiaShader::setFullscreenTexture( LPDIRECT3DTEXTURE9 tex )
 	return hr;
 }
 
-void PostSepiaShader::initMainTechnique()
-{
-	m_hDefaultTech = m_effect->GetTechniqueByName( "Main" );
-}
-
 void PostSepiaShader::setDesaturation( float desat )
 {
 	m_effect->SetFloat( "gDesat", desat );
@@ -562,12 +585,6 @@ HRESULT CALLBACK PostSepiaShader::onCreateDevice( LPDIRECT3DDEVICE9 pd3dDevice, 
 }
 //////////////////////////////////////////////////////////////////////////
 
-
-
-void PostRadialBlurShader::initMainTechnique()
-{
-	m_hDefaultTech = m_effect->GetTechniqueByName( "Main" );
-}
 
 HRESULT PostRadialBlurShader::setFullscreenTexture( LPDIRECT3DTEXTURE9 tex )
 {

@@ -59,7 +59,7 @@ SpriteManager*						g_spriteManager					= 0;
 EpLight*							g_epLight						= 0;
 SCREEN_VERTEX						g_Vertex[4];
 
-LPD3DXEFFECT						g_pEffect						= 0;
+//LPD3DXEFFECT						g_pEffect						= 0;
 D3DXHANDLE							g_tech							= 0;
 LPDIRECT3DVERTEXBUFFER9				g_lineElement					= 0;
 HANDLE								g_scriptBindingFinishedEvent	= 0;		// Signal object to resolve multi-threaded problems on console thread and main app thread
@@ -654,12 +654,19 @@ void CALLBACK OnD3D9FrameRender( IDirect3DDevice9* pd3dDevice, double fTime, flo
 {
 	HRESULT hr;
 
+	
 	LPDIRECT3DSURFACE9 originalRT = 0;
-	V( pd3dDevice->GetRenderTarget( 0, &originalRT ) );
 
+	const bool isShaderGood = g_postSepiaShader->isMainTechniqueOkay() && g_postRadialBlurShader->isMainTechniqueOkay();
+
+	if (isShaderGood)
+	{
+		V( pd3dDevice->GetRenderTarget( 0, &originalRT ) );
+		V( pd3dDevice->SetRenderTarget( 0, g_radialBlurRenderTargetSurf	 ) );
+	}
 
 	// Clear the render target and the zbuffer
-	V( pd3dDevice->SetRenderTarget( 0, g_radialBlurRenderTargetSurf	 ) );
+	
 	V( pd3dDevice->Clear( 0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, g_fillColor, 1.0f, 0 ) );
 	V( pd3dDevice->SetRenderState( D3DRS_ZENABLE, TRUE ) );
 	// Render the scene
@@ -741,58 +748,56 @@ void CALLBACK OnD3D9FrameRender( IDirect3DDevice9* pd3dDevice, double fTime, flo
 		V( pd3dDevice->EndScene() );
 	}
 
-	//GetG().m_screenFlash.frameRender();
 
-
-	V( pd3dDevice->SetRenderTarget( 0, g_sepiaRenderTargetSurf ) );
-	V( pd3dDevice->SetRenderState( D3DRS_ZENABLE, FALSE ) );
-
-	// Clear the render target
-	V( pd3dDevice->Clear( 0L, NULL, D3DCLEAR_TARGET, 0x00000000, 1.0f, 0L ) );
-	if( SUCCEEDED( pd3dDevice->BeginScene() ) )
+	if (isShaderGood)
 	{
-		UINT iPass, cPasses;
-		V( g_postRadialBlurShader->setMainTechnique() );
-		V( g_postRadialBlurShader->begin( &cPasses, 0 ) );
-		for( iPass = 0; iPass < cPasses; iPass++ )
+		V( pd3dDevice->SetRenderTarget( 0, g_sepiaRenderTargetSurf ) );
+		V( pd3dDevice->SetRenderState( D3DRS_ZENABLE, FALSE ) );
+
+		// Clear the render target
+		V( pd3dDevice->Clear( 0L, NULL, D3DCLEAR_TARGET, 0x00000000, 1.0f, 0L ) );
+		if( SUCCEEDED( pd3dDevice->BeginScene() ) )
 		{
-			V( g_postRadialBlurShader->beginPass( iPass ) );
-			V( pd3dDevice->SetFVF( SCREEN_VERTEX::FVF ) );
-			V( pd3dDevice->DrawPrimitiveUP( D3DPT_TRIANGLESTRIP, 2, g_Vertex, sizeof( SCREEN_VERTEX ) ) );
-			V( g_postRadialBlurShader->endPass() );
+			UINT iPass, cPasses;
+			V(g_postRadialBlurShader->setMainTechnique());
+			V( g_postRadialBlurShader->begin( &cPasses, 0 ) );
+			for( iPass = 0; iPass < cPasses; iPass++ )
+			{
+				V( g_postRadialBlurShader->beginPass( iPass ) );
+				V( pd3dDevice->SetFVF( SCREEN_VERTEX::FVF ) );
+				V( pd3dDevice->DrawPrimitiveUP( D3DPT_TRIANGLESTRIP, 2, g_Vertex, sizeof( SCREEN_VERTEX ) ) );
+				V( g_postRadialBlurShader->endPass() );
+			}
+			V( g_postRadialBlurShader->end() );
+
+			V( pd3dDevice->EndScene() );
 		}
-		V( g_postRadialBlurShader->end() );
-		//////////////////////////////////////////////////////////////////////////
-		V( pd3dDevice->EndScene() );
-	}
 
 
-	V( pd3dDevice->SetRenderTarget( 0, originalRT ) );
-	
+		V( pd3dDevice->SetRenderTarget( 0, originalRT ) );
 
-	// Clear the render target
-	V( pd3dDevice->Clear( 0L, NULL, D3DCLEAR_TARGET, 0x00000000, 1.0f, 0L ) );
-	if( SUCCEEDED( pd3dDevice->BeginScene() ) )
-	{
-		UINT iPass, cPasses;
-		V( g_postSepiaShader->setMainTechnique() );
-		V( g_postSepiaShader->begin( &cPasses, 0 ) );
-		for( iPass = 0; iPass < cPasses; iPass++ )
+
+		// Clear the render target
+		V( pd3dDevice->Clear( 0L, NULL, D3DCLEAR_TARGET, 0x00000000, 1.0f, 0L ) );
+		if( SUCCEEDED( pd3dDevice->BeginScene() ) )
 		{
-			V( g_postSepiaShader->beginPass( iPass ) );
-			V( pd3dDevice->SetFVF( SCREEN_VERTEX::FVF ) );
-			V( pd3dDevice->DrawPrimitiveUP( D3DPT_TRIANGLESTRIP, 2, g_Vertex, sizeof( SCREEN_VERTEX ) ) );
-			V( g_postSepiaShader->endPass() );
+			UINT iPass, cPasses;
+			V(g_postSepiaShader->setMainTechnique());
+			V( g_postSepiaShader->begin( &cPasses, 0 ) );
+			for( iPass = 0; iPass < cPasses; iPass++ )
+			{
+				V( g_postSepiaShader->beginPass( iPass ) );
+				V( pd3dDevice->SetFVF( SCREEN_VERTEX::FVF ) );
+				V( pd3dDevice->DrawPrimitiveUP( D3DPT_TRIANGLESTRIP, 2, g_Vertex, sizeof( SCREEN_VERTEX ) ) );
+				V( g_postSepiaShader->endPass() );
+			}
+			V( g_postSepiaShader->end() );
+
+			V( pd3dDevice->EndScene() );
 		}
-		V( g_postSepiaShader->end() );
-		//////////////////////////////////////////////////////////////////////////
-		V( pd3dDevice->EndScene() );
+
+		SAFE_RELEASE( originalRT );
 	}
-
-	SAFE_RELEASE( originalRT );
-
-
-	
 }
 
 
@@ -1532,18 +1537,14 @@ void ConfigureShaders( LPDIRECT3DDEVICE9 pd3dDevice, const D3DSURFACE_DESC* pBac
 	assert( g_bombShader == 0 );
 	g_bombShader = new BombShader();
 	g_bombShader->onCreateDevice( pd3dDevice, pBackBufferSurfaceDesc );
-	g_bombShader->initMainTechnique();
 
 	assert( g_postSepiaShader == 0 );
 	g_postSepiaShader = new PostSepiaShader();
 	g_postSepiaShader->onCreateDevice( pd3dDevice, pBackBufferSurfaceDesc );
-	g_postSepiaShader->initMainTechnique();
 
 	assert( g_postRadialBlurShader == 0 );
 	g_postRadialBlurShader = new PostRadialBlurShader();
 	g_postRadialBlurShader->onCreateDevice( pd3dDevice, pBackBufferSurfaceDesc );
-	g_postRadialBlurShader->initMainTechnique();
-
 }
 
 void ConfigureTileGridGeometry( LPDIRECT3DDEVICE9 pd3dDevice )

@@ -8,7 +8,6 @@
 #include "PictureMap.h"
 #include "VideoMan.h"
 #include "Character.h"
-#include "ShaderWrapper.h"
 #include "Trigger.h"
 
 

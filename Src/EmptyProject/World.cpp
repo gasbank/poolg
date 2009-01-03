@@ -822,10 +822,14 @@ HRESULT World::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DES
 
 	D3DLIGHT9& light = GetG().m_light;
 
+	// These cause the scene more brighter when onResetDevice() is called, i.e., resizing the window.
+	// Why is these four lines are needed?
+	/*
 	setupLight();
 	pd3dDevice->SetLight(0, &light);
 	pd3dDevice->LightEnable(0, TRUE);
 	pd3dDevice->SetRenderState( D3DRS_LIGHTING, FALSE );
+	*/
 
 	UnitSet::iterator it = m_unitSet.begin();
 	for ( ; it != m_unitSet.end(); ++it )

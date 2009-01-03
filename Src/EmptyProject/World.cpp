@@ -351,32 +351,6 @@ HRESULT World::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 	return S_OK;
 }
 
-void World::setupLight() 
-{
-	D3DLIGHT9& light = GetG().m_light;
-
-	ZeroMemory(&light, sizeof(D3DLIGHT9));
-	D3DCOLORVALUE cv = { 0.5f, 0.5f, 0.5f, 1.0f };
-	light.Ambient = cv;
-	light.Diffuse = cv;
-	light.Specular = cv;
-	
-	light.Attenuation0 = 0.5f;
-
-	D3DXVECTOR3 dir(0.0f, 1.0f, 0.0f);
-	D3DXVec3Normalize((D3DXVECTOR3*)&light.Direction, &dir);
-
-	D3DXVECTOR3 pos(0.0f, -30.0f, 0.0f);
-	D3DXVec3Normalize((D3DXVECTOR3*)&light.Position, &pos);
-
-	light.Type = D3DLIGHT_DIRECTIONAL;
-	light.Range = 1000.0f;
-
-	//pd3dDevice->SetLight(0, &light);
-	//pd3dDevice->LightEnable(0, TRUE);
-	//pd3dDevice->SetRenderState( D3DRS_LIGHTING, TRUE );
-}
-
 UINT World::addUnit( UnitBase* u )
 {
 	m_unitSet.push_back( u );

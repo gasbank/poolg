@@ -81,7 +81,6 @@ public:
 
 private:
 									World( const char* worldName, const TCHAR* modelFilePath );
-	void							setupLight();
 	void							startTileDefinedDialogIfExist();
 	void							proceedCurDialog();
 	void							forceCloseCurDialog();

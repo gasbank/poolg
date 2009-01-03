@@ -101,27 +101,39 @@ HRESULT SkillObject::frameRender ( IDirect3DDevice9* pd3dDevice, double dTime, f
 	D3DXMATRIX mWorld;
 	D3DXMatrixIdentity( &mWorld );
 	UINT iPass, cPasses;
-	V( g_bombShader->setMainTechnique() );
-	
-	V( g_bombShader->setWorldViewProj( dTime, fElapsedTime, &getLocalXform(), GetG().m_camera.GetViewMatrix(), GetG().m_camera.GetProjMatrix() ) );
-
-	V( g_bombShader->begin( &cPasses, 0 ) );
-	for( iPass = 0; iPass < cPasses; iPass++ )
+	if ( SUCCEEDED(g_bombShader->setMainTechnique()) )
 	{
-		V( g_bombShader->beginPass( iPass ) );
+		V( g_bombShader->setWorldViewProj( dTime, fElapsedTime, &getLocalXform(), GetG().m_camera.GetViewMatrix(), GetG().m_camera.GetProjMatrix() ) );
 
+		V( g_bombShader->begin( &cPasses, 0 ) );
+		for( iPass = 0; iPass < cPasses; iPass++ )
+		{
+			V( g_bombShader->beginPass( iPass ) );
+
+			// TODO Mesh pointing should be done here? not OnResetDevice?
+			if ( getMesh() == 0 )
+			{
+				setMesh( g_bst[ m_bst ] );
+			}
+
+			f = getMesh()->DrawSubset( 0 );
+
+			V( g_bombShader->endPass() );
+		}
+		V( g_bombShader->end() );
+	}
+	else
+	{
 		// TODO Mesh pointing should be done here? not OnResetDevice?
 		if ( getMesh() == 0 )
 		{
 			setMesh( g_bst[ m_bst ] );
 		}
-
+		pd3dDevice->SetTransform(D3DTS_WORLD, &getLocalXform());
 		f = getMesh()->DrawSubset( 0 );
-		
-		V( g_bombShader->endPass() );
 	}
-	V( g_bombShader->end() );
 	
+
 	D3DPERF_EndEvent();
 	return f;
 }

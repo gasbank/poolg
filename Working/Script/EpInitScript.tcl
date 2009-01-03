@@ -46,11 +46,10 @@ proc getHero { tilePos } {
 	} else {
 		# Hero is created only once
 		set pHeroUnit [ EpCreateHero $tilePos ];
-		EpCharacterSetMoveDuration	$pHeroUnit 0.05		
+		EpCharacterSetMoveDuration	$pHeroUnit 0.05 ;# Default move duration; can be reassigned in *World.tcl file.
 		EpCharacterSetStat			$pHeroUnit 7 5 7 5 5 5 ;# Health Will Coding Defence Sense Immunity
 		EpCharacterSetCurHp			$pHeroUnit 10
 		EpCharacterSetCurCs			$pHeroUnit -1
-		EpCharacterSetMoveDuration	$pHeroUnit [expr 0.2]
 		EpUnitSetColor				$pHeroUnit 255 0 255
 		EpUnitSetArnMesh			$pHeroUnit "PoolGModel"
 		EpRegisterToWorld			$curWorld $pHeroUnit

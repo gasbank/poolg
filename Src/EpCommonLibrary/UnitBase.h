@@ -53,8 +53,8 @@ public:
 	friend class World;
 
 	// Static Variables
-	static DataStructures::List<UnitBase*>	soldiers;
-	static UnitBase*						mySoldier;
+	static DataStructures::List<UnitBase*>	units;
+	static UnitBase*						myUnit;
 
 	// Ctor and Dtor
 											UnitBase( UnitType type );
@@ -75,7 +75,7 @@ public:
 	// Overriding so the client can control if this object is visible or not (for cloaking). By default, only the server control this
 	// Objects that are not visible are not serialized automatically with ReplicaManager2::AutoSerialize()
 	virtual bool							QueryIsVisibilityAuthority(void) const;
-	// Overriding so the client can send serialization changes for its own soldier. By default, only the server can send serialization changes.
+	// Overriding so the client can send serialization changes for its own unit. By default, only the server can send serialization changes.
 	virtual bool							QueryIsSerializationAuthority(void) const;
 
 	virtual HRESULT							frameRender( IDirect3DDevice9* pd3dDevice, double dTime, float fElapsedTime ) { return S_OK; }
@@ -248,7 +248,7 @@ private:
 	bool									m_bLocalXformDirty;
 	Mat4Float								m_localXform;
 
-	EpUser*									m_owner; // The user that owns this soldier
+	EpUser*									m_owner; // The user that owns this unit
 
 	bool									m_bHidden;
 	RakNet::RakString						m_repName;

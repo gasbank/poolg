@@ -7,8 +7,8 @@
 bool QueryIsNetworkServer();
 NetworkIDManager& GetNetworkIdManager();
 
-DataStructures::List<UnitBase*> UnitBase::soldiers;
-UnitBase *UnitBase::mySoldier;
+DataStructures::List<UnitBase*> UnitBase::units;
+UnitBase *UnitBase::myUnit;
 
 
 UnitBase::UnitBase( UnitType type )
@@ -33,7 +33,7 @@ UnitBase::UnitBase( UnitType type )
 	// Set matrix as identity;
 	Mat4Float::MakeIdentity( &m_localXform );
 
-	soldiers.Insert( this );
+	units.Insert( this );
 }
 
 UnitBase::~UnitBase(void)
@@ -41,19 +41,19 @@ UnitBase::~UnitBase(void)
 	if ( m_attachedWorld && getType() == UT_UNITBASE )
 	{
 		m_attachedWorld->detachUnit( this );
-		if ( UnitBase::mySoldier != this )
-			printf( "Soldier named %s deleted.\n", getRepName().C_String() );
+		if ( UnitBase::myUnit != this )
+			printf( "Unit named %s deleted.\n", getRepName().C_String() );
 	}
 
-	soldiers.RemoveAtIndex( soldiers.GetIndexOf( this ) );
-	if ( UnitBase::mySoldier == this )
+	units.RemoveAtIndex( units.GetIndexOf( this ) );
+	if ( UnitBase::myUnit == this )
 	{
-		printf( "My soldier deleted.\n" );
-		UnitBase::mySoldier = 0;
+		printf( "My unit deleted.\n" );
+		UnitBase::myUnit = 0;
 	}	
 
 	if ( m_owner )
-		m_owner->soldier = 0;
+		m_owner->setUnit(0);
 }
 
 bool UnitBase::SerializeConstruction( RakNet::BitStream *bitStream, RakNet::SerializationContext *serializationContext )
@@ -66,8 +66,8 @@ bool UnitBase::Serialize( RakNet::BitStream *bitStream, RakNet::SerializationCon
 {
 	// Both the client and the server write the name.
 	// The client writes it to send it to the server
-	// The server writes the name when sending to systems other than the one that owns this soldier.
-	if ( QueryIsNetworkServer() == false || serializationContext->recipientAddress != m_owner->systemAddress )
+	// The server writes the name when sending to systems other than the one that owns this unit.
+	if ( QueryIsNetworkServer() == false || serializationContext->recipientAddress != m_owner->getSystemAddress() )
 	{
 		StringCompressor::Instance()->EncodeString( m_repName, m_repName.GetLength() + 1, bitStream );
 		bitStream->Write( m_vPos.x );
@@ -79,7 +79,7 @@ bool UnitBase::Serialize( RakNet::BitStream *bitStream, RakNet::SerializationCon
 	}
 
 	// Only the owner client needs to write the status of cloak, since this variable is only used by the server
-	if ( QueryIsNetworkServer() == false && UnitBase::mySoldier == this )
+	if ( QueryIsNetworkServer() == false && UnitBase::myUnit == this )
 		bitStream->Write( isHidden() );
 
 	// Only the server writes the owner
@@ -94,7 +94,7 @@ void UnitBase::Deserialize( RakNet::BitStream *bitStream, RakNet::SerializationT
 	NetworkID ownerNetworkId;
 
 	// Similar to Serialize(), only read the name if the server, or if we are not the owner
-	if ( QueryIsNetworkServer() || UnitBase::mySoldier != this )
+	if ( QueryIsNetworkServer() || UnitBase::myUnit != this )
 	{
 		StringCompressor::Instance()->DecodeString( &m_repName, 128, bitStream );
 		bitStream->Read( m_vPos.x );
@@ -118,10 +118,10 @@ void UnitBase::Deserialize( RakNet::BitStream *bitStream, RakNet::SerializationT
 	{
 		bitStream->Read( ownerNetworkId );
 		m_owner= (EpUser*) GetNetworkIdManager().GET_OBJECT_FROM_ID( ownerNetworkId );
-		m_owner->soldier = this;
+		m_owner->setUnit(this);
 	}
 
-	printf("Soldier %s updated.\n", getRepName().C_String() );
+	printf("Unit %s updated.\n", getRepName().C_String() );
 
 	setLocalXformDirty( true );
 	updateLocalXform();
@@ -141,40 +141,40 @@ void UnitBase::DeserializeVisibility( RakNet::BitStream *bitStream, RakNet::Seri
 	if ( m_owner )
 	{
 		if ( RakNet::SerializationContext::IsVisible( serializationType ) )
-			printf( "Soldier named %s owned by user at address %s has become visible.\n", getRepName().C_String(), m_owner->systemAddress.ToString() );
+			printf( "Unit named %s owned by user at address %s has become visible.\n", getRepName().C_String(), m_owner->getSystemAddress().ToString() );
 		else
-			printf( "Soldier named %s owned by user at address %s no longer visible.\n", getRepName().C_String(), m_owner->systemAddress.ToString() );
+			printf( "Unit named %s owned by user at address %s no longer visible.\n", getRepName().C_String(), m_owner->getSystemAddress().ToString() );
 	}
 	else
 	{
 		// Visibility message comes in before deserialize, and it is deserialize that contains the owner.
 		// However, construction comes before visibility.
-		// We could have thus just written the owner in Soldier::SerializeConstruction() and read and assigned it in ReplicaManager2DemoConnection::Construct()
+		// We could have thus just written the owner in UnitBase::SerializeConstruction() and read and assigned it in ReplicaManager2DemoConnection::Construct()
 		if ( RakNet::SerializationContext::IsVisible( serializationType ) )
-			printf( "Soldier named %s has become visible.\n", getRepName().C_String() );
+			printf( "Unit named %s has become visible.\n", getRepName().C_String() );
 		else
-			printf( "Soldier named %s is no longer visible.\n", getRepName().C_String() );
+			printf( "Unit named %s is no longer visible.\n", getRepName().C_String() );
 	}
 }
 
 bool UnitBase::QueryIsDestructionAuthority(void) const
 {
-	// Since we allow the controlling client to locally destroy the soldier, and transmit this across the network, the client must be the destruction authority
-	// Were this function not overridden, if the client deleted the soldier it would only be deleted locally.
+	// Since we allow the controlling client to locally destroy the unit, and transmit this across the network, the client must be the destruction authority
+	// Were this function not overridden, if the client deleted the unit it would only be deleted locally.
 	// If the server were the only system deleting this object, it would not be necessary to override this function
-	return QueryIsNetworkServer() || UnitBase::mySoldier == this;
+	return QueryIsNetworkServer() || UnitBase::myUnit == this;
 }
 
 bool UnitBase::QueryIsVisibilityAuthority(void) const
 {
 	// Same as QueryIsDestructionAuthority, but for QueryVisibility.
-	return QueryIsNetworkServer() || UnitBase::mySoldier==this;
+	return QueryIsNetworkServer() || UnitBase::myUnit==this;
 }
 
 bool UnitBase::QueryIsSerializationAuthority(void) const
 {
 	// Same as QueryIsDestructionAuthority, but for Serialize and AddAutoSerializeTimer.
-	return QueryIsNetworkServer() || UnitBase::mySoldier==this;
+	return QueryIsNetworkServer() || UnitBase::myUnit==this;
 }
 
 

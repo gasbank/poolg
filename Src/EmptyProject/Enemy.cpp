@@ -9,6 +9,8 @@
 #include "ArnMesh.h"
 #include "Skill.h"
 
+extern RakNet::ReplicaManager2*			g_replicaManager;
+
 Enemy::Enemy()
 : Character( UT_ENEMY )
 {

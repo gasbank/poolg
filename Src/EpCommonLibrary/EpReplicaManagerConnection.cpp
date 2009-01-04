@@ -18,20 +18,20 @@ RakNet::Replica2* EpReplicaManagerConnection::Construct( RakNet::BitStream *repl
 	if ( strcmp( objectName, "EpUser" ) == 0 )
 		return new EpUser;
 	if ( strcmp( objectName, "UnitBase" ) == 0 ) {
-		UnitBase *soldier = new UnitBase(UT_UNITBASE);
+		UnitBase* newUnit = new UnitBase(UT_UNITBASE);
 		if ( QueryIsNetworkServer() )
 		{
 			// If the server, then we can assign the owner by the address of the guy sending to us
-			// For the client, we read this in Soldier::Deserialize
+			// For the client, we read this in UnitBase::Deserialize
 			
-			soldier->setOwner( EpUser::GetUserByAddress( sender ) );
-			soldier->getOwner()->soldier = soldier;
+			newUnit->setOwner( EpUser::GetUserByAddress( sender ) );
+			newUnit->getOwner()->setUnit(newUnit);
 		}
 		else
 		{
-			AddToCurrentWorld( soldier );
+			AddToCurrentWorld( newUnit );
 		}
-		return soldier;
+		return newUnit;
 	};
 	return 0;
 }

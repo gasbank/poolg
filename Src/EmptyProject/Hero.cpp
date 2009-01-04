@@ -10,6 +10,7 @@
 #include "SkillSet.h"
 #include "Sound.h"
 #include "SkillManager.h"
+#include "EpUser.h"
 
 extern NetworkIDManager					g_networkIDManager;
 extern RakNet::ReplicaManager2*			g_replicaManager;
@@ -54,16 +55,15 @@ Unit* Hero::createHero( LPD3DXMESH mesh, int tileX, int tileY, float posZ )
 
 	if ( g_replicaManager )
 	{
-		// Spawn a new soldier
-		UnitBase::mySoldier = u;
+		// Spawn a new unit
+		UnitBase::myUnit = u;
 		// In order to use any networked member functions of Replica2, you must first call SetReplicaManager
-		UnitBase::mySoldier->SetReplicaManager( g_replicaManager );
+		UnitBase::myUnit->SetReplicaManager( g_replicaManager );
 		// Tell the system to automatically serialize our data members every 100 milliseconds (if changed)
-		// This way if we change the soldier's name we don't have to call Soldier::mySoldier->BroadcastSerialize();
-		UnitBase::mySoldier->AddAutoSerializeTimer( 100 );
+		// This way if we change the unit's name we don't have to call unit::myUnit->BroadcastSerialize();
+		UnitBase::myUnit->AddAutoSerializeTimer( 100 );
 		// Send out this new user to all systems. Unlike the old system (ReplicaManager) all sends are done immediately.
-		UnitBase::mySoldier->BroadcastConstruction();
-
+		UnitBase::myUnit->BroadcastConstruction();
 	}
 	
 	return u;

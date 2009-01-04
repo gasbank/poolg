@@ -7,24 +7,19 @@
 #include "EpUser.h"
 #include "UnitBase.h"
 
-RakNet::RPC3 g_rpc3Inst;
-ClientPool g_clientPool;
-
-// The system that performs most of our functionality for this demo
-RakNet::ReplicaManager2 g_replicaManager;
-// Instance of the class that creates the object we use to represent connections
-EpReplicaManagerConnectionFactory g_connectionFactory;
-
-NetworkIDManager networkIDManager;
-
-RakPeerInterface *server;
+RakNet::RPC3						g_rpc3Inst;
+ClientPool							g_clientPool;
+RakNet::ReplicaManager2				g_replicaManager;		// The system that performs most of our functionality for this demo
+EpReplicaManagerConnectionFactory	g_connectionFactory;	// Instance of the class that creates the object we use to represent connections
+NetworkIDManager					g_networkIDManager;
+RakPeerInterface*					g_server;
 
 // We copy this from Multiplayer.cpp to keep things all in one file for this example
 unsigned char GetPacketIdentifier(Packet *p);
 
-// Called from EpCommonLibrary
-NetworkIDManager& GetNetworkIdManager() { return networkIDManager; }
-RakPeerInterface* GetRakPeer() { return server; }
+// These functions are called from EpCommonLibrary
+NetworkIDManager& GetNetworkIdManager() { return g_networkIDManager; }
+RakPeerInterface* GetRakPeer() { return g_server; }
 bool QueryIsNetworkServer() { return true; }
 
 
@@ -41,21 +36,21 @@ int _tmain(int argc, _TCHAR* argv[])
 	_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 #endif
 
-	UnitBase::mySoldier=0;
-	EpUser::myUser=0;
+	UnitBase::myUnit = 0;
+	EpUser::myUser = 0;
 	
-	networkIDManager.SetIsNetworkIDAuthority(true);
-	g_rpc3Inst.SetNetworkIDManager(&networkIDManager);
+	g_networkIDManager.SetIsNetworkIDAuthority(true);
+	g_rpc3Inst.SetNetworkIDManager(&g_networkIDManager);
 
 	// Pointers to the interfaces of our server and client.
 	// Note we can easily have both in the same program
-	server = RakNetworkFactory::GetRakPeerInterface();
+	g_server = RakNetworkFactory::GetRakPeerInterface();
 
-	server->SetNetworkIDManager( &networkIDManager );
+	g_server->SetNetworkIDManager( &g_networkIDManager );
 
-	RakNetStatistics *rss = 0;
-	int i = server->GetNumberOfAddresses();
-	server->SetIncomingPassword( "Rumpelstiltskin", (int)strlen( "Rumpelstiltskin" ) );
+	RakNetStatistics* rss = 0;
+	unsigned i = g_server->GetNumberOfAddresses();
+	g_server->SetIncomingPassword( "Rumpelstiltskin", (int)strlen( "Rumpelstiltskin" ) );
 
 	// Holds packets
 	Packet* p = 0;
@@ -67,31 +62,29 @@ int _tmain(int argc, _TCHAR* argv[])
 	//SystemAddress clientID = UNASSIGNED_SYSTEM_ADDRESS;
 
 	// Holds user data
-	char portstring[30];
+	const unsigned serverPort = 10000;
 
-	printf( "This is a sample implementation of a text based chat server.\n" );
-	printf( "Connect to the project 'Chat Example Client'.\n" );
-	printf( "Difficulty: Beginner\n\n" );
+	puts( "----------------" );
+	puts( "|   EpServer   |" );
+	puts( "----------------" );
 
-	// A server
-	//	puts("Enter the server port to listen on");
-	//	gets(portstring);
-	//	if (portstring[0]==0)
-	strcpy_s( portstring, 30, "10000" );
+	printf(" - This Server Port: %d\n", serverPort);
 
 	puts( "Starting server." );
 	// Starting the server is very simple.  2 players allowed.
 	// 0 means we don't care about a connectionValidationInteger, and false
 	// for low priority threads
-	SocketDescriptor socketDescriptor( atoi( portstring ), 0 );
-	bool b = server->Startup( 32, 30, &socketDescriptor, 1 );
-	server->AttachPlugin( &g_replicaManager );
+	SocketDescriptor socketDescriptor( serverPort, 0 );
+	const unsigned short maxConnections = 32;
+	const int threadSleepTimer = 30;
+	bool b = g_server->Startup( maxConnections, threadSleepTimer, &socketDescriptor, 1 );
+	g_server->AttachPlugin( &g_replicaManager );
 	// Just test this
 	g_replicaManager.SetAutoAddNewConnections( false );
 	// Register our custom connection factory
 	g_replicaManager.SetConnectionFactory( &g_connectionFactory );
 
-	server->SetMaximumIncomingConnections( 4 );
+	g_server->SetMaximumIncomingConnections( 4 );
 	if ( b )
 		puts( "Server started, waiting for connections." );
 	else
@@ -99,14 +92,18 @@ int _tmain(int argc, _TCHAR* argv[])
 		puts( "Server failed to start.  Terminating." );
 		exit( 1 );
 	}
-	server->SetOccasionalPing( true );
+	g_server->SetOccasionalPing( true );
 
-	printf( "My IP is %s\n", server->GetLocalIP( 0 ) );
+	printf( "This Server IP: %s\n", g_server->GetLocalIP( 0 ) );
+	puts(" - 'quit' to quit.");
+	puts(" - 'stat' to show stats.");
+	puts(" - 'ban' to ban an IP from connecting.");
+	puts(" - 'kick' to kick the first connected player.");
+	puts(" - 'user' to query online users.");
+	puts("-------------");
+	puts("Type to talk." );
 
-
-	puts( "'quit' to quit. 'stat' to show stats. 'ping' to ping.\n'ban' to ban an IP from connecting.\n'kick to kick the first connected player.\nType to talk." );
-
-	server->AttachPlugin(&g_rpc3Inst);
+	g_server->AttachPlugin(&g_rpc3Inst);
 
 	// Here I use the string table class to efficiently send strings I know in advance.
 	// The encoding is used in in Replica2::SerializeConstruct
@@ -116,6 +113,16 @@ int _tmain(int argc, _TCHAR* argv[])
 	RakNet::StringTable::Instance()->AddString("UnitBase", false);
 	RakNet::StringTable::Instance()->AddString("EpUser", false);
 
+	EpUser* masterUser = new EpUser;
+	// In order to use any networked member functions of Replica2, you must first call SetReplicaManager
+	masterUser->SetReplicaManager( &g_replicaManager );
+	// Store which address this user is associated with
+	masterUser->setSystemAddress(g_server->GetSystemAddressFromIndex(0));
+	// Tell the user to automatically serialize our data members every 100 milliseconds (if changed)
+	// This way if we change the system address or the UnitBase* we don't have to call user->BroadcastSerialize();
+	masterUser->AddAutoSerializeTimer( 100 );
+	// Send out this new user to all systems. Unlike the old system (ReplicaManager) all sends are done immediately.
+	masterUser->BroadcastConstruction();
 
 	char message[2048];
 
@@ -142,25 +149,18 @@ int _tmain(int argc, _TCHAR* argv[])
 
 			if ( strcmp( message, "stat" ) == 0 )
 			{
-				rss = server->GetStatistics( server->GetSystemAddressFromIndex( 0 ) );
+				rss = g_server->GetStatistics( g_server->GetSystemAddressFromIndex( 0 ) );
 				StatisticsToString( rss, message, 2 );
 				printf( "%s", message );
-				printf( "Ping %i\n", server->GetAveragePing( server->GetSystemAddressFromIndex( 0 ) ) );
+				printf( "Ping %i\n", g_server->GetAveragePing( g_server->GetSystemAddressFromIndex( 0 ) ) );
 
 				continue;
 			}
 
-			if ( strcmp( message, "ping" ) == 0 )
-			{
-				//server->Ping(clientID);
-
-				continue;
-			}
 
 			if ( strcmp( message, "kick" ) == 0 )
 			{
-				//server->CloseConnection( clientID, true, 0 );
-
+				//g_server->CloseConnection( clientID, true, 0 );
 				continue;
 			}
 
@@ -182,17 +182,30 @@ int _tmain(int argc, _TCHAR* argv[])
 
 			if ( strcmp( message, "user" ) == 0 )
 			{
-				printf("%i Soldiers:\n", UnitBase::soldiers.Size());
-				for (unsigned i=0; i < UnitBase::soldiers.Size(); i++)
+				unsigned i;
+				const unsigned unitCount = UnitBase::units.Size();
+				printf("%i Units:\n", unitCount);
+				for (i = 0; i < unitCount; i++)
+				{
 					printf("%i. ptr=%p name=%s isCloaked=%i owner=%p Position=%s\n",
-						i+1, UnitBase::soldiers[i], UnitBase::soldiers[i]->getRepName().C_String(),
-						UnitBase::soldiers[i]->isHidden(), UnitBase::soldiers[i]->getOwner(),
-						UnitBase::soldiers[i]->getPositionAsString() );
+						i+1,
+						UnitBase::units[i],
+						UnitBase::units[i]->getRepName().C_String(),
+						UnitBase::units[i]->isHidden(),
+						UnitBase::units[i]->getOwner(),
+						UnitBase::units[i]->getPositionAsString() );
+				}
 
-				printf("%i Users:\n", EpUser::users.Size());
-				for (unsigned i=0; i < EpUser::users.Size(); i++)
-					printf("%i. ptr=%p systemAddress=%s soldier=%p\n",
-						i+1, EpUser::users[i], EpUser::users[i]->systemAddress.ToString(), EpUser::users[i]->soldier);
+				const unsigned userCount = EpUser::users.Size();
+				printf("%i Users:\n", userCount);
+				for (i = 0; i < userCount; i++)
+				{
+					printf("%i. ptr=%p systemAddress=%s unit=%p\n",
+						i+1,
+						EpUser::users[i],
+						EpUser::users[i]->getSystemAddress().ToString(),
+						EpUser::users[i]->getUnit());
+				}
 			}
 
 
@@ -200,7 +213,7 @@ int _tmain(int argc, _TCHAR* argv[])
 			{
 				printf( "Enter IP to ban.  You can use * as a wildcard\n" );
 				gets_s( message, 2048 );
-				server->AddToBanList( message );
+				g_server->AddToBanList( message );
 				printf( "IP %s added to ban list.\n", message );
 
 				continue;
@@ -223,13 +236,13 @@ int _tmain(int argc, _TCHAR* argv[])
 			// We arbitrarily pick 0 for the ordering stream
 			// UNASSIGNED_SYSTEM_ADDRESS means don't exclude anyone from the broadcast
 			// true means broadcast the message to everyone connected
-			server->Send( message2, (const int) strlen(message2)+1, HIGH_PRIORITY, RELIABLE_ORDERED, 0, UNASSIGNED_SYSTEM_ADDRESS, true );
+			g_server->Send( message2, (const int) strlen(message2)+1, HIGH_PRIORITY, RELIABLE_ORDERED, 0, UNASSIGNED_SYSTEM_ADDRESS, true );
 		}
 #endif
 
 		// Get a packet from either the server or the client
 
-		p = server->Receive();
+		p = g_server->Receive();
 
 		if ( p == 0 )
 			continue; // Didn't get any packets
@@ -264,16 +277,27 @@ int _tmain(int argc, _TCHAR* argv[])
 				// Necessary with SetAutoAddNewConnections(false);
 				g_replicaManager.AddNewConnection( p->systemAddress );
 				// The server should create a User class for each new connection.
-				EpUser *newUser = new EpUser;
+				EpUser* newUser = new EpUser;
 				// In order to use any networked member functions of Replica2, you must first call SetReplicaManager
 				newUser->SetReplicaManager( &g_replicaManager );
 				// Store which address this user is associated with
-				newUser->systemAddress = p->systemAddress;
+				newUser->setSystemAddress(p->systemAddress);
 				// Tell the user to automatically serialize our data members every 100 milliseconds (if changed)
-				// This way if we change the system address or the Soldier* we don't have to call user->BroadcastSerialize();
+				// This way if we change the system address or the UnitBase* we don't have to call user->BroadcastSerialize();
 				newUser->AddAutoSerializeTimer( 100 );
 				// Send out this new user to all systems. Unlike the old system (ReplicaManager) all sends are done immediately.
 				newUser->BroadcastConstruction();
+
+				/*
+				UnitBase* newUnitBase = new UnitBase(UT_UNITBASE);
+				newUnitBase->setOwner(masterUser);
+				newUnitBase->setTilePos( 50, 50 );
+				newUnitBase->setTileBufferPos( 50, 50 );
+				newUnitBase->SetReplicaManager( &g_replicaManager );
+				newUnitBase->AddAutoSerializeTimer( 100 );
+				newUnitBase->BroadcastConstruction();
+				//newUnitBase->setArnMeshName( "GwengYiModel" );
+				*/
 			}
 			
 			
@@ -331,20 +355,20 @@ int _tmain(int argc, _TCHAR* argv[])
 			// That messages can be changed on the server before being broadcast
 			// Sending is the same as before
 			sprintf_s( message, 2048, "%s", p->data );
-			server->Send( message, (const int) strlen(message)+1, HIGH_PRIORITY, RELIABLE_ORDERED, 0, p->systemAddress, true );
+			g_server->Send( message, (const int) strlen(message)+1, HIGH_PRIORITY, RELIABLE_ORDERED, 0, p->systemAddress, true );
 
 			break;
 		}
 
 		// We're done with the packet
-		server->DeallocatePacket( p );
+		g_server->DeallocatePacket( p );
 	}
 
-	server->Shutdown( 300 );
+	g_server->Shutdown( 300 );
 	// We're done with the network
-	RakNetworkFactory::DestroyRakPeerInterface( server );
+	RakNetworkFactory::DestroyRakPeerInterface( g_server );
 
-
+	delete masterUser;
 	RakNet::RakString::FreeMemory();
 	return 0;
 }

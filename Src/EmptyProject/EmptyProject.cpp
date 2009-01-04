@@ -821,7 +821,7 @@ LRESULT CALLBACK MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
 		if ( wParam == 'P' )
 		{
 			g_nActiveSystem++;
-			g_nActiveSystem %= 6;	
+			g_nActiveSystem %= 6;
 		}
 		else if ( wParam == 'L' )
 		{
@@ -1609,7 +1609,7 @@ void ConnectToServer()
 	//g_rpc3Inst = new RakNet::RPC3;
 	g_replicaManager = new RakNet::ReplicaManager2;
 
-	UnitBase::mySoldier=0;
+	UnitBase::myUnit=0;
 	EpUser::myUser=0;
 
 	g_networkIDManager.SetIsNetworkIDAuthority( false );
@@ -1636,46 +1636,30 @@ void ConnectToServer()
 	SystemAddress clientID = UNASSIGNED_SYSTEM_ADDRESS;
 
 	// Holds user data
-	char ip[30], serverPort[30], clientPort[30];
-
+	const char* serverIp = "127.0.0.1";
+	const unsigned short serverPort = 10000;
+	
 	// A client
 	isServer = false;
 
-	printf( "This is a sample implementation of a text based chat client.\n" );
-	printf( "Connect to the project 'Chat Example Server'.\n" );
-	printf( "Difficulty: Beginner\n\n" );
+	puts( "---------------------------" );
+	puts( "|   EmptyProject Client   |" );
+	puts( "---------------------------" );
 
-	// Get our input
-	puts( "Enter the client port to listen on" );
-	/*gets( clientPort );
-	if ( clientPort[0] == 0 )
-		strcpy( clientPort, "0" );*/
-	strcpy_s( clientPort, 30, "0" );
-	
-
-	puts( "Enter IP to connect to" );
-	//gets( ip );
+	printf( "Trying to connect server %s:%d ...\n", serverIp, serverPort);
 	g_clientPeer->AllowConnectionResponseIPMigration(false);
-	//if (ip[0]==0)
-		strcpy_s(ip, 30, "127.0.0.1");
-
-
-	puts("Enter the port to connect to");
-	//gets(serverPort);
-	//if (serverPort[0]==0)
-		strcpy_s(serverPort, 30, "10000");
-
+	
 	// Connecting the client is very simple.  0 means we don't care about
 	// a connectionValidationInteger, and false for low priority threads
-	SocketDescriptor socketDescriptor((unsigned short)atoi(clientPort),0);
-	g_clientPeer->Startup(1,30,&socketDescriptor, 1);
+	SocketDescriptor socketDescriptor(0, 0);
+	g_clientPeer->Startup(1, 30, &socketDescriptor, 1);
 	g_clientPeer->AttachPlugin( g_replicaManager );
 	// Just test this
 	g_replicaManager->SetAutoAddNewConnections( false );
 	// Register our custom connection factory
 	g_replicaManager->SetConnectionFactory( &g_connectionFactory );
 	g_clientPeer->SetOccasionalPing(true);
-	bool b = g_clientPeer->Connect(ip, (unsigned short)atoi(serverPort), "Rumpelstiltskin", (int) strlen("Rumpelstiltskin"));	
+	bool b = g_clientPeer->Connect(serverIp, serverPort, "Rumpelstiltskin", (int) strlen("Rumpelstiltskin"));	
 
 	g_clientPeer->AttachPlugin( &g_rpc3Inst );
 
@@ -1686,8 +1670,6 @@ void ConnectToServer()
 	if (b)
 	{
 		puts("Attempting connection");
-
-		//puts("'quit' to quit. 'stat' to show stats. 'ping' to ping. 'disconnect' to disconnect. Type to talk.");
 
 		bool doLoop = true;
 

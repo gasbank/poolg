@@ -573,7 +573,15 @@ void AUDIO_STATE::enterBattle()
 	audioState.pEngine->Stop( GetAudioState().iMusicCategory, 0 );
 	audioState.bBGMFade = true;
 	audioState.bMusicFade = false;
-	audioState.pSoundBank->Play( GetAudioState().iBattle[GetAudioState().nCurWorld], 0, 0, NULL );
+	if (audioState.pSoundBank)
+	{
+		audioState.pSoundBank->Play( GetAudioState().iBattle[GetAudioState().nCurWorld], 0, 0, NULL );
+	}
+	else
+	{
+		OutputDebugString(_T("(***) Audio is not ready?!\n"));
+	}
+	
 	audioState.bInBattle = true;
 }
 

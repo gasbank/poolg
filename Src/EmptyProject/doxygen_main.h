@@ -6,7 +6,7 @@
 - EP (EmptyProject)
 
 @section Program 최종 프로그램명
-- 풀쥐의 대모험
+- 풀쥐의 대모험(PoolG's Adventure)
 
 @section intro 소개
 - 본 프로젝트는 2008년 8월~9월 동안 연세대학교 프로그래밍 동아리 풀씨(PoolC)에서 진행된 프로젝트입니다.

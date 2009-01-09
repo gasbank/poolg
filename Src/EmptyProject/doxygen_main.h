@@ -185,7 +185,7 @@ EP 프로젝트는 SCM으로 SVN을 이용합니다. 현재 개발되고 있는 
 아래의 주소에서 체크아웃 하십시오.
 
 @code
-svn://poolg.org/poolg/trunk
+svn://poolc.org/poolg/trunk
 @endcode
 
 저장소는 익명 접근에 대해 읽기 전용이며, 계정을 가진 사용자에 대해서만 쓰기 권한이 주어집니다.

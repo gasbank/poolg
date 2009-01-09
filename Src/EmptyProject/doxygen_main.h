@@ -1,5 +1,5 @@
 ﻿/**
-@mainpage PoolG Game Project
+@mainpage PoolG's Adventure
 @version Summer 2008
 
 @section CodeName 개발코드명

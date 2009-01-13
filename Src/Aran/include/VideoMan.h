@@ -15,7 +15,7 @@
 #include "ModelReader.h"
 #include "DungeonInterface.h"
 #include "Singleton.h"
-
+#include "PreciseTimer.h"
 
 #ifndef SAFE_RELEASE
 #define SAFE_RELEASE(p) if((p)!=0) { (p)->Release(); (p) = 0; }
@@ -213,8 +213,7 @@ private:
 	double m_prevLastTime;
 	DWORD m_prevUpdateFrames;
 	float m_fFPS;
-
-	CDXUTTimer m_dxutTimer;
+	CPreciseTimer m_preciseTimer;
 
 	std::vector<float> testFloatArray;
 };

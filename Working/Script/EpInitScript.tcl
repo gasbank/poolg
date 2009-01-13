@@ -5,10 +5,10 @@
 #----------------------------------------------------------------------------------#
 
 variable EpStartTopStateName		PlayState
-set EpStartWorldName				EpLobbyWorld
+set EpStartWorldName				EpCeilingWorld
 set EpWorldList						[ list EpCeilingWorld EpRoomWorld EpA213World EpTestStage EpLobbyWorld ]
 set EpWindowMode					1
-set NetworkMode						1
+set NetworkMode						0
 
 # This callback procedure is called when the D3D device is not created yet.
 # Application level one-time initialization and constants are defined here.
@@ -16,7 +16,7 @@ proc EpInitApp {} {
 	# Screen Resolution
 	set w1 200
 	set h1 150
-	set multiplier 2
+	set multiplier 4
 	EpSetWindowSize [expr $w1 * $multiplier] [expr $h1 * $multiplier]
 }
 

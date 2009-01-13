@@ -5,6 +5,7 @@ struct NodeBase;
 struct NodeMesh2;
 struct NodeMesh3;
 class ArnMaterial;
+class ArnHierarchy;
 
 class ArnMesh : public ArnXformable
 {
@@ -34,13 +35,25 @@ private:
 	void				buildFrom(const NodeMesh3* nm);
 
 	LPD3DXMESH			m_d3dxMesh;
+	LPDIRECT3DVERTEXBUFFER9 m_d3dvb;
+	LPDIRECT3DINDEXBUFFER9 m_d3dib;
+
 	MaterialRefList		m_materialRefList;
 	MeshData			m_data;
 
 	bool				m_bVisible;
 	bool				m_bCollide;
-	
+
+	ArnHierarchy*		m_skeleton;
+
+	struct BoneDataInternal
+	{
+		STRING									nameFixed;
+		std::vector<std::pair<DWORD, float> >	indWeight;
+	};
+	std::vector<BoneDataInternal>	m_boneDataInt;
 };
 
 HRESULT arn_build_mesh(IN LPDIRECT3DDEVICE9 dev, IN const NodeMesh2* nm, OUT LPD3DXMESH& mesh);
 HRESULT arn_build_mesh(IN LPDIRECT3DDEVICE9 dev, IN const NodeMesh3* nm, OUT LPD3DXMESH& mesh);
+HRESULT arn_build_mesh(IN LPDIRECT3DDEVICE9 dev, IN const NodeMesh3* nm, OUT LPDIRECT3DVERTEXBUFFER9& d3dvb, OUT LPDIRECT3DINDEXBUFFER9& d3dib);

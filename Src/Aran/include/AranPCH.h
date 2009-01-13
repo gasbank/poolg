@@ -17,9 +17,14 @@
 #include <list>
 #include <vector>
 
-#include "DXUT.h"
-//#include <d3dx9.h>
-//#include <dxerr9.h>
+#include <d3dx9.h>
+#include <dxerr9.h>
+#include <CommCtrl.h>
+
+#ifndef V
+#define V(x)           { hr = (x); if( FAILED(hr) ) { return DXTrace( __FILE__, (DWORD)__LINE__, hr, L#x, true ); } }
+#endif
+
 
 #include "Macros.h"
 

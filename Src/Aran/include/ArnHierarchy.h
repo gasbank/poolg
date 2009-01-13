@@ -3,6 +3,7 @@
 
 struct NodeBase;
 struct NodeHierarchy1;
+struct NodeHierarchy2;
 
 class ArnHierarchy : public ArnNode
 {
@@ -15,6 +16,8 @@ public:
 	unsigned int				getFrameCount() const { return m_data.size(); }
 private:
 	void						buildFrom(const NodeHierarchy1* nh);
+	void						buildFrom(const NodeHierarchy2* ns);
 
 	std::vector<MyFrameData>	m_data;
+	SkeletonData				m_data2;
 };

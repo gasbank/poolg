@@ -22,77 +22,77 @@ enum NODE_DATA_TYPE // or NDD_DATA_TYPE
 {
 	NDT_UNKNOWN,
 	
-	NDT_CONTAINER1			= 0x1000,
-	NDT_CONTAINER2,
-	NDT_CONTAINER3,
-	NDT_CONTAINER4,
-	NDT_CONTAINER5,
+	NDT_CONTAINER1			= 0x1000,	// not used
+	NDT_CONTAINER2,						// not used
+	NDT_CONTAINER3,						// not used
+	NDT_CONTAINER4,						// not used
+	NDT_CONTAINER5,						// not used
 
 	NDT_MESH1				= 0x2000,	// ARN10, ARN11
 	NDT_MESH2,							// ARN20
 	NDT_MESH3,							// ARN25
-	NDT_MESH4,
-	NDT_MESH5,
+	NDT_MESH4,							// not used
+	NDT_MESH5,							// not used
 
 	NDT_LIGHT1				= 0x3000,	// ARN10, ARN11, ARN20
 	NDT_LIGHT2,							// ARN25
-	NDT_LIGHT3,
-	NDT_LIGHT4,
-	NDT_LIGHT5,
+	NDT_LIGHT3,							// not used
+	NDT_LIGHT4,							// not used
+	NDT_LIGHT5,							// not used
 
 	NDT_SKELETON1			= 0x4000,	// ARN10, ARN11, ARN20
-	NDT_SKELETON2,						// ARN25 (Armature in Blender)
-	NDT_SKELETON3,
-	NDT_SKELETON4,
-	NDT_SKELETON5,
+	NDT_SKELETON2,						// not used
+	NDT_SKELETON3,						// not used
+	NDT_SKELETON4,						// not used
+	NDT_SKELETON5,						// not used
 
 	NDT_HIERARCHY1			= 0x5000,	// ARN10, ARN11, ARN20
-	NDT_HIERARCHY2,
-	NDT_HIERARCHY3,
-	NDT_HIERARCHY4,
-	NDT_HIERARCHY5,
+	NDT_HIERARCHY2,						// ARN25 (Armature in Blender)
+	NDT_HIERARCHY3,						// not used
+	NDT_HIERARCHY4,						// not used
+	NDT_HIERARCHY5,						// not used
 
 	NDT_ANIM1				= 0x6000,	// ARN10, ARN11, ARN20
-	NDT_ANIM2,
-	NDT_ANIM3,
-	NDT_ANIM4,
-	NDT_ANIM5,
+	NDT_ANIM2,							// not used
+	NDT_ANIM3,							// not used
+	NDT_ANIM4,							// not used
+	NDT_ANIM5,							// not used
 	
 	NDT_CAMERA1				= 0x7000,	// ARN10, ARN11, ARN20
 	NDT_CAMERA2,						// ARN25
-	NDT_CAMERA3,
-	NDT_CAMERA4,
-	NDT_CAMERA5,
+	NDT_CAMERA3,						// not used
+	NDT_CAMERA4,						// not used
+	NDT_CAMERA5,						// not used
 
 	NDT_BONE1				= 0x8000,	// ARN10, ARN11, ARN20
 	NDT_BONE2,							// ARN25 (Bone in Blender)
-	NDT_BONE3,
-	NDT_BONE4,
-	NDT_BONE5,
+	NDT_BONE3,							// not used
+	NDT_BONE4,							// not used
+	NDT_BONE5,							// not used
 	
 	NDT_MATERIAL1			= 0x9000,	// ARN25 : Global materials node which consists of NDT_MATERIAL2
 	NDT_MATERIAL2,						// ARN25 : Individual material data node
-	NDT_MATERIAL3,
-	NDT_MATERIAL4,
-	NDT_MATERIAL5,
+	NDT_MATERIAL3,						// not used
+	NDT_MATERIAL4,						// not used
+	NDT_MATERIAL5,						// not used
 
 	NDT_IPO1				= 0xa000,	// ARN25 : Global IPOs node which consists of NDT_IPO2
 	NDT_IPO2,							// ARN25 : Individual IPO data node
-	NDT_IPO3,
-	NDT_IPO4,
-	NDT_IPO5,
+	NDT_IPO3,							// not used
+	NDT_IPO4,							// not used
+	NDT_IPO5,							// not used
 	
 	NDT_SYMLINK1			= 0xb000,	// ARN25 : Symbolic link to another node
-	NDT_SYMLINK2,
-	NDT_SYMLINK3,
-	NDT_SYMLINK4,
-	NDT_SYMLINK5,
+	NDT_SYMLINK2,						// not used
+	NDT_SYMLINK3,						// not used
+	NDT_SYMLINK4,						// not used
+	NDT_SYMLINK5,						// not used
 
-	NDT_ACTION1				= 0xc000,
-	NDT_ACTION2,
-	NDT_ACTION3,
-	NDT_ACTION4,
-	NDT_ACTION5,
+	NDT_ACTION1				= 0xc000,	// ARN25 : Global Action list node which consists all actions (Action list in Blender)
+	NDT_ACTION2,						// not used
+	NDT_ACTION3,						// not used
+	NDT_ACTION4,						// not used
+	NDT_ACTION5,						// not used
 
 	// Runtime objects RTTI
 	NDT_RT_CONTAINER		= 0x10000000,
@@ -105,6 +105,7 @@ enum NODE_DATA_TYPE // or NDD_DATA_TYPE
 	NDT_RT_SKELETON,
 	NDT_RT_BONE,
 	NDT_RT_IPO,
+	NDT_RT_ACTIONS,
 	NDT_RT_SYMLINK,
 	NDT_RT_SCENEGRAPH,
 	
@@ -132,6 +133,34 @@ struct ArnVertex
 	float x, y, z, nx, ny, nz, u, v;
 
 	static const DWORD FVF = D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1;
+};
+
+struct ArnBlendedVertex
+{
+	ArnBlendedVertex(float x, float y, float z, float nx, float ny, float nz, float u, float v, float w0, float w1, float w2, DWORD matIndices)
+	{
+		this->x = x;
+		this->y = y;
+		this->z = z;
+		weight0 = w0;
+		weight1 = w1;
+		weight2 = w2;
+		matrixIndices = matIndices;
+		normal[0] = nx;
+		normal[1] = ny;
+		normal[2] = nz;
+		this->u = u;
+		this->v = v;
+	}
+	float x, y, z;
+	float weight0;
+	float weight1;
+	float weight2;
+	DWORD matrixIndices; // 0x44332211 --> 11, 22, 33, 44 are individual bone matrix indices
+	float normal[3];
+	float u, v;
+
+	static const DWORD FVF = D3DFVF_XYZB4 | D3DFVF_LASTBETA_UBYTE4 | D3DFVF_NORMAL | D3DFVF_TEX0;
 };
 
 struct BezTripleData
@@ -242,6 +271,7 @@ public:
 	unsigned int materialCount;
 	std::vector<STRING> matNameList;
 	STRING armatureName;
+	std::vector<STRING> boneMatIdxMap;
 };
 //////////////////////////////////////////////////////////////////////////
 // Unions
@@ -433,5 +463,9 @@ struct DX_CONSTS
 	static const D3DXCOLOR D3DXCOLOR_CYAN;
 	static const D3DXCOLOR D3DXCOLOR_WHITE;
 };
+
+
+
+#define FOUR_BYTES_INTO_DWORD(i1, i2, i3, i4)  ((DWORD)((i1)&0xff | (((i2)&0xff)<<8) | (((i3)&0xff)<<16) | (((i4)&0xff)<<24) ))
 
 #endif // #ifndef __STRUCTS_H_

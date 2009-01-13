@@ -8,7 +8,8 @@ public:
 	RenderLayer(void);
 	virtual ~RenderLayer(void);
 
-	virtual HRESULT render(double fTime, float fElapsedTime) = 0;
+	virtual HRESULT render() = 0;
+	virtual HRESULT update(double fTime, float fElapsedTime) = 0;
 
 	void setVideoMan( VideoMan* pVideoMan ) { m_pVideoMan = pVideoMan; }
 	void setDev( LPDIRECT3DDEVICE9 pDev ) { m_lpDev = pDev; }

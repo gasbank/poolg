@@ -56,7 +56,13 @@ struct NodeMesh3 : public NodeBase
 	const DWORD* m_attr;
 	const char* m_armatureName;
 	std::vector<Bone2> m_bones;
+
+	std::vector<const char*> m_boneMatIdxMap;
+	float* m_weights; // Start address of v0[w0, w1, w2] v1[w0, w1, w2] ... w? are floats
+	unsigned char* m_matIdx; // v0[m0, m1, m2, m3], v1[m0, m1, m2, m3] ... m? are unsigned chars(0~255)
+
 };
+
 struct NodeAnim1 : public NodeBase
 {
 	unsigned int m_keyCount;
@@ -86,7 +92,7 @@ struct NodeSkeleton1 : public NodeBase
 	unsigned int m_boneCount;
 };
 
-struct NodeSkeleton2 : public NodeBase
+struct NodeHierarchy2 : public NodeBase
 {
 	const char* m_parentName;
 	unsigned int m_boneCount;
@@ -144,6 +150,11 @@ struct NodeIpo2 : public NodeBase
 	unsigned int m_curveCount;
 	CurveDataShell* m_curves;
 };
+struct NodeAction1 : public NodeBase
+{
+	unsigned int m_actionCount;
+	std::vector<std::pair<const char*, std::vector<std::pair<const char*, const char*> > > > m_actions;
+};
 
 struct NodeSymLink1 : public NodeBase
 {
@@ -183,7 +194,7 @@ void parse_nodeMaterial2(ArnBinaryFile& abf, NodeBase*& nodeBase);
 void parse_nodeMesh2(ArnBinaryFile& abf, NodeBase*& nodeBase);
 void parse_nodeMesh3(ArnBinaryFile& abf, NodeBase*& nodeBase);
 void parse_nodeSkeleton1(ArnBinaryFile& abf, NodeBase*& nodeBase);
-void parse_nodeSkeleton2(ArnBinaryFile& abf, NodeBase*& nodeBase);
+void parse_nodeHierarchy2(ArnBinaryFile& abf, NodeBase*& nodeBase);
 void parse_nodeHierarchy1(ArnBinaryFile& abf, NodeBase*& nodeBase);
 void parse_nodeLight1(ArnBinaryFile& abf, NodeBase*& nodeBase);
 void parse_nodeLight2(ArnBinaryFile& abf, NodeBase*& nodeBase);
@@ -194,6 +205,7 @@ void parse_nodeBone1(ArnBinaryFile& abf, NodeBase*& nodeBase);
 void parse_nodeBone2(ArnBinaryFile& abf, NodeBase*& nodeBase);
 void parse_nodeIpo1(ArnBinaryFile& abf, NodeBase*& nodeBase);
 void parse_nodeIpo2(ArnBinaryFile& abf, NodeBase*& nodeBase);
+void parse_nodeAction1(ArnBinaryFile& abf, NodeBase*& nodeBase);
 void parse_nodeSymLink(ArnBinaryFile& abf, NodeBase*& nodeBase);
 
 //////////////////////////////////////////////////////////////////////////
@@ -208,6 +220,7 @@ unsigned int*	file_read_uint_array(ArnBinaryFile& file, unsigned int count);
 int				file_read_int(ArnBinaryFile& file);
 float			file_read_float(ArnBinaryFile& file);
 BOOL			file_read_BOOL(ArnBinaryFile& file);
+void*			file_read_implicit_array(ArnBinaryFile& file, unsigned int byteLen);
 
 ARN_VDD*		file_read_arn_vdd_array(ArnBinaryFile& file, unsigned int count);
 ARN_MTD*		file_read_arn_mtd_array(ArnBinaryFile& file, unsigned int count);

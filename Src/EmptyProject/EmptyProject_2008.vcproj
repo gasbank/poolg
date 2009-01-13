@@ -45,7 +45,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../RakNet/include;../RakNet_RPC3;../Aran/include;../DXUT/Core;../DXUT/Optional;../tcl/include;../EpCommonLibrary"
+				AdditionalIncludeDirectories="../RakNet/include;../RakNet_RPC3;../Aran/include;../DXUT/include;../tcl/include;../EpCommonLibrary"
 				PreprocessorDefinitions="WIN32;_DEBUG;DEBUG;_WINDOWS;USE_XACT3"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -71,7 +71,7 @@
 				AdditionalOptions="/IGNORE:4089"
 				AdditionalDependencies="Aran.lib tcl85g.lib DXUT.lib DXUTOpt.lib dxerr.lib dxguid.lib d3dx9d.lib d3d9.lib winmm.lib comctl32.lib RakNetDLLDebug.lib RakNet_RPC3.lib EpCommonLibrary.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="../Aran/lib;../DXUT/Core/Debug;../DXUT/Optional/Debug;../tcl/lib;../RakNet/lib;../EpCommonLibrary/Debug"
+				AdditionalLibraryDirectories="../Aran/lib;../tcl/lib;../RakNet/lib;../EpCommonLibrary/Debug"
 				GenerateManifest="false"
 				DelayLoadDLLs=""
 				GenerateDebugInformation="true"

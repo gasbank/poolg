@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include "State.h"
 
@@ -20,7 +20,9 @@ typedef std::list<Enemy*> EnemyList;
 
 
 
-
+/**
+@brief ì „íˆ¬ State
+*/
 class BattleState : public State
 {
 public:
@@ -90,7 +92,7 @@ private:
 	BYTE					m_aKeys[BSI_MAX_KEYS];
 	UINT					m_cKeysDown;
 
-	/*ÀÌ°÷ºÎÅÍ°¡ ÄÄÆ÷³ÍÆ®*/
+	/*ì´ê³³ë¶€í„°ê°€ ì»´í¬ë„ŒíŠ¸*/
 	Sprite*					m_sprite;
 
 	DrawRequest*			m_skillContentBox;
@@ -136,7 +138,7 @@ private:
 	bool					m_levelProgress;
 	bool					m_levelUpFlag;
 
-	//StatSelect °ü·Ã
+	//StatSelect ê´€ë ¨
 	StatSelect				m_statSelect;
 	int						m_statCount;
 

@@ -1,7 +1,9 @@
-#pragma once
+﻿#pragma once
 //-----------------------------------------------------------------------------
 // Struct to hold audio game state
 //-----------------------------------------------------------------------------
+
+
 class AUDIO_STATE : public Singleton<AUDIO_STATE>
 {
 public:
@@ -74,6 +76,12 @@ public:
 
 inline AUDIO_STATE& GetAudioState() { return AUDIO_STATE::getSingleton(); }
 
+/**
+@brief 배경 음악 및 효과음을 관리하는 클래스
+
+XACT를 이용해 배경 음악 및 효과음을 재생하게 해 주는 클래스입니다.
+각 상황에 따라 음악을 바꿔주거나 캐릭터 이동 시에 발자국 소리를 나게 합니다.
+*/
 class Sound
 {
 public:

@@ -1,8 +1,14 @@
-#pragma once
+﻿#pragma once
 #include "Tile.h"
 #include "CommonStructs.h"
 
 
+/**
+@brief 특정 타일 영역을 정의하는 클래스
+
+맵은 타일 기반으로 이루어져 있습니다. 맵의 일정 영역을 정의하기 위해서는 타일 영역을
+정의할 필요가 있는데 본 클래스는 그러한 영역 하나를 정의합니다.
+*/
 class TileRegion
 {
 public:

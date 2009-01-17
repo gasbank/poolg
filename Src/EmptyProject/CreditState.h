@@ -1,7 +1,10 @@
-#pragma once
+﻿#pragma once
 
 #include "State.h"
 
+/**
+@brief 제작진을 보여주는 State
+*/
 class CreditState : public State
 {
 public:

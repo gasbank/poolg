@@ -1,7 +1,14 @@
-#pragma once
+﻿#pragma once
 
 enum LightState { LIGHT_FADE, LIGHT_FLICKER, LIGHT_NORMAL };
 
+
+/**
+@brief 게임 전반에 쓰이는 광원 조작 클래스
+
+페이드 인, 아웃이나 빛의 색 변경 등을 조작합니다.
+빛이 깜빡깜빡이는 flicker도 지원합니다.
+*/
 class EpLight : public Singleton<EpLight>
 {
 public:

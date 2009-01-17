@@ -1,9 +1,14 @@
-#pragma once
+﻿#pragma once
 
 class Sprite;
 
 typedef std::map<std::string, Sprite*> SpriteMap;
 
+/**
+@brief Sprite 인스턴스를 관리하는 클래스
+
+2D 이미지를 로드 및 출력하는 Sprite 클래스 인스턴스를 등록하거나 가져올 수 있습니다.
+*/
 class SpriteManager : public Singleton<SpriteManager>
 {
 public:

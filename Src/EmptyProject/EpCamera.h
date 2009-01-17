@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "ArnCamera.h"
 
@@ -10,13 +10,23 @@ enum RunningCamera {
 	CAMERA_SMOOTH_ATTACH 
 };
 
-// CAMERA_NORMAL : SetViewParamsWithUp()�� ���� ������ ��ġ�� ī�޶� �ű��.
-// CAMERA_SMOOTH : ���� ��ġ�κ��� SetDesViewParams()�� ���� ������ ��ġ�� ī�޶� ������ �ű��.
-//				�����̴µ� �ɸ��� �ð��� ������ �� �ִ�.
-// CAMERA_EXTERNAL : �ܺο��� ���� ArnCamera�� ���� ī�޶� ��ġ�� ��������.
-// CAMERA_SMOOTH_ATTACH : ���� ��ġ�κ��� setAttachPos�� ���� ������ �����Ͱ� ����Ű�� ���͸� z������
-//				-30��ŭ ������ ������ �ٶ󺸵��� ������ �پ ����ٴѴ�.
 
+
+/**
+@brief 게임 전반에 쓰이는 카메라 조작 클래스
+
+캐릭터를 쫓아다니는 카메라, 적군을 만났을 때 카메라웍이 어떻게 되는지 등을
+구현해 놓은 클래스입니다. 또한 카메라 흔들리기 기능도 있습니다.
+
+아래는 카메라 모드에 대한 목록입니다.
+
+- CAMERA_NORMAL : SetViewParamsWithUp()에 의해 지정된 위치로 카메라를 옮긴다.
+- CAMERA_SMOOTH : 이전 위치로부터 SetDesViewParams()에 의해 지정된 위치로 카메라를 서서히 옮긴다.
+                움직이는데 걸리는 시간도 지정할 수 있다.
+- CAMERA_EXTERNAL : 외부에서 들어온 ArnCamera에 의해 카메라 위치가 정해진다.
+- CAMERA_SMOOTH_ATTACH : 이전 위치로부터 setAttachPos에 의해 지정된 포인터가 가리키는 벡터를 z축으로
+                       -30만큼 떨어진 곳에서 바라보도록 서서이 붙어서 따라다닌다.
+*/
 class EpCamera : public CModelViewerCamera
 {
 public:

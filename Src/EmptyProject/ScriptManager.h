@@ -1,10 +1,19 @@
-#pragma once
+﻿#pragma once
 #include "SingletonCreators.h"
 
 class TileRegion;
 
 extern Tcl_Interp* g_consoleInterp;
 
+
+/**
+@brief Tcl 스크립트 엔진을 초기화/해제하고 기본적인 기능을 모아둔 클래스
+
+게임 초기화에서 Tcl 인터프리터를 초기화하고 게임 종료시에 해제해주는 기능을 합니다.
+초기화 단계에서 C/C++(소스 코드)측과 Tcl 스크립트 측의 바인딩을 설정하게 됩니다.
+또한 스크립트에서 정의된 전역변수나 오브젝트를 액세스할 수 있도록 도와주는 헬퍼
+함수도 있습니다.
+*/
 class ScriptManager : public Singleton<ScriptManager>
 {
 public:

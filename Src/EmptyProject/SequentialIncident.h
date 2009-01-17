@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Incident.h"
 
 class Action;
@@ -7,6 +7,10 @@ class BlockingActionIncident;
 
 typedef std::list<BlockingActionIncident*> BlockingActionIncidentList;
 
+/**
+@brief BlockingActionIncident 를 순차적으로 실행하는 Incident
+
+*/
 class SequentialIncident : public Incident
 {
 public:

@@ -1,7 +1,15 @@
-#pragma once
+﻿#pragma once
 
 enum ProgressMode { PM_BAR, PM_ILLUSION };
 
+
+/**
+@brief 전투 UI의 프로그레스바 클래스
+
+HP나 MP 등 수치를 가시화시켜주는 UI 컴포넌트입니다.
+특별히 수치를 바로바로 업데이트하지 않고 일정 시간동안 천천히 바뀌는
+애니메이션을 지원합니다.
+*/
 class ProgressUi {
 
 public:

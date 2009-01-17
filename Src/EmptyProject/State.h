@@ -1,6 +1,12 @@
-#pragma once
+﻿#pragma once
 #include "WorldManager.h"
 
+/**
+@brief 단위 상태를 나타내는 클래스
+
+예를 들어 로고를 보여주는 상태, 제작진을 보여주는 상태,
+게임 메인 로직이 돌아가고 있는 상태 등을 정의할 때 사용되는 베이스 클래스입니다.
+*/
 class State
 {
 public:

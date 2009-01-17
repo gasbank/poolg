@@ -78,7 +78,7 @@ Trigger* EpCreateUnitPositionTrigger( void* unit, int x0, int y0, int x1, int y1
 	end.x = ( x1 == -1 ) ? x0 : x1;
 	end.y = ( y1 == -1 ) ? y0 : y1;
 	TileRegion* region = new TileRegion( start, end );
-	return new UnitPositionTrigger( u, region, (UnitPositionTriggerType)type );
+	return new UnitPositionTrigger( u, region, (Trigger::UnitPositionTriggerType)type );
 } SCRIPT_CALLABLE_PV_PV_I_I_I_I_I( EpCreateUnitPositionTrigger )
 
 
@@ -249,7 +249,7 @@ Trigger* EpCreateUnitPositionWithTraceTrigger( void* unitA, void* unitB, int typ
 	Unit* uA = reinterpret_cast<Character*>( unitA );
 	Unit* uB = reinterpret_cast<Character*>( unitB );
 	
-	return new UnitPositionWithTraceTrigger( uA, uB, (UnitPositionTriggerType)type );
+	return new UnitPositionWithTraceTrigger( uA, uB, (Trigger::UnitPositionTriggerType)type );
 } SCRIPT_CALLABLE_PV_PV_PV_I( EpCreateUnitPositionWithTraceTrigger )
 
 //////////////////////////////////////////////////////////////////////////

@@ -1,7 +1,11 @@
-#pragma once
+﻿#pragma once
 
 #include "SingleIncident.h"
 
+/**
+@brief 정의된 Action을 순차적으로 실행하는 Incident
+
+*/
 class BlockingActionIncident : public SingleIncident
 {
 public:

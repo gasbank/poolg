@@ -1,9 +1,15 @@
-#pragma once
+﻿#pragma once
 
 #include "Picture.h"
 #include "TileManager.h"
 
 
+/**
+@brief 캐릭터 사이의 대화를 관리하는 클래스
+
+스크립트에 정의된 대화를 읽어와서 하나의 완전한 대화를 구성하는 클래스입니다.
+이 대화는 이벤트 시스템에 의해서 시작될 수 있습니다.
+*/
 class Dialog
 {
 public:

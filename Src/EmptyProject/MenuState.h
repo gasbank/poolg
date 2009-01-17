@@ -1,10 +1,13 @@
-#pragma once
+﻿#pragma once
 #include "Picture.h"
 #include "State.h"
 
 class Sprite;
 class DrawRequest;
 
+/**
+@brief 게임 플레이 중 플레이어가 메뉴를 불렀을 때 사용되는 State
+*/
 class MenuState : public State
 { 
 public:

@@ -1,7 +1,13 @@
-#pragma once
+﻿#pragma once
 #include "character.h"
 enum SkillLocation;
 
+
+/**
+@brief 플레이어가 조종하는 캐릭터 클래스
+
+경험치나 레벨업 등을 관리합니다.
+*/
 class Hero :
 	public Character
 {

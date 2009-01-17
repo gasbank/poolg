@@ -1,10 +1,17 @@
-#pragma once
+﻿#pragma once
 
 class World;
 class Dialog;
 
 typedef std::list<Dialog*> DialogList;
 
+/**
+@brief 모든 게임내 World를 관리하는 클래스
+
+게임 초기화시에 스크립트에 정의된 모든 World를 초기화 및 로드합니다.
+또한 실행 중에는 다음으로 바꿀 World를 설정하고, 종료시에는 로드된 World를
+해제합니다.
+*/
 class WorldManager : public Singleton<WorldManager>
 {
 public:

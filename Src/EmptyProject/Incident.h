@@ -1,6 +1,16 @@
-#pragma once
+﻿#pragma once
 
 
+/**
+@brief Trigger - Action 관계를 묶어주는 단위 이벤트 클래스
+
+Trigger에서 정의된 조건이 만족되면 Action이 발동되는 구조를 게임 안에서는
+Incident라고 부릅니다. 예를 들어 "주인공 캐릭터가 어디에 서 있다면"이 Trigger 부분이 되고
+"주인공의 HP를 꽉 채운다"가 Action이 됩니다. 이런 Trigger와 Action을 하나로 묶어서
+Incident가 됩니다.
+
+본 클래스는 추상 클래스입니다. 기본적인 Incident를 사용하기 위해서는 SingleIncident 를 참고하십시오.
+*/
 class Incident
 {
 public:

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "CommonWorldInterface.h"
 #include "State.h"
 #include "ArnFile.h"
@@ -18,6 +18,17 @@ class Hero;
 
 
 
+/**
+@brief 게임의 신 그래프(scene graph) 및 지도를 관리하는 클래스
+
+게임의 가상세계는 지도와 그 위의 유닛으로 구성되어 있습니다. 이를 통합하여
+World라고 부릅니다. 이 World에는 유닛을 추가할 수도 있고 뺄 수도 있습니다.
+또한 World의 특정 구역에 들어가면 다른 World로 이동할 수도 있습니다.
+
+일반적으로 주인공이 하나의 world에서 돌아다니다가 특정 조건이 만족되어
+다른 world로 이동하게 될 때에는 기존 world에서 주인공 유닛을 빼 내어 다른 world에다가
+넣어주어야 합니다.
+*/
 class World : public CommonWorldInterface
 {
 public:

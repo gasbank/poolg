@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "State.h"
 
 class World;
@@ -7,6 +7,9 @@ struct ArnFileData;
 class ArnMesh;
 class Sprite;
 
+/**
+@brief 게임을 플레이하고 있는 중의 State
+*/
 class PlayState : public State
 {
 public:

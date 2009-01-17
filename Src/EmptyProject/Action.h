@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "TileManager.h"
 #include "Incident.h"
 
@@ -9,6 +9,15 @@ class ArnXformable;
 
 enum ActionType { AT_BATTLE, AT_DIALOG, AT_SOUND, AT_HEAL, AT_UNITSPAWN, AT_SCRIPT, AT_FADE };
 
+
+/**
+@brief 게임의 단위 행동에 대해 정의하는 클래스
+
+본 클래스는 게임에서 일어날 수 있는 단위 행동을 정의할 수 있도록 하는
+베이스 클래스입니다. 이는 행동을 활성화하거나 비활성화 할 수 있도록 인터페이스를 제공합니다.
+
+이러한 단위 행동은 독립적으로 쓰이지 않고 Incident 클래스를 통해서 사용하게 됩니다.
+*/
 class Action
 {
 public:
@@ -44,6 +53,9 @@ SCRIPT_FACTORY( Action )
 
 //////////////////////////////////////////////////////////////////////////
 
+/**
+@brief Unit 과 관련된 Action
+*/
 class UnitAction : public Action
 {
 public:
@@ -61,9 +73,13 @@ private:
 
 //////////////////////////////////////////////////////////////////////////
 
-// If there is an action which affects one character in the world,
-// you can create a class based on this CharacterAction class.
-// CharacterAction derived class can be used at Skill's onHitAction.
+/**
+@brief Character 와 관련된 Action
+
+If there is an action which affects one character in the world,
+you can create a class based on this CharacterAction class.
+CharacterAction derived class can be used at Skill's onHitAction.
+*/
 class CharacterAction : public UnitAction
 {
 public:
@@ -79,7 +95,11 @@ protected:
 
 class Dialog;
 
-// Dialog window will be shown. Player cannot abort dialog in middle.
+/**
+@brief 대화를 시작하는 Action
+
+@remarks Dialog window will be shown. Player cannot abort dialog in middle.
+*/
 class DialogAction : public Action
 {
 public:
@@ -98,6 +118,9 @@ private:
 
 //////////////////////////////////////////////////////////////////////////
 
+/**
+@brief 소리를 재생하는 Action
+*/
 class SoundAction : public Action
 {
 public:
@@ -112,6 +135,10 @@ private:
 
 //////////////////////////////////////////////////////////////////////////
 
+
+/**
+@brief Character 의 HP를 조작하는 Action
+*/
 class HealAction : public CharacterAction
 {
 public:
@@ -127,6 +154,12 @@ private:
 
 //////////////////////////////////////////////////////////////////////////
 
+/**
+@brief Unit 을 등록하는 Action
+
+Unit을 미리 생성해 두었다가 등록해야합니다. 본 액션이 유닛을 생성까지
+하지는 않습니다.
+*/
 class UnitSpawnAction : public UnitAction
 {
 public:
@@ -140,7 +173,11 @@ public:
 
 //////////////////////////////////////////////////////////////////////////
 
-// Should be applied blocked type incident only
+/**
+@brief 특정 밀리세컨트만큼 다음 Action 을 지연해주는 Action
+
+@remarks Should be applied blocked type incident only
+*/
 class DelayAction : public Action
 {
 public:
@@ -157,6 +194,9 @@ private:
 
 //////////////////////////////////////////////////////////////////////////
 
+/**
+@brief Unit 을 움직이게 하는 Action
+*/
 class UnitMoveAction : public UnitAction
 {
 public:
@@ -173,6 +213,9 @@ private:
 
 //////////////////////////////////////////////////////////////////////////
 
+/**
+@brief 스크립트 명령어를 실행하는 Action
+*/
 class ScriptAction : public Action
 {
 public:
@@ -189,6 +232,9 @@ private:
 
 //////////////////////////////////////////////////////////////////////////
 
+/**
+@brief 페이드 인, 아웃을 해주는 Action
+*/
 class FadeAction : public Action
 {
 public:
@@ -204,6 +250,9 @@ private:
 
 //////////////////////////////////////////////////////////////////////////
 
+/**
+@brief Unit 을 특정 위치로 순간이동 시켜주는 Action
+*/
 class TeleportAction : public UnitAction
 {
 public:
@@ -221,9 +270,12 @@ private:
 
 class ArnCamera;
 
-// type == 0 : Camera follow hero
-// type == 1 : Externally defined camera
+/**
+@brief 카메라 모드를 바꿔주는 Action
 
+type == 0 : Camera follow hero
+type == 1 : Externally defined camera
+*/
 class CameraAction : public Action
 {
 public:
@@ -241,6 +293,11 @@ private:
 
 //////////////////////////////////////////////////////////////////////////
 
+/**
+@brief Character 를 조종가능한지 여부를 설정하는 Action
+
+@remarks 일반적으로 Character 는 플레이어가 조작하는 Hero 가 될 것입니다.
+*/
 class ControllableAction : public CharacterAction
 {
 public:
@@ -255,6 +312,10 @@ private:
 
 //////////////////////////////////////////////////////////////////////////
 
+
+/**
+@brief Incident 를 시작하는 Action
+*/
 class StartIncidentAction : public Action
 {
 public:
@@ -268,6 +329,9 @@ private:
 
 //////////////////////////////////////////////////////////////////////////
 
+/**
+@brief 화면을 특정 색깔로 깜빡거리게 하는 Action
+*/
 class FlickerAction : public Action
 {
 public:
@@ -289,7 +353,11 @@ private:
 
 //////////////////////////////////////////////////////////////////////////
 
-// Should be applied blocked type incident only
+/**
+@brief 애니메이션 가능한 3D 메시의 애니메이션을 시작하게 하는 Action
+
+@remarks Should be applied blocked type incident only
+*/
 class StartAnimationAction : public Action
 {
 public:

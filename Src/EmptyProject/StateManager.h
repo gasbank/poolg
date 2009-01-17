@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 enum GameState
 {
@@ -19,6 +19,11 @@ class State;
 
 typedef std::map<GameState, State*> StateMap;
 
+/**
+@brief State 인스턴스를 관리하는 클래스
+
+다른 State로 바꾸거나 현재 State를 알고 싶을 때 사용합니다.
+*/
 class StateManager
 {
 public:

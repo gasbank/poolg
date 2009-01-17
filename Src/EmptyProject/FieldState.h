@@ -1,6 +1,11 @@
-#pragma once
+﻿#pragma once
 #include "state.h"
 
+/**
+@brief 필드 State
+
+맵을 돌아다니고 있을 때의 상태이다.
+*/
 class FieldState :
 	public State
 {

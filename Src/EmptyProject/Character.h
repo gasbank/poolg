@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Unit.h"
 #include "TileManager.h"
 
@@ -14,12 +14,21 @@ typedef std::vector<StructureObject*> StructureObjectVector;
 
 enum SkillLocation;
 
-//������ ����. ���� �� �ø� ������.(simon ornen)
+//고정적 스탯. 레벨 업 시만 오르는.(simon ornen)
 struct Stat
 {
 	int health, will, coding, def, sense, immunity;
 };
 
+
+/**
+@brief 주인공 및 적군, NPC 캐릭터의 베이스 클래스
+
+Character 클래스는 보통 게임의 캐릭터가 가지는 공통된 속성을 가집니다. 예를 들어
+HP, MP, 공격력, 방어력 등이 그것입니다.
+
+캐릭터는 아이템을 소지 및 습득할 수 있으며, 스킬도 추가하거나 제거할 수 있습니다.
+*/
 class Character : public Unit
 {
 public:
@@ -34,7 +43,7 @@ public:
 	virtual const D3DXVECTOR3&			getPos() const { if ( m_moveImpulse != DX_CONSTS::D3DXVEC3_ZERO ) return m_curPos; else return Unit::getPos(); }
 	virtual void						processUnitInFront( UnitInput dir );
 
-	/* ��ų ���� �Լ� */
+	/* 스킬 관련 함수 */
 	//void doNormalAttack(int type, Character* enemy);
 	void								pushSkillObject( SkillObject* skillObj ) { m_skillObjects.push_back( skillObj ); }
 	void								pushSkillObjectList( const SkillObjectList soList );
@@ -87,7 +96,7 @@ private:
 	bool								m_bMoving;
 	float								m_fMovingTime;
 
-	//������ ����.
+	//유동적 스탯.
 	int									m_maxHp;
 	int									m_curHp;
 	int									m_maxCs;

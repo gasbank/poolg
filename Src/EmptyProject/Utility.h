@@ -1,7 +1,13 @@
-#pragma once
+﻿#pragma once
 
 #include "TileManager.h"
 
+
+/**
+@brief 귀찮아서 한번에 모아둔 각종 함수들 -_-
+
+충돌 테스트를 위한 레이 테스팅 관련 함수 및 디버그용 프린트 함수가 모여있습니다.
+*/
 class Utility
 {
 public:

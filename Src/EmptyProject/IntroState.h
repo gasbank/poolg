@@ -1,13 +1,16 @@
-#pragma once
+ï»¿#pragma once
 
 #include "State.h"
 #include "Picture.h"
-#include "Sound.h" // »ç¿îµå Çì´õÆÄÀÏ
+#include "Sound.h" // ì‚¬ìš´ë“œ í—¤ë”íŒŒì¼
 #include "Sprite.h"
 #include "StateManager.h"
 
 #define NUM_OF_LINES 20
 
+/**
+@brief ìƒˆ ê²Œì„ ì‹œì‘ì‹œì— ì†Œê°œë¥¼ ë³´ì—¬ì£¼ëŠ” State
+*/
 class IntroState : public State
 {
 public:
@@ -53,7 +56,7 @@ private:
 
 	float m_velocity;
 
-	Sound	m_sound; // »ç¿îµå º¯¼ö
+	Sound	m_sound; // ì‚¬ìš´ë“œ ë³€ìˆ˜
 
 	float m_fFadeTimer;
 	float m_fTextAlpha;

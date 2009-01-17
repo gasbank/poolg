@@ -1,11 +1,17 @@
-#pragma once
+﻿#pragma once
 #include "Unit.h"
 
 class BattleState;
 class DynamicMotion;
 class Action;
 
+/**
+@brief 전투 상태에서 기술을 사용했을 때 생성되는 Unit
 
+예를 들어 전투 중에 캐릭터가 파이어볼 기술을 사용했을 때 파이어볼에
+해당하는 오브젝트가 있어야 한다. 이 클래스는 그러한 오브젝트에 대한
+인터페이스를 제공한다.
+*/
 class SkillObject : public Unit
 {
 public:

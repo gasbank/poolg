@@ -1,8 +1,11 @@
-#pragma once
+﻿#pragma once
 #include "StateManager.h"
 
 class World;
 
+/**
+@brief 게임 내 최상위 레벨의 상태를 관리하는 클래스
+*/
 class TopStateManager : public StateManager, public Singleton<TopStateManager>
 {
 public:

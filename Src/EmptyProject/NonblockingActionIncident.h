@@ -1,6 +1,10 @@
-#pragma once
+﻿#pragma once
 #include "SingleIncident.h"
 
+/**
+@brief 정의된 Action을 동시에 실행하는 Incident
+
+*/
 class NonblockingActionIncident : public SingleIncident
 {
 public:

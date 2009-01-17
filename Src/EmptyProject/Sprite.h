@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 class SpriteManager;
 
@@ -27,6 +27,16 @@ private:
 	}
 };
 
+
+/**
+@brief 2D 이미지 하나를 나타내는 클래스
+
+3D 메시에 사용할 텍스쳐와는 별개로 2D 이미지를 찍어야 할 경우 사용하는 클래스입니다.
+물론 내부적으로는 사각형 메시로 2D이미지를 출력합니다. 주로 UI를 출력하거나 단순히
+2D 이미지를 보여줘야할 경우가 있을 때 사용합니다.
+
+본 클래스는 독립적으로 사용하는 경우는 없고 SpriteManager에 등록한 후에 사용하게 됩니다.
+*/
 class Sprite
 {
 public:

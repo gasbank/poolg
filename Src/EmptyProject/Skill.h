@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 class BattleState;
 class Character;
@@ -6,8 +6,9 @@ class SkillObject;
 class Unit;
 class DynamicMotion;
 
-
-
+/**
+@brief ì „íˆ¬ ì‹œì— Character ê°€ ì‚¬ìš©í•  ìˆ˜ ìˆëŠ” ê¸°ìˆ 
+*/
 class Skill
 {
 public:
@@ -40,7 +41,7 @@ private:
 //		m_skillName = L"N.A."; 
 //		m_skillDescription =
 //			L"[Normal Attack]\n"
-//			L"Å¸¶ôÇÑ ÄÚµùÀÇ È¥À» ´ã¾Æ ÀûÀ» °ø°İÇÕ´Ï´Ù.\n";
+//			L"íƒ€ë½í•œ ì½”ë”©ì˜ í˜¼ì„ ë‹´ì•„ ì ì„ ê³µê²©í•©ë‹ˆë‹¤.\n";
 //		m_csEssentials = 2;
 //	}
 //	virtual void useSkill( BattleState* battleState );
@@ -54,7 +55,7 @@ private:
 //		m_skillName = L"Heal";
 //		m_skillDescription =
 //			L"[Heal]\n"
-//			L"µğ¹ö±×¸¦ ÅëÇÏ¿© HP¸¦ È¸º¹ÇÕ´Ï´Ù.\n";
+//			L"ë””ë²„ê·¸ë¥¼ í†µí•˜ì—¬ HPë¥¼ íšŒë³µí•©ë‹ˆë‹¤.\n";
 //		m_csEssentials = 8;
 //	}
 //	virtual void useSkill( BattleState* battleState );
@@ -68,8 +69,8 @@ private:
 //		m_skillName = L"Meditation";
 //		m_skillDescription =
 //			L"[Meditation]\n"
-//			L"°øA°üÀÇ À½Ä§ÇÑ ±â¿îÀ» Èí¼öÇÏ¿© Ç®ÁãÀÇ\n"
-//			L"Å¸¶ôÇÑ ½ºÇÇ¸´À» ²ø¾î¿Ã¸³´Ï´Ù.\n";
+//			L"ê³µAê´€ì˜ ìŒì¹¨í•œ ê¸°ìš´ì„ í¡ìˆ˜í•˜ì—¬ í’€ì¥ì˜\n"
+//			L"íƒ€ë½í•œ ìŠ¤í”¼ë¦¿ì„ ëŒì–´ì˜¬ë¦½ë‹ˆë‹¤.\n";
 //		m_csEssentials = 0;
 //	}
 //	virtual void useSkill( BattleState* battleState );
@@ -83,8 +84,8 @@ private:
 //		m_skillName = L"MultiThread";
 //		m_skillDescription =
 //			L"[MultiThread]\n"
-//			L"¿©·¯ °³ÀÇ ¾²·¹µå¸¦ »ı¼ºÇÏ¿© »ó´ë¹æÀ»\n"
-//			L"º´·ÄÀûÀ¸·Î °ø°İÇÕ´Ï´Ù.\n";
+//			L"ì—¬ëŸ¬ ê°œì˜ ì“°ë ˆë“œë¥¼ ìƒì„±í•˜ì—¬ ìƒëŒ€ë°©ì„\n"
+//			L"ë³‘ë ¬ì ìœ¼ë¡œ ê³µê²©í•©ë‹ˆë‹¤.\n";
 //		m_csEssentials = 10;
 //	}
 //	virtual void useSkill( BattleState* battleState );
@@ -98,9 +99,9 @@ private:
 //		m_skillName = L"Goto";
 //		m_skillDescription =
 //			L"[Goto]\n"
-//			L"ÇÁ·Î±×·¡¸Óµé »çÀÌ¿¡¼­ ¾Ç½À, ±İ±â·Î\n"
-//			L"¿©°ÜÁ® ¿Ô¾ú´ø ½ºÅ³ÀÔ´Ï´Ù. ÀûÀ» ÇâÇØ\n"
-//			L"¸Í·ÄÈ÷ µ¹ÁøÇÏ¿© ÇÇÇØ¸¦ ÀÔÈü´Ï´Ù.\n";
+//			L"í”„ë¡œê·¸ë˜ë¨¸ë“¤ ì‚¬ì´ì—ì„œ ì•…ìŠµ, ê¸ˆê¸°ë¡œ\n"
+//			L"ì—¬ê²¨ì ¸ ì™”ì—ˆë˜ ìŠ¤í‚¬ì…ë‹ˆë‹¤. ì ì„ í–¥í•´\n"
+//			L"ë§¹ë ¬íˆ ëŒì§„í•˜ì—¬ í”¼í•´ë¥¼ ì…í™ë‹ˆë‹¤.\n";
 //		m_csEssentials = 8;
 //	}
 //	virtual void useSkill( BattleState* battleState );

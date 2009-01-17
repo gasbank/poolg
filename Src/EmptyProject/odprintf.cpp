@@ -1,5 +1,8 @@
 #include "EmptyProjectPCH.h"
 
+/**
+@brief Visual Studio 출력 창에 디버그 정보를 출력하는 함수
+*/
 void __cdecl odprintf(const char *format, ...)
 {
 	int nSize = 0;

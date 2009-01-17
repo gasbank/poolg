@@ -1,8 +1,11 @@
-#pragma once
+﻿#pragma once
 
 #include "ScriptManager.h"
 #include "Unit.h"
 
+/**
+@brief 아이템을 나타내는 클래스
+*/
 class EpItem : public Unit
 {
 public:

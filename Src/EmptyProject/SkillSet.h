@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 class Skill;
 class BattleState;
@@ -9,7 +9,9 @@ typedef std::list<const Skill*> ConstSkillList;
 
 enum SkillLocation { SL_FIRST = 0, SL_SECOND, SL_THIRD, SL_FOURTH, SL_FIFTH };
 
-
+/**
+@brief Character ê°€ ê°€ì§ˆ ìˆ˜ ìˆëŠ” Skill ëª©ë¡ì„ ê´€ë¦¬í•˜ëŠ” í´ë˜ìŠ¤
+*/
 class SkillSet
 {
 public:
@@ -31,7 +33,7 @@ public:
 	/*void							moveSkillLocation( char mode );
 	void							setCharacter( Character* hero, Character* enemy );*/
 
-	///*»ç¿ë Àü¿£ ¹İµå½Ã battleState¸¦ ¼³Á¤ÇØ ÁÖ¾î¾ß ÇÑ´Ù.*/
+	///*ì‚¬ìš© ì „ì—” ë°˜ë“œì‹œ battleStateë¥¼ ì„¤ì •í•´ ì£¼ì–´ì•¼ í•œë‹¤.*/
 	//void							setBattleState( BattleState* battleState ) { m_battleState = battleState; }
 
 private:

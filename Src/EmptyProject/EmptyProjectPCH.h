@@ -1,3 +1,4 @@
+
 #if defined(WIN32)
 	#if (_MSC_VER < 1500) // Lower than VC9.0 (2008)
 		#error "Visual Studio 2008 is minimum requirement of compilation of this project!"
@@ -84,9 +85,6 @@
 #include "StringCompressor.h"
 #include "StringTable.h"
 
-#ifndef EP_SAFE_RELEASE
-#define EP_SAFE_RELEASE(p)      { if (p) { (p)->release(); SAFE_DELETE(p); } }
-#endif
 
 // Visual Studio memory leak detection C runtime library
 // This feature is implemented somewhat different way in MFC library,
@@ -117,14 +115,22 @@ inline bool WasKeyDown( BYTE key ) { return( (key & KEY_WAS_DOWN_MASK) == KEY_WA
 #define SCRIPT_FACTORY(className) class _script_factory_##className { public: static void init(); };
 
 
-template<typename T> void EpSafeReleaseAll( T& obj ) {
-	T::iterator it = obj.begin();
-	for ( ; it != obj.end(); ++it )
-	{
-		EP_SAFE_RELEASE( *it );
-	}
-	obj.clear();
-};
+
+
+
+
+#define FLOAT_POS_INF		(0x7f800000)
+
+enum BasicShapeType { BST_UNKNOWN, BST_TEAPOT, BST_SPHERE, BST_CUBE, BST_PLANE, BST_COUNT };
+
+void cdecl odprintf(const char *format, ...);
+
+#include "Typedefs.h"
+#include "CommonStructs.h"
+
+#define DO_NOT_REDEFINE_NEW_KEYWORD
+#include "AranPCH.h"
+
 
 
 template<typename T> void SafeDeleteAll( T& obj ) {
@@ -144,14 +150,3 @@ template<typename T> void EpSafeReleaseAllMap( T& obj ) {
 	}
 	obj.clear();
 };
-
-
-
-#define FLOAT_POS_INF		(0x7f800000)
-
-enum BasicShapeType { BST_UNKNOWN, BST_TEAPOT, BST_SPHERE, BST_CUBE, BST_PLANE, BST_COUNT };
-
-void cdecl odprintf(const char *format, ...);
-
-#include "Typedefs.h"
-#include "CommonStructs.h"

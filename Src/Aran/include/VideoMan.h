@@ -47,6 +47,30 @@ struct ARN_CAMERA
 
 class RenderLayer;
 
+// General callbacks
+typedef void    (CALLBACK *LPARNCALLBACKFRAMEMOVE)( double fTime, float fElapsedTime);
+//typedef LRESULT (CALLBACK *LPARNCALLBACKMSGPROC)( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, bool* pbNoFurtherProcessing);
+//typedef void    (CALLBACK *LPARNCALLBACKTIMER)( UINT idEvent);
+//typedef bool    (CALLBACK *LPARNCALLBACKMODIFYDEVICESETTINGS)( DXUTDeviceSettings* pDeviceSettings);
+
+
+//// Direct3D 9 callbacks
+//typedef bool    (CALLBACK *LPARNCALLBACKISD3D9DEVICEACCEPTABLE)( D3DCAPS9* pCaps, D3DFORMAT AdapterFormat, D3DFORMAT BackBufferFormat, bool bWindowed, void* pUserContext );
+//typedef HRESULT (CALLBACK *LPARNCALLBACKD3D9DEVICECREATED)( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext );
+//typedef HRESULT (CALLBACK *LPARNCALLBACKD3D9DEVICERESET)( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext );
+//typedef void    (CALLBACK *LPARNCALLBACKD3D9FRAMERENDER)( IDirect3DDevice9* pd3dDevice, double fTime, float fElapsedTime, void* pUserContext );
+//typedef void    (CALLBACK *LPARNCALLBACKD3D9DEVICELOST)( void* pUserContext );
+//typedef void    (CALLBACK *LPARNCALLBACKD3D9DEVICEDESTROYED)( void* pUserContext );
+//
+//// OpenGL callbacks
+//typedef bool    (CALLBACK *LPDXUTCALLBACKISD3D9DEVICEACCEPTABLE)( D3DCAPS9* pCaps, D3DFORMAT AdapterFormat, D3DFORMAT BackBufferFormat, bool bWindowed, void* pUserContext );
+//typedef HRESULT (CALLBACK *LPDXUTCALLBACKD3D9DEVICECREATED)( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext );
+//typedef HRESULT (CALLBACK *LPDXUTCALLBACKD3D9DEVICERESET)( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext );
+//typedef void    (CALLBACK *LPDXUTCALLBACKD3D9FRAMERENDER)( IDirect3DDevice9* pd3dDevice, double fTime, float fElapsedTime, void* pUserContext );
+//typedef void    (CALLBACK *LPDXUTCALLBACKD3D9DEVICELOST)( void* pUserContext );
+//typedef void    (CALLBACK *LPDXUTCALLBACKD3D9DEVICEDESTROYED)( void* pUserContext );
+
+
 class VideoMan : public Singleton<VideoMan>
 {
 private:
@@ -208,6 +232,8 @@ public:
 	void renderMeshesOnly(ArnNode* node, const D3DXMATRIX& globalXform = DX_CONSTS::D3DXMAT_IDENTITY);
 	void renderSingleMesh(ArnMesh* mesh, const D3DXMATRIX& globalXform = DX_CONSTS::D3DXMAT_IDENTITY);
 	float getFPS() const { return m_fFPS; }
+
+	void setFrameMoveCallback(LPARNCALLBACKFRAMEMOVE pCallback);
 
 private:
 	double m_prevLastTime;

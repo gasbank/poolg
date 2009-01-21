@@ -22,7 +22,7 @@
 #include <CommCtrl.h>
 
 #ifndef V
-#define V(x)           { hr = (x); if( FAILED(hr) ) { return DXTrace( __FILE__, (DWORD)__LINE__, hr, L#x, true ); } }
+#define V(x)           { hr = (x); if( FAILED(hr) ) { DXTrace( __FILE__, (DWORD)__LINE__, hr, L#x, true ); } }
 #endif
 
 
@@ -37,7 +37,7 @@
 // This feature is implemented somewhat different way in MFC library,
 // therefore we should remove these on MFC related projects
 
-#ifndef _AFXDLL
+#if !defined(_AFXDLL) && !defined(DO_NOT_REDEFINE_NEW_KEYWORD)
 	#ifdef _DEBUG
 	#include <crtdbg.h>
 	#define DEBUG_NEW new(_NORMAL_BLOCK ,__FILE__, __LINE__)
@@ -52,3 +52,23 @@
 
 
 #pragma warning( disable : 4100 ) // disable unreference formal parameter warnings for /W4 builds
+
+
+#ifndef EP_SAFE_RELEASE
+#define EP_SAFE_RELEASE(p)      { if (p) { (p)->release(); SAFE_DELETE(p); } }
+#endif
+
+template<typename T> void EpSafeReleaseAll( T& obj ) {
+	T::iterator it = obj.begin();
+	for ( ; it != obj.end(); ++it )
+	{
+		EP_SAFE_RELEASE( *it );
+	}
+	obj.clear();
+};
+
+
+
+#ifndef V_RETURN
+#define V_RETURN(x)    { hr = (x); if( FAILED(hr) ) { return hr; } }
+#endif

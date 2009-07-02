@@ -70,7 +70,7 @@ LPD3DXMESH							g_bst[BST_COUNT];
 D3DCOLOR							g_fillColor;
 
 
-// LPD3DXFONTs will be manag	ed at global scope.
+// LPD3DXFONTs will be managed at global scope.
 
 LPD3DXFONT							g_pFont							= 0;
 LPD3DXFONT							g_unitNameFont					= 0;

@@ -5,7 +5,7 @@
 #----------------------------------------------------------------------------------#
 
 variable EpStartTopStateName		PlayState
-set EpStartWorldName				EpCeilingWorld
+set EpStartWorldName				EpCeilingWorld 
 set EpWorldList						[ list EpCeilingWorld EpRoomWorld EpA213World EpTestStage EpLobbyWorld ]
 set EpWindowMode					1
 set NetworkMode						0

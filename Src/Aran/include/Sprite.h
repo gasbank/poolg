@@ -7,7 +7,7 @@ class DrawRequest
 {
 
 public:
-	DrawRequest( bool bXformable ) : bXformable( bXformable ) {}
+	DrawRequest( bool bXformable ) : bXformable( bXformable ), bRender(true) {}
 	void release() {}
 	const bool bXformable;
 	RECT srcRect;
@@ -15,6 +15,7 @@ public:
 	D3DXVECTOR3 position;
 	D3DXMATRIX xform;
 	D3DCOLOR color;
+	bool bRender;
 private:
 	DrawRequest operator = ( const DrawRequest& rhs )
 	{

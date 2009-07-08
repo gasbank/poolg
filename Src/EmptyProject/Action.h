@@ -6,6 +6,7 @@ class World;
 class Enemy;
 class Unit;
 class ArnXformable;
+class Character;
 
 enum ActionType { AT_BATTLE, AT_DIALOG, AT_SOUND, AT_HEAL, AT_UNITSPAWN, AT_SCRIPT, AT_FADE };
 

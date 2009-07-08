@@ -57,7 +57,7 @@ bool StructureObject::frameMove( double dTime, float fElapsedTime )
 						if( !GetWorldManager().getCurWorld()->findUnitAtTile( nextTilePos.x, nextTilePos.y ) && entireRegion.isExist( nextTilePos ) )
 						{
 							m_bMoving = true;
-							m_vKeyboardDirection = D3DXVECTOR3( 0, 0, 0 );
+							m_vKeyboardDirection = ArnVec3( 0, 0, 0 );
 							m_vKeyboardDirection.x += (float) g_moveAmount[ i ].x * s_tileSize;
 							m_vKeyboardDirection.y += (float) g_moveAmount[ i ].y * s_tileSize;
 
@@ -78,10 +78,10 @@ bool StructureObject::frameMove( double dTime, float fElapsedTime )
 		m_vVelocity = m_vKeyboardDirection / m_moveDuration;
 
 		// Simple euler method to calculate position delta
-		D3DXVECTOR3 vPosDelta = m_vVelocity * fElapsedTime;
+		ArnVec3 vPosDelta = m_vVelocity * fElapsedTime;
 		m_fMovingTime += fElapsedTime;
 
-		D3DXVECTOR3 finalPos = getPos() + vPosDelta;
+		ArnVec3 finalPos = getPos() + vPosDelta;
 		setPos( finalPos.x, finalPos.y, finalPos.z );
 	}
 	else

@@ -26,7 +26,7 @@ void Picture::init(const TCHAR* imgFileName, LPDIRECT3DDEVICE9 d3dDev, UINT segm
 
 	m_d3dDev = d3dDev;
 
-	D3DXMatrixIdentity(&m_localXform);
+	ArnMatrixIdentity(&m_localXform);
 
 	if (FAILED(D3DXCreateMeshFVF(faces, vertices, D3DXMESH_MANAGED, D3DFVF_XYZ | D3DFVF_TEX1, d3dDev, &m_d3dxMesh)))
 	{
@@ -101,7 +101,7 @@ HRESULT Picture::initRhw( const TCHAR* imgFileName, LPDIRECT3DDEVICE9 d3dDev, fl
 
 	m_d3dDev = d3dDev;
 
-	D3DXMatrixIdentity(&m_localXform);
+	ArnMatrixIdentity(&m_localXform);
 	
 	V(D3DXCreateTextureFromFile(d3dDev, imgFileName, &m_d3dTex));
 
@@ -140,7 +140,7 @@ HRESULT Picture::draw(bool textured)
 	if (m_d3dxMesh)
 	{
 		// Non-rhw drawing
-		m_d3dDev->SetTransform(D3DTS_WORLD, &m_localXform);
+		m_d3dDev->SetTransform(D3DTS_WORLD, m_localXform.getConstDxPtr());
 		if (textured)
 			m_d3dDev->SetTexture(0, m_d3dTex);
 		else
@@ -221,7 +221,7 @@ PictureInput Picture::mapKey( UINT nKey )
 
 void Picture::frameMove( float fElapsedTime )
 {
-	m_vKeyboardDirection = D3DXVECTOR3( 0, 0, 0 );
+	m_vKeyboardDirection = ArnVec3( 0, 0, 0 );
 
 	//// Update acceleration vector based on keyboard state
 	
@@ -238,12 +238,12 @@ void Picture::frameMove( float fElapsedTime )
 	m_vVelocity = m_vKeyboardDirection;
 
 	// Simple euler method to calculate position delta
-	D3DXVECTOR3 vPosDelta = m_vVelocity * fElapsedTime;
+	ArnVec3 vPosDelta = m_vVelocity * fElapsedTime;
 	m_vPos += vPosDelta;
 
-	D3DXMATRIX mScaling, mTranslation;
-	D3DXMatrixScaling(&mScaling, m_width, m_height, 1.0f);
-	D3DXMatrixTranslation(&mTranslation, m_vPos.x, m_vPos.y, m_vPos.z);
+	ArnMatrix mScaling, mTranslation;
+	ArnMatrixScaling(&mScaling, m_width, m_height, 1.0f);
+	ArnMatrixTranslation(&mTranslation, m_vPos.x, m_vPos.y, m_vPos.z);
 
 	m_localXform = mScaling * mTranslation;
 }
@@ -253,10 +253,10 @@ void Picture::setSizeToTexture()
 	m_width = m_texWidth;
 	m_height = m_texHeight;
 
-	D3DXMATRIX rotMat, scaleMat, transMat;
-	D3DXMatrixIdentity(&rotMat);
-	D3DXMatrixScaling(&scaleMat, m_width, m_height, 1.0f);
-	D3DXMatrixTranslation(&transMat, m_vPos.x, m_vPos.y, 10.0f);
+	ArnMatrix rotMat, scaleMat, transMat;
+	ArnMatrixIdentity(&rotMat);
+	ArnMatrixScaling(&scaleMat, m_width, m_height, 1.0f);
+	ArnMatrixTranslation(&transMat, m_vPos.x, m_vPos.y, 10.0f);
 	
 	m_localXform = rotMat * scaleMat * transMat;
 }

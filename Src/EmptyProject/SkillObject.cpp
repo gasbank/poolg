@@ -10,6 +10,7 @@
 #include "ScriptManager.h"
 #include "Action.h"
 #include "DynamicMotion.h"
+#include "ArnMath.h"
 
 extern BombShader*						g_bombShader;
 extern LPD3DXMESH						g_bst[BST_COUNT];
@@ -66,13 +67,13 @@ bool SkillObject::frameMove( double dTime, float fElapsedTime )
 	// 'm_dm' governs the movement of this SkillObject.
 	m_dm->frameMove( fElapsedTime );
 
-	D3DXVECTOR3 objToTarget = getPos() - m_target->getPos();
-	float dist = D3DXVec3Length( &objToTarget );
+	ArnVec3 objToTarget = getPos() - m_target->getPos();
+	float dist = ArnVec3Length( &objToTarget );
 	if ( dist < 0.1f )
 	{
 		assert( m_target );
 		
-		m_target->addMoveImpulse( DX_CONSTS::D3DXVEC3_Z / 2.5f ); // Attacked unit shows startled shake
+		m_target->addMoveImpulse( ArnConsts::D3DXVEC3_Z / 2.5f ); // Attacked unit shows startled shake
 		
 		ActionList::iterator it = m_onHitActionList.begin();
 		UINT updateInProgressCount = 0;
@@ -98,12 +99,14 @@ HRESULT SkillObject::frameRender ( IDirect3DDevice9* pd3dDevice, double dTime, f
 	D3DPERF_BeginEvent( 0, L"SkillObject Render" );
 
 	HRESULT hr = S_OK;
-	D3DXMATRIX mWorld;
-	D3DXMatrixIdentity( &mWorld );
+	ArnMatrix mWorld;
+	ArnMatrixIdentity( &mWorld );
 	UINT iPass, cPasses;
 	if ( SUCCEEDED(g_bombShader->setMainTechnique()) )
 	{
-		V( g_bombShader->setWorldViewProj( dTime, fElapsedTime, &getLocalXform(), GetG().m_camera.GetViewMatrix(), GetG().m_camera.GetProjMatrix() ) );
+		ArnMatrix arnvm( GetG().m_camera.GetViewMatrix() );
+		ArnMatrix arnpm( GetG().m_camera.GetProjMatrix() );
+		V( g_bombShader->setWorldViewProj( dTime, fElapsedTime, &getLocalXform(), &arnvm, &arnpm) );
 
 		V( g_bombShader->begin( &cPasses, 0 ) );
 		for( iPass = 0; iPass < cPasses; iPass++ )
@@ -129,7 +132,7 @@ HRESULT SkillObject::frameRender ( IDirect3DDevice9* pd3dDevice, double dTime, f
 		{
 			setMesh( g_bst[ m_bst ] );
 		}
-		pd3dDevice->SetTransform(D3DTS_WORLD, &getLocalXform());
+		pd3dDevice->SetTransform(D3DTS_WORLD, getLocalXform().getConstDxPtr());
 		f = getMesh()->DrawSubset( 0 );
 	}
 	
@@ -261,7 +264,7 @@ END_SCRIPT_FACTORY( SkillObject )
 //
 //		m_target->damage(damage);
 //
-//		D3DXVECTOR3 posDiff = m_target->getPos() - m_user->getPos();
+//		ArnVec3 posDiff = m_target->getPos() - m_user->getPos();
 //		D3DXVec3Normalize( &posDiff, &posDiff );
 //		m_target->addMoveImpulse( posDiff / 3 ); // Attacked unit shows startled shake
 //
@@ -480,7 +483,7 @@ END_SCRIPT_FACTORY( SkillObject )
 //
 //		m_target->damage(damage);
 //
-//		D3DXVECTOR3 posDiff = m_target->getPos() - m_user->getPos();
+//		ArnVec3 posDiff = m_target->getPos() - m_user->getPos();
 //		D3DXVec3Normalize( &posDiff, &posDiff );
 //		if (m_leftNumber != 0)
 //			m_target->addMoveImpulse( posDiff / 3 ); // Attacked unit shows startled shake
@@ -584,7 +587,7 @@ END_SCRIPT_FACTORY( SkillObject )
 //
 //		m_target->damage(damage);
 //
-//		D3DXVECTOR3 posDiff = m_target->getPos() - m_user->getPos();
+//		ArnVec3 posDiff = m_target->getPos() - m_user->getPos();
 //		D3DXVec3Normalize( &posDiff, &posDiff );
 //		m_target->addMoveImpulse( posDiff / 3 ); // Attacked unit shows startled shake
 //
@@ -621,8 +624,8 @@ END_SCRIPT_FACTORY( SkillObject )
 //		}
 //
 //		m_phase = 2;
-//		D3DXVECTOR3 fireDir = m_originPoint - m_user->getPos();
-//		float dist = D3DXVec3Length( &fireDir );
+//		ArnVec3 fireDir = m_originPoint - m_user->getPos();
+//		float dist = ArnVec3Length( &fireDir );
 //		D3DXVec3Normalize( &fireDir, &fireDir );
 //
 //		m_effectObject->setVisible(false);
@@ -671,8 +674,8 @@ END_SCRIPT_FACTORY( SkillObject )
 //	m_illusion = Character::createCharacter(mesh, 0, 0, 0);
 //	//m_illusion = Unit::createUnit(mesh, 0, 0, 0);
 //
-//	D3DXVECTOR3 fireDir = m_target->getPos() - m_user->getPos();
-//	float dist = D3DXVec3Length( &fireDir );
+//	ArnVec3 fireDir = m_target->getPos() - m_user->getPos();
+//	float dist = ArnVec3Length( &fireDir );
 //	D3DXVec3Normalize( &fireDir, &fireDir );
 //
 //

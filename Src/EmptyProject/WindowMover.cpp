@@ -1,7 +1,8 @@
 #include "EmptyProjectPCH.h"
 #include "WindowMover.h"
+#include "ArnMath.h"
 
-void WindowMover::setPos( D3DXVECTOR3 onPos, D3DXVECTOR3 offPos )
+void WindowMover::setPos( ArnVec3 onPos, ArnVec3 offPos )
 {
 	m_onPos = onPos;
 	m_offPos = offPos;
@@ -38,10 +39,10 @@ void WindowMover::frameMove( float fElapsedTime )
 	/*왼쪽(활성화 쪽)으로 움직인다.*/
 	if (m_movingDirect == true && m_isOn == false)
 	{
-		const D3DXVECTOR3 gap = m_onPos - m_curPos;
-		float curDistance = D3DXVec3Length( &gap );
-		D3DXVECTOR3 normalizedVector;
-		D3DXVec3Normalize (&normalizedVector, &gap);
+		const ArnVec3 gap = m_onPos - m_curPos;
+		float curDistance = ArnVec3Length( &gap );
+		ArnVec3 normalizedVector;
+		ArnVec3Normalize (&normalizedVector, &gap);
 
 		if (curDistance <= 1)
 		{
@@ -54,10 +55,10 @@ void WindowMover::frameMove( float fElapsedTime )
 	/*오른쪽(비활성화 쪽)으로 움직인다.*/
 	else if (m_movingDirect == false && m_isOn == true)
 	{
-		const D3DXVECTOR3 gap = m_offPos - m_curPos;
-		float curDistance = D3DXVec3Length( &gap );
-		D3DXVECTOR3 normalizedVector;
-		D3DXVec3Normalize (&normalizedVector, &gap);
+		const ArnVec3 gap = m_offPos - m_curPos;
+		float curDistance = ArnVec3Length( &gap );
+		ArnVec3 normalizedVector;
+		ArnVec3Normalize (&normalizedVector, &gap);
 
 		if (curDistance <= 1)
 		{
@@ -71,7 +72,7 @@ void WindowMover::frameMove( float fElapsedTime )
 
 }
 
-D3DXVECTOR3 WindowMover::getPos()
+ArnVec3 WindowMover::getPos()
 {
 	return m_curPos;
 }

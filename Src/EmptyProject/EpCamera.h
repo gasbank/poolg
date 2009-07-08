@@ -34,15 +34,15 @@ public:
 
 	virtual LRESULT handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 	virtual void frameMove( FLOAT fElapsedTime );
-	void setViewParamsWithUp( D3DXVECTOR3* pvEyePt, D3DXVECTOR3* pvLookatPt, const D3DXVECTOR3& vUp );
-	void setViewParamsWithUp( D3DXVECTOR3* pvEyePt, D3DXVECTOR3* pvLookatPt, D3DXVECTOR3* pvUp );
-	void setDesViewParams( D3DXVECTOR3* pvEyePt, D3DXVECTOR3* pvLookatPtg, D3DXVECTOR3* vUp );
-	void setAttachPos( const D3DXVECTOR3* pos ) { m_vPos = pos; }
+	void setViewParamsWithUp( ArnVec3* pvEyePt, ArnVec3* pvLookatPt, const ArnVec3& vUp );
+	void setViewParamsWithUp( ArnVec3* pvEyePt, ArnVec3* pvLookatPt, ArnVec3* pvUp );
+	void setDesViewParams( ArnVec3* pvEyePt, ArnVec3* pvLookatPtg, ArnVec3* vUp );
+	void setAttachPos( const ArnVec3* pos ) { m_vPos = pos; }
 	void setSmoothCameraDuration( float f ) { m_fSmoothCameraDuration = f; }
 	void setExternalCamera( ArnCamera* arnCam ) { _ASSERTE( arnCam && "Camera not found" ); m_pArnCam = arnCam; }
-	void beginShoulderLookCamera( const D3DXVECTOR3* pvMePos, const D3DXVECTOR3* pvOppPos );
+	void beginShoulderLookCamera( const ArnVec3* pvMePos, const ArnVec3* pvOppPos );
 	void begin( RunningCamera rc );
-	D3DXVECTOR3* GetUpPt();
+	ArnVec3* GetUpPt();
 	bool getShake() const { return m_bShake; }
 	void setShake(bool val) { m_bShake = val; }
 protected:
@@ -52,28 +52,28 @@ protected:
 	void updateSmoothAttachCamera( float fElapsedTime );
 	void updateAttachCamera();
 	void lerpViewParams( 
-		D3DXVECTOR3* pvEyeOut, D3DXVECTOR3* pvLookAtOut, D3DXVECTOR3* pvUpOut, 
-		D3DXVECTOR3* pvEye1, D3DXVECTOR3* pvLookAt1, D3DXVECTOR3* pvUp1,
-		D3DXVECTOR3* pvEye2, D3DXVECTOR3* pvLookAt2, D3DXVECTOR3* pvUp2,
+		ArnVec3* pvEyeOut, ArnVec3* pvLookAtOut, ArnVec3* pvUpOut, 
+		ArnVec3* pvEye1, ArnVec3* pvLookAt1, ArnVec3* pvUp1,
+		ArnVec3* pvEye2, ArnVec3* pvLookAt2, ArnVec3* pvUp2,
 		float s	);
-	void pulledEye( D3DXVECTOR3* vPulledEye, D3DXVECTOR3* vLookAt, D3DXVECTOR3* vEye, int nth );
+	void pulledEye( ArnVec3* vPulledEye, ArnVec3* vLookAt, ArnVec3* vEye, int nth );
 	void processShake( float fElapsedTime );
 
-	D3DXVECTOR3		m_vUp;
+	ArnVec3		m_vUp;
 	ArnCamera*		m_pArnCam;
 	RunningCamera	m_runningCamera;
 
-	D3DXVECTOR3		m_vPrevEye;
-	D3DXVECTOR3		m_vPrevLookAt;
-	D3DXVECTOR3		m_vPrevUp;
+	ArnVec3		m_vPrevEye;
+	ArnVec3		m_vPrevLookAt;
+	ArnVec3		m_vPrevUp;
 
-	D3DXVECTOR3		m_vDesEye;
-	D3DXVECTOR3		m_vDesLookAt;
-	D3DXVECTOR3		m_vDesUp;
+	ArnVec3		m_vDesEye;
+	ArnVec3		m_vDesLookAt;
+	ArnVec3		m_vDesUp;
 
-	D3DXVECTOR3		m_vEyeShake, m_vLookAtShake, m_vUpShake;
+	ArnVec3		m_vEyeShake, m_vLookAtShake, m_vUpShake;
 
-	const D3DXVECTOR3*	m_vPos;
+	const ArnVec3*	m_vPos;
 
 	float			m_fSmoothCameraTimer;
 	float			m_fSmoothCameraDuration;

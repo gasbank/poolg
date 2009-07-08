@@ -45,17 +45,18 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../RakNet/include;../RakNet_RPC3;../Aran/include;../DXUT/include;../tcl/include;../EpCommonLibrary"
-				PreprocessorDefinitions="WIN32;_DEBUG;DEBUG;_WINDOWS;USE_XACT3"
+				AdditionalIncludeDirectories="../RakNet/include;../RakNet_RPC3;../../../AranLib_Decouple/Aran;../DXUT/include;../tcl/include;../EpCommonLibrary"
+				PreprocessorDefinitions="WIN32;_DEBUG;DEBUG;_WINDOWS;USE_XACT3;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="EmptyProjectPCH.h"
-				WarningLevel="3"
+				WarningLevel="4"
 				WarnAsError="true"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
+				DisableSpecificWarnings="4512"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -69,9 +70,9 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/IGNORE:4089"
-				AdditionalDependencies="Aran.lib tcl85g.lib DXUT.lib DXUTOpt.lib dxerr.lib dxguid.lib d3dx9d.lib d3d9.lib winmm.lib comctl32.lib RakNetDLLDebug.lib RakNet_RPC3.lib EpCommonLibrary.lib"
+				AdditionalDependencies="Aran.lib tcl85g.lib DXUT.lib DXUTOpt.lib dxerr.lib dxguid.lib d3dx9d.lib d3d9.lib winmm.lib comctl32.lib RakNetDLLDebug.lib RakNet_RPC3.lib EpCommonLibrary.lib glew32.lib xerces-c_3D.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="../Aran/lib;../tcl/lib;../RakNet/lib;../EpCommonLibrary/Debug"
+				AdditionalLibraryDirectories="../Build/DebugLib;../tcl/lib;../RakNet/lib;../EpCommonLibrary/Debug;../DXUT/lib"
 				GenerateManifest="false"
 				DelayLoadDLLs=""
 				GenerateDebugInformation="true"

@@ -1,7 +1,7 @@
 #include "EmptyProjectPCH.h"
 #include "ScreenFlash.h"
-
 #include "ShaderWrapper.h"
+#include "ArnMath.h"
 
 ScreenFlash::ScreenFlash(void)
 {
@@ -63,9 +63,9 @@ HRESULT ScreenFlash::frameMove( double fTime, float fElapsedTime )
 
 	HRESULT hr = S_OK;
 
-	D3DXMATRIXA16 mWorldViewProj;
-	D3DXMatrixIdentity( &mWorldViewProj );
-	V( m_alphaShader->getConstantTable()->SetMatrix( DXUTGetD3D9Device(), "mWorldViewProj", &mWorldViewProj ) );
+	ArnMatrix mWorldViewProj;
+	ArnMatrixIdentity( &mWorldViewProj );
+	V( m_alphaShader->getConstantTable()->SetMatrix( DXUTGetD3D9Device(), "mWorldViewProj", mWorldViewProj.getConstDxPtr() ) );
 
 
 	m_bStop = false;

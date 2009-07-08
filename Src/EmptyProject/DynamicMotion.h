@@ -41,11 +41,11 @@ public:
 	virtual bool				frameMove( float fElapsedTime );
 
 protected:
-								FireUniformlyDynamicMotion( Unit* target, const D3DXVECTOR3& initPos, const D3DXVECTOR3& fireDir, float retainDist,  float velocity );
+								FireUniformlyDynamicMotion( Unit* target, const ArnVec3& initPos, const ArnVec3& fireDir, float retainDist,  float velocity );
 								FireUniformlyDynamicMotion( const FireUniformlyDynamicMotion& dm );
 private:
-	D3DXVECTOR3					m_initPos;
-	D3DXVECTOR3					m_fireDir;
+	ArnVec3					m_initPos;
+	ArnVec3					m_fireDir;
 	float						m_retainDist;
 	float						m_velocity;
 };
@@ -59,10 +59,10 @@ public:
 	virtual bool				frameMove( float fElapsedTime );
 
 protected:
-								SpinAroundDynamicMotion( Unit* target, const D3DXVECTOR3& fireDest, float radius, float radiusVelocity, float angularVelocity );
+								SpinAroundDynamicMotion( Unit* target, const ArnVec3& fireDest, float radius, float radiusVelocity, float angularVelocity );
 								SpinAroundDynamicMotion( const SpinAroundDynamicMotion& dm );
 private:
-	D3DXVECTOR3					m_fireDest;
+	ArnVec3					m_fireDest;
 	float						m_radius;
 	float						m_radiusVelocity;
 	float						m_angle;
@@ -78,7 +78,7 @@ public:
 	virtual bool				frameMove( float fElapsedTime);
 	
 protected:
-								PuffDynamicMotion( Unit* target, const D3DXVECTOR3& initPos, float puffRate, float puffSpeed );
+								PuffDynamicMotion( Unit* target, const ArnVec3& initPos, float puffRate, float puffSpeed );
 								PuffDynamicMotion( const PuffDynamicMotion& dm );
 private:
 	float						m_puffRate;

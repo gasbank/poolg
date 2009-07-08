@@ -3,7 +3,7 @@
 class WindowMover
 {
 public:
-	void setPos (D3DXVECTOR3 onPos, D3DXVECTOR3 offPos);
+	void setPos (ArnVec3 onPos, ArnVec3 offPos);
 	void onBox();
 	void offBox();
 	bool isOn() {return m_isOn;}
@@ -13,14 +13,14 @@ public:
 
 	void frameMove( float fElapsedTime );
 
-	D3DXVECTOR3 getPos();
+	ArnVec3 getPos();
 
 private:
 
-	D3DXVECTOR3 m_onPos;
-	D3DXVECTOR3 m_offPos;
+	ArnVec3 m_onPos;
+	ArnVec3 m_offPos;
 
-	D3DXVECTOR3 m_curPos;
+	ArnVec3 m_curPos;
 
 	bool m_movingDirect;
 	bool m_isOn;

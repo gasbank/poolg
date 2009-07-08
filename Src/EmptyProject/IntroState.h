@@ -36,7 +36,7 @@ private:
 	void setupCamera();
 	
 	bool m_backgroundVisible;
-	D3DXMATRIX m_matBackground;
+	ArnMatrix m_matBackground;
 
 	Sprite* m_pLogo;
 	DrawRequest* m_pLogoDrawRequest;

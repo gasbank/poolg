@@ -251,8 +251,8 @@ HRESULT MenuState::frameRender(IDirect3DDevice9* pd3dDevice,  double fTime, floa
 {
 	pd3dDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
 	pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
-	pd3dDevice->SetTransform(D3DTS_VIEW, &GetG().g_fixedViewMat);
-	pd3dDevice->SetTransform(D3DTS_PROJECTION, &GetG().g_orthoProjMat);
+	pd3dDevice->SetTransform(D3DTS_VIEW, GetG().g_fixedViewMat.getConstDxPtr());
+	pd3dDevice->SetTransform(D3DTS_PROJECTION, GetG().g_orthoProjMat.getConstDxPtr());
 
 	GetSpriteManager().frameRenderSpecificSprite( "MenuUI" );
 

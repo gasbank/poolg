@@ -67,7 +67,7 @@ public:
 	HRESULT							beginPass( UINT pass ) { return m_effect->BeginPass( pass ); }
 	HRESULT							endPass() { return m_effect->EndPass(); }
 	HRESULT							end() { return m_effect->End(); }
-	HRESULT							setWorldViewProj( double fTime, float fElapsedTime, const D3DXMATRIX* mWorld, const D3DXMATRIX* mView, const D3DXMATRIX* mProj );
+	HRESULT							setWorldViewProj( double fTime, float fElapsedTime, const ArnMatrix* mWorld, const ArnMatrix* mView, const ArnMatrix* mProj );
 private:
 	LPDIRECT3DTEXTURE9				m_fireTexture;
 };
@@ -193,6 +193,6 @@ private:
 	
 	DWORD                       g_dwBackgroundColor;
 
-	D3DXMATRIX                  g_mViewProjectionLast;
+	ArnMatrix                  g_mViewProjectionLast;
 
 };

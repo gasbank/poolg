@@ -29,8 +29,8 @@ const int CR_RECYCLE = 2;
 
 struct Plane
 {
-    D3DXVECTOR3 m_vNormal;           // The plane's normal
-    D3DXVECTOR3 m_vPoint;            // A coplanar point within the plane
+    ArnVec3 m_vNormal;           // The plane's normal
+    ArnVec3 m_vPoint;            // A coplanar point within the plane
     float       m_fBounceFactor;     // Coefficient of restitution (or how bouncy the plane is)
     int         m_nCollisionResult;  // What will particles do when they strike the plane
 
@@ -39,8 +39,8 @@ struct Plane
 
 struct Particle
 {
-    D3DXVECTOR3 m_vCurPos;    // Current position of particle
-    D3DXVECTOR3 m_vCurVel;    // Current velocity of particle
+    ArnVec3 m_vCurPos;    // Current position of particle
+    ArnVec3 m_vCurVel;    // Current velocity of particle
     float       m_fInitTime;  // Time of creation of particle
 
     Particle   *m_pNext;      // Next particle in list
@@ -49,7 +49,7 @@ struct Particle
 // Custom vertex and FVF declaration for point sprite vertex points
 struct PointVertex
 {
-    D3DXVECTOR3 posit;
+    ArnVec3 posit;
     D3DCOLOR    color;
 
 	enum FVF
@@ -99,17 +99,17 @@ public:
     void SetColor( D3DXCOLOR clrColor ) { m_clrColor = clrColor; }
 	D3DXCOLOR GetColor( void ) { return m_clrColor; }
 
-    void SetPosition( D3DXVECTOR3 vPosition ) { m_vPosition = vPosition; }
-	D3DXVECTOR3 GetPosition( void ) { return m_vPosition; }
+    void SetPosition( ArnVec3 vPosition ) { m_vPosition = vPosition; }
+	ArnVec3 GetPosition( void ) { return m_vPosition; }
 
-    void SetVelocity( D3DXVECTOR3 vVelocity ) { m_vVelocity = vVelocity; }
-	D3DXVECTOR3 GetVelocity( void ) { return m_vVelocity; }
+    void SetVelocity( ArnVec3 vVelocity ) { m_vVelocity = vVelocity; }
+	ArnVec3 GetVelocity( void ) { return m_vVelocity; }
 
-    void SetGravity( D3DXVECTOR3 vGravity ) { m_vGravity = vGravity; }
-	D3DXVECTOR3 GetGravity( void ) { return m_vGravity; }
+    void SetGravity( ArnVec3 vGravity ) { m_vGravity = vGravity; }
+	ArnVec3 GetGravity( void ) { return m_vGravity; }
 
-    void SetWind( D3DXVECTOR3 vWind ) { m_vWind = vWind; }
-	D3DXVECTOR3 GetWind( void ) { return m_vWind; }
+    void SetWind( ArnVec3 vWind ) { m_vWind = vWind; }
+	ArnVec3 GetWind( void ) { return m_vWind; }
 
     void SetAirResistence( bool bAirResistence ) { m_bAirResistence = bAirResistence; }
 	bool GetAirResistence( void ) { return m_bAirResistence; }
@@ -117,7 +117,7 @@ public:
     void SetVelocityVar( float fVelocityVar ) { m_fVelocityVar = fVelocityVar; }
 	float GetVelocityVar( void ) { return m_fVelocityVar; }
 
-    void SetCollisionPlane( D3DXVECTOR3 vPlaneNormal, D3DXVECTOR3 vPoint, 
+    void SetCollisionPlane( ArnVec3 vPlaneNormal, ArnVec3 vPoint, 
                             float fBounceFactor = 1.0f, int nCollisionResult = CR_BOUNCE );
 
     HRESULT Init( LPDIRECT3DDEVICE9 pd3dDevice );
@@ -157,10 +157,10 @@ private:
     float       m_fLifeCycle;
     float       m_fSize;
     D3DXCOLOR   m_clrColor;
-    D3DXVECTOR3 m_vPosition;
-    D3DXVECTOR3 m_vVelocity;
-    D3DXVECTOR3 m_vGravity;
-    D3DXVECTOR3 m_vWind;
+    ArnVec3 m_vPosition;
+    ArnVec3 m_vVelocity;
+    ArnVec3 m_vGravity;
+    ArnVec3 m_vWind;
     bool        m_bAirResistence;
     float       m_fVelocityVar;
     char       *m_chTexFile;

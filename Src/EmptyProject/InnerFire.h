@@ -15,14 +15,14 @@ public:
 		void* pUserContext );
 	virtual void onLostDevice();
 protected:
-	//D3DXMATRIX m_localXform;
+	//ArnMatrix m_localXform;
 	//LPDIRECT3DDEVICE9 m_d3dDev;
 	//LPD3DXMESH m_d3dxMesh;
 	//LPDIRECT3DTEXTURE9 m_d3dTex;
-	//D3DXVECTOR3 m_vVelocity;
-	//D3DXVECTOR3 m_vPos;
+	//ArnVec3 m_vVelocity;
+	//ArnVec3 m_vPos;
 	
-	D3DXMATRIX m_mWorld;
+	ArnMatrix m_mWorld;
 	float m_radius, m_height;
 	int m_angleNumber;
 	float m_angle;

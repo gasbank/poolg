@@ -79,8 +79,8 @@ HRESULT CreditState::leave()
 HRESULT CreditState::frameRender( IDirect3DDevice9* pd3dDevice, double fTime, float fElapsedTime )
 {
 	pd3dDevice->SetRenderState( D3DRS_CULLMODE, D3DCULL_CCW );
-	pd3dDevice->SetTransform( D3DTS_VIEW, &GetG().g_fixedViewMat );
-	pd3dDevice->SetTransform( D3DTS_PROJECTION, &GetG().g_orthoProjMat );
+	pd3dDevice->SetTransform( D3DTS_VIEW, GetG().g_fixedViewMat.getConstDxPtr() );
+	pd3dDevice->SetTransform( D3DTS_PROJECTION, GetG().g_orthoProjMat.getConstDxPtr() );
 	setupLight( pd3dDevice );
 
 	RECT rc;
@@ -129,7 +129,7 @@ HRESULT CreditState::frameRender( IDirect3DDevice9* pd3dDevice, double fTime, fl
 	}
 
 	pd3dDevice->SetRenderState( D3DRS_LIGHTING, TRUE );
-	D3DXMATRIX mTrans, mScale, mRot;
+	ArnMatrix mTrans, mScale, mRot;
 	D3DPERF_BeginEvent( 0xff00ff00, L"3D Text" );
 	//m_text3D.draw();
 	D3DPERF_EndEvent();
@@ -183,17 +183,17 @@ HRESULT CreditState::release()
 
 void CreditState::setupLight( IDirect3DDevice9* pd3dDevice ) 
 {
-	D3DLIGHT9& light = GetG().m_light;
+	ArnLightData& light = GetG().m_light;
 
-	ZeroMemory( &light, sizeof( D3DLIGHT9) );
+	ZeroMemory( &light, sizeof(ArnLightData) );
 	light.Ambient.r = light.Ambient.g = light.Ambient.b = light.Ambient.a = 1.0f;
 	light.Diffuse.r = light.Diffuse.g = light.Diffuse.b = light.Diffuse.a = 1.0f;
-	light.Direction = D3DXVECTOR3( 0.0f, 0.0f, 1.0f );
-	light.Position = D3DXVECTOR3( 0.0f, 0.0f, -30.0f );
+	light.Direction = ArnVec3( 0.0f, 0.0f, 1.0f );
+	light.Position = ArnVec3( 0.0f, 0.0f, -30.0f );
 	light.Range = 1000.0f;
-	light.Type = D3DLIGHT_DIRECTIONAL;
+	light.Type = ArnLightData::ARNLIGHT_DIRECTIONAL;
 
-	pd3dDevice->SetLight( 0, &light );
+	pd3dDevice->SetLight( 0, light.getConstDxPtr() );
 	pd3dDevice->LightEnable( 0, TRUE );
 
 }

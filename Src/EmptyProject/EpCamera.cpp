@@ -20,7 +20,7 @@ EpCamera::EpCamera(void)
 	m_nextShakeTime = 0;
 	m_minPullDist = 5.0f;
 
-	m_vEyeShake = m_vUpShake = m_vLookAtShake = DX_CONSTS::D3DXVEC3_ZERO;
+	m_vEyeShake = m_vUpShake = m_vLookAtShake = ArnConsts::D3DXVEC3_ZERO;
 }
 
 void EpCamera::frameMove( FLOAT fElapsedTime )
@@ -52,17 +52,21 @@ void EpCamera::frameMove( FLOAT fElapsedTime )
 	
 	if ( ( m_bViewParamsDirty && !m_bCamManualMovement ) || m_bShake )
 	{
+		ArnVec3 eye, lookAt, up;
 		if ( m_bShake )
 		{
-			D3DXVECTOR3 eye, lookAt, up;
-			eye		= m_vEye + m_vEyeShake;
-			lookAt	= m_vLookAt + m_vLookAtShake;
-			up		= m_vUp + m_vUpShake;
+			
+			eye		= m_vEyeShake + m_vEye;
+			lookAt	= m_vLookAtShake + m_vLookAt;
+			up		= m_vUpShake + m_vUp;
 			setViewParamsWithUp( &eye, &lookAt, &up );
 		}
 		else
 		{
-			setViewParamsWithUp( &m_vEye, &m_vLookAt, &m_vUp );
+			eye		= m_vEye;
+			lookAt	= m_vLookAt;
+			up		= m_vUp;
+			setViewParamsWithUp( &eye, &lookAt, &up );
 		}
 		
 		m_bViewParamsDirty = false;
@@ -97,26 +101,41 @@ D3DUtil_CameraKeys EpCamera::MapKey( UINT nKey )
 	return CAM_UNKNOWN;
 }
 
-void EpCamera::setViewParamsWithUp( D3DXVECTOR3* pvEyePt, D3DXVECTOR3* pvLookatPt, const D3DXVECTOR3& vUp )
+void EpCamera::setViewParamsWithUp( ArnVec3* pvEyePt, ArnVec3* pvLookatPt, const ArnVec3& vUp )
 {
 	if( NULL == pvEyePt || NULL == pvLookatPt )
 		return;
 
-	m_vDefaultEye = m_vEye = *pvEyePt;
-	m_vDefaultLookAt = m_vLookAt = *pvLookatPt;
+	m_vEye.x = pvEyePt->x;
+	m_vEye.y = pvEyePt->y;
+	m_vEye.z = pvEyePt->z;
+
+	m_vDefaultEye.x = pvEyePt->x;
+	m_vDefaultEye.y = pvEyePt->y;
+	m_vDefaultEye.z = pvEyePt->z;
+
+	m_vLookAt.x = pvLookatPt->x;
+	m_vLookAt.y = pvLookatPt->y;
+	m_vLookAt.z = pvLookatPt->z;
+
+	m_vDefaultLookAt.x = pvLookatPt->x;
+	m_vDefaultLookAt.y = pvLookatPt->y;
+	m_vDefaultLookAt.z = pvLookatPt->z;
 	m_vUp = vUp;
 
-	// Calc the view matrix
-	D3DXMatrixLookAtLH( &m_mView, pvEyePt, pvLookatPt, &vUp );
+	// TODO: Should be verified...
 
-	D3DXMATRIX mInvView;
-	D3DXMatrixInverse( &mInvView, NULL, &m_mView );
+	// Calc the view matrix
+	ArnMatrixLookAtLH( reinterpret_cast<ArnMatrix*>(&m_mView), pvEyePt, pvLookatPt, &vUp );
+
+	ArnMatrix mInvView;
+	ArnMatrixInverse( &mInvView, NULL, reinterpret_cast<ArnMatrix*>(&m_mView) );
 
 	// The axis basis vectors and camera position are stored inside the 
 	// position matrix in the 4 rows of the camera's world matrix.
 	// To figure out the yaw/pitch of the camera, we just need the Z basis vector
 
-	D3DXVECTOR3* pZBasis = ( D3DXVECTOR3* )&mInvView._31;
+	ArnVec3* pZBasis = ( ArnVec3* )&mInvView.m[3][1];
 
 	m_fCameraYawAngle = atan2f( pZBasis->x, pZBasis->z );
 	float fLen = sqrtf( pZBasis->z * pZBasis->z + pZBasis->x * pZBasis->x );
@@ -124,27 +143,27 @@ void EpCamera::setViewParamsWithUp( D3DXVECTOR3* pvEyePt, D3DXVECTOR3* pvLookatP
 
 
 	// Propogate changes to the member arcball
-	D3DXQUATERNION quat;
-	D3DXMATRIXA16 mRotation;
-	D3DXMatrixLookAtLH( &mRotation, pvEyePt, pvLookatPt, &vUp );
-	D3DXQuaternionRotationMatrix( &quat, &mRotation );
-	m_ViewArcBall.SetQuatNow( quat );
+	ArnQuat quat;
+	ArnMatrix mRotation;
+	ArnMatrixLookAtLH( &mRotation, pvEyePt, pvLookatPt, &vUp );
+	ArnQuaternionRotationMatrix( &quat, &mRotation );
+	m_ViewArcBall.SetQuatNow( quat.getDx() );
 
 	// Set the radius according to the distance
-	D3DXVECTOR3 vEyeToPoint;
-	D3DXVec3Subtract( &vEyeToPoint, pvLookatPt, pvEyePt );
-	SetRadius( D3DXVec3Length( &vEyeToPoint ) );
+	ArnVec3 vEyeToPoint;
+	vEyeToPoint = *pvLookatPt - *pvEyePt;
+	SetRadius( ArnVec3Length( &vEyeToPoint ) );
 
 	// View information changed. FrameMove should be called.
 	m_bDragSinceLastUpdate = true;
 }
 
-void EpCamera::setViewParamsWithUp( D3DXVECTOR3* pvEyePt, D3DXVECTOR3* pvLookatPt, D3DXVECTOR3* pvUp )
+void EpCamera::setViewParamsWithUp( ArnVec3* pvEyePt, ArnVec3* pvLookatPt, ArnVec3* pvUp )
 {
 	setViewParamsWithUp( pvEyePt, pvLookatPt, *pvUp );
 
 }
-D3DXVECTOR3* EpCamera::GetUpPt()
+ArnVec3* EpCamera::GetUpPt()
 {
 	return &m_vUp;
 }
@@ -168,27 +187,27 @@ void EpCamera::updateExternalCamera( ArnCamera* arnCam )
 	const ARN_NDD_CAMERA_CHUNK& arnCamData = arnCam->getCameraData();
 
 	// Extract information from localXfrom
-	D3DXMATRIX arnCamLocalXfrom = m_pArnCam->getFinalLocalXform();
+	ArnMatrix arnCamLocalXfrom(m_pArnCam->getFinalLocalXform());
 
 	// Calculate up and lookAt vectors based on local xform mat
-	D3DXVECTOR3 pos = *(D3DXVECTOR3*)&arnCamLocalXfrom._41;		// Camera position stored in 4th row of mat
-	D3DXVECTOR3 up = DX_CONSTS::D3DXVEC3_Y;						// Up vector basis (+Y axis)
-	D3DXVECTOR3 look = DX_CONSTS::D3DXVEC3_Z;					// LookAt vector basis (+Z axis)
-	D3DXVec3TransformCoord( &look, &look, &arnCamLocalXfrom );	// Transform LookAt vector
+	ArnVec3 pos = *(ArnVec3*)&arnCamLocalXfrom.m[3][0];		// Camera position stored in 4th row of mat
+	ArnVec3 up = ArnConsts::D3DXVEC3_Y;						// Up vector basis (+Y axis)
+	ArnVec3 look = ArnConsts::D3DXVEC3_Z;					// LookAt vector basis (+Z axis)
+	ArnVec3TransformCoord( &look, &look, &arnCamLocalXfrom );	// Transform LookAt vector
 	
 	// Clear translation part of camera xform mat since Up vector is relative to
 	// camera position, not absolute.
-	arnCamLocalXfrom._41 = arnCamLocalXfrom._42 = arnCamLocalXfrom._43 = 0;
-	D3DXVec3TransformCoord( &up, &up, &arnCamLocalXfrom );		// Transform Up vector
+	arnCamLocalXfrom.m[3][0] = arnCamLocalXfrom.m[3][1] = arnCamLocalXfrom.m[3][2] = 0;
+	ArnVec3TransformCoord( &up, &up, &arnCamLocalXfrom );		// Transform Up vector
 
 	m_vUp = up;
-	m_vLookAt = look;
-	m_vEye = pos;
+	ArnVec3Assign(m_vLookAt, look);
+	ArnVec3Assign(m_vEye, pos);
 
 	m_bViewParamsDirty = true;
 }
 
-void EpCamera::setDesViewParams( D3DXVECTOR3* pvEyePt, D3DXVECTOR3* pvLookAtPt, D3DXVECTOR3* vUp )
+void EpCamera::setDesViewParams( ArnVec3* pvEyePt, ArnVec3* pvLookAtPt, ArnVec3* vUp )
 {
 	m_vDesEye = *pvEyePt;
 	m_vDesLookAt = *pvLookAtPt;
@@ -203,10 +222,10 @@ void EpCamera::updateSmoothCamera( float fElapsedTime )
 	{
 		float s = m_fSmoothCameraTimer / m_fSmoothCameraDuration;
 
-		D3DXVec3Lerp( &m_vEye, &m_vPrevEye, &m_vDesEye, s );
+		ArnVec3Lerp( &m_vEye, &m_vPrevEye, &m_vDesEye, s );
 
-		D3DXVec3Lerp( &m_vLookAt, &m_vPrevLookAt, &m_vDesLookAt, s );
-		D3DXVec3Lerp( &m_vUp, &m_vPrevUp, &m_vDesUp, s );
+		ArnVec3Lerp( &m_vLookAt, &m_vPrevLookAt, &m_vDesLookAt, s );
+		ArnVec3Lerp( &m_vUp, &m_vPrevUp, &m_vDesUp, s );
 
 		m_fSmoothCameraTimer += fElapsedTime;
 
@@ -221,8 +240,8 @@ void EpCamera::updateSmoothCamera( float fElapsedTime )
 	else if ( m_bUpdateContinue )
 	{
 		// 마지막으로 최종 위치에 정확히 카메라를 놓는다.
-		m_vEye = m_vDesEye;
-		m_vLookAt = m_vDesLookAt;
+		ArnVec3Assign(m_vEye, m_vDesEye);
+		ArnVec3Assign(m_vLookAt, m_vDesLookAt);
 		m_vUp	= m_vDesUp;
 
 		m_bUpdateContinue = false;
@@ -254,14 +273,14 @@ void EpCamera::begin( RunningCamera rc )
 
 // 쓸모 없는 함수가 된듯 하나 아까워서 남겨둠.
 void EpCamera::lerpViewParams(
-	D3DXVECTOR3* pvEyeOut, D3DXVECTOR3* pvLookAtOut, D3DXVECTOR3* pvUpOut, 
-	D3DXVECTOR3* pvEye1, D3DXVECTOR3* pvLookAt1, D3DXVECTOR3* pvUp1, 
-	D3DXVECTOR3* pvEye2, D3DXVECTOR3* pvLookAt2, D3DXVECTOR3* pvUp2, 
+	ArnVec3* pvEyeOut, ArnVec3* pvLookAtOut, ArnVec3* pvUpOut, 
+	ArnVec3* pvEye1, ArnVec3* pvLookAt1, ArnVec3* pvUp1, 
+	ArnVec3* pvEye2, ArnVec3* pvLookAt2, ArnVec3* pvUp2, 
 	float s )
 {
-	D3DXVec3Lerp( pvEyeOut, pvEye1, pvEye2, s );
-	D3DXVec3Lerp( pvLookAtOut, pvLookAt1, pvLookAt2, s );
-	D3DXVec3Lerp( pvUpOut, pvUp1, pvUp2, s );
+	ArnVec3Lerp( pvEyeOut, pvEye1, pvEye2, s );
+	ArnVec3Lerp( pvLookAtOut, pvLookAt1, pvLookAt2, s );
+	ArnVec3Lerp( pvUpOut, pvUp1, pvUp2, s );
 }
 
 LRESULT EpCamera::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
@@ -309,7 +328,7 @@ void EpCamera::updateSmoothAttachCamera( float fElapsedTime )
 		m_vUp.y = 1.0f;
 		m_vUp.z = 0.0f;
 
-		pulledEye( &m_vEye, &m_vLookAt, &m_vEye, 1 );
+		pulledEye( reinterpret_cast<ArnVec3*>(&m_vEye), reinterpret_cast<ArnVec3*>(&m_vLookAt), reinterpret_cast<ArnVec3*>(&m_vEye), 1 );
 	}
 
 	// And move to the destination gradually
@@ -319,30 +338,30 @@ void EpCamera::updateSmoothAttachCamera( float fElapsedTime )
 	m_bViewParamsDirty = true;
 }
 
-void EpCamera::beginShoulderLookCamera( const D3DXVECTOR3* pvMePos, const D3DXVECTOR3* pvOppPos )
+void EpCamera::beginShoulderLookCamera( const ArnVec3* pvMePos, const ArnVec3* pvOppPos )
 {
-	D3DXVECTOR3 vEnemyPos = *pvOppPos;
-	D3DXVECTOR3 vHeroPos = *pvMePos;
+	ArnVec3 vEnemyPos = *pvOppPos;
+	ArnVec3 vHeroPos = *pvMePos;
 
 	// 전투가 일어나는 위치를 구한다. 적의 위치와 주인공 위치의 중간임.
-	D3DXVECTOR3 vBattlePos;
+	ArnVec3 vBattlePos;
 	vBattlePos.x = (vEnemyPos.x + vHeroPos.x) / 2.0f;
 	vBattlePos.y = (vEnemyPos.y + vHeroPos.y) / 2.0f;
 	vBattlePos.z = (vEnemyPos.z + vHeroPos.z) / 2.0f;
 
 	// 최종 카메라 상태.
-	D3DXVECTOR3 vDesEye( 0.0f, 0.0f, -15.0f );
-	D3DXVECTOR3 vDesLookAt( vBattlePos.x, vBattlePos.y, vBattlePos.z - 2.0f );
-	D3DXVECTOR3 vDesUp( 0.0f, 0.0f, -1.0f );
+	ArnVec3 vDesEye( 0.0f, 0.0f, -15.0f );
+	ArnVec3 vDesLookAt( vBattlePos.x, vBattlePos.y, vBattlePos.z - 2.0f );
+	ArnVec3 vDesUp( 0.0f, 0.0f, -1.0f );
 
 	// 주인공으로부터 적으로 이어지는 축을 구한다.
-	D3DXVECTOR3 vBattleAxis;
+	ArnVec3 vBattleAxis;
 	vBattleAxis.x = (vEnemyPos.x - vHeroPos.x);
 	vBattleAxis.y = (vEnemyPos.y - vHeroPos.y);
 	vBattleAxis.z = (vEnemyPos.z - vHeroPos.z);
 
 	// z 축에 대고 vBattleAxis를 -45도 돌린다.
-	D3DXVECTOR3 zAxis( 0.0f, 0.0f, 1.0f );
+	ArnVec3 zAxis( 0.0f, 0.0f, 1.0f );
 	Utility::rotateAboutAxis( &vBattleAxis, &zAxis, D3DXToRadian( -30.0f ) );
 
 	// vDesEye를 vBattleAxis에 대고 -60도 만큼 돌린다.
@@ -378,13 +397,13 @@ void EpCamera::updateAttachCamera()
 	m_bViewParamsDirty = true;
 }
 
-void EpCamera::pulledEye( D3DXVECTOR3* vPulledEye, D3DXVECTOR3* vLookAt, D3DXVECTOR3* vEye, int nth )
+void EpCamera::pulledEye( ArnVec3* vPulledEye, ArnVec3* vLookAt, ArnVec3* vEye, int nth )
 {
 	ArnNode* arnNode = GetWorldManager().getCurWorld()->getArnSceneGraphPt()->getSceneRoot();
-	D3DXVECTOR3 vRayDir = *vEye - *vLookAt;
-	D3DXVECTOR3 vNormRayDir;
-	D3DXVec3Normalize( &vNormRayDir, &vRayDir );
-	float camDist = D3DXVec3Length( &vRayDir );
+	ArnVec3 vRayDir = *vEye - *vLookAt;
+	ArnVec3 vNormRayDir;
+	ArnVec3Normalize( &vNormRayDir, &vRayDir );
+	float camDist = ArnVec3Length( &vRayDir );
 	float obsDist = Utility::FullTraverseExhaustiveRayTesting( arnNode, *vLookAt, vNormRayDir, nth );
 
 	if ( camDist <= obsDist )
@@ -415,15 +434,15 @@ void EpCamera::processShake( float fElapsedTime )
 
 		if ( m_nextShakeTime <= 0 )
 		{
-			m_vEyeShake = D3DXVECTOR3(
+			m_vEyeShake = ArnVec3(
 				( (float)rand()/RAND_MAX - 0.5f ) * eyeShakeAmount,
 				( (float)rand()/RAND_MAX - 0.5f ) * eyeShakeAmount,
 				( (float)rand()/RAND_MAX - 0.5f ) * eyeShakeAmount );
-			m_vLookAtShake = D3DXVECTOR3(
+			m_vLookAtShake = ArnVec3(
 				( (float)rand()/RAND_MAX - 0.5f ) * lookAtShakeAmount,
 				( (float)rand()/RAND_MAX - 0.5f ) * lookAtShakeAmount,
 				( (float)rand()/RAND_MAX - 0.5f ) * lookAtShakeAmount );
-			m_vUpShake = D3DXVECTOR3(
+			m_vUpShake = ArnVec3(
 				( (float)rand()/RAND_MAX - 0.5f ) * upShakeAmount,
 				( (float)rand()/RAND_MAX - 0.5f ) * upShakeAmount,
 				( (float)rand()/RAND_MAX - 0.5f ) * upShakeAmount );

@@ -122,8 +122,8 @@ bool Skill::getClonedSkillObjects( SkillObjectList& soList, Character* user, Cha
 //	bs->pushBattleLog("일반 공격을 사용하였습니다.");
 //	//m_hero->doNormalAttack(0, m_enemy);
 //
-//	D3DXVECTOR3 fireDir = m_enemy->getPos() - m_hero->getPos();
-//	float dist = D3DXVec3Length( &fireDir );
+//	ArnVec3 fireDir = m_enemy->getPos() - m_hero->getPos();
+//	float dist = ArnVec3Length( &fireDir );
 //
 //	D3DXVec3Normalize( &fireDir, &fireDir );
 //
@@ -210,8 +210,8 @@ bool Skill::getClonedSkillObjects( SkillObjectList& soList, Character* user, Cha
 //	bs->pushBattleLog("멀티쓰레드를 사용하였습니다.");
 //	//m_hero->doMultiThread(3, m_enemy);
 //
-//	D3DXVECTOR3 fireDir = m_enemy->getPos() - m_hero->getPos();
-//	float dist = D3DXVec3Length( &fireDir );
+//	ArnVec3 fireDir = m_enemy->getPos() - m_hero->getPos();
+//	float dist = ArnVec3Length( &fireDir );
 //
 //	D3DXVec3Normalize( &fireDir, &fireDir );
 //

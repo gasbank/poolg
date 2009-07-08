@@ -25,7 +25,7 @@ public:
 	void setupLight( IDirect3DDevice9* pd3dDevice );
 	void setColor( float r, float g, float b );
 	void setFlickerColor( D3DXCOLOR& color );
-	void setLightPos( D3DXVECTOR3& pos ) { m_light.Position = pos; m_bLightValueDirty = true; }
+	void setLightPos( ArnVec3& pos ) { m_light.Position = pos; m_bLightValueDirty = true; }
 	void setBrightness( float b ) { m_fBrightness = b; }
 	void turnOnLight();
 	void turnOffLight();
@@ -36,12 +36,12 @@ public:
 	void stopFlicker();
 	bool isFlicker() { return m_bIsFlicker; }
 
-	void setLight( D3DLIGHT9* light );;
+	void setLight( ArnLightData* light );;
 private:
 	void updateFadeBrightness( float fElapsedTime );
 	void updateFlicker( float fElapsedTime );
 
-	D3DLIGHT9			m_light;
+	ArnLightData		m_light;
 	float				m_fFadeTimer;
 	
 	float				m_fFadeDuration;
@@ -60,8 +60,8 @@ private:
 
 	bool				m_bInFading;
 
-	D3DXVECTOR3			m_vDir;
-	D3DXVECTOR3			m_vPos;
+	ArnVec3			m_vDir;
+	ArnVec3			m_vPos;
 
 	float				m_fDelay;
 

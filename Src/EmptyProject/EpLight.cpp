@@ -19,8 +19,8 @@ EpLight::EpLight(void)
 	m_fDelay = 0.0f;
 	m_bLightOn = false;
 
-	D3DXVECTOR3 dir( 0.0f, 0.0f, 1.0f );
-	D3DXVECTOR3 pos( -38.0f, -10.0f, -40.0f );
+	ArnVec3 dir( 0.0f, 0.0f, 1.0f );
+	ArnVec3 pos( -38.0f, -10.0f, -40.0f );
 	m_vDir = dir;
 	m_vPos = pos;
 }
@@ -34,14 +34,14 @@ void EpLight::setupLight( IDirect3DDevice9* pd3dDevice )
 	ZeroMemory(&m_light, sizeof(D3DLIGHT9));
 
 	D3DCOLORVALUE cvAmb = { 0.3f, 0.3f, 0.3f, 1.0f };
-	m_light.Ambient = cvAmb;
+	ArnRgbaAssign(m_light.Ambient, cvAmb);
 	D3DCOLORVALUE cvDif = { 0.6f, 0.6f, 0.6f, 1.0f };
-	m_light.Diffuse = cvDif;
+	ArnRgbaAssign(m_light.Diffuse, cvDif);
 	D3DCOLORVALUE cvSpc = { 0.1f, 0.1f, 0.1f, 1.0f };
-	m_light.Specular = cvSpc;
+	ArnRgbaAssign(m_light.Specular, cvSpc);
 
 	
-	D3DXVec3Normalize((D3DXVECTOR3*)&m_light.Direction, &m_vDir);
+	ArnVec3Normalize((ArnVec3*)&m_light.Direction, &m_vDir);
 	m_light.Position = m_vPos;
 
 	m_light.Falloff	= 1.0f; 
@@ -55,7 +55,7 @@ void EpLight::setupLight( IDirect3DDevice9* pd3dDevice )
 	m_light.Attenuation1 = 0.01f;
 	m_light.Attenuation2 = 0.0f;
 
-	pd3dDevice->SetLight(1, &m_light);
+	pd3dDevice->SetLight(1, m_light.getConstDxPtr());
 	pd3dDevice->LightEnable( 1, TRUE );
 
 	m_cAmbient = cvAmb;
@@ -66,7 +66,7 @@ void EpLight::setupLight( IDirect3DDevice9* pd3dDevice )
 LRESULT EpLight::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
 	D3DXCOLOR color( 1.0f, 0.0f, 0.0f, 1.0f );
-	//static D3DXVECTOR3 vPos( -38.0f, -10.0f, 10.0f) ;
+	//static ArnVec3 vPos( -38.0f, -10.0f, 10.0f) ;
 	switch ( uMsg )
 	{
 	case WM_KEYDOWN:
@@ -123,32 +123,32 @@ void EpLight::frameMove( FLOAT fElapsedTime )
 	switch ( m_eLightState )
 	{
 	case LIGHT_FADE:
-		m_light.Ambient = m_cAmbient * m_fBrightness;
-		m_light.Diffuse = m_cDiffuse * m_fBrightness;
-		m_light.Specular = m_cSpecular * m_fBrightness;
+		ArnRgbaAssign(m_light.Ambient, m_cAmbient * m_fBrightness);
+		ArnRgbaAssign(m_light.Diffuse, m_cDiffuse * m_fBrightness);
+		ArnRgbaAssign(m_light.Specular, m_cSpecular * m_fBrightness);
 		break;
 	case LIGHT_FLICKER:
 		if ( m_fBrightness < 0.3f )
 			m_fBrightness = 0.3f;
-		m_light.Ambient = m_cFlickerAmbient * m_fBrightness;
-		m_light.Diffuse = m_cFlickerDiffuse * m_fBrightness;
-		m_light.Specular = m_cFlickerSpecular * m_fBrightness;
+		ArnRgbaAssign(m_light.Ambient, m_cFlickerAmbient * m_fBrightness);
+		ArnRgbaAssign(m_light.Diffuse, m_cFlickerDiffuse * m_fBrightness);
+		ArnRgbaAssign(m_light.Specular, m_cFlickerSpecular * m_fBrightness);
 		break;
 	case LIGHT_NORMAL:
-		m_light.Ambient = m_cAmbient * m_fBrightness;
-		m_light.Diffuse = m_cDiffuse * m_fBrightness;
-		m_light.Specular = m_cSpecular * m_fBrightness;
+		ArnRgbaAssign(m_light.Ambient, m_cAmbient * m_fBrightness);
+		ArnRgbaAssign(m_light.Diffuse, m_cDiffuse * m_fBrightness);
+		ArnRgbaAssign(m_light.Specular, m_cSpecular * m_fBrightness);
 		break;
 	}
 
 	m_vDir = *GetG().m_camera.GetLookAtPt() - *GetG().m_camera.GetEyePt();
 	m_vPos = *GetG().m_camera.GetEyePt();
 
-	float vDirLen = D3DXVec3Length( &m_vDir );
+	float vDirLen = ArnVec3Length( &m_vDir );
 	if ( vDirLen < 1e-5 || vDirLen > 1e6 )
-		m_light.Direction = DX_CONSTS::D3DXVEC3_Z;
+		m_light.Direction = ArnConsts::D3DXVEC3_Z;
 	else
-		D3DXVec3Normalize((D3DXVECTOR3*)&m_light.Direction, &m_vDir);
+		ArnVec3Normalize((ArnVec3*)&m_light.Direction, &m_vDir);
 
 	m_light.Position = m_vPos;
 
@@ -271,9 +271,9 @@ void EpLight::setColor( float r, float g, float b )
 	m_cSpecular.g = g * 0.1f;
 	m_cSpecular.b = b * 0.1f;
 
-	m_light.Ambient = m_cAmbient;
-	m_light.Diffuse = m_cDiffuse;
-	m_light.Specular = m_cSpecular;
+	ArnRgbaAssign(m_light.Ambient, m_cAmbient);
+	ArnRgbaAssign(m_light.Diffuse, m_cDiffuse);
+	ArnRgbaAssign(m_light.Specular, m_cSpecular);
 
 	m_bLightValueDirty = true;
 }
@@ -289,9 +289,9 @@ void EpLight::flicker( float flickerDuration )
 {
 	m_fFlickerDuration = flickerDuration;
 
-	m_light.Ambient = m_cFlickerAmbient;
-	m_light.Diffuse = m_cFlickerDiffuse;
-	m_light.Specular = m_cFlickerSpecular;
+	ArnRgbaAssign(m_light.Ambient, m_cFlickerAmbient);
+	ArnRgbaAssign(m_light.Diffuse, m_cFlickerDiffuse);
+	ArnRgbaAssign(m_light.Specular, m_cFlickerSpecular);
 
 	m_bLightValueDirty = true;
 	m_bIsFlicker	   = true;
@@ -303,7 +303,7 @@ void EpLight::stopFlicker()
 	m_bIsFlicker = false;
 }
 
-void EpLight::setLight( D3DLIGHT9* light )
+void EpLight::setLight( ArnLightData* light )
 {
 	m_light = *light;
 	m_bLightValueDirty = true;
@@ -313,11 +313,11 @@ void EpLight::frameRender( IDirect3DDevice9* pd3dDevice )
 {
 	if ( m_bLightValueDirty )
 	{
-		float vDirLen = D3DXVec3Length( (D3DXVECTOR3*)&m_light.Direction );
+		float vDirLen = ArnVec3Length( (ArnVec3*)&m_light.Direction );
 		if ( vDirLen < 1e-5 || vDirLen > 1e6 )
-			m_light.Direction = DX_CONSTS::D3DXVEC3_Z;
+			m_light.Direction = ArnConsts::D3DXVEC3_Z;
 
-		pd3dDevice->SetLight( 1, &m_light );
+		pd3dDevice->SetLight( 1, reinterpret_cast<D3DLIGHT9*>(&m_light) );
 		m_bLightValueDirty = false;
 		//printf("lightPos: %f %f %f \n", m_light.Position.x, m_light.Position.y, m_light.Position.z );
 	}

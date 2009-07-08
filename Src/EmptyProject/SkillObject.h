@@ -4,6 +4,7 @@
 class BattleState;
 class DynamicMotion;
 class Action;
+class Character;
 
 /**
 @brief 전투 상태에서 기술을 사용했을 때 생성되는 Unit
@@ -146,7 +147,7 @@ SCRIPT_FACTORY( SkillObject )
 //	Character* m_target;
 //	Unit* m_illusion;
 //	int m_phase;
-//	D3DXVECTOR3 m_originPoint;
+//	ArnVec3 m_originPoint;
 //
 //private:
 //	SOgoto (Character* user, Character* target, Unit* effectObject);

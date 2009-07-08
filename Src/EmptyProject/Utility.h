@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "TileManager.h"
-
+#include "ArnMath.h"
 
 /**
 @brief 귀찮아서 한번에 모아둔 각종 함수들 -_-
@@ -14,27 +14,27 @@ public:
 	Utility(void);
 	~Utility(void);
 
-	static void rotateAboutAxis( D3DXVECTOR3* vOut, D3DXVECTOR3* axis, float rad );
-	static float radBetweenVectors( const D3DXVECTOR3* v1, const D3DXVECTOR3* v2 );
+	static void rotateAboutAxis( ArnVec3* vOut, ArnVec3* axis, float rad );
+	static float radBetweenVectors( const ArnVec3* v1, const ArnVec3* v2 );
 
 	// If a ray intersects a triangle within distMin, true is returned.
 	// Otherwise false is returned.
 	static bool FullTraverseExhaustiveRayTesting( 
-		ArnNode* node, const D3DXVECTOR3& rayStartPos, const D3DXVECTOR3& rayDir, float distMin );
+		ArnNode* node, const ArnVec3& rayStartPos, const ArnVec3& rayDir, float distMin );
 	
 	// Return distance to the nth closest mesh
 	static float FullTraverseExhaustiveRayTesting( 
-		ArnNode* node, const D3DXVECTOR3& rayStartPos, const D3DXVECTOR3& rayDir, int nth );
+		ArnNode* node, const ArnVec3& rayStartPos, const ArnVec3& rayDir, int nth );
 
 	// return the number of intersected meshes
 	static int	FullTraverseExhaustiveRayTesting( 
-		ArnNode* node, const D3DXVECTOR3& rayStartPos, const D3DXVECTOR3& rayDir );
+		ArnNode* node, const ArnVec3& rayStartPos, const ArnVec3& rayDir );
 
 	// Ultimate version of FullTraverseExhaustiveRayTesting
-	static void Utility::FullTraverseExhaustiveRayTesting( 
+	static void FullTraverseExhaustiveRayTesting( 
 		ArnNode* node, 
-		const D3DXVECTOR3& rayStartPos, 
-		const D3DXVECTOR3& rayDir,
+		const ArnVec3& rayStartPos, 
+		const ArnVec3& rayDir,
 		int nth, 
 		float* pNthClosestDist, 
 		int* pIntersectedMeshCount
@@ -42,9 +42,9 @@ public:
 
 	//// Return the number of intersected meshes between two position
 	//static int intersectionsBetweenTwoPosition( 
-	//	const D3DXVECTOR3* v1, const D3DXVECTOR3* v2, ArnNode* arnNode );
+	//	const ArnVec3* v1, const ArnVec3* v2, ArnNode* arnNode );
 
-	static void printValue( const D3DXVECTOR3& vec3 )
+	static void printValue( const ArnVec3& vec3 )
 	{
 		printf( "(%.2f, %.2f, %.2f)", vec3.x, vec3.y, vec3.z );
 	}
@@ -52,13 +52,13 @@ public:
 	{
 		printf( "(%d,%d)~(%d,%d)", tr.getStart().x, tr.getStart().y, tr.getEnd().x, tr.getEnd().y );
 	}
-	static void printValue( const D3DXMATRIX& mat )
+	static void printValue( const ArnMatrix& mat )
 	{
-		D3DXVECTOR3 vScale, vTrans, vRotAxis;
-		D3DXQUATERNION qRot;
+		ArnVec3 vScale, vTrans, vRotAxis;
+		ArnQuat qRot;
 		float fRotAngle;
-		D3DXMatrixDecompose( &vScale, &qRot, &vTrans, &mat );
-		D3DXQuaternionToAxisAngle( &qRot, &vRotAxis, &fRotAngle );
+		ArnMatrixDecompose( &vScale, &qRot, &vTrans, &mat );
+		ArnQuatToAxisAngle( &vRotAxis, &fRotAngle, &qRot );
 		printf("Scale: "); printValue( vScale ); printf( "\n" );
 		printf("Trans: "); printValue( vTrans ); printf( "\n" );
 		printf("RotAxis: "); printValue( vRotAxis ); printf(" / Angle: %f\n", fRotAngle );

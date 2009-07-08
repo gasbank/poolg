@@ -77,8 +77,8 @@ public:
 
 // 	Tile* getTile( int x, int y );
 // 	Tile* getTile( const Point2Uint& pos );
-	int pos2TileX( const D3DXVECTOR3* pos );
-	int pos2TileY( const D3DXVECTOR3* pos );
+	int pos2TileX( const ArnVec3* pos );
+	int pos2TileY( const ArnVec3* pos );
 
 private:
 	//Tile	m_tileArray[s_xSize][s_ySize];

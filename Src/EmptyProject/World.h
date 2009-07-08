@@ -61,8 +61,8 @@ public:
 	UnitSet::iterator				removeUnit( UnitBase* pUnit );
 	
 	
-	const D3DXVECTOR3&				getHeroPos();
-	bool							isCollide( const D3DXVECTOR3* vec0, const D3DXVECTOR3* vec1 );
+	const ArnVec3&				getHeroPos();
+	bool							isCollide( const ArnVec3* vec0, const ArnVec3* vec1 );
 
 	Unit*							getHero() { return m_heroUnit; }
 	Character*						getHeroUnit() { return m_heroUnit; }

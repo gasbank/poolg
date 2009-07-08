@@ -54,18 +54,18 @@ public:
 	virtual bool					frameMove( double dTime, float fElapsedTime );
 	virtual HRESULT					onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext );
 	virtual void					onLostDevice();
-	virtual const D3DXVECTOR3&		getPos() const { return *(D3DXVECTOR3*)&getPosRaw(); }
+	virtual const ArnVec3&		getPos() const { return *(ArnVec3*)&getPosRaw(); }
 	virtual void					updateArnMesh();
 	
 	
 	void							clearKey(); ///< 키보드 버퍼 값을 지웁니다.
 	void							setHeadDir( UnitInput ui );
-	const D3DXMATRIX&				getLocalXform() const					{ return *(D3DXMATRIX*)&getLocalXformRaw(); }
+	const ArnMatrix&				getLocalXform() const					{ return *(ArnMatrix*)&getLocalXformRaw(); }
 	World*							getCurWorld() const						{ return GetWorldManager().getCurWorld(); }
 	
 	void							setColor( int r, int g, int b );
 	bool							isForcedMove() const					{ return m_bForcedMove; }
-	void							setViewAt( const D3DXVECTOR3* at );
+	void							setViewAt( const ArnVec3* at );
 	void							forcedMoveTest();
 
 
@@ -127,8 +127,8 @@ protected:
 
 	BYTE							m_aKeys[UNIT_MAX_KEYS];		///< Keyboard input buffer
 	UINT							m_cKeysDown;				///< Number of keys down
-	D3DXVECTOR3						m_vKeyboardDirection;
-	D3DXVECTOR3						m_vVelocity;
+	ArnVec3						m_vKeyboardDirection;
+	ArnVec3						m_vVelocity;
 	
 private:
 	void							drawSoul( IDirect3DDevice9* pd3dDevice );
@@ -151,10 +151,10 @@ private:
 	float							m_fSoulAnimationTimer;
 	float							m_fSoulAnimationDuration;
 	float							m_fSoulAnimationHeight;
-	D3DXMATRIX						m_localXformSoul;
+	ArnMatrix						m_localXformSoul;
 	D3DMATERIAL9					m_materialSoul;
 	bool							m_bSoulAnimation;
-	D3DXMATRIX						m_prevLocalXform;
+	ArnMatrix						m_prevLocalXform;
 	D3DMATERIAL9					m_prevMaterial;
 
 	// For name drawing

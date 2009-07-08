@@ -1,5 +1,6 @@
 #include "EmptyProjectPCH.h"
 #include "ShaderWrapper.h"
+#include "ArnMath.h"
 
 Shader::Shader(void)
 {
@@ -53,14 +54,14 @@ HRESULT Shader::compileShader( const char* functionName, const char* profile, DW
 void Shader::update( float fTime, float fElapsedTime )
 {
 	// Draw picture map with shader settings
-	D3DXMATRIXA16 mWorldViewProj;
-	D3DXMatrixIdentity( &mWorldViewProj );
-	m_pConstantTable->SetMatrix( DXUTGetD3D9Device(), "mWorldViewProj", &mWorldViewProj );
+	ArnMatrix mWorldViewProj;
+	ArnMatrixIdentity( &mWorldViewProj );
+	m_pConstantTable->SetMatrix( DXUTGetD3D9Device(), "mWorldViewProj", mWorldViewProj.getDxPtr() );
 
 	// Set up the vertex shader constants
-	D3DXMATRIXA16 mViewProj; //= *camera.GetViewMatrix() * *camera.GetProjMatrix();
-	D3DXMatrixIdentity( &mViewProj );
-	m_pConstantTable->SetMatrix( DXUTGetD3D9Device(), "mViewProj", &mViewProj );
+	ArnMatrix mViewProj; //= *camera.GetViewMatrix() * *camera.GetProjMatrix();
+	ArnMatrixIdentity( &mViewProj );
+	m_pConstantTable->SetMatrix( DXUTGetD3D9Device(), "mViewProj", mViewProj.getDxPtr() );
 	m_pConstantTable->SetFloat( DXUTGetD3D9Device(), "fTime", ( float )fTime );
 
 }
@@ -160,12 +161,12 @@ HRESULT CALLBACK BombShader::onResetDevice( IDirect3DDevice9* pd3dDevice, const 
 	return hr;
 }
 
-HRESULT BombShader::setWorldViewProj( double fTime, float fElapsedTime, const D3DXMATRIX* mWorld, const D3DXMATRIX* mView, const D3DXMATRIX* mProj )
+HRESULT BombShader::setWorldViewProj( double fTime, float fElapsedTime, const ArnMatrix* mWorld, const ArnMatrix* mView, const ArnMatrix* mProj )
 {
 	HRESULT hr = S_OK;
 
-	D3DXMATRIX wvp = *mWorld * *mView * *mProj;
-	V_RETURN( m_effect->SetMatrix( "gWvpXf", &wvp) );
+	ArnMatrix wvp = *mWorld * *mView * *mProj;
+	V_RETURN( m_effect->SetMatrix( "gWvpXf", wvp.getConstDxPtr() ) );
 	V_RETURN( m_effect->SetFloat( "gTimer", (float)fTime) );
 	
 
@@ -421,12 +422,12 @@ void MotionBlurShader::onFrameRender( IDirect3DDevice9* pd3dDevice, double dTime
 
 	HRESULT hr;
 	LPDIRECT3DSURFACE9 apOriginalRenderTarget[2] = { NULL, NULL };
-	D3DXMATRIXA16 mProj;
-	D3DXMATRIXA16 mView;
-	D3DXMATRIXA16 mViewProjection;
-	D3DXMATRIXA16 mWorldViewProjection;
-	D3DXMATRIXA16 mWorldViewProjectionLast;
-	D3DXMATRIXA16 mWorld;
+	ArnMatrix mProj;
+	ArnMatrix mView;
+	ArnMatrix mViewProjection;
+	ArnMatrix mWorldViewProjection;
+	ArnMatrix mWorldViewProjectionLast;
+	ArnMatrix mWorld;
 	D3DXVECTOR4 vEyePt;
 	UINT iPass, cPasses;
 
@@ -478,7 +479,7 @@ void MotionBlurShader::onFrameRender( IDirect3DDevice9* pd3dDevice, double dTime
 		const int NUM_WALLS = 10;
 		for( int iObject = 0; iObject < NUM_WALLS; iObject++ )
 		{
-			D3DXMATRIX mWorld, mWorldLast;
+			ArnMatrix mWorld, mWorldLast;
 			LPDIRECT3DTEXTURE9 texture = 0;
 			LPD3DXMESH		mesh = 0;
 
@@ -486,11 +487,11 @@ void MotionBlurShader::onFrameRender( IDirect3DDevice9* pd3dDevice, double dTime
 			mWorldViewProjectionLast = mWorldLast * g_mViewProjectionLast;
 
 			// Tell the effect where the camera is now
-			V( m_effect->SetMatrix( g_hWorldViewProjection, &mWorldViewProjection ) );
-			V( m_effect->SetMatrix( g_hWorld, &mWorld ) );
+			V( m_effect->SetMatrix( g_hWorldViewProjection, mWorldViewProjection.getConstDxPtr() ) );
+			V( m_effect->SetMatrix( g_hWorld, mWorld.getConstDxPtr() ) );
 
 			// Tell the effect where the camera was last frame
-			V( m_effect->SetMatrix( g_hWorldViewProjectionLast, &mWorldViewProjectionLast ) );
+			V( m_effect->SetMatrix( g_hWorldViewProjectionLast, mWorldViewProjectionLast.getConstDxPtr() ) );
 
 			// Tell the effect the current mesh's texture
 			V( m_effect->SetTexture( g_hMeshTexture, texture ) );

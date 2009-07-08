@@ -20,7 +20,7 @@ IntroState::IntroState(void)
 	m_pLogo = GetSpriteManager().registerSprite( "PoolCLogo", "Images/PoolC_Square.png" );
 	m_pLogo->registerRect( "PoolCLogo", 0, 0, 248, 129 );
 
-	D3DXVECTOR3 logoPos( GetG().m_scrWidth / 2.0f - 124.0f, GetG().m_scrHeight / 2.0f - 64.5f, 0.0f );
+	ArnVec3 logoPos( GetG().m_scrWidth / 2.0f - 124.0f, GetG().m_scrHeight / 2.0f - 64.5f, 0.0f );
 	D3DXCOLOR logoColor( 1.0f, 1.0f, 1.0f, 0.0f );
 	m_pLogoDrawRequest = m_pLogo->drawRequest( "PoolCLogo", 0, &logoPos, logoColor );
 
@@ -28,7 +28,7 @@ IntroState::IntroState(void)
 	m_pGalaxy = GetSpriteManager().registerSprite( "Galaxy", "Images/the_Whirlpool_Galaxy_M51.jpg" );
 	m_pGalaxy->registerRect( "Galaxy", 0, 0, 1280, 1280 );
 
-	D3DXVECTOR3 galaxyPos( 0.0f, 0.0f, 3.0f );
+	ArnVec3 galaxyPos( 0.0f, 0.0f, 3.0f );
 	D3DXCOLOR galaxyColor( 1.0f, 1.0f, 1.0f, 0.0f );
 	m_pGalaxyDrawRequest = m_pGalaxy->drawRequest( "Galaxy", 0, &galaxyPos, galaxyColor );
 
@@ -37,7 +37,7 @@ IntroState::IntroState(void)
 	m_pPrologue->registerRect( "Prologue", 0, 0, 512, 1024 );
 
 
-	D3DXVECTOR3 prologuePos( 0.0f, 0.0f, 0.0f );
+	ArnVec3 prologuePos( 0.0f, 0.0f, 0.0f );
 	D3DXCOLOR prologueColor( 1.0f, 1.0f, 1.0f, 1.0f );
 	m_pPrologueDrawRequest = m_pPrologue->drawRequestXformable( "Prologue" );
 
@@ -61,7 +61,7 @@ HRESULT IntroState::enter( double dStartTime )
 
 	//m_sound.init(); // 사운드 초기화
 
-	//pd3dDevice->SetTransform( D3DTS_WORLD, &DX_CONSTS::D3DXMAT_IDENTITY );
+	//pd3dDevice->SetTransform( D3DTS_WORLD, &ArnConsts::D3DXMAT_IDENTITY );
 
 	return State::enter( dStartTime );
 }
@@ -94,10 +94,10 @@ HRESULT IntroState::frameMove( double fTime, float fElapsedTime )
 
 	if ( 6.0f >= m_fFadeTimer )
 	{
-		D3DXMATRIX prologueTrans;
-		D3DXMATRIX prologueScale;
-		D3DXMatrixScaling( &prologueScale, 0.03f, -0.03f, 0.03f );
-		D3DXMatrixTranslation( 
+		ArnMatrix prologueTrans;
+		ArnMatrix prologueScale;
+		ArnMatrixScaling( &prologueScale, 0.03f, -0.03f, 0.03f );
+		ArnMatrixTranslation( 
 			&prologueTrans, 
 			0.0f, 
 			m_prologueInitZPos,
@@ -106,10 +106,10 @@ HRESULT IntroState::frameMove( double fTime, float fElapsedTime )
 	}	
 	if ( 6.0f <= m_fFadeTimer && m_fFadeTimer < 46.0f )
 	{	
-		D3DXMATRIX prologueTrans;
-		D3DXMATRIX prologueScale;
-		D3DXMatrixScaling( &prologueScale, 0.03f, -0.03f, 0.03f );
-		D3DXMatrixTranslation( 
+		ArnMatrix prologueTrans;
+		ArnMatrix prologueScale;
+		ArnMatrixScaling( &prologueScale, 0.03f, -0.03f, 0.03f );
+		ArnMatrixTranslation( 
 			&prologueTrans, 
 			0.0f, 
 			m_prologueInitZPos + (float)m_fFadeTimer * m_velocity,
@@ -198,9 +198,9 @@ void IntroState::setupLight()
 
 void IntroState::setupCamera()
 {
-	D3DXVECTOR3 vecEye( 0.0f, -10.0f, -25.0f );
-	D3DXVECTOR3 vecAt( 0.0f, 0.0f, 0.0f );
-	D3DXVECTOR3 vecUp( 0.0f, 1.0f, 0.0f );
+	ArnVec3 vecEye( 0.0f, -10.0f, -25.0f );
+	ArnVec3 vecAt( 0.0f, 0.0f, 0.0f );
+	ArnVec3 vecUp( 0.0f, 1.0f, 0.0f );
 	GetG().m_camera.setViewParamsWithUp( &vecEye, &vecAt, &vecUp );
 }
 
@@ -208,7 +208,7 @@ HRESULT IntroState::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFAC
 {
 	if ( m_pLogoDrawRequest )
 	{
-		D3DXVECTOR3 logoPos( GetG().m_scrWidth / 2.0f - 124.0f, GetG().m_scrHeight / 2.0f - 64.5f, 0.0f );
+		ArnVec3 logoPos( GetG().m_scrWidth / 2.0f - 124.0f, GetG().m_scrHeight / 2.0f - 64.5f, 0.0f );
 		m_pLogoDrawRequest->position = logoPos;
 	}
 	

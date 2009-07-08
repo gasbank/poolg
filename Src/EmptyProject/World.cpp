@@ -48,7 +48,7 @@ HRESULT World::init()
 
 	HRESULT hr = S_OK;
 
-	if ( GetG().m_videoMan.GetDev() )
+	if ( GetG().m_videoMan->GetDev() )
 		loadWorldModel();
 
 	char command[128];
@@ -101,9 +101,9 @@ HRESULT World::frameRender(IDirect3DDevice9* pd3dDevice, double dTime, float fEl
 	// Aran lib rendering routine (CW)
 	pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CW);
 	pd3dDevice->SetFVF(ArnVertex::FVF);
-	D3DXMATRIX transform;
-	D3DXMatrixTranslation( &transform, m_heroUnit->getPos().x, m_heroUnit->getPos().y, m_heroUnit->getPos().z );
-	GetG().m_videoMan.renderMeshesOnly(m_modelSg->getSceneRoot());
+	ArnMatrix transform;
+	ArnMatrixTranslation( &transform, m_heroUnit->getPos().x, m_heroUnit->getPos().y, m_heroUnit->getPos().z );
+	GetG().m_videoMan->renderMeshesOnly(m_modelSg->getSceneRoot());
 	
 	//////////////////////////////////////////////////////////////////////////
 	// EP rendering routine (CCW)
@@ -194,7 +194,7 @@ HRESULT World::frameMove( double dTime, float fElapsedTime )
 		m_heroUnit->getTilePosY() );
 	g_debugBuffer.append( msg );
 
-	D3DXVECTOR3 diff = m_heroUnit->getPos() - *GetG().m_camera.GetEyePt();
+	ArnVec3 diff = m_heroUnit->getPos() - *GetG().m_camera.GetEyePt();
 	StringCchPrintf( msg, 128, L"Hero - Camera Pos : (%.4f, %.4f, %.4f)\n",
 		diff.x, diff.y, diff.z );
 	g_debugBuffer.append( msg );
@@ -321,7 +321,7 @@ HRESULT World::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 			//////////////////////////////////////////////////////////////////////////
 			// External camera test
 			EpCamera& rCamera = GetG().m_camera;
-			const D3DXVECTOR3& vHeroPos = getHeroPos();
+			const ArnVec3& vHeroPos = getHeroPos();
 			static bool bExtCam = true;
 			if ( bExtCam )
 			{
@@ -365,7 +365,7 @@ UINT World::addUnit( UnitBase* u )
 	return m_unitSet.size();
 }
 
-const D3DXVECTOR3& World::getHeroPos()
+const ArnVec3& World::getHeroPos()
 {
 	assert( m_heroUnit );
 	return m_heroUnit->getPos();
@@ -406,7 +406,7 @@ bool World::isInEventArea( Character* heroPt, Character* enemyPt )
 	
 }
 
-bool World::isCollide( const D3DXVECTOR3* vec0, const D3DXVECTOR3* vec1 )
+bool World::isCollide( const ArnVec3* vec0, const ArnVec3* vec1 )
 {
 	const float collideRange = 10.0f;
 	float range = sqrt( (vec0->x - vec1->x) * (vec0->x - vec1->x) + (vec0->y - vec1->y) * (vec0->y - vec1->y) );
@@ -567,7 +567,7 @@ void World::loadWorldModel()
 		// World model init and loading
 		m_modelArnFile = new ArnFileData;
 		load_arnfile( m_modelFilePath.c_str(), *m_modelArnFile );
-		m_modelSg = new ArnSceneGraph( *m_modelArnFile );
+		m_modelSg = ArnSceneGraph::createFrom(m_modelArnFile);
 	}
 	else if ( m_modelArnFile && m_modelSg )
 	{
@@ -629,10 +629,10 @@ void World::battleEventCheck()
 					// Shoot ray from hero to enemy, and if distance to the third intersected
 					// mesh is shorter than distance between hero and enemy, then there exists
 					// at least one obstacle.
-					D3DXVECTOR3 vStartPos( getHero()->getPos() );
-					D3DXVECTOR3 vRayDir = oppCharacter->getPos() - getHero()->getPos();
-					float fRayLength = D3DXVec3Length( &vRayDir );
-					D3DXVec3Normalize( &vRayDir, &vRayDir );
+					ArnVec3 vStartPos( getHero()->getPos() );
+					ArnVec3 vRayDir = oppCharacter->getPos() - getHero()->getPos();
+					float fRayLength = ArnVec3Length( &vRayDir );
+					ArnVec3Normalize( &vRayDir, &vRayDir );
 					float f3rdDist = Utility::FullTraverseExhaustiveRayTesting(
 						getArnSceneGraphPt()->getSceneRoot(),
 						vStartPos,
@@ -753,9 +753,9 @@ VOID World::enter()
 	GetG().m_camera.setAttachPos( &getHeroPos() );
 	GetG().m_camera.begin( CAMERA_ATTACH );
 
-	/*D3DXVECTOR3 eye( getHero()->getPos().x, getHero()->getPos().y, getHero()->getPos().z - 30.0f );
-	D3DXVECTOR3 at( getHero()->getPos().x, getHero()->getPos().y, getHero()->getPos().z - 1.0f );
-	D3DXVECTOR3 up( 0.0f, 1.0f, 0.0f );
+	/*ArnVec3 eye( getHero()->getPos().x, getHero()->getPos().y, getHero()->getPos().z - 30.0f );
+	ArnVec3 at( getHero()->getPos().x, getHero()->getPos().y, getHero()->getPos().z - 1.0f );
+	ArnVec3 up( 0.0f, 1.0f, 0.0f );
 	GetG().m_camera.setViewParamsWithUp( &eye, &at, &up );*/
 
 	//GetEpLight().setFadeDuration( 1.0f );
@@ -794,7 +794,7 @@ HRESULT World::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DES
 	OutputDebugString( _T( " - INFO: World::onResetDevice called.\n" ) );
 	loadWorldModel();
 
-	D3DLIGHT9& light = GetG().m_light;
+	ArnLightData& light = GetG().m_light;
 
 	// These cause the scene more brighter when onResetDevice() is called, i.e., resizing the window.
 	// Why is these four lines are needed?

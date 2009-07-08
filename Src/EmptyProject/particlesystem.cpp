@@ -25,9 +25,9 @@ float getRandomMinMax( float fMin, float fMax )
 // Desc: Generates a random vector where X,Y, and Z components are between
 //       -1.0 and 1.0
 //-----------------------------------------------------------------------------
-D3DXVECTOR3 getRandomVector( void )
+ArnVec3 getRandomVector( void )
 {
-	D3DXVECTOR3 vVector;
+	ArnVec3 vVector;
 
     // Pick a random Z between -1.0f and 1.0f.
     vVector.z = getRandomMinMax( -1.0f, 1.0f );
@@ -49,10 +49,10 @@ D3DXVECTOR3 getRandomVector( void )
 // Name : classifyPoint()
 // Desc : Classifies a point against the plane passed
 //-----------------------------------------------------------------------------
-int classifyPoint( D3DXVECTOR3 *vPoint, Plane *pPlane )
+int classifyPoint( ArnVec3 *vPoint, Plane *pPlane )
 {
-	D3DXVECTOR3 vDirection = pPlane->m_vPoint - *vPoint;
-	float fResult = D3DXVec3Dot( &vDirection, &pPlane->m_vNormal );
+	ArnVec3 vDirection = pPlane->m_vPoint - *vPoint;
+	float fResult = ArnVec3Dot( &vDirection, &pPlane->m_vNormal );
 
 	if( fResult < -0.001f )
         return CP_FRONT;
@@ -87,10 +87,10 @@ CParticleSystem::CParticleSystem()
     m_fLifeCycle       = 1.0f;
     m_fSize            = 1.0f;
     m_clrColor         = D3DXCOLOR(1.0f,1.0f,1.0f,1.0f);
-    m_vPosition        = D3DXVECTOR3(0.0f,0.0f,0.0f);
-    m_vVelocity        = D3DXVECTOR3(0.0f,0.0f,0.0f);
-    m_vGravity         = D3DXVECTOR3(0.0f,0.0f,0.0f);
-    m_vWind            = D3DXVECTOR3(0.0f,0.0f,0.0f);
+    m_vPosition        = ArnVec3(0.0f,0.0f,0.0f);
+    m_vVelocity        = ArnVec3(0.0f,0.0f,0.0f);
+    m_vGravity         = ArnVec3(0.0f,0.0f,0.0f);
+    m_vWind            = ArnVec3(0.0f,0.0f,0.0f);
     m_bAirResistence   = true;
     m_fVelocityVar     = 1.0f;	
     
@@ -173,7 +173,7 @@ LPDIRECT3DTEXTURE9 &CParticleSystem::GetTextureObject()
 // Name: SetCollisionPlane()
 // Desc: 
 //-----------------------------------------------------------------------------
-void CParticleSystem::SetCollisionPlane( D3DXVECTOR3 vPlaneNormal, D3DXVECTOR3 vPoint, 
+void CParticleSystem::SetCollisionPlane( ArnVec3 vPlaneNormal, ArnVec3 vPoint, 
                                          float fBounceFactor, int nCollisionResult )
 {
     Plane *pPlane = new Plane;
@@ -230,7 +230,7 @@ HRESULT CParticleSystem::Update( FLOAT fElpasedTime )
     Particle **ppParticle = 0;
     Plane     *pPlane = 0;
     Plane    **ppPlane = 0;
-    D3DXVECTOR3 vOldPosition;
+    ArnVec3 vOldPosition;
 
     m_fCurrentTime += fElpasedTime;     // Update our particle system timer...
 
@@ -307,11 +307,9 @@ HRESULT CParticleSystem::Update( FLOAT fElpasedTime )
 
                         float Kr = pPlane->m_fBounceFactor;
 
-                        D3DXVECTOR3 Vn = D3DXVec3Dot( &pPlane->m_vNormal, 
-                                                      &pParticle->m_vCurVel ) * 
-                                                      pPlane->m_vNormal;
-                        D3DXVECTOR3 Vt = pParticle->m_vCurVel - Vn;
-                        D3DXVECTOR3 Vp = Vt - Kr * Vn;
+                        ArnVec3 Vn = pPlane->m_vNormal * ArnVec3Dot( &pPlane->m_vNormal, &pParticle->m_vCurVel );
+                        ArnVec3 Vt = pParticle->m_vCurVel - Vn;
+                        ArnVec3 Vp = Vt - (Vn * Kr);
 
                         pParticle->m_vCurVel = Vp;
                     }
@@ -323,7 +321,7 @@ HRESULT CParticleSystem::Update( FLOAT fElpasedTime )
                     else if( pPlane->m_nCollisionResult == CR_STICK )
                     {
                         pParticle->m_vCurPos = vOldPosition;
-                        pParticle->m_vCurVel = D3DXVECTOR3(0.0f,0.0f,0.0f);
+                        pParticle->m_vCurVel = ArnVec3(0.0f,0.0f,0.0f);
                     }
                 }
 
@@ -383,7 +381,7 @@ HRESULT CParticleSystem::Update( FLOAT fElpasedTime )
 
                 if( m_fVelocityVar != 0.0f )
                 {
-                    D3DXVECTOR3 vRandomVec = getRandomVector();
+                    ArnVec3 vRandomVec = getRandomVector();
                     pParticle->m_vCurVel += vRandomVec * m_fVelocityVar;
                 }
 
@@ -485,8 +483,8 @@ HRESULT CParticleSystem::Render( LPDIRECT3DDEVICE9 pd3dDevice )
     // Render each particle
     while( pParticle )
     {
-        D3DXVECTOR3 vPos(pParticle->m_vCurPos);
-        D3DXVECTOR3 vVel(pParticle->m_vCurVel);
+        ArnVec3 vPos(pParticle->m_vCurPos);
+        ArnVec3 vVel(pParticle->m_vCurVel);
 
         pVertices->posit = vPos;
         pVertices->color = m_clrColor;

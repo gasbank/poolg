@@ -24,8 +24,8 @@ extern TileManager tileManager;
 //
 //void Character::doNormalAttack( int type, Character* enemy )
 //{
-//	D3DXVECTOR3 fireDir = enemy->getPos() - getPos();
-//	float dist = D3DXVec3Length( &fireDir );
+//	ArnVec3 fireDir = enemy->getPos() - getPos();
+//	float dist = ArnVec3Length( &fireDir );
 //
 //	D3DXVec3Normalize( &fireDir, &fireDir );
 //
@@ -154,9 +154,9 @@ bool Character::frameMove( double dTime, float fElapsedTime )
 		m_vVelocity = m_vKeyboardDirection / m_moveDuration;
 
 		// Simple euler method to calculate position delta
-		D3DXVECTOR3 vPosDelta = m_vVelocity * fElapsedTime;
+		ArnVec3 vPosDelta = m_vVelocity * fElapsedTime;
 		m_fMovingTime += fElapsedTime;
-		D3DXVECTOR3 finalPos = getPos() + vPosDelta;
+		ArnVec3 finalPos = getPos() + vPosDelta;
 		setPos( finalPos.x, finalPos.y, finalPos.z );
 	}
 	else
@@ -183,9 +183,9 @@ bool Character::frameMove( double dTime, float fElapsedTime )
 			++it;
 	}
 
-	const D3DXVECTOR3& unitPos = Unit::getPos();
+	const ArnVec3& unitPos = Unit::getPos();
 	m_curPos = unitPos + m_moveImpulse;
-	if ( m_moveImpulse != DX_CONSTS::D3DXVEC3_ZERO )
+	if ( m_moveImpulse != ArnConsts::D3DXVEC3_ZERO )
 	{
 		/*
 		printf( "%s : m_moveImpulse ", getTypeString() ); Utility::printValue( m_moveImpulse ); printf( "\n" );
@@ -195,8 +195,8 @@ bool Character::frameMove( double dTime, float fElapsedTime )
 
 		const float decimate = 0.5f;
 		m_moveImpulse *= decimate;
-		if ( D3DXVec3Length( &m_moveImpulse ) < 1e-4 )
-			m_moveImpulse = DX_CONSTS::D3DXVEC3_ZERO;
+		if ( ArnVec3Length( &m_moveImpulse ) < 1e-4 )
+			m_moveImpulse = ArnConsts::D3DXVEC3_ZERO;
 
 		//printf( "Char FM: %.2f %.2f %.2f\n", m_curPos.x, m_curPos.y, m_curPos.z );
 		setLocalXformDirty();
@@ -259,7 +259,7 @@ LRESULT Character::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 
 
 Character::Character( UnitType type )
-: Unit( type ), m_moveImpulse( DX_CONSTS::D3DXVEC3_ZERO )
+: Unit( type ), m_moveImpulse( ArnConsts::D3DXVEC3_ZERO )
 {
 	m_maxHp				= 5;
 	m_curHp				= m_maxHp;
@@ -269,7 +269,7 @@ Character::Character( UnitType type )
 	m_bControllable		= true;
 	m_boundaryTileRect.setStart( Point2Uint( 0, 0 ) );
 	m_boundaryTileRect.setEnd( Point2Uint( s_xSize - 1, s_ySize - 1 ) );
-	m_curPos			= DX_CONSTS::D3DXVEC3_ZERO;
+	m_curPos			= ArnConsts::D3DXVEC3_ZERO;
 	ZeroMemory( &m_stat, sizeof(Stat) );
 	
 	// Initialize random number
@@ -416,7 +416,7 @@ void Character::setDead()
 	startSoulAnimation( 1.0f, 10.0f );*/
 }
 
-void Character::addMoveImpulse( const D3DXVECTOR3& impulse )
+void Character::addMoveImpulse( const ArnVec3& impulse )
 {
 	//printf( "addMoveImpulse called with impulse " ); Utility::printValue( impulse ); printf( "\n" );
 	m_moveImpulse += impulse;

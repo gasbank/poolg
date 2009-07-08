@@ -1,6 +1,8 @@
 #include "EmptyProjectPCH.h"
 #include "DynamicMotion.h"
 #include "ScriptManager.h"
+#include "ArnMath.h"
+#include "ArnConsts.h"
 
 DynamicMotion::DynamicMotion( Unit* motionTarget )
 : m_motionTarget( motionTarget )
@@ -45,10 +47,10 @@ END_SCRIPT_FACTORY( DynamicMotion )
 
 bool FireUniformlyDynamicMotion::frameMove(float fElapsedTime)
 {
-	D3DXVECTOR3 newPos = getMotionTarget()->getPos() + m_fireDir * m_velocity * fElapsedTime;
-	D3DXVECTOR3 vMoved = m_initPos - newPos;
+	ArnVec3 newPos = getMotionTarget()->getPos() + m_fireDir * m_velocity * fElapsedTime;
+	ArnVec3 vMoved = m_initPos - newPos;
 	
-	float distToInitPos = D3DXVec3Length( &vMoved );
+	float distToInitPos = ArnVec3Length( &vMoved );
 //	m_target->setRotY(distToInitPos);
 	if ( distToInitPos > m_retainDist )
 	{
@@ -58,7 +60,7 @@ bool FireUniformlyDynamicMotion::frameMove(float fElapsedTime)
 	return true;
 }
 
-FireUniformlyDynamicMotion::FireUniformlyDynamicMotion ( Unit* target, const D3DXVECTOR3& initPos, const D3DXVECTOR3& fireDir, float retainDist, float velocity )
+FireUniformlyDynamicMotion::FireUniformlyDynamicMotion ( Unit* target, const ArnVec3& initPos, const ArnVec3& fireDir, float retainDist, float velocity )
 : DynamicMotion( target )
 {
 	m_initPos = initPos;
@@ -84,16 +86,16 @@ DynamicMotion* FireUniformlyDynamicMotion::clone() const
 bool SpinAroundDynamicMotion::frameMove(float fElapsedTime)
 {
 	/*
-	D3DXVECTOR3 newPos = m_target->getPos() + m_fireDir * m_velocity;
-	D3DXVECTOR3 vMoved = m_initPos - newPos;
-	float distToInitPos = D3DXVec3Length( &vMoved );
+	ArnVec3 newPos = m_target->getPos() + m_fireDir * m_velocity;
+	ArnVec3 vMoved = m_initPos - newPos;
+	float distToInitPos = ArnVec3Length( &vMoved );
 	if ( distToInitPos > m_retainDist )
 	{
 		return false;
 	}
 	m_target->setPos(newPos);*/
 
-	D3DXVECTOR3 newPos;
+	ArnVec3 newPos;
 	m_radius -= m_radiusVelocity;
 	m_angle += m_angularVelocity;
 	float angle = D3DXToRadian (m_angle);
@@ -111,7 +113,7 @@ bool SpinAroundDynamicMotion::frameMove(float fElapsedTime)
 	return true;
 }
 
-SpinAroundDynamicMotion::SpinAroundDynamicMotion ( Unit* target, const D3DXVECTOR3& fireDest, float radius, float radiusVelocity, float angularVelocity )
+SpinAroundDynamicMotion::SpinAroundDynamicMotion ( Unit* target, const ArnVec3& fireDest, float radius, float radiusVelocity, float angularVelocity )
 : DynamicMotion( target )
 {
 	m_fireDest = fireDest;
@@ -122,7 +124,7 @@ SpinAroundDynamicMotion::SpinAroundDynamicMotion ( Unit* target, const D3DXVECTO
 
 	float angle = D3DXToRadian (m_angle);
 
-	D3DXVECTOR3 newPos;
+	ArnVec3 newPos;
 
 	newPos.x = target->getPos().x + m_radius * cos (angle);
 	newPos.y = target->getPos().y + m_radius * sin (angle);
@@ -163,7 +165,7 @@ bool PuffDynamicMotion::frameMove(float fElapsedTime)
 	return true;
 }
 
-PuffDynamicMotion::PuffDynamicMotion (Unit* target, const D3DXVECTOR3& initPos, float puffRate, float puffSpeed)
+PuffDynamicMotion::PuffDynamicMotion (Unit* target, const ArnVec3& initPos, float puffRate, float puffSpeed)
 : DynamicMotion( target )
 {
 	m_puffRate = puffRate;
@@ -208,19 +210,19 @@ bool RandomCurveDynamicMotion::frameMove( float fElapsedTime )
 	assert( getMotionTarget()->getType() == UT_SKILLOBJECT );
 
 	m_totalElapsedTime += fElapsedTime;
-	D3DXVECTOR3 targetPos = DX_CONSTS::D3DXVEC3_ZERO;
+	ArnVec3 targetPos = ArnConsts::D3DXVEC3_ZERO;
 	if ( m_totalElapsedTime < m_duration )
 	{
 		float zeroToOne = m_totalElapsedTime / m_duration;
-		D3DXVec3Lerp( &targetPos, &getFireUnit()->getPos(), &getTargetUnit()->getPos(), zeroToOne );
+		ArnVec3Lerp( &targetPos, &getFireUnit()->getPos(), &getTargetUnit()->getPos(), zeroToOne );
 		
-		D3DXVECTOR3 zDelta( 0, 0, 3.0f * zeroToOne * (zeroToOne - 1 ) );
+		ArnVec3 zDelta( 0, 0, 3.0f * zeroToOne * (zeroToOne - 1 ) );
 		
 
-		D3DXVECTOR3 fireDir = getTargetUnit()->getPos() - getFireUnit()->getPos();
-		D3DXMATRIX mat;
-		D3DXMatrixRotationAxis( &mat, &fireDir, D3DXToRadian( (zeroToOne * 360 - 180) * 2 ) );
-		D3DXVec3TransformCoord( &zDelta, &zDelta, &mat );
+		ArnVec3 fireDir = getTargetUnit()->getPos() - getFireUnit()->getPos();
+		ArnMatrix mat;
+		ArnMatrixRotationAxis( &mat, &fireDir, D3DXToRadian( (zeroToOne * 360 - 180) * 2 ) );
+		ArnVec3TransformCoord( &zDelta, &zDelta, &mat );
 
 		targetPos += zDelta;
 	}

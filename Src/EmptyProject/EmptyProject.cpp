@@ -276,9 +276,9 @@ HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFA
 	OutputDebugString( scrSizeString );
 
 	/// - GUI 요소나 고정된 2D 그래픽을 출력하기 위해 사용하는 orthogonal 뷰 변환 행렬을 설정합니다.
-	D3DXVECTOR3 eye(0, 0, -50.0f), at(0, 0, 0), up(0, 1.0f, 0);
-	D3DXMatrixOrthoLH(&GetG().g_orthoProjMat, (FLOAT)pBackBufferSurfaceDesc->Width, (FLOAT)pBackBufferSurfaceDesc->Height, 0.1f, 100.0f);
-	D3DXMatrixLookAtLH(&GetG().g_fixedViewMat,	&eye, &at, &up);
+	ArnVec3 eye(0, 0, -50.0f), at(0, 0, 0), up(0, 1.0f, 0);
+	ArnMatrixOrthoLH(&GetG().g_orthoProjMat, (FLOAT)pBackBufferSurfaceDesc->Width, (FLOAT)pBackBufferSurfaceDesc->Height, 0.1f, 100.0f);
+	ArnMatrixLookAtLH(&GetG().g_fixedViewMat,	&eye, &at, &up);
 
 	float fAspectRatio = pBackBufferSurfaceDesc->Width / ( FLOAT )pBackBufferSurfaceDesc->Height;
 	GetG().m_camera.SetProjParams( D3DX_PI / 4, fAspectRatio, 1.0f, 1000.0f );
@@ -507,11 +507,13 @@ void CALLBACK OnFrameMove( double fTime, float fElapsedTime, void* pUserContext 
 HRESULT drawBurningTeapot( double fTime, float fElapsedTime )
 {
 	HRESULT hr = S_OK;
-	D3DXMATRIX mWorld;
-	D3DXMatrixIdentity( &mWorld );
+	ArnMatrix mWorld;
+	ArnMatrixIdentity( &mWorld );
 	UINT iPass, cPasses;
 	V( g_bombShader->setMainTechnique() );
-	V( g_bombShader->setWorldViewProj( fTime, fElapsedTime, &mWorld, GetG().m_camera.GetViewMatrix(), GetG().m_camera.GetProjMatrix() ) );
+	ArnMatrix arnvm( GetG().m_camera.GetViewMatrix() );
+	ArnMatrix arnpm( GetG().m_camera.GetProjMatrix() );
+	V( g_bombShader->setWorldViewProj( fTime, fElapsedTime, &mWorld, &arnvm, &arnpm ) );
 
 	V( g_bombShader->begin( &cPasses, 0 ) );
 	for( iPass = 0; iPass < cPasses; iPass++ )
@@ -547,8 +549,8 @@ void renderDebugText()
 void renderFixedElements( double fTime, float fElapsedTime )
 {
 	DXUTGetD3D9Device()->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
-	DXUTGetD3D9Device()->SetTransform(D3DTS_VIEW, &GetG().g_fixedViewMat);
-	DXUTGetD3D9Device()->SetTransform(D3DTS_PROJECTION, &GetG().g_orthoProjMat);
+	DXUTGetD3D9Device()->SetTransform(D3DTS_VIEW, GetG().g_fixedViewMat.getConstDxPtr());
+	DXUTGetD3D9Device()->SetTransform(D3DTS_PROJECTION, GetG().g_orthoProjMat.getConstDxPtr());
 
 #ifdef DEBUG
 	renderDebugText();
@@ -573,29 +575,29 @@ HRESULT renderTileGrid( IDirect3DDevice9* pd3dDevice )
 	V( pd3dDevice->SetStreamSource( 0, g_lineElement, 0, 16 ) );
 
 	int i;
-	D3DXMATRIX mWorld, mTrans, mRot, mScaling;
-	D3DXMatrixScaling( &mScaling, (float)(s_xSize) * s_tileSize, 1.0f, 1.0f );
+	ArnMatrix mWorld, mTrans, mRot, mScaling;
+	ArnMatrixScaling( &mScaling, (float)(s_xSize) * s_tileSize, 1.0f, 1.0f );
 	for ( i = -s_ySize / 2; i < s_ySize / 2; ++i )
 	{
-		D3DXMatrixTranslation( &mTrans,
+		ArnMatrixTranslation( &mTrans,
 			0,
 			(float)i * s_tileSize,
 			0 );
 		mWorld = mScaling * mTrans;
-		V( pd3dDevice->SetTransform( D3DTS_WORLD, &mWorld ) );
+		V( pd3dDevice->SetTransform( D3DTS_WORLD, mWorld.getConstDxPtr() ) );
 		V( pd3dDevice->DrawPrimitive( D3DPT_LINELIST, 0, 1 ) );
 	}
 
-	D3DXMatrixScaling( &mScaling, (float)(s_ySize) * s_tileSize, 1.0f, 1.0f );
-	D3DXMatrixRotationZ( &mRot, D3DXToRadian( 90 ) );
+	ArnMatrixScaling( &mScaling, (float)(s_ySize) * s_tileSize, 1.0f, 1.0f );
+	ArnMatrixRotationZ( &mRot, D3DXToRadian( 90 ) );
 	for ( i = -s_xSize / 2; i < s_xSize / 2; ++i )
 	{
-		D3DXMatrixTranslation( &mTrans,
+		ArnMatrixTranslation( &mTrans,
 			(float)i * s_tileSize,
 			0,
 			0 );
 		mWorld = mScaling * mRot * mTrans;
-		V( pd3dDevice->SetTransform( D3DTS_WORLD, &mWorld ) );
+		V( pd3dDevice->SetTransform( D3DTS_WORLD, mWorld.getConstDxPtr() ) );
 		D3DPERF_BeginEvent( 0, L"Boundary Line Drawing" );
 		V( pd3dDevice->DrawPrimitive( D3DPT_LINELIST, 0, 1 ) );
 		D3DPERF_EndEvent();
@@ -698,15 +700,15 @@ void CALLBACK OnD3D9FrameRender( IDirect3DDevice9* pd3dDevice, double fTime, flo
 
 			pd3dDevice->SetTransform( D3DTS_VIEW, GetG().m_camera.GetViewMatrix() );
 			pd3dDevice->SetTransform( D3DTS_PROJECTION, GetG().m_camera.GetProjMatrix() );
-			D3DXMATRIX world;	
-			D3DXMATRIX scale;
-			D3DXMATRIX rotate;
-			D3DXMATRIX trans;
-			D3DXMatrixScaling( &scale, 0.5f, 0.5f, 0.5f );
-			D3DXMatrixRotationX( &rotate, D3DXToRadian( -90.0f ) );	
-			D3DXMatrixTranslation( &trans, -30.0f, -4.0f, 0.0f );
+			ArnMatrix world;	
+			ArnMatrix scale;
+			ArnMatrix rotate;
+			ArnMatrix trans;
+			ArnMatrixScaling( &scale, 0.5f, 0.5f, 0.5f );
+			ArnMatrixRotationX( &rotate, D3DXToRadian( -90.0f ) );	
+			ArnMatrixTranslation( &trans, -30.0f, -4.0f, 0.0f );
 			world = rotate * scale * trans;
-			pd3dDevice->SetTransform( D3DTS_WORLD, &world );
+			pd3dDevice->SetTransform( D3DTS_WORLD, world.getConstDxPtr() );
 
 			pd3dDevice->SetRenderState( D3DRS_ZENABLE, TRUE );
 
@@ -882,7 +884,7 @@ void CALLBACK OnD3D9LostDevice( void* pUserContext )
 	OnD3D9LostDeviceParticleSystem();
 
 	// GetG() related
-	GetG().m_videoMan.SetDev(0);
+	GetG().m_videoMan->SetDev(0);
 }
 
 
@@ -917,7 +919,7 @@ void CALLBACK OnD3D9DestroyDevice( void* pUserContext )
 
 
 	// GetG() related
-	GetG().m_videoMan.SetDev(0);
+	GetG().m_videoMan->SetDev(0);
 	GetG().m_screenFlash.onDestroyDevice();
 
 
@@ -1385,10 +1387,10 @@ void OnResetParticleSystem( LPDIRECT3DDEVICE9 pd3dDevice )
 	g_pParticleSystems[0]->SetLifeCycle( 0.5f );
 	g_pParticleSystems[0]->SetSize( 1.0f );
 	g_pParticleSystems[0]->SetColor( D3DXCOLOR( 1.0f, 0.0f, 0.0f, 1.0f ));
-	g_pParticleSystems[0]->SetPosition( D3DXVECTOR3( 0.0f, 5.0f, 0.0f) );
-	g_pParticleSystems[0]->SetVelocity( D3DXVECTOR3( 0.0f, 0.0f, 0.0f) );
-	g_pParticleSystems[0]->SetGravity( D3DXVECTOR3( 0.0f, 0.0f, 0.0f) );
-	g_pParticleSystems[0]->SetWind( D3DXVECTOR3( 0.0f, 0.0f, 0.0f) );
+	g_pParticleSystems[0]->SetPosition( ArnVec3( 0.0f, 5.0f, 0.0f) );
+	g_pParticleSystems[0]->SetVelocity( ArnVec3( 0.0f, 0.0f, 0.0f) );
+	g_pParticleSystems[0]->SetGravity( ArnVec3( 0.0f, 0.0f, 0.0f) );
+	g_pParticleSystems[0]->SetWind( ArnVec3( 0.0f, 0.0f, 0.0f) );
 	g_pParticleSystems[0]->SetVelocityVar( 10.0f );	
 
 	g_pParticleSystems[0]->Init( pd3dDevice );
@@ -1407,10 +1409,10 @@ void OnResetParticleSystem( LPDIRECT3DDEVICE9 pd3dDevice )
 	g_pParticleSystems[1]->SetLifeCycle( 4.0f );
 	g_pParticleSystems[1]->SetSize( 0.5f );
 	g_pParticleSystems[1]->SetColor( D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ));
-	g_pParticleSystems[1]->SetPosition( D3DXVECTOR3( 0.0f, 0.0f, 0.0f ) );
-	g_pParticleSystems[1]->SetVelocity( D3DXVECTOR3( 0.0f, 5.0f, 0.0f ) );
-	g_pParticleSystems[1]->SetGravity( D3DXVECTOR3( 0.0f, 0.0f, 0.0f ) );
-	g_pParticleSystems[1]->SetWind( D3DXVECTOR3( 2.0f, 0.0f, 0.0f ) );
+	g_pParticleSystems[1]->SetPosition( ArnVec3( 0.0f, 0.0f, 0.0f ) );
+	g_pParticleSystems[1]->SetVelocity( ArnVec3( 0.0f, 5.0f, 0.0f ) );
+	g_pParticleSystems[1]->SetGravity( ArnVec3( 0.0f, 0.0f, 0.0f ) );
+	g_pParticleSystems[1]->SetWind( ArnVec3( 2.0f, 0.0f, 0.0f ) );
 	g_pParticleSystems[1]->SetVelocityVar( 1.5f );
 
 	g_pParticleSystems[1]->Init( pd3dDevice );
@@ -1428,11 +1430,11 @@ void OnResetParticleSystem( LPDIRECT3DDEVICE9 pd3dDevice )
 	g_pParticleSystems[2]->SetLifeCycle( 5.0f );
 	g_pParticleSystems[2]->SetSize( 0.5f );
 	g_pParticleSystems[2]->SetColor( D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ));
-	g_pParticleSystems[2]->SetPosition( D3DXVECTOR3( 0.0f, 0.0f, 0.0f) );
-	g_pParticleSystems[2]->SetVelocity( D3DXVECTOR3( 0.0f, 0.0f, 0.0f) );
-	g_pParticleSystems[2]->SetGravity( D3DXVECTOR3( 0.0f, 0.0f, 0.0f) );
+	g_pParticleSystems[2]->SetPosition( ArnVec3( 0.0f, 0.0f, 0.0f) );
+	g_pParticleSystems[2]->SetVelocity( ArnVec3( 0.0f, 0.0f, 0.0f) );
+	g_pParticleSystems[2]->SetGravity( ArnVec3( 0.0f, 0.0f, 0.0f) );
 
-	g_pParticleSystems[2]->SetWind( D3DXVECTOR3( 0.0f, 0.0f, 0.0f) );
+	g_pParticleSystems[2]->SetWind( ArnVec3( 0.0f, 0.0f, 0.0f) );
 	g_pParticleSystems[2]->SetAirResistence( false );
 
 	g_pParticleSystems[2]->SetVelocityVar(2.0f);
@@ -1453,14 +1455,14 @@ void OnResetParticleSystem( LPDIRECT3DDEVICE9 pd3dDevice )
 	g_pParticleSystems[3]->SetLifeCycle( 3.0f );
 	g_pParticleSystems[3]->SetSize( 0.5f );
 	g_pParticleSystems[3]->SetColor( D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ));
-	g_pParticleSystems[3]->SetPosition( D3DXVECTOR3( 0.0f, 0.0f, 0.0f ) );
-	g_pParticleSystems[3]->SetVelocity( D3DXVECTOR3( 0.0f, 5.0f, 0.0f ) );
-	g_pParticleSystems[3]->SetGravity( D3DXVECTOR3( 0.0f, 0.0f, 0.0f ) );
-	g_pParticleSystems[3]->SetWind( D3DXVECTOR3( 0.0f, 0.0f, -20.0f ) );
+	g_pParticleSystems[3]->SetPosition( ArnVec3( 0.0f, 0.0f, 0.0f ) );
+	g_pParticleSystems[3]->SetVelocity( ArnVec3( 0.0f, 5.0f, 0.0f ) );
+	g_pParticleSystems[3]->SetGravity( ArnVec3( 0.0f, 0.0f, 0.0f ) );
+	g_pParticleSystems[3]->SetWind( ArnVec3( 0.0f, 0.0f, -20.0f ) );
 	g_pParticleSystems[3]->SetVelocityVar( 2.5f );
 
-	g_pParticleSystems[3]->SetCollisionPlane( D3DXVECTOR3( 0.0f, 0.0f,1.0f ), 
-		D3DXVECTOR3( 0.0f, 0.0f, -5.0f ),
+	g_pParticleSystems[3]->SetCollisionPlane( ArnVec3( 0.0f, 0.0f,1.0f ), 
+		ArnVec3( 0.0f, 0.0f, -5.0f ),
 		1.0f, CR_STICK );
 
 	g_pParticleSystems[3]->Init( pd3dDevice );
@@ -1478,14 +1480,14 @@ void OnResetParticleSystem( LPDIRECT3DDEVICE9 pd3dDevice )
 	g_pParticleSystems[4]->SetLifeCycle( 5.0f );
 	g_pParticleSystems[4]->SetSize( 1.5f );
 	g_pParticleSystems[4]->SetColor( D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ));
-	g_pParticleSystems[4]->SetPosition( D3DXVECTOR3( 0.0f, 0.0f, 0.0f ) );
-	g_pParticleSystems[4]->SetVelocity( D3DXVECTOR3( 0.0f, 0.0f, 0.0f ) );
-	g_pParticleSystems[4]->SetGravity( D3DXVECTOR3( 0.0f, -9.8f, 0.0f ) );
-	g_pParticleSystems[4]->SetWind( D3DXVECTOR3( 0.0f, 0.0f, 0.0f ) );
+	g_pParticleSystems[4]->SetPosition( ArnVec3( 0.0f, 0.0f, 0.0f ) );
+	g_pParticleSystems[4]->SetVelocity( ArnVec3( 0.0f, 0.0f, 0.0f ) );
+	g_pParticleSystems[4]->SetGravity( ArnVec3( 0.0f, -9.8f, 0.0f ) );
+	g_pParticleSystems[4]->SetWind( ArnVec3( 0.0f, 0.0f, 0.0f ) );
 	g_pParticleSystems[4]->SetVelocityVar( 20.0f );
 
-	g_pParticleSystems[4]->SetCollisionPlane( D3DXVECTOR3( 0.0f, 1.0f, 0.0f ), 
-		D3DXVECTOR3( 0.0f, 0.0f, 0.0f ) );
+	g_pParticleSystems[4]->SetCollisionPlane( ArnVec3( 0.0f, 1.0f, 0.0f ), 
+		ArnVec3( 0.0f, 0.0f, 0.0f ) );
 
 	g_pParticleSystems[4]->Init( pd3dDevice );
 
@@ -1502,30 +1504,30 @@ void OnResetParticleSystem( LPDIRECT3DDEVICE9 pd3dDevice )
 	g_pParticleSystems[5]->SetLifeCycle( 5.0f );
 	g_pParticleSystems[5]->SetSize( 1.0f );
 	g_pParticleSystems[5]->SetColor( D3DXCOLOR( 1.0f, 1.0f, 1.0f, 1.0f ));
-	g_pParticleSystems[5]->SetPosition( D3DXVECTOR3( 0.0f, 0.0f, 0.0f ) );
-	g_pParticleSystems[5]->SetVelocity( D3DXVECTOR3( 0.0f, 0.0f, 0.0f ) );
-	g_pParticleSystems[5]->SetGravity( D3DXVECTOR3( 0.0f, -9.8f, 0.0f ) );
-	g_pParticleSystems[5]->SetWind( D3DXVECTOR3( 0.0f, 0.0f, 0.0f ) );
+	g_pParticleSystems[5]->SetPosition( ArnVec3( 0.0f, 0.0f, 0.0f ) );
+	g_pParticleSystems[5]->SetVelocity( ArnVec3( 0.0f, 0.0f, 0.0f ) );
+	g_pParticleSystems[5]->SetGravity( ArnVec3( 0.0f, -9.8f, 0.0f ) );
+	g_pParticleSystems[5]->SetWind( ArnVec3( 0.0f, 0.0f, 0.0f ) );
 	g_pParticleSystems[5]->SetVelocityVar( 20.0f );
 
 	// Create a series of planes to collide with
-	g_pParticleSystems[5]->SetCollisionPlane( D3DXVECTOR3( 0.0f, 1.0f, 0.0f ), 
-		D3DXVECTOR3( 0.0f, 0.0f, 0.0f ) ); // Floor
+	g_pParticleSystems[5]->SetCollisionPlane( ArnVec3( 0.0f, 1.0f, 0.0f ), 
+		ArnVec3( 0.0f, 0.0f, 0.0f ) ); // Floor
 
-	g_pParticleSystems[5]->SetCollisionPlane( D3DXVECTOR3( 1.0f, 0.0f, 0.0f ), 
-		D3DXVECTOR3(-3.0f, 0.0f, 0.0f ) ); // Left Wall
+	g_pParticleSystems[5]->SetCollisionPlane( ArnVec3( 1.0f, 0.0f, 0.0f ), 
+		ArnVec3(-3.0f, 0.0f, 0.0f ) ); // Left Wall
 
-	g_pParticleSystems[5]->SetCollisionPlane( D3DXVECTOR3(-1.0f, 0.0f, 0.0f ), 
-		D3DXVECTOR3( 3.0f, 0.0f, 0.0f ) ); // Right Wall
+	g_pParticleSystems[5]->SetCollisionPlane( ArnVec3(-1.0f, 0.0f, 0.0f ), 
+		ArnVec3( 3.0f, 0.0f, 0.0f ) ); // Right Wall
 
-	g_pParticleSystems[5]->SetCollisionPlane( D3DXVECTOR3( 0.0f, 0.0f, 1.0f ), 
-		D3DXVECTOR3( 0.0f, 0.0f,-3.0f ) ); // Front Wall
+	g_pParticleSystems[5]->SetCollisionPlane( ArnVec3( 0.0f, 0.0f, 1.0f ), 
+		ArnVec3( 0.0f, 0.0f,-3.0f ) ); // Front Wall
 
-	g_pParticleSystems[5]->SetCollisionPlane( D3DXVECTOR3( 0.0f, 0.0f,-1.0f ), 
-		D3DXVECTOR3( 0.0f, 0.0f, 3.0f ) ); // Back Wall
+	g_pParticleSystems[5]->SetCollisionPlane( ArnVec3( 0.0f, 0.0f,-1.0f ), 
+		ArnVec3( 0.0f, 0.0f, 3.0f ) ); // Back Wall
 
-	g_pParticleSystems[5]->SetCollisionPlane( D3DXVECTOR3( 0.0f,-1.0f, 0.0f ), 
-		D3DXVECTOR3( 0.0f, 5.0f, 0.0f ) ); // Ceiling
+	g_pParticleSystems[5]->SetCollisionPlane( ArnVec3( 0.0f,-1.0f, 0.0f ), 
+		ArnVec3( 0.0f, 5.0f, 0.0f ) ); // Ceiling
 
 	g_pParticleSystems[5]->Init( pd3dDevice );
 

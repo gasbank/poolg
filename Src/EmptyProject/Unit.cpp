@@ -57,7 +57,7 @@ HRESULT Unit::frameRender( IDirect3DDevice9* pd3dDevice, double dTime, float fEl
 	if ( m_arnMesh )
 	{
 		pd3dDevice->SetRenderState( D3DRS_CULLMODE, D3DCULL_CW );
-		GetG().m_videoMan.renderMeshesOnly( m_arnMesh, getLocalXform() );
+		GetG().m_videoMan->renderMeshesOnly( m_arnMesh, getLocalXform() );
 		pd3dDevice->SetRenderState( D3DRS_CULLMODE, D3DCULL_CCW );
 
 		drawSoul( pd3dDevice );
@@ -216,9 +216,9 @@ HRESULT Unit::rayTesting( UnitInput mappedKey )
 
 	World* ws = GetWorldManager().getCurWorld();
 
-	D3DXVECTOR3 rayStartPos( getPos().x, getPos().y, getPos().z - 2.0f );
+	ArnVec3 rayStartPos( getPos().x, getPos().y, getPos().z - 2.0f );
 	float dirArray[4][3] = { { 0.0f, 1.0f, 0.0f }, { 0.0f, -1.0f, 0.0f }, { -1.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f } };
-	D3DXVECTOR3 rayDir( dirArray[mappedKey][0], dirArray[mappedKey][1], dirArray[mappedKey][2] );
+	ArnVec3 rayDir( dirArray[mappedKey][0], dirArray[mappedKey][1], dirArray[mappedKey][2] );
 
 	bool intersected = Utility::FullTraverseExhaustiveRayTesting( ws->getArnSceneGraphPt()->getSceneRoot(), rayStartPos, rayDir, (float)s_tileSize * 1.01f );
 	m_bMovable = !intersected;
@@ -230,7 +230,7 @@ void Unit::drawSoul( IDirect3DDevice9* pd3dDevice )
 {	
 	if ( m_bSoulAnimation )
 	{
-		pd3dDevice->SetTransform(D3DTS_WORLD, &m_localXformSoul);
+		pd3dDevice->SetTransform(D3DTS_WORLD, m_localXformSoul.getConstDxPtr());
 		pd3dDevice->SetMaterial( &m_materialSoul );
 
 		pd3dDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
@@ -250,7 +250,7 @@ void Unit::startSoulAnimation( float duration, float height )
 	m_fSoulAnimationHeight = height;
 	m_bSoulAnimation = true;
 
-	m_prevLocalXform = *(D3DXMATRIX*)&getLocalXformRaw();
+	m_prevLocalXform = *(ArnMatrix*)&getLocalXformRaw();
 	m_prevMaterial = m_material;
 }
 
@@ -269,8 +269,8 @@ void Unit::updateSoulAnimation( float fElapsedTime )
 		float ratio = sin( D3DXToRadian( m_fSoulAnimationTimer / m_fSoulAnimationDuration * 90.0f ) );
 		float height = ratio * m_fSoulAnimationHeight;
 		
-		D3DXMATRIX translation;
-		D3DXMatrixTranslation( &translation, 0.0f, 0.0f, -height );
+		ArnMatrix translation;
+		ArnMatrixTranslation( &translation, 0.0f, 0.0f, -height );
 		m_localXformSoul = m_prevLocalXform * translation;
 
 		m_materialSoul = m_prevMaterial;
@@ -282,10 +282,10 @@ void Unit::updateSoulAnimation( float fElapsedTime )
 	}
 }
 
-void Unit::setViewAt( const D3DXVECTOR3* at )
+void Unit::setViewAt( const ArnVec3* at )
 {
-	D3DXVECTOR3 positiveY( 0.0f, 1.0f, 0.0f );
-	D3DXVECTOR3 dir = *at - getPos();
+	ArnVec3 positiveY( 0.0f, 1.0f, 0.0f );
+	ArnVec3 dir = *at - getPos();
 	
 	float rad = Utility::radBetweenVectors( &positiveY, &dir );
 
@@ -316,23 +316,26 @@ void Unit::drawName( IDirect3DDevice9* pd3dDevice )
 
 		// 대상이 카메라 앞에 있는지, 뒤에 있는지 카메라의 방향 벡터와,
 		// 카메라로부터 대상까지의 방향 벡터를 내적하여 판단한다.
-		const D3DXVECTOR3* pvCamEye = GetG().m_camera.GetEyePt();
-		const D3DXVECTOR3* pvCamAt  = GetG().m_camera.GetLookAtPt();
-		D3DXVECTOR3  vCamDir  = *pvCamAt - *pvCamEye;
-		D3DXVECTOR3  vUnitDir = getPos() - *pvCamEye;
-		if ( D3DXVec3Dot( &vCamDir, &vUnitDir ) > 0 )
+		const ArnVec3 pvCamEye( GetG().m_camera.GetEyePt() );
+		const ArnVec3 pvCamAt( GetG().m_camera.GetLookAtPt() );
+		ArnVec3  vCamDir  = pvCamAt - pvCamEye;
+		ArnVec3  vUnitDir = getPos() - pvCamEye;
+		if ( ArnVec3Dot( &vCamDir, &vUnitDir ) > 0 )
 		{
-			D3DXVECTOR3 vProj;
-			D3DXMATRIX ident;
-			D3DXMatrixIdentity( &ident );
+			ArnVec3 vProj;
+			ArnMatrix ident;
+			ArnMatrixIdentity( &ident );
 
-			D3DVIEWPORT9 vp9;
-			pd3dDevice->GetViewport( &vp9 );
-			D3DXVec3Project( 
-				&vProj, &getPos(),
+			ArnViewportData vp9;
+			pd3dDevice->GetViewport( (D3DVIEWPORT9*)&vp9 );
+			ArnMatrix pm( GetG().m_camera.GetProjMatrix() );
+			ArnMatrix vm( GetG().m_camera.GetViewMatrix() );
+			ArnVec3Project( 
+				&vProj,
+				&getPos(),
 				&vp9,
-				GetG().m_camera.GetProjMatrix(),
-				GetG().m_camera.GetViewMatrix(),
+				&pm,
+				&vm,
 				&ident );
 
 			/*std::string str( "An Old Rat..." );

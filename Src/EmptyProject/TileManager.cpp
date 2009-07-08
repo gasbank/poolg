@@ -24,7 +24,7 @@ TileManager::~TileManager(void)
 {
 }
 
-int TileManager::pos2TileX( const D3DXVECTOR3* pos )
+int TileManager::pos2TileX( const ArnVec3* pos )
 {
 	for ( int i = 0; i < s_xSize; i++ )
 	{
@@ -35,7 +35,7 @@ int TileManager::pos2TileX( const D3DXVECTOR3* pos )
 	return 0;
 }
 
-int TileManager::pos2TileY( const D3DXVECTOR3* pos )
+int TileManager::pos2TileY( const ArnVec3* pos )
 {
 	for ( int i = 0; i < s_ySize; i++ )
 	{

@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "Unit.h"
 #include "TileManager.h"
+#include "ArnConsts.h"
 
 class SkillSet;
 class SkillObject;
@@ -40,7 +41,7 @@ public:
 	virtual HRESULT						frameRender( IDirect3DDevice9* pd3dDevice, double dTime, float fElapsedTime );
 	virtual bool						frameMove( double dTime, float fElapsedTime );
 	virtual LRESULT						handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
-	virtual const D3DXVECTOR3&			getPos() const { if ( m_moveImpulse != DX_CONSTS::D3DXVEC3_ZERO ) return m_curPos; else return Unit::getPos(); }
+	virtual const ArnVec3&				getPos() const { if ( m_moveImpulse != ArnConsts::D3DXVEC3_ZERO ) return m_curPos; else return Unit::getPos(); }
 	virtual void						processUnitInFront( UnitInput dir );
 
 	/* 스킬 관련 함수 */
@@ -71,7 +72,7 @@ public:
 	bool								isDead() const				{ return (m_curHp<=0); }
 
 	void								setDead();
-	void								addMoveImpulse( const D3DXVECTOR3& impulse );
+	void								addMoveImpulse( const ArnVec3& impulse );
 	
 	void								setMoveDuration( float val ) { m_moveDuration = val; }	
 	void								setBoundaryRect( LONG left, LONG top, LONG right, LONG bottom );
@@ -107,8 +108,8 @@ private:
 	TileRegion							m_boundaryTileRect;
 
 	// Move amount that applied instantly and decimated constantly on every frameMove()
-	D3DXVECTOR3							m_moveImpulse;
-	D3DXVECTOR3							m_curPos;
+	ArnVec3								m_moveImpulse;
+	ArnVec3								m_curPos;
 
 	Stat								m_stat;
 

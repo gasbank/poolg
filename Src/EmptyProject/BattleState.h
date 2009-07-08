@@ -12,13 +12,10 @@ class ProgressUi;
 class WindowMover;
 class InnerFire;
 class SkillSet;
+class Character;
 
 enum SubBattleState { SBS_NULLSTATE, SBS_PLAYER_TURN, SBS_ENEMY_TURN, SBS_LEVEL_UP };
 enum StatSelect { SS_HEALTH, SS_WILL, SS_CODING, SS_DEF, SS_SENSE, SS_IMMUNITY, SS_EXIT };
-
-typedef std::list<Enemy*> EnemyList;
-
-
 
 /**
 @brief 전투 State
@@ -130,7 +127,7 @@ private:
 	ProgressUi*				m_csIllusionEnemyProg;
 
 
-	StringList				m_battleLog;
+	ArnStringList			m_battleLog;
 	
 	InnerFire*				m_innerFire;
 

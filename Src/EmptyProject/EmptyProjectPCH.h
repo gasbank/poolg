@@ -1,3 +1,4 @@
+#pragma once
 
 #if defined(WIN32)
 	#if (_MSC_VER < 1500) // Lower than VC9.0 (2008)
@@ -61,11 +62,14 @@
 
 
 // Aran Lib
+#include "AranPCH.h"
+/*
 #include "Macros.h"
 #include "Singleton.h"
 #include "Log.h"
 #include "Structs.h"
 #include "MyError.h"
+*/
 
 #include "G.h"
 

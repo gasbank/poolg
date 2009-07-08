@@ -89,11 +89,11 @@ BattleState::BattleState()
 	m_skillContentBoxMover = new WindowMover();
 	m_statSelectBoxMover = new WindowMover();
 	m_skillContentBoxMover->
-		setPos( D3DXVECTOR3((float)scrWidth - skillBoxWidth - margin - skillContentBoxWidth, (float)scrHeight - skillBoxHeight - margin, 0),
-				D3DXVECTOR3((float)scrWidth - skillBoxWidth - margin - skillContentBoxWidth, (float)scrHeight + 10, 0));
+		setPos( ArnVec3((float)scrWidth - skillBoxWidth - margin - skillContentBoxWidth, (float)scrHeight - skillBoxHeight - margin, 0),
+				ArnVec3((float)scrWidth - skillBoxWidth - margin - skillContentBoxWidth, (float)scrHeight + 10, 0));
 	m_statSelectBoxMover->
-		setPos( D3DXVECTOR3((float)scrWidth/2, (float)margin * 2 + statusBoxHeight, 0),
-				D3DXVECTOR3((float)scrWidth + 10, (float)margin * 2 + statusBoxHeight, 0));
+		setPos( ArnVec3((float)scrWidth/2, (float)margin * 2 + statusBoxHeight, 0),
+				ArnVec3((float)scrWidth + 10, (float)margin * 2 + statusBoxHeight, 0));
 
 
 
@@ -259,7 +259,7 @@ HRESULT BattleState::leave()
 	EpCamera& camera = G::getSingleton().m_camera;
 
 	// Get hero position
-	const D3DXVECTOR3& vHeroPos = getCurWorld()->getHeroPos();
+	const ArnVec3& vHeroPos = getCurWorld()->getHeroPos();
 
 	camera.setAttachPos( &vHeroPos );
 	camera.setSmoothCameraDuration( 1.0f );
@@ -272,8 +272,8 @@ HRESULT BattleState::frameRender( IDirect3DDevice9* pd3dDevice, double fTime, fl
 {
 
 	pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
-	pd3dDevice->SetTransform(D3DTS_VIEW, &GetG().g_fixedViewMat);
-	pd3dDevice->SetTransform(D3DTS_PROJECTION, &GetG().g_orthoProjMat);
+	pd3dDevice->SetTransform(D3DTS_VIEW, GetG().g_fixedViewMat.getConstDxPtr());
+	pd3dDevice->SetTransform(D3DTS_PROJECTION, GetG().g_orthoProjMat.getConstDxPtr());
 
 	pd3dDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
 
@@ -429,7 +429,7 @@ void BattleState::renderFixedText(int scrWidth, int scrHeight)
 		rc.top -= (maxDrawLogCount - m_battleLog.size()) * lineHeight;
 	}
 	
-	StringList::const_reverse_iterator it = m_battleLog.rbegin();
+	ArnStringList::const_reverse_iterator it = m_battleLog.rbegin();
 	UINT drawLogCount = 0;
 	for ( ; it != m_battleLog.rend(); ++it )
 	{
@@ -478,24 +478,24 @@ void BattleState::renderFixedText(int scrWidth, int scrHeight)
 	// Draw all equipped skill names of hero.
 	char textBufferA[512];
 	StringCchPrintfA(textBufferA, 512, m_heroSkillSet->getSkillName(SL_FIRST).c_str());
-	g_fontSkill->DrawTextA(0, textBufferA, -1, &rc, drawTextFormat, DX_CONSTS::D3DXCOLOR_WHITE );
+	g_fontSkill->DrawTextA(0, textBufferA, -1, &rc, drawTextFormat, ArnConsts::D3DXCOLOR_WHITE.getDx() );
 	rc.top += skillLineInterval;
 	StringCchPrintfA(textBufferA, 512, m_heroSkillSet->getSkillName(SL_SECOND).c_str());
-	g_fontSkill->DrawTextA(0, textBufferA, -1, &rc, drawTextFormat, DX_CONSTS::D3DXCOLOR_WHITE );
+	g_fontSkill->DrawTextA(0, textBufferA, -1, &rc, drawTextFormat, ArnConsts::D3DXCOLOR_WHITE.getDx() );
 	rc.top += skillLineInterval;
 	StringCchPrintfA(textBufferA, 512, m_heroSkillSet->getSkillName(SL_THIRD).c_str());
-	g_fontSkill->DrawTextA(0, textBufferA, -1, &rc, drawTextFormat, DX_CONSTS::D3DXCOLOR_WHITE );
+	g_fontSkill->DrawTextA(0, textBufferA, -1, &rc, drawTextFormat, ArnConsts::D3DXCOLOR_WHITE.getDx() );
 	rc.top += skillLineInterval;
 	StringCchPrintfA(textBufferA, 512, m_heroSkillSet->getSkillName(SL_FOURTH).c_str());
-	g_fontSkill->DrawTextA(0, textBufferA, -1, &rc, drawTextFormat, DX_CONSTS::D3DXCOLOR_WHITE );
+	g_fontSkill->DrawTextA(0, textBufferA, -1, &rc, drawTextFormat, ArnConsts::D3DXCOLOR_WHITE.getDx() );
 	rc.top += skillLineInterval;
 	StringCchPrintfA(textBufferA, 512, m_heroSkillSet->getSkillName(SL_FIFTH).c_str());
-	g_fontSkill->DrawTextA(0, textBufferA, -1, &rc, drawTextFormat, DX_CONSTS::D3DXCOLOR_WHITE );
+	g_fontSkill->DrawTextA(0, textBufferA, -1, &rc, drawTextFormat, ArnConsts::D3DXCOLOR_WHITE.getDx() );
 
 	/* Draw currently selected skill of hero. */
 	rc.top = scrHeight - 190 + skillLineInterval * m_curSelSkill;
 	StringCchPrintfA(textBufferA, 512, m_heroSkillSet->getSkillName( m_curSelSkill ).c_str());
-	g_fontSkill->DrawTextA(0, textBufferA, -1, &rc, drawTextFormat, DX_CONSTS::D3DXCOLOR_RED );
+	g_fontSkill->DrawTextA(0, textBufferA, -1, &rc, drawTextFormat, ArnConsts::D3DXCOLOR_RED.getDx() );
 	
 
 	//rc.top = scrHeight - 190;
@@ -673,8 +673,8 @@ void BattleState::setupCamera()
 	// WorldState에 접근하기 위한 코드.
 	TopStateManager& tsm = TopStateManager::getSingleton();
 	World* ws = GetWorldManager().getCurWorld();
-	const D3DXVECTOR3& vEnemyPos = getFirstEnemy()->getPos();
-	const D3DXVECTOR3& vHeroPos = ws->getHeroPos();
+	const ArnVec3& vEnemyPos = getFirstEnemy()->getPos();
+	const ArnVec3& vHeroPos = ws->getHeroPos();
 
 	GetG().m_camera.beginShoulderLookCamera( &vHeroPos, &vEnemyPos );
 }

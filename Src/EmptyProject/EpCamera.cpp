@@ -126,7 +126,10 @@ void EpCamera::setViewParamsWithUp( ArnVec3* pvEyePt, ArnVec3* pvLookatPt, const
 	// TODO: Should be verified...
 
 	// Calc the view matrix
-	ArnMatrixLookAtLH( reinterpret_cast<ArnMatrix*>(&m_mView), pvEyePt, pvLookatPt, &vUp );
+	ArnMatrix view;
+	ArnMatrixLookAtLH( &view, pvEyePt, pvLookatPt, &vUp );
+	view = view.transpose();
+	memcpy(&m_mView, &view, sizeof(float)*4*4);
 
 	ArnMatrix mInvView;
 	ArnMatrixInverse( &mInvView, NULL, reinterpret_cast<ArnMatrix*>(&m_mView) );

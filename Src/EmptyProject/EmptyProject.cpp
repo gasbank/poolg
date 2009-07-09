@@ -279,6 +279,7 @@ HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFA
 	ArnVec3 eye(0, 0, -50.0f), at(0, 0, 0), up(0, 1.0f, 0);
 	ArnMatrixOrthoLH(&GetG().g_orthoProjMat, (FLOAT)pBackBufferSurfaceDesc->Width, (FLOAT)pBackBufferSurfaceDesc->Height, 0.1f, 100.0f);
 	ArnMatrixLookAtLH(&GetG().g_fixedViewMat,	&eye, &at, &up);
+	GetG().g_fixedViewMat = GetG().g_fixedViewMat.transpose();
 
 	float fAspectRatio = pBackBufferSurfaceDesc->Width / ( FLOAT )pBackBufferSurfaceDesc->Height;
 	GetG().m_camera.SetProjParams( D3DX_PI / 4, fAspectRatio, 1.0f, 1000.0f );

@@ -14,7 +14,7 @@ namespace eval EpLobbyWorld {
 		
 		EpOutputDebugString " - [info level 0] called\n"
 		
-		set pHeroUnit				[ getHero { 43 79 } ];
+		set pHeroUnit				[ getHero { 44 79 } ];
 		EpCharacterSetControllable	$pHeroUnit 1
 		
 		                                           # Health Will Coding Defence Sense Immunity

@@ -1100,7 +1100,7 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 #if defined(DEBUG) | defined(_DEBUG)
 	_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 #endif
-	GetG().m_videoMan = VideoMan::create(RENDERER_DX9, 640, 480, argc, argv);
+	GetG().m_videoMan = VideoMan::create(RENDERER_DX9, 640, 480, 0, 0);
 	ZeroMemory( g_bst, sizeof(LPD3DXMESH) * 4 );
 
 	// TODO: Perform any application-level initialization here

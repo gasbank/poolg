@@ -39,8 +39,6 @@ HRESULT PlayState::frameRender( IDirect3DDevice9* pd3dDevice, double fTime, floa
 {
 	getCurWorld()->frameRender( pd3dDevice, fTime, fElapsedTime );
 
-	
-	
 	GetSpriteManager().frameRenderSpecificSprite( "PlayUI" );
 
 	return S_OK;

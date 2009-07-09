@@ -45,7 +45,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../RakNet/include;../RakNet_RPC3;../../../AranLib_Decouple/Aran;../DXUT/include;../tcl/include;../EpCommonLibrary"
+				AdditionalIncludeDirectories="../RakNet/include;../RakNet_RPC3;../../../AranLib_Decouple/Aran;../../../Aran_trunk/DXUT/Core;../../../Aran_trunk/DXUT/Optional;../DXUT/include;../tcl/include;../EpCommonLibrary"
 				PreprocessorDefinitions="WIN32;_DEBUG;DEBUG;_WINDOWS;USE_XACT3;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -72,7 +72,7 @@
 				AdditionalOptions="/IGNORE:4089"
 				AdditionalDependencies="Aran.lib tcl85g.lib DXUT.lib DXUTOpt.lib dxerr.lib dxguid.lib d3dx9d.lib d3d9.lib winmm.lib comctl32.lib RakNetDLLDebug.lib RakNet_RPC3.lib EpCommonLibrary.lib glew32.lib xerces-c_3D.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="../Build/DebugLib;../tcl/lib;../RakNet/lib;../EpCommonLibrary/Debug;../DXUT/lib"
+				AdditionalLibraryDirectories="../Build/DebugLib;../tcl/lib;../RakNet/lib;../EpCommonLibrary/Debug"
 				GenerateManifest="false"
 				DelayLoadDLLs=""
 				GenerateDebugInformation="true"

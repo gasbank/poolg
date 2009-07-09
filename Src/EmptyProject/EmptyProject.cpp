@@ -1088,7 +1088,7 @@ void CreateScriptManagerIfNotExist()
 	OnFrameMove에서는 D3D Device와 연관된 코드를 작성하지 않아야 함을 의미합니다.
 */
 #ifdef DEBUG
-int main()
+int main(int argc, char** argv)
 {
 	system( "title EmptyProject Console" );
 #else
@@ -1099,7 +1099,7 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 #if defined(DEBUG) | defined(_DEBUG)
 	_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 #endif
-
+	GetG().m_videoMan = VideoMan::create(RENDERER_DX9, 640, 480, argc, argv);
 	ZeroMemory( g_bst, sizeof(LPD3DXMESH) * 4 );
 
 	// TODO: Perform any application-level initialization here
@@ -1307,7 +1307,6 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 	ResetEvent( g_consoleReleasedEvent ); 
 	g_closeConsole = 1;
 	WaitForSingleObject( g_consoleReleasedEvent, INFINITE );
-	
 #endif
 
 	if ( g_clientPeer && g_clientPeer->IsConnected( g_clientPeer->GetSystemAddressFromIndex( 0 ) ) )
@@ -1346,6 +1345,7 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 	delete g_spriteManager;
 	delete g_skillManager;
 	delete g_epLight;
+	delete GetG().m_videoMan;
 	
 	Tcl_Finalize();
 

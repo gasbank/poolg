@@ -87,7 +87,7 @@ enum RPC3TagFlag
 struct RPC3Tag
 {
 	RPC3Tag() {}
-	RPC3Tag(void *_v, unsigned int _count, RPC3TagFlag _flag) : v(_v), count(_count), flag(_flag) {}
+	RPC3Tag(void *_v, unsigned int _count, RPC3TagFlag _flag) : v(_v), count(_count), flag((unsigned char)_flag) {}
 	void* v;
 	unsigned int count;
 	unsigned char flag;

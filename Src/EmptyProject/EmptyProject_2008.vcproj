@@ -45,7 +45,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../RakNet/include;../RakNet_RPC3;../../../AranLib_Decouple/Aran;../../../Aran_trunk/DXUT/Core;../../../Aran_trunk/DXUT/Optional;../DXUT/include;../tcl/include;../EpCommonLibrary"
+				AdditionalIncludeDirectories="../../../aran/Src;../../../aran/Src/Aran;../../../aran/Src/AranMath;../../../aran/Src/AranPhy;../../../DXUT/Core;../../../DXUT/Optional;../EpCommonLibrary;../RakNet_RPC3;../RakNet/include;../tcl/include"
 				PreprocessorDefinitions="WIN32;_DEBUG;DEBUG;_WINDOWS;USE_XACT3;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -56,7 +56,7 @@
 				WarnAsError="true"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
-				DisableSpecificWarnings="4512"
+				DisableSpecificWarnings="4512;4251"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"

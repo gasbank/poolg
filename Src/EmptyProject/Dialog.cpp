@@ -93,8 +93,8 @@ HRESULT Dialog::frameRender( IDirect3DDevice9* pd3dDevice,  double dTime, float 
 	{
 		pd3dDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
 		pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
-		pd3dDevice->SetTransform(D3DTS_VIEW, GetG().g_fixedViewMat.getConstDxPtr());
-		pd3dDevice->SetTransform(D3DTS_PROJECTION, GetG().g_orthoProjMat.getConstDxPtr());
+		pd3dDevice->SetTransform(D3DTS_VIEW, (const D3DXMATRIX*)GetG().g_fixedViewMat.m);
+		pd3dDevice->SetTransform(D3DTS_PROJECTION, (const D3DXMATRIX*)GetG().g_orthoProjMat.m);
 
 		D3DMATERIAL9 material;
 		D3DCOLORVALUE cv, cv2;

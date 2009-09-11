@@ -185,7 +185,7 @@ bool Character::frameMove( double dTime, float fElapsedTime )
 
 	const ArnVec3& unitPos = Unit::getPos();
 	m_curPos = unitPos + m_moveImpulse;
-	if ( m_moveImpulse != ArnConsts::D3DXVEC3_ZERO )
+	if ( m_moveImpulse != ArnConsts::ARNVEC3_ZERO )
 	{
 		/*
 		printf( "%s : m_moveImpulse ", getTypeString() ); Utility::printValue( m_moveImpulse ); printf( "\n" );
@@ -196,7 +196,7 @@ bool Character::frameMove( double dTime, float fElapsedTime )
 		const float decimate = 0.5f;
 		m_moveImpulse *= decimate;
 		if ( ArnVec3Length( &m_moveImpulse ) < 1e-4 )
-			m_moveImpulse = ArnConsts::D3DXVEC3_ZERO;
+			m_moveImpulse = ArnConsts::ARNVEC3_ZERO;
 
 		//printf( "Char FM: %.2f %.2f %.2f\n", m_curPos.x, m_curPos.y, m_curPos.z );
 		setLocalXformDirty();
@@ -259,7 +259,7 @@ LRESULT Character::handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 
 
 Character::Character( UnitType type )
-: Unit( type ), m_moveImpulse( ArnConsts::D3DXVEC3_ZERO )
+: Unit( type ), m_moveImpulse( ArnConsts::ARNVEC3_ZERO )
 {
 	m_maxHp				= 5;
 	m_curHp				= m_maxHp;
@@ -269,7 +269,7 @@ Character::Character( UnitType type )
 	m_bControllable		= true;
 	m_boundaryTileRect.setStart( Point2Uint( 0, 0 ) );
 	m_boundaryTileRect.setEnd( Point2Uint( s_xSize - 1, s_ySize - 1 ) );
-	m_curPos			= ArnConsts::D3DXVEC3_ZERO;
+	m_curPos			= ArnConsts::ARNVEC3_ZERO;
 	ZeroMemory( &m_stat, sizeof(Stat) );
 	
 	// Initialize random number

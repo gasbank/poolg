@@ -1,26 +1,25 @@
-﻿/**
-	@file EmptyProject.cpp
-	@brief main()/WinMain() 함수가 있는 파일입니다.
-	EP 전반에서 쓰이는 전역 변수의 할당/초기화/해제를 담당하고 있습니다.
-	@details
-	EP는 DXUT(DirectX Utility Kit) 소스 코드를 기반으로 작성되었습니다.
-	DXUT는 DirectX 라이브러리를 좀 더 편리하게 사용할 수 있도록 도와주는 랩퍼 라이브러리라고
-	볼 수 있습니다.
-	DXUT는 화면 출력이나 입력, UI, 카메라 관련 클래스 및 비디오 게임에서 자주 사용되는
-	아주 많은 요소에 대해 다양한 프레임워크와 클래스를 제공하지만 EP에서 사용된
-	주된 기능은 화면 출력을 위한 프레임워크 및 카메라 클래스입니다. 이외의 기능은 사용하지
-	않았습니다.
-
-	본 프로그램이 처음으로 실행되었을 상태부터 끝날때까지의 함수 호출 순서는 다음과 같습니다.
-
-		-# WinMain
-		-# OnCreateDevice
-		-# OnResetDevice
-		-# OnFrameMove / OnFrameRender loop (주 루프)
-		-# OnLostDevice
-		-# OnDestroyDevice
-*/
-
+/*!
+ * @file EmptyProject.cpp
+ * @brief main()/WinMain() 함수가 있는 파일입니다.
+ *
+ * EP 전반에서 쓰이는 전역 변수의 할당/초기화/해제를 담당하고 있습니다.
+ * EP는 DXUT(DirectX Utility Kit) 소스 코드를 기반으로 작성되었습니다.
+ * DXUT는 DirectX 라이브러리를 좀 더 편리하게 사용할 수 있도록 도와주는 랩퍼 라이브러리라고
+ * 볼 수 있습니다.
+ * DXUT는 화면 출력이나 입력, UI, 카메라 관련 클래스 및 비디오 게임에서 자주 사용되는
+ * 아주 많은 요소에 대해 다양한 프레임워크와 클래스를 제공하지만 EP에서 사용된
+ * 주된 기능은 화면 출력을 위한 프레임워크 및 카메라 클래스입니다. 이외의 기능은 사용하지
+ * 않았습니다.
+ *
+ * 본 프로그램이 처음으로 실행되었을 상태부터 끝날때까지의 함수 호출 순서는 다음과 같습니다.
+ *
+ * -# WinMain
+ * -# OnCreateDevice
+ * -# OnResetDevice
+ * -# OnFrameMove / OnFrameRender loop (주 루프)
+ * -# OnLostDevice
+ * -# OnDestroyDevice
+ */
 #include "EmptyProjectPCH.h"
 #include "EmptyProject.h"
 #include "resource.h"
@@ -85,9 +84,6 @@ LPD3DXFONT							g_fontBattle					= 0;
 LPD3DXFONT							g_fontSkill						= 0;
 LPD3DXFONT							g_fontSkillDescription			= 0;
 LPD3DXFONT							g_fontStat						= 0;
-
-
-LOGMANAGER							logMan;
 
 Tcl_Interp*							g_consoleInterp					= 0;
 
@@ -213,8 +209,11 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 
 
 	/// - Aran 라이브러리의 D3D9 디바이스 값을 설정합니다.
-	assert( VideoMan::getSingleton().GetDev() == 0 );
-	VideoMan::getSingleton().SetDev( pd3dDevice );
+
+	// ARAN3 INCOMPAT
+	ARN_THROW_NOT_IMPLEMENTED_ERROR
+	//assert( VideoMan::getSingleton().GetDev() == 0 );
+	//VideoMan::getSingleton().SetDev( pd3dDevice );
 	
 	/// - G::m_screenFlash를 초기화
 	GetG().m_screenFlash.onCreateDevice( pd3dDevice, pBackBufferSurfaceDesc );
@@ -261,7 +260,10 @@ HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFA
 {
 	OutputDebugString( _T(" - INFO: OnResetDevice() called.\n") );
 
-	VideoMan::getSingleton().SetDev( pd3dDevice );
+	// ARAN3 INCOMPAT
+	ARN_THROW_NOT_IMPLEMENTED_ERROR
+	//VideoMan::getSingleton().SetDev( pd3dDevice );
+
 	GetG().m_scrWidth = pBackBufferSurfaceDesc->Width;
 	GetG().m_scrHeight = pBackBufferSurfaceDesc->Height;
 
@@ -512,8 +514,9 @@ HRESULT drawBurningTeapot( double fTime, float fElapsedTime )
 	ArnMatrixIdentity( &mWorld );
 	UINT iPass, cPasses;
 	V( g_bombShader->setMainTechnique() );
-	ArnMatrix arnvm( GetG().m_camera.GetViewMatrix() );
-	ArnMatrix arnpm( GetG().m_camera.GetProjMatrix() );
+	ArnMatrix arnvm, arnpm;
+	memcpy(arnvm.m, GetG().m_camera.GetViewMatrix()->m, sizeof(float)*16 );
+	memcpy(arnpm.m, GetG().m_camera.GetProjMatrix()->m, sizeof(float)*16 );
 	V( g_bombShader->setWorldViewProj( fTime, fElapsedTime, &mWorld, &arnvm, &arnpm ) );
 
 	V( g_bombShader->begin( &cPasses, 0 ) );
@@ -550,8 +553,8 @@ void renderDebugText()
 void renderFixedElements( double fTime, float fElapsedTime )
 {
 	DXUTGetD3D9Device()->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
-	DXUTGetD3D9Device()->SetTransform(D3DTS_VIEW, GetG().g_fixedViewMat.getConstDxPtr());
-	DXUTGetD3D9Device()->SetTransform(D3DTS_PROJECTION, GetG().g_orthoProjMat.getConstDxPtr());
+	DXUTGetD3D9Device()->SetTransform(D3DTS_VIEW, (const D3DXMATRIX*)GetG().g_fixedViewMat.m);
+	DXUTGetD3D9Device()->SetTransform(D3DTS_PROJECTION, (const D3DXMATRIX*)GetG().g_orthoProjMat.m);
 
 #ifdef DEBUG
 	renderDebugText();
@@ -585,7 +588,7 @@ HRESULT renderTileGrid( IDirect3DDevice9* pd3dDevice )
 			(float)i * s_tileSize,
 			0 );
 		mWorld = mScaling * mTrans;
-		V( pd3dDevice->SetTransform( D3DTS_WORLD, mWorld.getConstDxPtr() ) );
+		V( pd3dDevice->SetTransform( D3DTS_WORLD, (const D3DXMATRIX*)mWorld.m ) );
 		V( pd3dDevice->DrawPrimitive( D3DPT_LINELIST, 0, 1 ) );
 	}
 
@@ -598,7 +601,7 @@ HRESULT renderTileGrid( IDirect3DDevice9* pd3dDevice )
 			0,
 			0 );
 		mWorld = mScaling * mRot * mTrans;
-		V( pd3dDevice->SetTransform( D3DTS_WORLD, mWorld.getConstDxPtr() ) );
+		V( pd3dDevice->SetTransform( D3DTS_WORLD, (const D3DXMATRIX*)mWorld.m ) );
 		D3DPERF_BeginEvent( 0, L"Boundary Line Drawing" );
 		V( pd3dDevice->DrawPrimitive( D3DPT_LINELIST, 0, 1 ) );
 		D3DPERF_EndEvent();
@@ -709,7 +712,7 @@ void CALLBACK OnD3D9FrameRender( IDirect3DDevice9* pd3dDevice, double fTime, flo
 			ArnMatrixRotationX( &rotate, D3DXToRadian( -90.0f ) );	
 			ArnMatrixTranslation( &trans, -30.0f, -4.0f, 0.0f );
 			world = rotate * scale * trans;
-			pd3dDevice->SetTransform( D3DTS_WORLD, world.getConstDxPtr() );
+			pd3dDevice->SetTransform( D3DTS_WORLD, (const D3DXMATRIX*)world.m );
 
 			pd3dDevice->SetRenderState( D3DRS_ZENABLE, TRUE );
 
@@ -885,7 +888,10 @@ void CALLBACK OnD3D9LostDevice( void* pUserContext )
 	OnD3D9LostDeviceParticleSystem();
 
 	// GetG() related
-	GetG().m_videoMan->SetDev(0);
+
+	// ARAN3 INCOMPAT
+	ARN_THROW_NOT_IMPLEMENTED_ERROR
+	//GetG().m_videoMan->SetDev(0);
 }
 
 
@@ -914,13 +920,16 @@ void CALLBACK OnD3D9DestroyDevice( void* pUserContext )
 	SAFE_RELEASE( g_lineElement );
 
 	// Shaders
-	EP_SAFE_RELEASE( g_bombShader );
-	EP_SAFE_RELEASE( g_postSepiaShader );
-	EP_SAFE_RELEASE( g_postRadialBlurShader );
+	EP_SAFE_release( g_bombShader );
+	EP_SAFE_release( g_postSepiaShader );
+	EP_SAFE_release( g_postRadialBlurShader );
 
 
 	// GetG() related
-	GetG().m_videoMan->SetDev(0);
+	// ARAN3 INCOMPAT
+	ARN_THROW_NOT_IMPLEMENTED_ERROR
+	//GetG().m_videoMan->SetDev(0);
+
 	GetG().m_screenFlash.onDestroyDevice();
 
 
@@ -1100,7 +1109,11 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 #if defined(DEBUG) | defined(_DEBUG)
 	_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 #endif
-	GetG().m_videoMan = VideoMan::create(RENDERER_DX9, 640, 480, 0, 0);
+	
+	// ARAN3 INCOMPAT
+	ARN_THROW_NOT_IMPLEMENTED_ERROR
+	//GetG().m_videoMan = VideoMan::create(RENDERER_DX9, 640, 480, 0, 0);
+
 	ZeroMemory( g_bst, sizeof(LPD3DXMESH) * 4 );
 
 	// TODO: Perform any application-level initialization here
@@ -1330,7 +1343,7 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 	}
 	SAFE_DELETE( g_replicaManager );
 
-	// DO NOT USE EP_SAFE_RELEASE or SAFE_DELETE on these objects.
+	// DO NOT USE EP_SAFE_release or SAFE_DELETE on these objects.
 	// It should be allocated once time through the application lifetime,
 	// and therefore should be deallocated only once.
 

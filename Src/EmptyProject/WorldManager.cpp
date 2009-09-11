@@ -70,7 +70,7 @@ void WorldManager::detachAllWorlds()
 	std::map<std::string, World*>::iterator it = m_worlds.begin();
 	for ( ; it != m_worlds.end(); ++it )
 	{
-		EP_SAFE_RELEASE( it->second );
+		EP_SAFE_release( it->second );
 	}
 	m_worlds.clear();
 }

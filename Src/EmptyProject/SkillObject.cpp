@@ -51,7 +51,7 @@ SkillObject::~SkillObject(void)
 	//m_effectObject->release();
 	//delete m_effectObject;
 
-	EP_SAFE_RELEASE( m_dm );
+	EP_SAFE_release( m_dm );
 	EpSafeReleaseAll( m_onHitActionList );
 
 }
@@ -73,7 +73,7 @@ bool SkillObject::frameMove( double dTime, float fElapsedTime )
 	{
 		assert( m_target );
 		
-		m_target->addMoveImpulse( ArnConsts::D3DXVEC3_Z / 2.5f ); // Attacked unit shows startled shake
+		m_target->addMoveImpulse( ArnConsts::ARNVEC3_Z / 2.5f ); // Attacked unit shows startled shake
 		
 		ActionList::iterator it = m_onHitActionList.begin();
 		UINT updateInProgressCount = 0;
@@ -104,8 +104,10 @@ HRESULT SkillObject::frameRender ( IDirect3DDevice9* pd3dDevice, double dTime, f
 	UINT iPass, cPasses;
 	if ( SUCCEEDED(g_bombShader->setMainTechnique()) )
 	{
-		ArnMatrix arnvm( GetG().m_camera.GetViewMatrix() );
-		ArnMatrix arnpm( GetG().m_camera.GetProjMatrix() );
+		ArnMatrix arnvm, arnpm;
+		memcpy(arnvm.m, GetG().m_camera.GetViewMatrix()->m, sizeof(float)*16);
+		memcpy(arnpm.m, GetG().m_camera.GetProjMatrix()->m, sizeof(float)*16);
+
 		V( g_bombShader->setWorldViewProj( dTime, fElapsedTime, &getLocalXform(), &arnvm, &arnpm) );
 
 		V( g_bombShader->begin( &cPasses, 0 ) );
@@ -132,7 +134,7 @@ HRESULT SkillObject::frameRender ( IDirect3DDevice9* pd3dDevice, double dTime, f
 		{
 			setMesh( g_bst[ m_bst ] );
 		}
-		pd3dDevice->SetTransform(D3DTS_WORLD, getLocalXform().getConstDxPtr());
+		pd3dDevice->SetTransform(D3DTS_WORLD, (const D3DXMATRIX*)getLocalXform().m);
 		f = getMesh()->DrawSubset( 0 );
 	}
 	

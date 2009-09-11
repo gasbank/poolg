@@ -48,8 +48,12 @@ HRESULT World::init()
 
 	HRESULT hr = S_OK;
 
+	// ARAN3 INCOMPAT
+	ARN_THROW_NOT_IMPLEMENTED_ERROR
+	/*
 	if ( GetG().m_videoMan->GetDev() )
 		loadWorldModel();
+	*/
 
 	char command[128];
 	StringCchPrintfA( command, 128, "%s::init 0x%p", m_worldName.c_str(), this );
@@ -100,7 +104,12 @@ HRESULT World::frameRender(IDirect3DDevice9* pd3dDevice, double dTime, float fEl
 	//////////////////////////////////////////////////////////////////////////
 	// Aran lib rendering routine (CW)
 	pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CW);
-	pd3dDevice->SetFVF(ArnVertex::FVF);
+	
+	// ARAN3 INCOMPAT
+	ARN_THROW_NOT_IMPLEMENTED_ERROR
+	//pd3dDevice->SetFVF(ArnVertex::FVF);
+	
+	
 	ArnMatrix transform;
 	ArnMatrixTranslation( &transform, m_heroUnit->getPos().x, m_heroUnit->getPos().y, m_heroUnit->getPos().z );
 	GetG().m_videoMan->renderMeshesOnly(m_modelSg->getSceneRoot());
@@ -236,7 +245,7 @@ HRESULT World::release()
 {
 	// DO NOT RELEASE THIS POINTER: m_heroUnit
 
-	EP_SAFE_RELEASE( m_sound );
+	EP_SAFE_release( m_sound );
 
 	m_pic.release();
 	m_picRhw.release();
@@ -566,8 +575,11 @@ void World::loadWorldModel()
 	{
 		// World model init and loading
 		m_modelArnFile = new ArnFileData;
-		load_arnfile( m_modelFilePath.c_str(), *m_modelArnFile );
-		m_modelSg = ArnSceneGraph::createFrom(m_modelArnFile);
+
+		// ARAN3 INCOMPAT
+		ARN_THROW_NOT_IMPLEMENTED_ERROR
+		//load_arnfile( m_modelFilePath.c_str(), *m_modelArnFile );
+		//m_modelSg = ArnSceneGraph::createFrom(m_modelArnFile);
 	}
 	else if ( m_modelArnFile && m_modelSg )
 	{
@@ -581,8 +593,13 @@ void World::loadWorldModel()
 }
 void World::unloadWorldModel()
 {
+	// ARAN3 INCOMPAT
+	ARN_THROW_NOT_IMPLEMENTED_ERROR
+	/*
 	if ( m_modelArnFile )
 		release_arnfile( *m_modelArnFile );
+	*/
+
 	SAFE_DELETE( m_modelArnFile );
 	SAFE_DELETE( m_modelSg );
 }

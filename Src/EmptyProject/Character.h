@@ -41,7 +41,7 @@ public:
 	virtual HRESULT						frameRender( IDirect3DDevice9* pd3dDevice, double dTime, float fElapsedTime );
 	virtual bool						frameMove( double dTime, float fElapsedTime );
 	virtual LRESULT						handleMessages( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
-	virtual const ArnVec3&				getPos() const { if ( m_moveImpulse != ArnConsts::D3DXVEC3_ZERO ) return m_curPos; else return Unit::getPos(); }
+	virtual const ArnVec3&				getPos() const { if ( m_moveImpulse != ArnConsts::ARNVEC3_ZERO ) return m_curPos; else return Unit::getPos(); }
 	virtual void						processUnitInFront( UnitInput dir );
 
 	/* 스킬 관련 함수 */

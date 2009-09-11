@@ -210,7 +210,7 @@ bool RandomCurveDynamicMotion::frameMove( float fElapsedTime )
 	assert( getMotionTarget()->getType() == UT_SKILLOBJECT );
 
 	m_totalElapsedTime += fElapsedTime;
-	ArnVec3 targetPos = ArnConsts::D3DXVEC3_ZERO;
+	ArnVec3 targetPos = ArnConsts::ARNVEC3_ZERO;
 	if ( m_totalElapsedTime < m_duration )
 	{
 		float zeroToOne = m_totalElapsedTime / m_duration;

@@ -79,8 +79,8 @@ HRESULT CreditState::leave()
 HRESULT CreditState::frameRender( IDirect3DDevice9* pd3dDevice, double fTime, float fElapsedTime )
 {
 	pd3dDevice->SetRenderState( D3DRS_CULLMODE, D3DCULL_CCW );
-	pd3dDevice->SetTransform( D3DTS_VIEW, GetG().g_fixedViewMat.getConstDxPtr() );
-	pd3dDevice->SetTransform( D3DTS_PROJECTION, GetG().g_orthoProjMat.getConstDxPtr() );
+	pd3dDevice->SetTransform( D3DTS_VIEW, (const D3DXMATRIX*)GetG().g_fixedViewMat.m );
+	pd3dDevice->SetTransform( D3DTS_PROJECTION, (const D3DXMATRIX*)GetG().g_orthoProjMat.m );
 	setupLight( pd3dDevice );
 
 	RECT rc;
@@ -191,9 +191,9 @@ void CreditState::setupLight( IDirect3DDevice9* pd3dDevice )
 	light.Direction = ArnVec3( 0.0f, 0.0f, 1.0f );
 	light.Position = ArnVec3( 0.0f, 0.0f, -30.0f );
 	light.Range = 1000.0f;
-	light.Type = ArnLightData::ARNLIGHT_DIRECTIONAL;
+	light.Type = ARNLIGHT_DIRECTIONAL;
 
-	pd3dDevice->SetLight( 0, light.getConstDxPtr() );
+	pd3dDevice->SetLight( 0, (const D3DLIGHT9*)&light );
 	pd3dDevice->LightEnable( 0, TRUE );
 
 }

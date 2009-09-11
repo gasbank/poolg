@@ -56,12 +56,12 @@ void Shader::update( float fTime, float fElapsedTime )
 	// Draw picture map with shader settings
 	ArnMatrix mWorldViewProj;
 	ArnMatrixIdentity( &mWorldViewProj );
-	m_pConstantTable->SetMatrix( DXUTGetD3D9Device(), "mWorldViewProj", mWorldViewProj.getDxPtr() );
+	m_pConstantTable->SetMatrix( DXUTGetD3D9Device(), "mWorldViewProj", (const D3DXMATRIX*)mWorldViewProj.m );
 
 	// Set up the vertex shader constants
 	ArnMatrix mViewProj; //= *camera.GetViewMatrix() * *camera.GetProjMatrix();
 	ArnMatrixIdentity( &mViewProj );
-	m_pConstantTable->SetMatrix( DXUTGetD3D9Device(), "mViewProj", mViewProj.getDxPtr() );
+	m_pConstantTable->SetMatrix( DXUTGetD3D9Device(), "mViewProj", (const D3DXMATRIX*)mViewProj.m );
 	m_pConstantTable->SetFloat( DXUTGetD3D9Device(), "fTime", ( float )fTime );
 
 }
@@ -166,7 +166,7 @@ HRESULT BombShader::setWorldViewProj( double fTime, float fElapsedTime, const Ar
 	HRESULT hr = S_OK;
 
 	ArnMatrix wvp = *mWorld * *mView * *mProj;
-	V_RETURN( m_effect->SetMatrix( "gWvpXf", wvp.getConstDxPtr() ) );
+	V_RETURN( m_effect->SetMatrix( "gWvpXf", (const D3DXMATRIX*)wvp.m ) );
 	V_RETURN( m_effect->SetFloat( "gTimer", (float)fTime) );
 	
 
@@ -472,8 +472,8 @@ void MotionBlurShader::onFrameRender( IDirect3DDevice9* pd3dDevice, double dTime
 		V( m_effect->SetTechnique( g_hTechWorldWithVelocity ) );
 
 		// Get the projection & view matrix from the camera class
-		mProj = *GetG().m_camera.GetProjMatrix();
-		mView = *GetG().m_camera.GetViewMatrix();
+		memcpy(mProj.m, GetG().m_camera.GetProjMatrix()->m, sizeof(float)*16);
+		memcpy(mView.m, GetG().m_camera.GetViewMatrix()->m, sizeof(float)*16);
 
 		mViewProjection = mView * mProj;
 		const int NUM_WALLS = 10;
@@ -487,11 +487,11 @@ void MotionBlurShader::onFrameRender( IDirect3DDevice9* pd3dDevice, double dTime
 			mWorldViewProjectionLast = mWorldLast * g_mViewProjectionLast;
 
 			// Tell the effect where the camera is now
-			V( m_effect->SetMatrix( g_hWorldViewProjection, mWorldViewProjection.getConstDxPtr() ) );
-			V( m_effect->SetMatrix( g_hWorld, mWorld.getConstDxPtr() ) );
+			V( m_effect->SetMatrix( g_hWorldViewProjection, (const D3DXMATRIX*)mWorldViewProjection.m ) );
+			V( m_effect->SetMatrix( g_hWorld, (const D3DXMATRIX*)mWorld.m ) );
 
 			// Tell the effect where the camera was last frame
-			V( m_effect->SetMatrix( g_hWorldViewProjectionLast, mWorldViewProjectionLast.getConstDxPtr() ) );
+			V( m_effect->SetMatrix( g_hWorldViewProjectionLast, (const D3DXMATRIX*)mWorldViewProjectionLast.m ) );
 
 			// Tell the effect the current mesh's texture
 			V( m_effect->SetTexture( g_hMeshTexture, texture ) );

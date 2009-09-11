@@ -2,7 +2,6 @@
 #include "PlayState.h"
 #include "World.h"
 #include "ArnSceneGraph.h"
-#include "ArnFile.h"
 #include "SpriteManager.h"
 #include "Sprite.h"
 
@@ -76,14 +75,21 @@ void PlayState::loadArnModels()
 	// Character models are stored in 'Characters.arn' file
 	assert( m_CharactersArnFile == 0 && m_CharactersSg == 0 );
 	m_CharactersArnFile = new ArnFileData;
-	load_arnfile( _T("Characters.arn"), *m_CharactersArnFile );
-	m_CharactersSg = ArnSceneGraph::createFrom( m_CharactersArnFile );
+	
+	// ARAN3 INCOMPAT
+	ARN_THROW_NOT_IMPLEMENTED_ERROR
+	//load_arnfile( _T("Characters.arn"), *m_CharactersArnFile );
+	//m_CharactersSg = ArnSceneGraph::createFrom( m_CharactersArnFile );
 }
 
 void PlayState::unloadArnModels()
 {
 	assert( m_CharactersArnFile && m_CharactersSg );
-	release_arnfile(*m_CharactersArnFile);
+	
+	// ARAN3 INCOMPAT
+	ARN_THROW_NOT_IMPLEMENTED_ERROR
+	//release_arnfile(*m_CharactersArnFile);
+
 	SAFE_DELETE( m_CharactersArnFile );
 	SAFE_DELETE( m_CharactersSg );
 }

@@ -1,7 +1,6 @@
 ﻿#pragma once
 #include "CommonWorldInterface.h"
 #include "State.h"
-#include "ArnFile.h"
 #include "ArnSceneGraph.h"
 #include "ArnNode.h"
 #include "Picture.h"

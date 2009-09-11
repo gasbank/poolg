@@ -60,22 +60,30 @@
 #include "DXUTcamera.h"
 #include "tcl.h"
 
+//
+// Boost C++
+//
+#include <boost/shared_ptr.hpp>
+#include <boost/lambda/lambda.hpp>
+#include <boost/function.hpp>
+#include <boost/foreach.hpp>
+#include <boost/tokenizer.hpp>
+#include <boost/array.hpp>
+#define foreach BOOST_FOREACH
 
-// Aran Lib
-#include "AranPCH.h"
-/*
-#include "Macros.h"
-#include "Singleton.h"
-#include "Log.h"
-#include "Structs.h"
-#include "MyError.h"
-*/
+//
+// ARAN library
+//
+#include "AranApi.h"
 
+//
+// Singleton for storing global variables
+//
 #include "G.h"
 
-
-
+//
 // RakNet
+//
 #include "RPC3.h"
 #include "MessageIdentifiers.h"
 #include "RakNetworkFactory.h"
@@ -132,11 +140,6 @@ void cdecl odprintf(const char *format, ...);
 #include "Typedefs.h"
 #include "CommonStructs.h"
 
-#define DO_NOT_REDEFINE_NEW_KEYWORD
-#include "AranPCH.h"
-
-
-
 template<typename T> void SafeDeleteAll( T& obj ) {
 	T::iterator it = obj.begin();
 	for ( ; it != obj.end(); ++it )
@@ -150,7 +153,7 @@ template<typename T> void EpSafeReleaseAllMap( T& obj ) {
 	T::iterator it = obj.begin();
 	for ( ; it != obj.end(); ++it )
 	{
-		EP_SAFE_RELEASE( it->second );
+		EP_SAFE_release( it->second );
 	}
 	obj.clear();
 };

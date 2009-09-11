@@ -272,8 +272,8 @@ HRESULT BattleState::frameRender( IDirect3DDevice9* pd3dDevice, double fTime, fl
 {
 
 	pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
-	pd3dDevice->SetTransform(D3DTS_VIEW, GetG().g_fixedViewMat.getConstDxPtr());
-	pd3dDevice->SetTransform(D3DTS_PROJECTION, GetG().g_orthoProjMat.getConstDxPtr());
+	pd3dDevice->SetTransform(D3DTS_VIEW, (const D3DXMATRIX*)GetG().g_fixedViewMat.m);
+	pd3dDevice->SetTransform(D3DTS_PROJECTION, (const D3DXMATRIX*)GetG().g_orthoProjMat.m);
 
 	pd3dDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
 
@@ -474,28 +474,27 @@ void BattleState::renderFixedText(int scrWidth, int scrHeight)
 	rc.top = scrHeight - 190;
 	rc.left = scrWidth - 110;
 
-
 	// Draw all equipped skill names of hero.
 	char textBufferA[512];
 	StringCchPrintfA(textBufferA, 512, m_heroSkillSet->getSkillName(SL_FIRST).c_str());
-	g_fontSkill->DrawTextA(0, textBufferA, -1, &rc, drawTextFormat, ArnConsts::D3DXCOLOR_WHITE.getDx() );
+	g_fontSkill->DrawTextA(0, textBufferA, -1, &rc, drawTextFormat, 0xffffffff );
 	rc.top += skillLineInterval;
 	StringCchPrintfA(textBufferA, 512, m_heroSkillSet->getSkillName(SL_SECOND).c_str());
-	g_fontSkill->DrawTextA(0, textBufferA, -1, &rc, drawTextFormat, ArnConsts::D3DXCOLOR_WHITE.getDx() );
+	g_fontSkill->DrawTextA(0, textBufferA, -1, &rc, drawTextFormat, 0xffffffff );
 	rc.top += skillLineInterval;
 	StringCchPrintfA(textBufferA, 512, m_heroSkillSet->getSkillName(SL_THIRD).c_str());
-	g_fontSkill->DrawTextA(0, textBufferA, -1, &rc, drawTextFormat, ArnConsts::D3DXCOLOR_WHITE.getDx() );
+	g_fontSkill->DrawTextA(0, textBufferA, -1, &rc, drawTextFormat, 0xffffffff );
 	rc.top += skillLineInterval;
 	StringCchPrintfA(textBufferA, 512, m_heroSkillSet->getSkillName(SL_FOURTH).c_str());
-	g_fontSkill->DrawTextA(0, textBufferA, -1, &rc, drawTextFormat, ArnConsts::D3DXCOLOR_WHITE.getDx() );
+	g_fontSkill->DrawTextA(0, textBufferA, -1, &rc, drawTextFormat, 0xffffffff );
 	rc.top += skillLineInterval;
 	StringCchPrintfA(textBufferA, 512, m_heroSkillSet->getSkillName(SL_FIFTH).c_str());
-	g_fontSkill->DrawTextA(0, textBufferA, -1, &rc, drawTextFormat, ArnConsts::D3DXCOLOR_WHITE.getDx() );
+	g_fontSkill->DrawTextA(0, textBufferA, -1, &rc, drawTextFormat, 0xffffffff );
 
 	/* Draw currently selected skill of hero. */
 	rc.top = scrHeight - 190 + skillLineInterval * m_curSelSkill;
 	StringCchPrintfA(textBufferA, 512, m_heroSkillSet->getSkillName( m_curSelSkill ).c_str());
-	g_fontSkill->DrawTextA(0, textBufferA, -1, &rc, drawTextFormat, ArnConsts::D3DXCOLOR_RED.getDx() );
+	g_fontSkill->DrawTextA(0, textBufferA, -1, &rc, drawTextFormat, 0xff0000ff );
 	
 
 	//rc.top = scrHeight - 190;
@@ -1174,7 +1173,7 @@ void BattleState::handleEnemyTurnState()
 
 HRESULT BattleState::release()
 {
-	EP_SAFE_RELEASE( m_innerFire );
+	EP_SAFE_release( m_innerFire );
 
 	SAFE_DELETE( m_hpBarPlayerProg );
 	SAFE_DELETE( m_csBarPlayerProg );

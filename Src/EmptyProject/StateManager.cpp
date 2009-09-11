@@ -47,7 +47,7 @@ void StateManager::release()
 	StateMap::iterator it = m_states.begin();
 	for ( ; it != m_states.end(); ++it )
 	{
-		EP_SAFE_RELEASE( it->second );
+		EP_SAFE_release( it->second );
 	}
 }
 

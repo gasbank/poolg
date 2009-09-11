@@ -65,7 +65,7 @@ HRESULT ScreenFlash::frameMove( double fTime, float fElapsedTime )
 
 	ArnMatrix mWorldViewProj;
 	ArnMatrixIdentity( &mWorldViewProj );
-	V( m_alphaShader->getConstantTable()->SetMatrix( DXUTGetD3D9Device(), "mWorldViewProj", mWorldViewProj.getConstDxPtr() ) );
+	V( m_alphaShader->getConstantTable()->SetMatrix( DXUTGetD3D9Device(), "mWorldViewProj", (const D3DXMATRIX*)mWorldViewProj.m ) );
 
 
 	m_bStop = false;
@@ -140,7 +140,7 @@ HRESULT ScreenFlash::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFA
 
 void ScreenFlash::onDestroyDevice()
 {
-	EP_SAFE_RELEASE( m_alphaShader );
+	EP_SAFE_release( m_alphaShader );
 }
 
 void ScreenFlash::onLostDevice()

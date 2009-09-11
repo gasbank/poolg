@@ -54,7 +54,10 @@ float MeshRayClosestIntersectDist( LPD3DXMESH mesh, const ArnVec3& rayStartPos, 
 	float hitDist;
 
 	// Get intersection information
-	V( ArnIntersectDx9( mesh, &rayStartPos, &rayDir, &hit,  &hitFaceIndex, &hitU, &hitV, &hitDist, 0, 0 ) );
+	
+	// ARAN3 INCOMPAT
+	ARN_THROW_NOT_IMPLEMENTED_ERROR
+	//V( ArnIntersectDx9( mesh, &rayStartPos, &rayDir, &hit,  &hitFaceIndex, &hitU, &hitV, &hitDist, 0, 0 ) );
 
 	// If there is collision between ray and face
 	if ( hit )
@@ -116,14 +119,17 @@ void Utility::FullTraverseExhaustiveRayTesting(
 		float dist = 0;
 		if ( mesh->isCollide() )
 		{	
-			const ArnMatrix& meshXform = mesh->getFinalLocalXform();
-			ArnVec3 relativeRayStartPos = ArnConsts::D3DXVEC3_ZERO;
-			ArnVec3 relativeRayDir = ArnConsts::D3DXVEC3_ZERO;
+			const ArnMatrix meshXform = mesh->computeWorldXform();
+			ArnVec3 relativeRayStartPos = ArnConsts::ARNVEC3_ZERO;
+			ArnVec3 relativeRayDir = ArnConsts::ARNVEC3_ZERO;
 
 			if ( mesh->getIpoName().length() == 0 )
 			{
 				relativeRayStartPos = rayStartPos - mesh->getLocalXform_Trans();
-				dist = MeshRayClosestIntersectDist( mesh->getD3DXMesh(), relativeRayStartPos, rayDir );
+				
+				// ARAN3 INCOMPAT
+				ARN_THROW_NOT_IMPLEMENTED_ERROR
+				//dist = MeshRayClosestIntersectDist( mesh->getD3DXMesh(), relativeRayStartPos, rayDir );
 			}
 			else
 			{
@@ -136,7 +142,10 @@ void Utility::FullTraverseExhaustiveRayTesting(
 				ArnMatrixRotationQuaternion( &mRot, &qRot );
 				ArnVec3TransformCoord( &relativeRayStartPos, &rayStartPos, &meshXformInv );
 				ArnVec3TransformCoord( &relativeRayDir, &rayDir, &mRot );
-				dist = MeshRayClosestIntersectDist( mesh->getD3DXMesh(), relativeRayStartPos, relativeRayDir );
+
+				// ARAN3 INCOMPAT
+				ARN_THROW_NOT_IMPLEMENTED_ERROR
+				//dist = MeshRayClosestIntersectDist( mesh->getD3DXMesh(), relativeRayStartPos, relativeRayDir );
 			}
 		}
 		else

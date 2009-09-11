@@ -140,7 +140,7 @@ HRESULT Picture::draw(bool textured)
 	if (m_d3dxMesh)
 	{
 		// Non-rhw drawing
-		m_d3dDev->SetTransform(D3DTS_WORLD, m_localXform.getConstDxPtr());
+		m_d3dDev->SetTransform(D3DTS_WORLD, (const D3DXMATRIX*)m_localXform.m);
 		if (textured)
 			m_d3dDev->SetTexture(0, m_d3dTex);
 		else

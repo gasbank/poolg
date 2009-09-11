@@ -48,14 +48,14 @@ void EpLight::setupLight( IDirect3DDevice9* pd3dDevice )
 	m_light.Phi = D3DXToRadian(80);
 	m_light.Theta = D3DXToRadian(10);
 
-	m_light.Type = D3DLIGHT_DIRECTIONAL;
+	m_light.Type = ARNLIGHT_DIRECTIONAL;
 	m_light.Range = 1000.0f;
 
 	m_light.Attenuation0 = 1.0f;
 	m_light.Attenuation1 = 0.01f;
 	m_light.Attenuation2 = 0.0f;
 
-	pd3dDevice->SetLight(1, m_light.getConstDxPtr());
+	pd3dDevice->SetLight(1, (const D3DLIGHT9*)&m_light);
 	pd3dDevice->LightEnable( 1, TRUE );
 
 	m_cAmbient = cvAmb;
@@ -146,7 +146,7 @@ void EpLight::frameMove( FLOAT fElapsedTime )
 
 	float vDirLen = ArnVec3Length( &m_vDir );
 	if ( vDirLen < 1e-5 || vDirLen > 1e6 )
-		m_light.Direction = ArnConsts::D3DXVEC3_Z;
+		m_light.Direction = ArnConsts::ARNVEC3_Z;
 	else
 		ArnVec3Normalize((ArnVec3*)&m_light.Direction, &m_vDir);
 
@@ -315,7 +315,7 @@ void EpLight::frameRender( IDirect3DDevice9* pd3dDevice )
 	{
 		float vDirLen = ArnVec3Length( (ArnVec3*)&m_light.Direction );
 		if ( vDirLen < 1e-5 || vDirLen > 1e6 )
-			m_light.Direction = ArnConsts::D3DXVEC3_Z;
+			m_light.Direction = ArnConsts::ARNVEC3_Z;
 
 		pd3dDevice->SetLight( 1, reinterpret_cast<D3DLIGHT9*>(&m_light) );
 		m_bLightValueDirty = false;

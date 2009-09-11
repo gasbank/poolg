@@ -230,14 +230,18 @@ void Unit::drawSoul( IDirect3DDevice9* pd3dDevice )
 {	
 	if ( m_bSoulAnimation )
 	{
-		pd3dDevice->SetTransform(D3DTS_WORLD, m_localXformSoul.getConstDxPtr());
+		pd3dDevice->SetTransform(D3DTS_WORLD, (const D3DXMATRIX*)m_localXformSoul.m);
 		pd3dDevice->SetMaterial( &m_materialSoul );
 
 		pd3dDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
 		pd3dDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
 		pd3dDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
 		pd3dDevice->SetRenderState( D3DRS_CULLMODE, D3DCULL_CW );
-		m_arnMesh->getD3DXMesh()->DrawSubset( 0 );
+		
+		// ARAN3 INCOMPAT
+		ARN_THROW_NOT_IMPLEMENTED_ERROR
+		//m_arnMesh->getD3DXMesh()->DrawSubset( 0 );
+
 		pd3dDevice->SetRenderState( D3DRS_CULLMODE, D3DCULL_CCW );
 		pd3dDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
 	}
@@ -316,8 +320,8 @@ void Unit::drawName( IDirect3DDevice9* pd3dDevice )
 
 		// 대상이 카메라 앞에 있는지, 뒤에 있는지 카메라의 방향 벡터와,
 		// 카메라로부터 대상까지의 방향 벡터를 내적하여 판단한다.
-		const ArnVec3 pvCamEye( GetG().m_camera.GetEyePt() );
-		const ArnVec3 pvCamAt( GetG().m_camera.GetLookAtPt() );
+		const ArnVec3 pvCamEye( GetG().m_camera.GetEyePt()->x, GetG().m_camera.GetEyePt()->y, GetG().m_camera.GetEyePt()->z );
+		const ArnVec3 pvCamAt( GetG().m_camera.GetLookAtPt()->x, GetG().m_camera.GetLookAtPt()->y, GetG().m_camera.GetLookAtPt()->z );
 		ArnVec3  vCamDir  = pvCamAt - pvCamEye;
 		ArnVec3  vUnitDir = getPos() - pvCamEye;
 		if ( ArnVec3Dot( &vCamDir, &vUnitDir ) > 0 )
@@ -328,8 +332,9 @@ void Unit::drawName( IDirect3DDevice9* pd3dDevice )
 
 			ArnViewportData vp9;
 			pd3dDevice->GetViewport( (D3DVIEWPORT9*)&vp9 );
-			ArnMatrix pm( GetG().m_camera.GetProjMatrix() );
-			ArnMatrix vm( GetG().m_camera.GetViewMatrix() );
+			ArnMatrix pm, vm;
+			memcpy( pm.m, GetG().m_camera.GetProjMatrix()->m, sizeof(float)*16 );
+			memcpy( vm.m, GetG().m_camera.GetViewMatrix()->m, sizeof(float)*16 );
 			ArnVec3Project( 
 				&vProj,
 				&getPos(),

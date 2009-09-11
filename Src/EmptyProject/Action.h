@@ -323,7 +323,7 @@ public:
 							StartIncidentAction( Incident* incident );
 
 	virtual bool			update( double dTime, float fElapsedTime );
-	virtual void			release() { Action::release(); EP_SAFE_RELEASE( m_incident ); }
+	virtual void			release() { Action::release(); EP_SAFE_release( m_incident ); }
 private:
 	Incident*				m_incident;
 };

@@ -53,7 +53,6 @@
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="EmptyProjectPCH.h"
 				WarningLevel="4"
-				WarnAsError="true"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
 				DisableSpecificWarnings="4512;4251"
@@ -70,9 +69,9 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/IGNORE:4089"
-				AdditionalDependencies="Aran.lib tcl85g.lib DXUT.lib DXUTOpt.lib dxerr.lib dxguid.lib d3dx9d.lib d3d9.lib winmm.lib comctl32.lib RakNetDLLDebug.lib RakNet_RPC3.lib EpCommonLibrary.lib glew32.lib xerces-c_3D.lib"
+				AdditionalDependencies="AranMath_D.lib Aran_D.lib EpCommonLibrary.lib tcl85g.lib RakNetDLLDebug.lib RakNet_RPC3.lib DXUT.lib DXUTOpt.lib dxerr.lib dxguid.lib d3dx9d.lib d3d9.lib winmm.lib comctl32.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="../Build/DebugLib;../tcl/lib;../RakNet/lib;../EpCommonLibrary/Debug"
+				AdditionalLibraryDirectories="../Build/DebugLib;../tcl/lib;../RakNet/lib;../EpCommonLibrary/Debug;&quot;$(SolutionDir)/DebugDLL&quot;"
 				GenerateManifest="false"
 				DelayLoadDLLs=""
 				GenerateDebugInformation="true"
@@ -1032,6 +1031,22 @@
 		</File>
 		<File
 			RelativePath=".\Sound.h"
+			>
+		</File>
+		<File
+			RelativePath=".\Sprite.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\Sprite.h"
+			>
+		</File>
+		<File
+			RelativePath=".\SpriteManager.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\SpriteManager.h"
 			>
 		</File>
 		<File

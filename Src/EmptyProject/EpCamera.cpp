@@ -20,7 +20,7 @@ EpCamera::EpCamera(void)
 	m_nextShakeTime = 0;
 	m_minPullDist = 5.0f;
 
-	m_vEyeShake = m_vUpShake = m_vLookAtShake = ArnConsts::D3DXVEC3_ZERO;
+	m_vEyeShake = m_vUpShake = m_vLookAtShake = ArnConsts::ARNVEC3_ZERO;
 }
 
 void EpCamera::frameMove( FLOAT fElapsedTime )
@@ -150,7 +150,8 @@ void EpCamera::setViewParamsWithUp( ArnVec3* pvEyePt, ArnVec3* pvLookatPt, const
 	ArnMatrix mRotation;
 	ArnMatrixLookAtLH( &mRotation, pvEyePt, pvLookatPt, &vUp );
 	ArnQuaternionRotationMatrix( &quat, &mRotation );
-	m_ViewArcBall.SetQuatNow( quat.getDx() );
+	D3DXQUATERNION d3dxQ(quat.x, quat.y, quat.z, quat.w);
+	m_ViewArcBall.SetQuatNow( d3dxQ );
 
 	// Set the radius according to the distance
 	ArnVec3 vEyeToPoint;
@@ -190,12 +191,12 @@ void EpCamera::updateExternalCamera( ArnCamera* arnCam )
 	const ARN_NDD_CAMERA_CHUNK& arnCamData = arnCam->getCameraData();
 
 	// Extract information from localXfrom
-	ArnMatrix arnCamLocalXfrom(m_pArnCam->getFinalLocalXform());
+	ArnMatrix arnCamLocalXfrom(m_pArnCam->computeWorldXform());
 
 	// Calculate up and lookAt vectors based on local xform mat
 	ArnVec3 pos = *(ArnVec3*)&arnCamLocalXfrom.m[3][0];		// Camera position stored in 4th row of mat
-	ArnVec3 up = ArnConsts::D3DXVEC3_Y;						// Up vector basis (+Y axis)
-	ArnVec3 look = ArnConsts::D3DXVEC3_Z;					// LookAt vector basis (+Z axis)
+	ArnVec3 up = ArnConsts::ARNVEC3_Y;						// Up vector basis (+Y axis)
+	ArnVec3 look = ArnConsts::ARNVEC3_Z;					// LookAt vector basis (+Z axis)
 	ArnVec3TransformCoord( &look, &look, &arnCamLocalXfrom );	// Transform LookAt vector
 	
 	// Clear translation part of camera xform mat since Up vector is relative to

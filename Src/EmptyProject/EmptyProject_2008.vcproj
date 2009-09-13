@@ -21,7 +21,7 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="../../Working"
+			OutputDirectory="../../../Working"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
@@ -45,7 +45,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../../../aran/Src;../../../aran/Src/Aran;../../../aran/Src/AranMath;../../../aran/Src/AranPhy;../../../DXUT/Core;../../../DXUT/Optional;../EpCommonLibrary;../RakNet_RPC3;../RakNet/include;../tcl/include"
+				AdditionalIncludeDirectories="../../../aran/Src;../../../aran/Src/Aran;../../../aran/Src/AranMath;../../../aran/Src/AranPhy;../../../DXUT/Core;../../../DXUT/Optional;../EpCommonLibrary;../RakNet_RPC3;../RakNet/include;C:\Tcl\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;DEBUG;_WINDOWS;USE_XACT3;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -69,9 +69,9 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/IGNORE:4089"
-				AdditionalDependencies="AranMath_D.lib Aran_D.lib EpCommonLibrary.lib tcl85g.lib RakNetDLLDebug.lib RakNet_RPC3.lib DXUT.lib DXUTOpt.lib dxerr.lib dxguid.lib d3dx9d.lib d3d9.lib winmm.lib comctl32.lib"
+				AdditionalDependencies="AranMath_D.lib Aran_D.lib EpCommonLibrary.lib tcl85.lib RakNetDLLDebug.lib RakNet_RPC3.lib DXUT.lib DXUTOpt.lib dxerr.lib dxguid.lib d3dx9d.lib d3d9.lib winmm.lib comctl32.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="../Build/DebugLib;../tcl/lib;../RakNet/lib;../EpCommonLibrary/Debug;&quot;$(SolutionDir)/DebugDLL&quot;"
+				AdditionalLibraryDirectories="../Build/DebugLib;C:\Tcl\lib;../RakNet/lib;../EpCommonLibrary/Debug;&quot;$(SolutionDir)/DebugDLL&quot;"
 				GenerateManifest="false"
 				DelayLoadDLLs=""
 				GenerateDebugInformation="true"

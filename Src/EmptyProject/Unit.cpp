@@ -235,9 +235,8 @@ void Unit::drawSoul( IDirect3DDevice9* pd3dDevice )
 		pd3dDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
 		pd3dDevice->SetRenderState( D3DRS_CULLMODE, D3DCULL_CW );
 		
-		// ARAN3 INCOMPAT
-		ARN_THROW_NOT_IMPLEMENTED_ERROR
-		//m_arnMesh->getD3DXMesh()->DrawSubset( 0 );
+		// TODO: 적이 물리칠 때 나타나는 soul 애니메이션 수정
+		GetG().m_videoMan->renderMeshesOnly( m_arnMesh, m_localXformSoul );
 
 		pd3dDevice->SetRenderState( D3DRS_CULLMODE, D3DCULL_CCW );
 		pd3dDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);

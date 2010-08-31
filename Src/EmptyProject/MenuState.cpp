@@ -664,25 +664,20 @@ HRESULT MenuState::enter( double dStartTime )
 
 HRESULT MenuState::leave()
 {
-
-	return S_OK;
+	return State::leave();
 }
 
 HRESULT MenuState::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext )
 {
-
-	
 	return S_OK;
 }
 
 void MenuState::onLostDevice()
-{
-	
+{	
 }
 
 HRESULT MenuState::onCreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext )
 {
 	HRESULT hr = S_OK;
-
 	return hr;
 }

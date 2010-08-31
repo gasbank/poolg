@@ -110,7 +110,7 @@ HRESULT World::frameRender(IDirect3DDevice9* pd3dDevice, double dTime, float fEl
 	//////////////////////////////////////////////////////////////////////////
 	// Perspective Rendering Phase
 
-	pd3dDevice->SetRenderState( D3DRS_LIGHTING, TRUE );
+	pd3dDevice->SetRenderState( D3DRS_LIGHTING, FALSE );
 
 	D3DXMATRIX v, p, w;
 	D3DXVECTOR3 eye(0, 0, -50), at(0, 0, 0), up(0, 1, 0);

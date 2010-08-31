@@ -17,7 +17,7 @@
 // Aran Includes
 #include "ArnMesh.h"
 #include "ArnCamera.h"
-
+#include "StructsDx9.h"
 
 IMPLEMENT_SINGLETON( TileManager );
 TileManager	tileManager;
@@ -25,35 +25,50 @@ TileManager	tileManager;
 extern std::wstring						g_debugBuffer;
 extern LPD3DXMESH						g_bst[BST_COUNT];
 
+// Prototype for conversion functions
+std::wstring StringToWString(const std::string& s);
+std::string WStringToString(const std::wstring& s);
+
+std::wstring StringToWString(const std::string& s)
+{
+	std::wstring temp(s.length(),L' ');
+	std::copy(s.begin(), s.end(), temp.begin());
+	return temp;
+}
+
+
+std::string WStringToString(const std::wstring& s)
+{
+	std::string temp(s.length(), ' ');
+	std::copy(s.begin(), s.end(), temp.begin());
+	return temp;
+}
+
 World::World( const char* worldName, const TCHAR* modelFilePath )
+: m_modelSg (0)
+, m_sampleTeapotMeshRot (0)
+, m_heroUnit (0)
+, m_curDialog (0)
+, m_sound (0)
+, m_bNotEntered (true)
 {
 	m_worldName				= worldName;
 	m_modelFilePath			= modelFilePath;
-	m_modelArnFile			= 0;
-	m_modelSg				= 0;
-	m_sampleTeapotMeshRot	= 0;
-	m_heroUnit				= 0;
-	m_curDialog				= 0;
-	m_sound					= 0;
-	m_bNotEntered			= true;
+
+	std::string path (WStringToString (m_modelFilePath));
+	m_modelSg = ArnSceneGraph::createFrom (path.c_str ());
 }
 
 World::~World(void)
 {
+	SAFE_DELETE( m_modelSg );
 }
 
 HRESULT World::init()
 {
-	//assert( GetG().m_dev );
-
 	HRESULT hr = S_OK;
-
-	// ARAN3 INCOMPAT
-	ARN_THROW_NOT_IMPLEMENTED_ERROR
-	/*
 	if ( GetG().m_videoMan->GetDev() )
 		loadWorldModel();
-	*/
 
 	char command[128];
 	StringCchPrintfA( command, 128, "%s::init 0x%p", m_worldName.c_str(), this );
@@ -97,29 +112,38 @@ HRESULT World::frameRender(IDirect3DDevice9* pd3dDevice, double dTime, float fEl
 
 	pd3dDevice->SetRenderState( D3DRS_LIGHTING, TRUE );
 
+	D3DXMATRIX v, p, w;
+	D3DXVECTOR3 eye(0, 0, -50), at(0, 0, 0), up(0, 1, 0);
+	D3DXMatrixPerspectiveFovLH(&p, ArnToRadian(45.0), 1.0f, 0.0f, 1000.0f);
+	D3DXMatrixLookAtRH(&v, &eye, &at, &up);
+	D3DXMatrixIdentity(&w);
+	
 	pd3dDevice->SetTransform(D3DTS_VIEW, camera.GetViewMatrix());
 	pd3dDevice->SetTransform(D3DTS_PROJECTION, camera.GetProjMatrix());
+	
+	
+	//pd3dDevice->SetTransform(D3DTS_VIEW, &v);
+	//pd3dDevice->SetTransform(D3DTS_PROJECTION, &p);
+	//pd3dDevice->SetTransform(D3DTS_WORLD, &w);
+	
+	
 	
 
 	//////////////////////////////////////////////////////////////////////////
 	// Aran lib rendering routine (CW)
-	pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CW);
-	
-	// ARAN3 INCOMPAT
-	ARN_THROW_NOT_IMPLEMENTED_ERROR
-	//pd3dDevice->SetFVF(ArnVertex::FVF);
-	
-	
-	ArnMatrix transform;
-	ArnMatrixTranslation( &transform, m_heroUnit->getPos().x, m_heroUnit->getPos().y, m_heroUnit->getPos().z );
+	//pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CW);
+	pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
+	pd3dDevice->SetFVF(ArnVertex::FVF);
+	D3DPERF_BeginEvent(0, L"World render");
 	GetG().m_videoMan->renderMeshesOnly(m_modelSg->getSceneRoot());
+	D3DPERF_EndEvent();
 	
 	//////////////////////////////////////////////////////////////////////////
 	// EP rendering routine (CCW)
 
-	pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
-	pd3dDevice->SetTransform(D3DTS_VIEW, camera.GetViewMatrix());
-	pd3dDevice->SetTransform(D3DTS_PROJECTION, camera.GetProjMatrix());
+	//pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
+	//pd3dDevice->SetTransform(D3DTS_VIEW, camera.GetViewMatrix());
+	//pd3dDevice->SetTransform(D3DTS_PROJECTION, camera.GetProjMatrix());
 
 	UnitSet::iterator it = m_unitSet.begin();
 	for ( ; it != m_unitSet.end(); ++it )
@@ -571,38 +595,14 @@ UINT World::addIncident( Incident* inc )
 
 void World::loadWorldModel()
 {
-	if ( m_modelArnFile == 0 && m_modelSg == 0 )
-	{
-		// World model init and loading
-		m_modelArnFile = new ArnFileData;
-
-		// ARAN3 INCOMPAT
-		ARN_THROW_NOT_IMPLEMENTED_ERROR
-		//load_arnfile( m_modelFilePath.c_str(), *m_modelArnFile );
-		//m_modelSg = ArnSceneGraph::createFrom(m_modelArnFile);
-	}
-	else if ( m_modelArnFile && m_modelSg )
-	{
-		// Already loaded
-	}
-	else
-	{
-		// Partially loaded?!
-		throw std::runtime_error( "Arn file loading corrupted!" );
-	}
+	assert(m_modelSg);
+	ArnInitializeRenderableObjectsDx9(m_modelSg);
 }
 void World::unloadWorldModel()
 {
-	// ARAN3 INCOMPAT
-	ARN_THROW_NOT_IMPLEMENTED_ERROR
-	/*
-	if ( m_modelArnFile )
-		release_arnfile( *m_modelArnFile );
-	*/
-
-	SAFE_DELETE( m_modelArnFile );
-	SAFE_DELETE( m_modelSg );
+	ArnDetachRenderableObjects(m_modelSg);
 }
+
 World* World::createWorld( const char* worldName, TCHAR* modelFilePath, bool preloadDlg )
 {
 	World* ret = new World( worldName, modelFilePath );

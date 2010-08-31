@@ -6,9 +6,10 @@
 #include "Sprite.h"
 
 PlayState::PlayState(void)
-: m_CharactersArnFile( 0 )
-, m_CharactersSg( 0 )
+: m_CharactersSg( 0 )
 {
+	m_CharactersSg = ArnSceneGraph::createFrom("F:/Devel3/Working/models/Characters.xml");
+
 	m_sprite = GetSpriteManager().registerSprite( "PlayUI", "Images/PlayUI/Items.png" );
 	m_sprite->setCustomRendered( true );
 	m_sprite->registerRect( "GreenButtonBG", 0, 0, 32, 32 );
@@ -16,6 +17,8 @@ PlayState::PlayState(void)
 
 PlayState::~PlayState(void)
 {
+	delete m_CharactersSg;
+	m_CharactersSg = 0;
 }
 
 HRESULT PlayState::enter( double dStartTime )
@@ -72,26 +75,12 @@ ArnSceneGraph* PlayState::getCharacterSceneGraph() const
 
 void PlayState::loadArnModels()
 {
-	// Character models are stored in 'Characters.arn' file
-	assert( m_CharactersArnFile == 0 && m_CharactersSg == 0 );
-	m_CharactersArnFile = new ArnFileData;
-	
-	// ARAN3 INCOMPAT
-	ARN_THROW_NOT_IMPLEMENTED_ERROR
-	//load_arnfile( _T("Characters.arn"), *m_CharactersArnFile );
-	//m_CharactersSg = ArnSceneGraph::createFrom( m_CharactersArnFile );
+	ArnInitializeRenderableObjectsDx9 (m_CharactersSg);
 }
 
 void PlayState::unloadArnModels()
 {
-	assert( m_CharactersArnFile && m_CharactersSg );
-	
-	// ARAN3 INCOMPAT
-	ARN_THROW_NOT_IMPLEMENTED_ERROR
-	//release_arnfile(*m_CharactersArnFile);
-
-	SAFE_DELETE( m_CharactersArnFile );
-	SAFE_DELETE( m_CharactersSg );
+	ArnDetachRenderableObjects (m_CharactersSg);
 }
 
 HRESULT PlayState::onResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc, void* pUserContext )

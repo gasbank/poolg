@@ -35,7 +35,7 @@ void InnerFire::init(const TCHAR* imgFileName, float radius, float height, int a
 
 void InnerFire::release()
 {
-	
+	SAFE_RELEASE(m_d3dTex);
 }
 
 HRESULT InnerFire::draw(bool textured)
@@ -163,4 +163,9 @@ void InnerFire::onLostDevice()
 	SAFE_RELEASE(m_d3dTex);
 
 	Unit::onLostDevice();
+}
+
+InnerFire::~InnerFire()
+{
+	SAFE_RELEASE(m_d3dTex);
 }

@@ -1,20 +1,26 @@
 #include "EmptyProjectPCH.h"
 #include "Sprite.h"
 #include "ArnConsts.h"
+#include "ArnTextureDx9.h"
 
 Sprite::Sprite( const char* texFileName )
-: m_d3dTex( 0 ), m_bCustomRendered( false ), m_texFileName( texFileName )
+: m_d3dTex (0)
+, m_bCustomRendered (false)
+, m_texFileName (texFileName)
 {
+	m_d3dTex = ArnTexture::createFrom (m_texFileName.c_str ());
+	m_d3dTex->init();
 }
+
 Sprite::~Sprite(void)
 {
+	delete m_d3dTex;
 }
 
 void Sprite::release()
 {
-	//***SAFE_RELEASE( m_d3dTex );
-	EpSafeReleaseAll( m_drawReqList );
-	EpSafeReleaseAll( m_drawReqXformableList );
+	EpSafeReleaseAll (m_drawReqList);
+	EpSafeReleaseAll (m_drawReqXformableList);
 }
 
 void Sprite::registerRect( const char* rectName, const RECT& rect )
@@ -136,17 +142,17 @@ void Sprite::removeDrawRequest( DrawRequest*& dr )
 
 HRESULT Sprite::onResetDevice()
 {
-	ARN_THROW_NOT_IMPLEMENTED_ERROR
-
-	//***HRESULT hr = S_OK;
-	//***assert( m_d3dTex == 0 );
-	//***V_RETURN( D3DXCreateTextureFromFileA( pd3dDevice, m_texFileName.c_str(), &m_d3dTex ) );
-	//***return hr;
+	ArnDetachRenderableObjects (m_d3dTex);
+	assert(m_d3dTex);
+	ArnRenderableObject *renderable = ArnTextureDx9::createFrom (m_d3dTex);
+	assert (renderable);
+	m_d3dTex->attachChild (renderable);
+	return 0;
 }
 
 void Sprite::onLostDevice()
 {
-	//***SAFE_RELEASE( m_d3dTex );
+	ArnDetachRenderableObjects (m_d3dTex);
 }
 
 void Sprite::clearDrawRequest()

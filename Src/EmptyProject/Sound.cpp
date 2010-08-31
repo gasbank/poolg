@@ -72,7 +72,7 @@ HRESULT Sound::init()
 			pGlobalSettingsData = CoTaskMemAlloc( dwGlobalSettingsFileSize );
 			if( pGlobalSettingsData )
 			{
-				if( 0 != ReadFile( hFile, pGlobalSettingsData, dwGlobalSettingsFileSize, &dwBytesRead, NULL ) )
+				if( 0 != ReadFile( hFile, pGlobalSettingsData, dwGlobalSettingsFileSize, reinterpret_cast<LPDWORD>(&dwBytesRead), NULL ) )
 				{
 					bSuccess = true;
 				}
@@ -200,7 +200,7 @@ HRESULT Sound::init()
             audioState.pbSoundBank = new BYTE[dwFileSize];
             if( audioState.pbSoundBank )
             {
-                if( 0 != ReadFile( hFile, audioState.pbSoundBank, dwFileSize, &dwBytesRead, NULL ) )
+                if( 0 != ReadFile( hFile, audioState.pbSoundBank, dwFileSize, reinterpret_cast<LPDWORD>(&dwBytesRead), NULL ) )
                 {
                     hr = audioState.pEngine->CreateSoundBank( audioState.pbSoundBank, dwFileSize, 0,
                                                                 0, &audioState.pSoundBank );

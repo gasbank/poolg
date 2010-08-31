@@ -2,7 +2,7 @@
 #include "EpCamera.h"
 #include "ScreenFlash.h"
 
-class VideoMan;
+class VideoManDx9;
 
 /**
 	@brief EmptyProject 프로그램 전역으로 쓰이는 변수를 모아놓은 클래스
@@ -21,7 +21,7 @@ public:
 
 	EpCamera			m_camera;			///< 전역적으로 쓰이는 카메라
 	ArnLightData		m_light;			///< 전역적으로 쓰이는 광원
-	VideoMan*			m_videoMan;			///< Aran 모델을 렌더링 하기 위해 필요한 클래스
+	VideoManDx9*		m_videoMan;			///< Aran 모델을 렌더링 하기 위해 필요한 클래스
 	ScreenFlash			m_screenFlash;		///< 화면을 번쩍이게 해 주는 일을 담당하는 클래스
 
 	int					m_scrWidth;			///< 가로 해상도

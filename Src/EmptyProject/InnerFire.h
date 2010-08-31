@@ -6,6 +6,7 @@ class InnerFire : public Unit
 {
 public:
 	InnerFire();
+	~InnerFire();
 
 	void init (const TCHAR* imgFileName, float radius, float height, int angleNumber);
 	void release ();

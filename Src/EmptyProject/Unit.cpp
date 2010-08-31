@@ -56,10 +56,7 @@ HRESULT Unit::frameRender( IDirect3DDevice9* pd3dDevice, double dTime, float fEl
 
 	if ( m_arnMesh )
 	{
-		pd3dDevice->SetRenderState( D3DRS_CULLMODE, D3DCULL_CW );
 		GetG().m_videoMan->renderMeshesOnly( m_arnMesh, getLocalXform() );
-		pd3dDevice->SetRenderState( D3DRS_CULLMODE, D3DCULL_CCW );
-
 		drawSoul( pd3dDevice );
 	}
 

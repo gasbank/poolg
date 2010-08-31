@@ -64,6 +64,8 @@ void ScriptManager::executeFile( const char* fileName )
 		throw std::runtime_error("Script file opening failed");
 #endif
 
+	//Tcl_SetSystemEncoding(m_interp, "euc-kr");
+
 	if ( Tcl_EvalFile( m_interp, fileName ) != TCL_OK )
 		throwScriptErrorWithMessage( m_interp );
 }

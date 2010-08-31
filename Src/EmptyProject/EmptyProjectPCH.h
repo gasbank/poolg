@@ -75,6 +75,10 @@
 // ARAN library
 //
 #include "AranApi.h"
+#include "VideoManDx9.h"
+#include "ArnConsts.h"
+#include "AranDx9.h"
+#include "ArnTextureDx9.h"
 
 //
 // Singleton for storing global variables

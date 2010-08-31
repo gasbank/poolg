@@ -46,7 +46,7 @@
 #include "EpReplicaManagerConnection.h"
 #include "EpUser.h"
 
-
+#include "VideoManDx9.h"
 
 G									g_g;
 WorldManager*						g_wm							= 0;
@@ -174,7 +174,6 @@ bool CALLBACK ModifyDeviceSettings( DXUTDeviceSettings* pDeviceSettings, void* p
 	return true;
 }
 
-
 /*!
 	\brief 디바이스 리셋 이벤트에도 살아남는 개체를 생성합니다.
 	\param pd3dDevice D3D9 디바이스
@@ -198,6 +197,7 @@ bool CALLBACK ModifyDeviceSettings( DXUTDeviceSettings* pDeviceSettings, void* p
 
 	이후는 본 함수에서 일어나는 일 중 중요한 것을 나열한 것입니다.
 */
+
 HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFACE_DESC* pBackBufferSurfaceDesc,
 									void* pUserContext )
 {
@@ -211,9 +211,8 @@ HRESULT CALLBACK OnD3D9CreateDevice( IDirect3DDevice9* pd3dDevice, const D3DSURF
 	/// - Aran 라이브러리의 D3D9 디바이스 값을 설정합니다.
 
 	// ARAN3 INCOMPAT
-	ARN_THROW_NOT_IMPLEMENTED_ERROR
-	//assert( VideoMan::getSingleton().GetDev() == 0 );
-	//VideoMan::getSingleton().SetDev( pd3dDevice );
+	assert (GetVideoManagerDx9 ().GetDev () == 0);
+	GetVideoManagerDx9 ().SetDev (pd3dDevice);
 	
 	/// - G::m_screenFlash를 초기화
 	GetG().m_screenFlash.onCreateDevice( pd3dDevice, pBackBufferSurfaceDesc );
@@ -261,8 +260,7 @@ HRESULT CALLBACK OnD3D9ResetDevice( IDirect3DDevice9* pd3dDevice, const D3DSURFA
 	OutputDebugString( _T(" - INFO: OnResetDevice() called.\n") );
 
 	// ARAN3 INCOMPAT
-	ARN_THROW_NOT_IMPLEMENTED_ERROR
-	//VideoMan::getSingleton().SetDev( pd3dDevice );
+	GetVideoManagerDx9 ().SetDev (pd3dDevice);
 
 	GetG().m_scrWidth = pBackBufferSurfaceDesc->Width;
 	GetG().m_scrHeight = pBackBufferSurfaceDesc->Height;
@@ -888,12 +886,9 @@ void CALLBACK OnD3D9LostDevice( void* pUserContext )
 	OnD3D9LostDeviceParticleSystem();
 
 	// GetG() related
-
-	// ARAN3 INCOMPAT
-	ARN_THROW_NOT_IMPLEMENTED_ERROR
-	//GetG().m_videoMan->SetDev(0);
+	
+	GetG().m_videoMan->SetDev(0);
 }
-
 
 //--------------------------------------------------------------------------------------
 // Release D3D9 resources created in the OnD3D9CreateDevice callback 
@@ -926,9 +921,7 @@ void CALLBACK OnD3D9DestroyDevice( void* pUserContext )
 
 
 	// GetG() related
-	// ARAN3 INCOMPAT
-	ARN_THROW_NOT_IMPLEMENTED_ERROR
-	//GetG().m_videoMan->SetDev(0);
+	GetG().m_videoMan->SetDev(0);
 
 	GetG().m_screenFlash.onDestroyDevice();
 
@@ -1109,10 +1102,14 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 #if defined(DEBUG) | defined(_DEBUG)
 	_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 #endif
+
+	int err;
+	err = ArnInitializeXmlParser();
+	assert(err == 0);
+	err = ArnInitializeImageLibrary();
+	assert(err == 0);
 	
-	// ARAN3 INCOMPAT
-	ARN_THROW_NOT_IMPLEMENTED_ERROR
-	//GetG().m_videoMan = VideoMan::create(RENDERER_DX9, 640, 480, 0, 0);
+	GetG().m_videoMan = VideoManDx9::create();
 
 	ZeroMemory( g_bst, sizeof(LPD3DXMESH) * 4 );
 
@@ -1366,6 +1363,9 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 	// This should be done at the last stage of termination since
 	// many replica objects have RakNet::RakString.
 	RakNet::RakString::FreeMemory();
+
+	ArnCleanupXmlParser();
+	ArnCleanupImageLibrary();
 
 	return DXUTGetExitCode();
 }

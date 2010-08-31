@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <Working>F:\Devel3\Working\</Working>
+    <Codebase>F:\Devel3\</Codebase>
+  </PropertyGroup>
+  <PropertyGroup />
+  <ItemDefinitionGroup />
+  <ItemGroup>
+    <BuildMacro Include="Working">
+      <Value>$(Working)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Codebase">
+      <Value>$(Codebase)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

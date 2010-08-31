@@ -42,7 +42,7 @@ HRESULT Shader::compileShader( const char* functionName, const char* profile, DW
 	V_RETURN( D3DXCompileShaderFromFile( m_shaderFileName, NULL, NULL, functionName, profile, dwShaderFlags, &pCode, NULL, &m_pConstantTable ) );
 
 	// Create the vertex shader
-	hr = m_dev->CreateVertexShader( ( DWORD* )pCode->GetBufferPointer(), &m_pVertexShader );
+	hr = m_dev->CreateVertexShader(reinterpret_cast<const DWORD *>(pCode->GetBufferPointer()), &m_pVertexShader );
 	pCode->Release();
 
 	if( FAILED( hr ) )

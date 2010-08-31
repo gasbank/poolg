@@ -1,0 +1,328 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{2fc1dbab-f31f-432c-bac5-ee16bd0335df}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{82964742-5c48-4121-a154-fa85a5c4e7d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Incident">
+      <UniqueIdentifier>{67a373c7-a064-4d62-a29d-c6e706ab8aff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Unit">
+      <UniqueIdentifier>{9d5f5f9b-9c9d-4f27-a8a7-e38af81bfa45}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="State">
+      <UniqueIdentifier>{59036c6d-3b1d-486c-a7a3-50505ad3f2c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="State\Top States">
+      <UniqueIdentifier>{9abd7b5a-a85c-477b-b1a3-4352382152f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="State\PlayState%27s Substates %28World States%29">
+      <UniqueIdentifier>{ea4df292-341c-4da1-81e2-e96111750c84}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI">
+      <UniqueIdentifier>{f47ef62d-7cbf-42f2-9d10-d426f761c6ff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sprite">
+      <UniqueIdentifier>{926b64cf-4acc-4fe6-9cae-e7f89ba72b3e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tile">
+      <UniqueIdentifier>{680c9df5-3429-4fc3-ae45-9e8bcea9c6bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Skill">
+      <UniqueIdentifier>{18f57d74-b56a-4fbd-b437-41d4deafdd87}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="directx.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\Working\Shaders\Alpha.vsh">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Working\Shaders\HLSLwithoutEffects.vsh">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Working\Shaders\HLSL\vbomb.fx">
+      <Filter>Shaders</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="EmptyProject.manifest">
+      <Filter>Resource Files</Filter>
+    </Manifest>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="EmptyProject.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="resource.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderWrapper.h">
+      <Filter>Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="Action.h">
+      <Filter>Incident</Filter>
+    </ClInclude>
+    <ClInclude Include="BlockingActionIncident.h">
+      <Filter>Incident</Filter>
+    </ClInclude>
+    <ClInclude Include="Incident.h">
+      <Filter>Incident</Filter>
+    </ClInclude>
+    <ClInclude Include="NonblockingActionIncident.h">
+      <Filter>Incident</Filter>
+    </ClInclude>
+    <ClInclude Include="SequentialIncident.h">
+      <Filter>Incident</Filter>
+    </ClInclude>
+    <ClInclude Include="SingleIncident.h">
+      <Filter>Incident</Filter>
+    </ClInclude>
+    <ClInclude Include="Trigger.h">
+      <Filter>Incident</Filter>
+    </ClInclude>
+    <ClInclude Include="Character.h">
+      <Filter>Unit</Filter>
+    </ClInclude>
+    <ClInclude Include="Enemy.h">
+      <Filter>Unit</Filter>
+    </ClInclude>
+    <ClInclude Include="EpItem.h">
+      <Filter>Unit</Filter>
+    </ClInclude>
+    <ClInclude Include="Hero.h">
+      <Filter>Unit</Filter>
+    </ClInclude>
+    <ClInclude Include="InnerFire.h">
+      <Filter>Unit</Filter>
+    </ClInclude>
+    <ClInclude Include="Npc.h">
+      <Filter>Unit</Filter>
+    </ClInclude>
+    <ClInclude Include="SkillObject.h">
+      <Filter>Unit</Filter>
+    </ClInclude>
+    <ClInclude Include="StructureObject.h">
+      <Filter>Unit</Filter>
+    </ClInclude>
+    <ClInclude Include="Unit.h">
+      <Filter>Unit</Filter>
+    </ClInclude>
+    <ClInclude Include="State.h">
+      <Filter>State</Filter>
+    </ClInclude>
+    <ClInclude Include="StateManager.h">
+      <Filter>State</Filter>
+    </ClInclude>
+    <ClInclude Include="TopStateManager.h">
+      <Filter>State</Filter>
+    </ClInclude>
+    <ClInclude Include="WorldStateManager.h">
+      <Filter>State</Filter>
+    </ClInclude>
+    <ClInclude Include="CreditState.h">
+      <Filter>State\Top States</Filter>
+    </ClInclude>
+    <ClInclude Include="IntroState.h">
+      <Filter>State\Top States</Filter>
+    </ClInclude>
+    <ClInclude Include="MainState.h">
+      <Filter>State\Top States</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayState.h">
+      <Filter>State\Top States</Filter>
+    </ClInclude>
+    <ClInclude Include="BattleState.h">
+      <Filter>State\PlayState%27s Substates %28World States%29</Filter>
+    </ClInclude>
+    <ClInclude Include="FieldState.h">
+      <Filter>State\PlayState%27s Substates %28World States%29</Filter>
+    </ClInclude>
+    <ClInclude Include="MenuState.h">
+      <Filter>State\PlayState%27s Substates %28World States%29</Filter>
+    </ClInclude>
+    <ClInclude Include="ProgressUi.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="WindowMover.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Picture.h">
+      <Filter>Sprite</Filter>
+    </ClInclude>
+    <ClInclude Include="PictureMap.h">
+      <Filter>Sprite</Filter>
+    </ClInclude>
+    <ClInclude Include="Tile.h">
+      <Filter>Tile</Filter>
+    </ClInclude>
+    <ClInclude Include="TileManager.h">
+      <Filter>Tile</Filter>
+    </ClInclude>
+    <ClInclude Include="Skill.h">
+      <Filter>Skill</Filter>
+    </ClInclude>
+    <ClInclude Include="SkillManager.h">
+      <Filter>Skill</Filter>
+    </ClInclude>
+    <ClInclude Include="SkillSet.h">
+      <Filter>Skill</Filter>
+    </ClInclude>
+    <ClInclude Include="Dialog.h" />
+    <ClInclude Include="doxygen_main.h" />
+    <ClInclude Include="DynamicMotion.h" />
+    <ClInclude Include="EmptyProject.h" />
+    <ClInclude Include="EmptyProjectPCH.h" />
+    <ClInclude Include="EpCamera.h" />
+    <ClInclude Include="EpLight.h" />
+    <ClInclude Include="G.h" />
+    <ClInclude Include="ParticleSystem.h" />
+    <ClInclude Include="ScreenFlash.h" />
+    <ClInclude Include="ScriptManager.h" />
+    <ClInclude Include="SingletonCreators.h" />
+    <ClInclude Include="Sound.h" />
+    <ClInclude Include="Sprite.h" />
+    <ClInclude Include="SpriteManager.h" />
+    <ClInclude Include="Typedefs.h" />
+    <ClInclude Include="Utility.h" />
+    <ClInclude Include="World.h" />
+    <ClInclude Include="WorldManager.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ShaderWrapper.cpp">
+      <Filter>Shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="Action.cpp">
+      <Filter>Incident</Filter>
+    </ClCompile>
+    <ClCompile Include="BlockingActionIncident.cpp">
+      <Filter>Incident</Filter>
+    </ClCompile>
+    <ClCompile Include="Incident.cpp">
+      <Filter>Incident</Filter>
+    </ClCompile>
+    <ClCompile Include="NonblockingActionIncident.cpp">
+      <Filter>Incident</Filter>
+    </ClCompile>
+    <ClCompile Include="SequentialIncident.cpp">
+      <Filter>Incident</Filter>
+    </ClCompile>
+    <ClCompile Include="SingleIncident.cpp">
+      <Filter>Incident</Filter>
+    </ClCompile>
+    <ClCompile Include="Trigger.cpp">
+      <Filter>Incident</Filter>
+    </ClCompile>
+    <ClCompile Include="Character.cpp">
+      <Filter>Unit</Filter>
+    </ClCompile>
+    <ClCompile Include="Enemy.cpp">
+      <Filter>Unit</Filter>
+    </ClCompile>
+    <ClCompile Include="EpItem.cpp">
+      <Filter>Unit</Filter>
+    </ClCompile>
+    <ClCompile Include="Hero.cpp">
+      <Filter>Unit</Filter>
+    </ClCompile>
+    <ClCompile Include="InnerFire.cpp">
+      <Filter>Unit</Filter>
+    </ClCompile>
+    <ClCompile Include="Npc.cpp">
+      <Filter>Unit</Filter>
+    </ClCompile>
+    <ClCompile Include="SkillObject.cpp">
+      <Filter>Unit</Filter>
+    </ClCompile>
+    <ClCompile Include="StructureObject.cpp">
+      <Filter>Unit</Filter>
+    </ClCompile>
+    <ClCompile Include="Unit.cpp">
+      <Filter>Unit</Filter>
+    </ClCompile>
+    <ClCompile Include="State.cpp">
+      <Filter>State</Filter>
+    </ClCompile>
+    <ClCompile Include="StateManager.cpp">
+      <Filter>State</Filter>
+    </ClCompile>
+    <ClCompile Include="TopStateManager.cpp">
+      <Filter>State</Filter>
+    </ClCompile>
+    <ClCompile Include="WorldStateManager.cpp">
+      <Filter>State</Filter>
+    </ClCompile>
+    <ClCompile Include="CreditState.cpp">
+      <Filter>State\Top States</Filter>
+    </ClCompile>
+    <ClCompile Include="IntroState.cpp">
+      <Filter>State\Top States</Filter>
+    </ClCompile>
+    <ClCompile Include="MainState.cpp">
+      <Filter>State\Top States</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayState.cpp">
+      <Filter>State\Top States</Filter>
+    </ClCompile>
+    <ClCompile Include="BattleState.cpp">
+      <Filter>State\PlayState%27s Substates %28World States%29</Filter>
+    </ClCompile>
+    <ClCompile Include="FieldState.cpp">
+      <Filter>State\PlayState%27s Substates %28World States%29</Filter>
+    </ClCompile>
+    <ClCompile Include="MenuState.cpp">
+      <Filter>State\PlayState%27s Substates %28World States%29</Filter>
+    </ClCompile>
+    <ClCompile Include="ProgressUi.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="WindowMover.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Picture.cpp">
+      <Filter>Sprite</Filter>
+    </ClCompile>
+    <ClCompile Include="PictureMap.cpp">
+      <Filter>Sprite</Filter>
+    </ClCompile>
+    <ClCompile Include="Tile.cpp">
+      <Filter>Tile</Filter>
+    </ClCompile>
+    <ClCompile Include="TileManager.cpp">
+      <Filter>Tile</Filter>
+    </ClCompile>
+    <ClCompile Include="Skill.cpp">
+      <Filter>Skill</Filter>
+    </ClCompile>
+    <ClCompile Include="SkillManager.cpp">
+      <Filter>Skill</Filter>
+    </ClCompile>
+    <ClCompile Include="SkillSet.cpp">
+      <Filter>Skill</Filter>
+    </ClCompile>
+    <ClCompile Include="Dialog.cpp" />
+    <ClCompile Include="DynamicMotion.cpp" />
+    <ClCompile Include="EmptyProject.cpp" />
+    <ClCompile Include="EmptyProjectPCH.cpp" />
+    <ClCompile Include="EpCamera.cpp" />
+    <ClCompile Include="EpLight.cpp" />
+    <ClCompile Include="G.cpp" />
+    <ClCompile Include="odprintf.cpp" />
+    <ClCompile Include="ParticleSystem.cpp" />
+    <ClCompile Include="ScreenFlash.cpp" />
+    <ClCompile Include="ScriptManager.cpp" />
+    <ClCompile Include="Sound.cpp" />
+    <ClCompile Include="Sprite.cpp" />
+    <ClCompile Include="SpriteManager.cpp" />
+    <ClCompile Include="Utility.cpp" />
+    <ClCompile Include="World.cpp" />
+    <ClCompile Include="WorldManager.cpp" />
+  </ItemGroup>
+</Project>

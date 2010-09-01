@@ -51,11 +51,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Manifest Include="EmptyProject.manifest">
-      <Filter>Resource Files</Filter>
-    </Manifest>
-  </ItemGroup>
-  <ItemGroup>
     <ResourceCompile Include="EmptyProject.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>

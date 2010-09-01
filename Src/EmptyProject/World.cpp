@@ -98,37 +98,21 @@ HRESULT World::init()
 	return hr;
 }
 
-
 HRESULT World::frameRender(IDirect3DDevice9* pd3dDevice, double dTime, float fElapsedTime)
-{		
+{
 	EpCamera& camera = GetG().m_camera;
-	
-	HRESULT hr;
-
-	UNREFERENCED_PARAMETER( hr );	
-
+	HRESULT hr = S_OK;
 	//////////////////////////////////////////////////////////////////////////
 	// Perspective Rendering Phase
-
-	pd3dDevice->SetRenderState( D3DRS_LIGHTING, FALSE );
-
+	pd3dDevice->SetRenderState( D3DRS_LIGHTING, TRUE );
 	D3DXMATRIX v, p, w;
 	D3DXVECTOR3 eye(0, 0, -50), at(0, 0, 0), up(0, 1, 0);
 	D3DXMatrixPerspectiveFovLH(&p, ArnToRadian(45.0), 1.0f, 0.0f, 1000.0f);
 	D3DXMatrixLookAtRH(&v, &eye, &at, &up);
 	D3DXMatrixIdentity(&w);
-	
 	pd3dDevice->SetTransform(D3DTS_VIEW, camera.GetViewMatrix());
 	pd3dDevice->SetTransform(D3DTS_PROJECTION, camera.GetProjMatrix());
 	
-	
-	//pd3dDevice->SetTransform(D3DTS_VIEW, &v);
-	//pd3dDevice->SetTransform(D3DTS_PROJECTION, &p);
-	//pd3dDevice->SetTransform(D3DTS_WORLD, &w);
-	
-	
-	
-
 	//////////////////////////////////////////////////////////////////////////
 	// Aran lib rendering routine (CW)
 	//pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CW);
@@ -140,11 +124,6 @@ HRESULT World::frameRender(IDirect3DDevice9* pd3dDevice, double dTime, float fEl
 	
 	//////////////////////////////////////////////////////////////////////////
 	// EP rendering routine (CCW)
-
-	//pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
-	//pd3dDevice->SetTransform(D3DTS_VIEW, camera.GetViewMatrix());
-	//pd3dDevice->SetTransform(D3DTS_PROJECTION, camera.GetProjMatrix());
-
 	UnitSet::iterator it = m_unitSet.begin();
 	for ( ; it != m_unitSet.end(); ++it )
 	{
@@ -163,34 +142,25 @@ HRESULT World::frameRender(IDirect3DDevice9* pd3dDevice, double dTime, float fEl
 			}
 		}
 	}
-	
 	DialogList::iterator itDialog = m_scriptedDialog.begin();
 	for ( ; itDialog != m_scriptedDialog.end(); ++itDialog )
 	{
 		(*itDialog)->frameRender(pd3dDevice, dTime, fElapsedTime);
 	}
-
 	WorldStateManager& wsm = WorldStateManager::getSingleton();
 	wsm.getCurState()->frameRender(pd3dDevice, dTime, fElapsedTime);
-
-	return S_OK;
-
+	return hr;
 }
 
 HRESULT World::frameMove( double dTime, float fElapsedTime )
 {
 	EpCamera& camera = GetG().m_camera;
-
-	HRESULT hr;
-
-	UNREFERENCED_PARAMETER( hr );
-
+	HRESULT hr = S_OK;
 	if ( m_bNotEntered )
 	{
 		enter();
 		m_bNotEntered = false;
 	}
-	
 	m_pic.frameMove(fElapsedTime);
 	m_avatar.frameMove(fElapsedTime);
 	//camera.frameMove(fElapsedTime);
@@ -212,7 +182,6 @@ HRESULT World::frameMove( double dTime, float fElapsedTime )
 	GetWorldStateManager().getCurState()->frameMove(dTime, fElapsedTime);
 
 	m_modelSg->getSceneRoot()->update(dTime, fElapsedTime);
-	
 
 	WCHAR msg[128];
 
@@ -260,9 +229,7 @@ HRESULT World::frameMove( double dTime, float fElapsedTime )
 		// Any registered units will not be deallocated automatically
 		// until the world destructed.
 	}
-
-
-	return S_OK;
+	return hr;
 }
 
 HRESULT World::release()

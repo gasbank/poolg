@@ -1254,8 +1254,8 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 	/** - 초기 World를 설정\n
 	기본적으로 IntroState 이후 PlayState에 진입하게 되는데, PlayState에서는 여러 개의
 	로드된 World 중에 하나를 선택해야 합니다. 이러한 초기 World를 여기서 설정해줍니다.
-	어떤 World가 초기 월드가 되는지는 EpInitScript.tcl 파일의 EpStartWorldName 스크립트	변수에
-	정의되어 있습니다.
+	어떤 World가 초기 월드가 되는지는 EpInitScript.tcl 파일의 EpStartWorldName 스크립트
+	변수에 정의되어 있습니다.
 	*/
 	const char* startWorldName = GetScriptManager().readString( "EpStartWorldName" );
 	GetWorldManager().setNextWorld( startWorldName );
@@ -1323,13 +1323,11 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, int )
 	if ( g_clientPeer && g_clientPeer->IsConnected( g_clientPeer->GetSystemAddressFromIndex( 0 ) ) )
 	{
 		Unit* hero = GetWorldManager().getCurWorld()->getHero();
-
 		GetWorldManager().getCurWorld()->detachUnit( hero );		// Detach from world since Hero will be deallocated by ReplicaManager.
 		GetWorldManager().getCurWorld()->detachAllUnitBaseType();	// Detach from world since UnitBase typed instances will be deallocated by ReplicaManager.
-
 		DisconnectFromServer();
 	}
-	
+
 	if ( g_clientPeer )
 	{
 		// Be nice and let the server know we quit.

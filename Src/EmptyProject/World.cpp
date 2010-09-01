@@ -104,7 +104,7 @@ HRESULT World::frameRender(IDirect3DDevice9* pd3dDevice, double dTime, float fEl
 	HRESULT hr = S_OK;
 	//////////////////////////////////////////////////////////////////////////
 	// Perspective Rendering Phase
-	pd3dDevice->SetRenderState( D3DRS_LIGHTING, TRUE );
+	pd3dDevice->SetRenderState( D3DRS_LIGHTING, TRUE ); // TODO - Lighting
 	D3DXMATRIX v, p, w;
 	D3DXVECTOR3 eye(0, 0, -50), at(0, 0, 0), up(0, 1, 0);
 	D3DXMatrixPerspectiveFovLH(&p, ArnToRadian(45.0), 1.0f, 0.0f, 1000.0f);
@@ -115,8 +115,8 @@ HRESULT World::frameRender(IDirect3DDevice9* pd3dDevice, double dTime, float fEl
 	
 	//////////////////////////////////////////////////////////////////////////
 	// Aran lib rendering routine (CW)
-	//pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CW);
-	pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
+	pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CW);
+	//pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 	pd3dDevice->SetFVF(ArnVertex::FVF);
 	D3DPERF_BeginEvent(0, L"World render");
 	GetG().m_videoMan->renderMeshesOnly(m_modelSg->getSceneRoot());

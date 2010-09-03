@@ -1650,7 +1650,7 @@ void ConnectToServer()
 	SystemAddress clientID = UNASSIGNED_SYSTEM_ADDRESS;
 
 	// Holds user data
-	const char* serverIp = "127.0.0.1";
+	const char* serverIp = "143.248.139.115";
 	const unsigned short serverPort = 10000;
 	
 	// A client

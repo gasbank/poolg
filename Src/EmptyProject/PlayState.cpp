@@ -8,7 +8,9 @@
 PlayState::PlayState(void)
 : m_CharactersSg( 0 )
 {
-	m_CharactersSg = ArnSceneGraph::createFrom("F:/Devel3/Working/models/Characters.xml");
+	std::string charSgFilePath = getenv("WORKING");
+	charSgFilePath += "/models/Characters.xml";
+	m_CharactersSg = ArnSceneGraph::createFrom(charSgFilePath.c_str());
 
 	m_sprite = GetSpriteManager().registerSprite( "PlayUI", "Images/PlayUI/Items.png" );
 	m_sprite->setCustomRendered( true );
@@ -73,8 +75,10 @@ ArnSceneGraph* PlayState::getCharacterSceneGraph() const
 	return m_CharactersSg;
 }
 
-void PlayState::loadArnModels()
+int PlayState::loadArnModels()
 {
+	if (!m_CharactersSg)
+		throw std::runtime_error("Error - Characters scene file not availble!");
 	ArnInitializeRenderableObjectsDx9 (m_CharactersSg);
 }
 

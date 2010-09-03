@@ -26,7 +26,7 @@ public:
 	void					updateHeroItemListThumbnails();
 
 private:
-	void					loadArnModels();
+	int 					loadArnModels();
 	void					unloadArnModels();
 	ArnSceneGraph*			m_CharactersSg;
 	Sprite*					m_sprite;

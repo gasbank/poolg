@@ -36,7 +36,11 @@ ScriptManager::~ScriptManager(void)
 HRESULT ScriptManager::init()
 {
 	m_interp = Tcl_CreateInterp();
-	if ( Tcl_AppInit( m_interp ) != TCL_OK ) throw std::runtime_error( "Script init error" );
+	if ( Tcl_AppInit( m_interp ) != TCL_OK )
+	{
+		std::cout << m_interp->result << std::endl;
+		throw std::runtime_error( "Script init error" );
+	}
 	
 	return S_OK;
 }

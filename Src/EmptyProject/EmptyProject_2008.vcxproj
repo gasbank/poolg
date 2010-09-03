@@ -143,7 +143,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../../../aran/Src;../../../aran/Src/Aran;../../../aran/Src/AranMath;../../../aran/Src/AranDx9;../../../aran/Src/AranPhy;../../../DXUT/Core;../../../DXUT/Optional;../EpCommonLibrary;../RakNet_RPC3;$(Codebase)/RakNet-3.26/Source;$(Codebase)/tcl8.5.8/generic;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(Codebase)/aran/Src;$(Codebase)/aran/Src/Aran;$(Codebase)/aran/Src/AranMath;$(Codebase)/aran/Src/AranDx9;$(Codebase)/aran/Src/AranPhy;$(Codebase)/RakNet-3.26/Source;$(Codebase)/tcl8.5.8/generic;../DXUT/Core;../DXUT/Optional;../RakNet_RPC3;../EpCommonLibrary;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;DEBUG;_WINDOWS;USE_XACT3;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -156,7 +156,7 @@
     </ClCompile>
     <Link>
       <AdditionalOptions>/IGNORE:4089 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>AranMath_D.lib;Aran_D.lib;AranDx9_D.lib;EpCommonLibrary.lib;tcl85.lib;RakNetDLLDebug.lib;RakNet_RPC3.lib;DXUT.lib;DXUTOpt.lib;dxerr.lib;dxguid.lib;d3dx9d.lib;d3d9.lib;winmm.lib;comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>AranMath_D.lib;Aran_D.lib;AranDx9_D.lib;EpCommonLibrary.lib;RakNet_RPC3.lib;DXUT.lib;DXUTopt.lib;tcl85.lib;RakNetDLLDebug.lib;dxerr.lib;dxguid.lib;d3dx9d.lib;d3d9.lib;winmm.lib;comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(Working)/lib;$(Codebase)/RakNet-3.26/Lib;$(SolutionDir)/Debug;$(SolutionDir)/DebugLib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>

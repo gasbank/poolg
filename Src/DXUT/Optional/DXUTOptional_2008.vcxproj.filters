@@ -1,0 +1,74 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Sources">
+      <UniqueIdentifier>{3e0d7c87-f6af-40be-bb2e-9bbabdb9a241}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="DXUTcamera.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="DXUTgui.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="DXUTres.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="DXUTsettingsdlg.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="DXUTShapes.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="SDKmesh.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="SDKmisc.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="SDKsound.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="SDKwavefile.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="DXUTcamera.h">
+      <Filter>Sources</Filter>
+    </ClInclude>
+    <ClInclude Include="DXUTgui.h">
+      <Filter>Sources</Filter>
+    </ClInclude>
+    <ClInclude Include="DXUTlockfreepipe.h">
+      <Filter>Sources</Filter>
+    </ClInclude>
+    <ClInclude Include="DXUTres.h">
+      <Filter>Sources</Filter>
+    </ClInclude>
+    <ClInclude Include="DXUTsettingsdlg.h">
+      <Filter>Sources</Filter>
+    </ClInclude>
+    <ClInclude Include="DXUTShapes.h">
+      <Filter>Sources</Filter>
+    </ClInclude>
+    <ClInclude Include="SDKmesh.h">
+      <Filter>Sources</Filter>
+    </ClInclude>
+    <ClInclude Include="SDKmisc.h">
+      <Filter>Sources</Filter>
+    </ClInclude>
+    <ClInclude Include="SDKsound.h">
+      <Filter>Sources</Filter>
+    </ClInclude>
+    <ClInclude Include="SDKwavefile.h">
+      <Filter>Sources</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="makefile.inc">
+      <Filter>Sources</Filter>
+    </None>
+  </ItemGroup>
+</Project>

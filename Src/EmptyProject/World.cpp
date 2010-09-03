@@ -138,6 +138,7 @@ HRESULT World::frameRender(IDirect3DDevice9* pd3dDevice, double dTime, float fEl
 			{
 				// Remotely created instance by RakNet ReplicaManager.
 				pd3dDevice->SetTransform( D3DTS_WORLD, (D3DMATRIX*)&((*it)->getLocalXformRaw()) );
+				pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 				g_bst[BST_TEAPOT]->DrawSubset( 0 );
 			}
 		}

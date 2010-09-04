@@ -156,7 +156,7 @@
     </ClCompile>
     <Link>
       <AdditionalOptions>/IGNORE:4089 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>AranMath_D.lib;Aran_D.lib;AranDx9_D.lib;EpCommonLibrary.lib;RakNet_RPC3.lib;DXUT.lib;DXUTopt.lib;tcl85.lib;RakNetDLLDebug.lib;dxerr.lib;dxguid.lib;d3dx9d.lib;d3d9.lib;winmm.lib;comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>AranMath_D.lib;Aran_D.lib;AranDx9_D.lib;EpCommonLibrary_D.lib;RakNet_RPC3_D.lib;DXUT.lib;DXUTopt.lib;tcl85.lib;RakNetDLLDebug.lib;dxerr.lib;dxguid.lib;d3dx9d.lib;d3d9.lib;winmm.lib;comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(Working)/lib;$(Codebase)/RakNet-3.26/Lib;$(SolutionDir)/Debug;$(SolutionDir)/DebugLib;$(Codebase)/tcl8.5.8/win/Release_VC9;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>

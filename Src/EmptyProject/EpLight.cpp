@@ -31,16 +31,14 @@ EpLight::~EpLight(void)
 
 void EpLight::setupLight( IDirect3DDevice9* pd3dDevice )
 {
-	ZeroMemory(&m_light, sizeof(D3DLIGHT9));
-
-	D3DCOLORVALUE cvAmb = { 0.3f, 0.3f, 0.3f, 1.0f };
+	ZeroMemory(&m_light, sizeof(ArnLightData));
+	D3DCOLORVALUE cvAmb = { 1.0f, 1.0f, 1.0f, 1.0f };
 	ArnRgbaAssign(m_light.Ambient, cvAmb);
-	D3DCOLORVALUE cvDif = { 0.6f, 0.6f, 0.6f, 1.0f };
+	D3DCOLORVALUE cvDif = { 1.0f, 1.0f, 1.0f, 1.0f };
 	ArnRgbaAssign(m_light.Diffuse, cvDif);
-	D3DCOLORVALUE cvSpc = { 0.1f, 0.1f, 0.1f, 1.0f };
+	D3DCOLORVALUE cvSpc = { 0.0f, 0.0f, 0.0f, 0.0f };
 	ArnRgbaAssign(m_light.Specular, cvSpc);
 
-	
 	ArnVec3Normalize((ArnVec3*)&m_light.Direction, &m_vDir);
 	m_light.Position = m_vPos;
 
